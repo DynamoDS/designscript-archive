@@ -1,0 +1,11 @@
+[Imperative]
+{
+    def f(input)
+    {
+        return = input * 2;
+    }
+    
+    sum = 0;
+    sum = 2 + f(1);
+    k = 22;
+}

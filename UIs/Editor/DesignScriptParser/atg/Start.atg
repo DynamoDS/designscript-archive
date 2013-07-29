@@ -1,0 +1,361 @@
+
+COMPILER DesignScriptParser
+
+	public DesignScript.Parser.Associative.CodeBlockNode root { get; set; }
+	public Dictionary<string, DesignScript.Parser.Associative.ImportNode> GlobalModuleTable {get; set;}
+
+	private int localVarCount = 0;
+	private bool isGlobalScope = true;
+    private bool codeSegmentStarted = false;
+
+    private bool isLeft = false; // check if it is left hand side of the assignment expression
+
+	private bool isLeftNode() { return isLeft; }
+	private bool isArrayAccess()
+	{
+		Token pt = la;
+		if( _ident == pt.kind ) 
+		{
+			pt = scanner.Peek();
+			scanner.ResetPeek();
+			if( _openbracket == pt.kind ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private bool IsTypedVariable()
+    {
+        Token pt = la;
+
+        if (_ident == pt.kind) {
+            pt = scanner.Peek();
+            scanner.ResetPeek();
+            if (":" == pt.val) 
+                return true;
+        }
+        scanner.ResetPeek();
+        return false;
+    }
+	
+	private bool isFunctionCall()
+	{
+		Token pt = la;
+		if( _ident == pt.kind ) 
+		{
+			pt = scanner.Peek();
+			scanner.ResetPeek();
+			if( _openparen == pt.kind ) {
+				return true;
+			}
+		}
+		return false;
+	}
+   
+    private bool IsReplicationGuideIdent()
+	{
+		Token pt = la;
+
+		if( _lessthan == pt.kind ) 
+		{
+			pt = scanner.Peek();
+			if( _number == pt.kind ) 
+			{
+				pt = scanner.Peek();
+				scanner.ResetPeek();
+				if( _greaterthan == pt.kind ) 
+				{
+					return true;
+				}
+			}
+		
+		}
+		scanner.ResetPeek();
+		return false;
+	}
+
+	private bool hasIndices()
+    {
+        Token pt = la;
+        if( "[" == pt.val )
+		{ 
+			scanner.ResetPeek();
+			return true;
+        }
+		else return false;
+    }
+
+	private bool hasReturnType()
+    {
+        Token pt = la;
+        if( _ident == pt.kind ) 
+        {
+            pt = scanner.Peek();
+            scanner.ResetPeek();
+            if( _ident == pt.kind ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+	private bool IsNumber()
+    {
+        Token pt = la;
+
+        if (pt.val == "-") {
+            pt = scanner.Peek();
+            scanner.ResetPeek();
+        }
+
+        return ((_number == pt.kind) || (_float == pt.kind));
+    }
+
+	private bool isVariableDecl()
+    {
+        Token pt = la;
+        if( _ident == pt.kind ) 
+        {
+            pt = scanner.Peek();
+            scanner.ResetPeek();
+            if( _ident == pt.kind ) {
+                return true;
+            }
+        }
+
+        if (_kw_heap == pt.kind)
+        {
+            pt = scanner.Peek();
+            if (_ident == pt.kind)
+            {
+                pt = scanner.Peek();
+                if (_ident == pt.kind)
+                {
+                    scanner.ResetPeek();
+                    return true;
+                }
+            }
+        }
+        scanner.ResetPeek();
+        return false;
+    }
+
+    private string GetImportedModuleFullPath(string moduleLocation)
+    {
+        try
+        {
+            string fileName = moduleLocation.Replace("\"", String.Empty);
+            if (Path.IsPathRooted(fileName) && File.Exists(fileName))
+                return Path.GetFullPath(fileName);
+
+            string rootModuleName = core.Options.RootModulePathName;
+            string rootModuleDirectory = Directory.GetCurrentDirectory();
+            if (rootModuleName != null)
+                rootModuleDirectory = Path.GetDirectoryName(rootModuleName);
+
+            string fullPathName = Path.Combine(rootModuleDirectory, fileName);
+            if (File.Exists(fullPathName))
+                return Path.GetFullPath(fullPathName);
+
+            foreach (string directory in core.Options.IncludeDirectories)
+            {
+                fullPathName = Path.Combine(rootModuleDirectory, fileName);
+                if (File.Exists(fullPathName))
+                    return Path.GetFullPath(fullPathName);
+            }
+
+            return null;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+	private bool HasMoreAssignmentStatements()
+    {
+        Token pt = la;
+
+        if (pt.kind != _ident)
+            return false;
+
+        bool gotAssignmentToken = false;
+        bool gotEndLineToken = false;
+        bool isAssignmentStatement = false;
+
+        while (true) {
+            pt = scanner.Peek();
+            if (pt.kind == 0) {
+                break;
+            }
+            else if (pt.val == "=") {
+                isAssignmentStatement = true;
+                break;
+            }
+            else if (pt.kind == _endline) {
+                isAssignmentStatement = gotAssignmentToken;
+                break;
+            }
+            else if (pt.val == "{")
+                break;
+        }
+
+        scanner.ResetPeek();
+        return isAssignmentStatement;
+    }
+
+	private bool IsModifierStack()
+    {
+        Token pt = la;
+        if (pt.val != "{")
+        {
+            scanner.ResetPeek();
+            return false;
+        }
+
+        int counter = 1;
+        pt = scanner.Peek();
+        while (counter != 0 && pt.kind != _EOF)
+        {
+            if (pt.val == "{")
+                counter++;
+            else if (pt.val == "}")
+                counter--;
+
+            if (pt.val == ";" && counter == 1)
+            {
+                scanner.ResetPeek();
+                return true;
+            }
+
+            pt = scanner.Peek();
+        }
+
+        scanner.ResetPeek();
+        return false;
+    }
+
+CHARACTERS
+
+	uppercaseletter = 'A'..'Z'.
+	lowercaseletter = 'a'..'z'.
+	letter = uppercaseletter + lowercaseletter.
+	digit = '0'..'9'.
+	cr  = '\r'. 
+	lf  = '\n'.
+	tab = '\t'.
+	anyExcludingQuote = ANY - '"'.
+	anyExcludingSingleQuote = ANY - '\''.
+    anyButApostrophe = ANY - '\''.
+	anychar = ANY.
+	other = ANY - '/' - '*'.
+    anyExcludingEndOfLine = ANY - lf.
+
+TOKENS
+	ident = (letter | '_'){letter | digit | '_' | '@'}.
+	number = digit {digit} .
+	float = digit {digit} '.' digit {digit} [('E' | 'e') ['+'|'-'] digit {digit}].
+	textstring = '"' {anyExcludingQuote} '"'.
+	char = '\'' {anyButApostrophe} '\''.
+	period = '.'.
+
+	openbracket = '['.
+	closebracket = ']'.
+	openparen = '('.
+	closeparen = ')'.
+
+	not = '!'.
+	neg = '-'.
+	pipe = '|'.
+	lessthan = '<'.
+	greaterthan = '>'.
+	lessequal = "<=".
+	greaterequal = ">=".
+	equal = "==".
+	notequal = "!=".
+	endline = ';'.
+	rangeop = "..".
+
+    kw_native = "native".
+    kw_class = "class".
+    kw_constructor = "constructor".
+	kw_def = "def".
+    kw_external = "external".
+	kw_extend = "extends".
+	kw_public = "public".
+	kw_private = "private".
+	kw_protected = "protected".
+	kw_heap = "__heap".
+	kw_if = "if".
+    kw_elseif = "elseif".
+    kw_else = "else".
+    kw_while = "while".
+	kw_for = "for".
+	Kw_double = "double".
+	Kw_int = "int".
+	Kw_var = "var".
+    Kw_function = "function".
+	Kw_import = "import".
+	Kw_from = "from".
+	Kw_prefix = "prefix".
+	Kw_static = "static".
+	Kw_break = "break".
+	Kw_continue = "continue".
+    literal_true = "true".
+    literal_false = "false".
+    literal_null = "null".
+
+PRAGMAS
+
+    inlinecomment =  "//" {anyExcludingEndOfLine}.			(. 
+                                                                   CommentNode cNode = new CommentNode(la.col, la.line, la.val, CommentNode.CommentType.Inline); 
+                                                                   root.Body.Add(cNode); .)
+    blockcomment = "/*" {'/' | other | '*' {'*'} other} '*' {'*'} '/'. (.
+                                                             CommentNode cNode = new CommentNode(la.col, la.line, la.val, CommentNode.CommentType.Block); 
+                                                             root.Body.Add(cNode); .)
+
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+
+DesignScriptParser  (.
+                        DesignScript.Parser.Associative.CodeBlockNode code = null;
+                        code = new DesignScript.Parser.Associative.CodeBlockNode();
+                        code.Line = la.line;
+                        code.Col = la.col;
+                        Node node = null;
+                    .)
+=
+    {
+        IF(la.kind != _EOF)                     (. bool valid = false; .)
+        (
+            (
+                Import_Statement<out node>      (. valid = true; .)
+            )
+            |
+            (
+                Assoc_Statement<out node>       (. valid = true; .)
+            )
+            |
+            (
+                Assoc_FunctionDecl<out node>    (. valid = true; .)
+            )
+            |
+            (
+                Assoc_ClassDecl<out node>       (. valid = true; .)
+            )
+            |
+            (
+                Assoc_LanguageBlock<out node>   (. valid = true; .)
+            )
+        )
+                (.
+                    if(false == valid)
+                        Get();
+                    if (node != null)
+                        code.Body.Add(node);
+                    node = null;
+                .)
+  }             (. root.Body.Add(code); .)
+.

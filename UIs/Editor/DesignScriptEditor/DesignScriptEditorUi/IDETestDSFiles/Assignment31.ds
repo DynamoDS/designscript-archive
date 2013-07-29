@@ -1,0 +1,10 @@
+[Imperative]
+{
+	a = -1;
+	b = -2;
+	c = -3;
+	c = a * b * c;
+	d = c * b - a;
+	e = b + c / a;
+	f = a * b + c;
+} 

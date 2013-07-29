@@ -1,0 +1,69 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignScriptStudio.Graph.Ui", "DesignScriptStudio.Graph.Ui\DesignScriptStudio.Graph.Ui.csproj", "{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignScriptStudio.Graph.Core", "DesignScriptStudio.Graph.Core\DesignScriptStudio.Graph.Core.csproj", "{DC06125F-B32A-44DF-A367-7450B1B5D80A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A69E7467-7A33-4242-AEA2-984B41130F54} = {A69E7467-7A33-4242-AEA2-984B41130F54}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignScriptStudio.App", "DesignScriptStudio.App\DesignScriptStudio.App.csproj", "{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignScriptStudio.Tests", "DesignScriptStudio.Tests\DesignScriptStudio.Tests.csproj", "{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DesignScriptStudio.Renderer", "DesignScriptStudio.Renderer\DesignScriptStudio.Renderer.vcxproj", "{A69E7467-7A33-4242-AEA2-984B41130F54}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Code Coverage = Debug|Code Coverage
+		Debug|x64 = Debug|x64
+		Release|Code Coverage = Release|Code Coverage
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Debug|Code Coverage.ActiveCfg = Debug|x86
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Debug|Code Coverage.Build.0 = Debug|x86
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Debug|x64.ActiveCfg = Debug|x64
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Debug|x64.Build.0 = Debug|x64
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Release|Code Coverage.ActiveCfg = Release|x86
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Release|Code Coverage.Build.0 = Release|x86
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Release|x64.ActiveCfg = Release|x64
+		{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}.Release|x64.Build.0 = Release|x64
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Debug|Code Coverage.ActiveCfg = Debug|x86
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Debug|Code Coverage.Build.0 = Debug|x86
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Debug|x64.ActiveCfg = Debug|x64
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Debug|x64.Build.0 = Debug|x64
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Release|Code Coverage.ActiveCfg = Release|x86
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Release|Code Coverage.Build.0 = Release|x86
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Release|x64.ActiveCfg = Release|x64
+		{DC06125F-B32A-44DF-A367-7450B1B5D80A}.Release|x64.Build.0 = Release|x64
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Debug|Code Coverage.ActiveCfg = Debug|x86
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Debug|Code Coverage.Build.0 = Debug|x86
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Debug|x64.ActiveCfg = Debug|x64
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Debug|x64.Build.0 = Debug|x64
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Release|Code Coverage.ActiveCfg = Release|x86
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Release|Code Coverage.Build.0 = Release|x86
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Release|x64.ActiveCfg = Release|x64
+		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Release|x64.Build.0 = Release|x64
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Debug|Code Coverage.ActiveCfg = Debug|x86
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Debug|Code Coverage.Build.0 = Debug|x86
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Debug|x64.ActiveCfg = Debug|x64
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Debug|x64.Build.0 = Debug|x64
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Release|Code Coverage.ActiveCfg = Release|x86
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Release|Code Coverage.Build.0 = Release|x86
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Release|x64.ActiveCfg = Release|x64
+		{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}.Release|x64.Build.0 = Release|x64
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Debug|Code Coverage.ActiveCfg = Debug|Win32
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Debug|Code Coverage.Build.0 = Debug|Win32
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Debug|x64.ActiveCfg = Debug|x64
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Debug|x64.Build.0 = Debug|x64
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Release|Code Coverage.ActiveCfg = Release|Win32
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Release|Code Coverage.Build.0 = Release|Win32
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Release|x64.ActiveCfg = Release|x64
+		{A69E7467-7A33-4242-AEA2-984B41130F54}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,21 @@
+class A
+{
+    a : int;
+    
+    constructor func(x : int)
+    {
+        a = x;
+    }
+    def diff(x : int)
+    {
+        b = a - x;
+        return = A.func(b);
+    }
+}
+
+
+x = 2;
+a1 = A.func(10);
+a1 = a1.diff(x);
+x = 3;
+x = 4;

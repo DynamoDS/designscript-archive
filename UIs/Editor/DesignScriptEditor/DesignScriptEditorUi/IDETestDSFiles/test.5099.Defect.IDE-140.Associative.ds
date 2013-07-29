@@ -1,0 +1,12 @@
+a = 10;
+b = 5;
+
+c = [Associative]
+{
+    x = 4;
+    x = x + b;
+    
+    return = x;
+}
+
+d = c;

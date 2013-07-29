@@ -1,0 +1,16 @@
+import("ProtoGeometry.dll");
+
+WCS = CoordinateSystem.Identity();
+// create initialPoints
+diafac1 = 1;
+h1 = 15;
+hL1 = 10;
+pt0 = Point.ByCartesianCoordinates(WCS, -5 * diafac1, -5 * diafac1, 0);
+pt1 = Point.ByCartesianCoordinates(WCS, 5 * diafac1, -5 * diafac1, 0);
+pt2 = Point.ByCartesianCoordinates(WCS, 5 * diafac1, 5 * diafac1, 0);
+pt3 = Point.ByCartesianCoordinates(WCS, -5 * diafac1, 5 * diafac1, 0);
+
+pt4 = Point.ByCartesianCoordinates(WCS, -5 * diafac1, -5 * diafac1, hL1);
+pt5 = Point.ByCartesianCoordinates(WCS, 5 * diafac1, -5 * diafac1, hL1);
+pt6 = Point.ByCartesianCoordinates(WCS, 5 * diafac1, 5 * diafac1, hL1);
+pt7 = Point.ByCartesianCoordinates(WCS, -5 * diafac1, 5 * diafac1, hL1);

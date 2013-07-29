@@ -1,0 +1,10 @@
+[Imperative]
+{
+	a = { -2,3,4.5,true };
+	x = 1;
+	for ( y in a )
+	{
+		x = x *y;       //incorrect result
+    }
+	
+}

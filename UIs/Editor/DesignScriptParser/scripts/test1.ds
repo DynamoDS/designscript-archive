@@ -1,0 +1,171 @@
+
+
+a = 7;
+
+[Imperative]
+{
+                //vardecl
+				func(a, b, c);
+                aVar = 2;
+                nVar = -4.6;
+                bVar = aVar;
+                sVar = ( 3.0 + 5) + bVar;
+
+                lVar = true;
+                nullVar = null;
+
+
+                a = 2 & 5;
+                a = 2 | 5;
+                a = 2 ^ 5;
+
+                //function decl and ArgDecl
+                def func(a, b, c)
+                {	
+                                result = a + b * c;
+                }
+
+                //function call
+                aVar = func(a, b, c);
+				[Associative]
+				{
+					abc = 10;
+				}
+                //assignstmt
+                aVar = bVar;
+
+                //ifstmt
+                if ( a == b)
+                {
+                                a = 0;
+                }
+                else if ( !(a < b) ) //unary expr
+                {
+                                a = a - b;
+                }
+                else
+                {
+                                a = a + b;
+                }
+
+
+                //forloop
+
+                                a = {10,20,30,40};
+                                x = 0;
+                                for (val in a)
+                                {
+                                                x = x + val;
+                                }
+
+
+                                x = 0;
+                                for (val in {100,200,300,400})
+                                {
+                                                x = x + val;
+                                }
+
+                                x = 0;
+                                for (val in {{100,101},{200,201},{300,301},{400,401}})
+                                {
+                                                x = x + val[1];
+                                }
+
+                                x = 0;
+                                for (val in 10)
+                                {
+                                                x = x + val;
+                                }
+
+                                
+                                y = 0;
+                                b = 11;
+                                for (val in b)
+                                {
+                                                y = y + val;
+                                }
+
+                                
+                // array and whilestmt...................start
+
+                x = 0;
+                y = 0;
+                xSize = 2;
+                ySize = 3;
+                result = 0;
+
+                somelist[] = {11,102,1003,1004};
+                somelist2[] = {x, y, xSize * 4, 1004 * ySize};
+
+                // Populate a multi-dimensional array    
+                list2d[0][0] = 10;
+                list2d[0][1] = 20;
+                list2d[0][2] = 30;
+                list2d[1][0] = 40;
+                list2d[1][1] = 50;
+                list2d[1][2] = 60;
+
+                // do somthing with those values
+                while( x < xSize )
+                {
+                                while( y < ySize )
+                                {
+                                                result = result + list2d[x][y];
+                                                y = y + 1;
+                                }
+                                x = x + 1;
+                                y = 0;
+                }
+
+                result = result * 10;
+
+
+
+                // Populate an array of integers and compute its average
+
+                // Populate an array of ints          
+                list[0] = 10;
+                list[1] = 20;
+                list[2] = 30;
+                list[3] = 40;
+                list[4] = 50;
+				/* asdhfjgajsgf
+				asdgkjasgjdfg
+				*/
+
+                // Declare counters and result storage
+                n = 0;
+                size = 5;
+                result = 0;
+
+
+                // Summation of elements in 'list' and storing them in 'result'
+                while( n < size )
+                {
+                                result = result + list[n];
+                                n = n + 1;
+                }
+
+                // Get the average
+                result = result / size;
+                // array and whilestmt...................end
+
+
+                //unary expression, strange negate sign...
+                a = ~5;
+
+                //rangop
+
+                a = 1..100..#1;
+				[Imperative]
+				{
+					happy = 1;
+				}
+}
+
+aaa = 23847;
+[Associative]
+{
+	what = 90234785.9439843789;
+}
+

@@ -1,0 +1,10 @@
+[Imperative]
+{
+	a = 0;
+	while ( a == false )
+	{
+		a = 1;
+	}
+	
+	b = a;
+}

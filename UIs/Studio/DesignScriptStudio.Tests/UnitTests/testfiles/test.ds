@@ -1,0 +1,40 @@
+class Appu
+{
+    Name : string;
+    constructor ByName(name : string)
+    {
+        Name = name;
+    }
+    
+    def Foo()
+    {
+        return = Name + "Pratap";
+    }
+    
+}
+
+class Anon
+{
+    Number : double;
+    ID : int;
+    
+    constructor ByNumber(number : double)
+    {
+        Number = number;
+    }
+    
+    constructor ByID(id : int)
+    {
+        ID = id;
+    }
+}
+
+    def Foo()
+    {
+        return = "Pratap";
+    }
+
+    def Foo1(name : string)
+    {
+        return = name;
+    }

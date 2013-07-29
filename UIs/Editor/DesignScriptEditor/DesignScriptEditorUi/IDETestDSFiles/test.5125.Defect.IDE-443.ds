@@ -1,0 +1,22 @@
+def foo()
+{
+    return = 8;
+}
+
+class B 
+{
+    t : int;
+    a : int;
+    b : int;
+    c : int;
+    constructor B( y)
+    {
+        t = y + 1;
+    }
+}
+
+z = B.B(1);
+
+z.a = 10;
+z.b = 2 * 1;
+z.c = foo();

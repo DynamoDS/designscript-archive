@@ -1,0 +1,29 @@
+class B
+{
+    x3 : int;
+    constructor B(a)
+    {
+        x3 = a;
+    }
+    def foo()
+    {
+        return = x3;
+    }
+}
+    
+    class A extends B
+    {
+        x1 : int;
+        x2 : double;
+        constructor A(a1, a2, a3) : base.B(a3)
+        {
+            x1 = a1;
+            x2 = a2;
+        }
+        def foo()
+        {
+            return = { x1, x2 };
+        }
+    }
+    a1 = A.A(1, 1.5, 0);
+    b1 = a1.foo();

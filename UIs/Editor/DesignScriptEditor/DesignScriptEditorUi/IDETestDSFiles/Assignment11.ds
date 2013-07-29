@@ -1,0 +1,16 @@
+
+                                 class A 
+                                 {
+                                      
+                                      P1:int;
+                                      constructor A(p1:int)
+                                      {
+                                          P1 = p1;
+                                      }
+          
+                                 }
+
+                                 a1 = A.A(2);
+                                 b1 = a1.P1;
+                            
+

@@ -1,0 +1,12 @@
+class A
+{
+    x;
+}
+
+[Associative]
+{
+    a = A.A();
+    x = a.x;
+    a.x = a;
+    b = 33;
+}

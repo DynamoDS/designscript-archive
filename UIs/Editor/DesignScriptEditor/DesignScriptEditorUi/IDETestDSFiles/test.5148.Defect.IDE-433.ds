@@ -1,0 +1,37 @@
+b1 = 6;
+
+class A
+{
+    x : int;
+    
+    constructor A()
+    {
+        x = 1;
+    }
+    
+    def foo()
+    {
+        return = 90;
+    }
+}
+
+def foo1()
+{
+    return = 10;
+}
+
+a =
+{
+    A.A() => a2;
+    a2.foo();
+    foo1();
+    b1 + 1;
+    +2 => a1;
+    a1 + b1;
+    +2 => a3;
+    -5 => a4;
+    a1 + b1;
+    4 + 2;
+    
+}
+c = 90;

@@ -1,0 +1,416 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9F687DD2-CC22-4099-A7A1-25D316FD0FE4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DesignScript.Editor.Ui</RootNamespace>
+    <AssemblyName>DesignScript.Editor.Ui</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
+  </ImportGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\Prototype\bin\$(Platform)\$(Configuration)</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\Prototype\bin\$(Platform)\$(Configuration)</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DesignScript.Editor.CodeGen">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(OutputPath)\DesignScript.Editor.CodeGen.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <SpecificVersion>False</SpecificVersion>
+      <NunitPath Condition=" '$(NunitPath)' == '' ">..\..\..\nunit\framework\nunit.framework.dll</NunitPath>
+      <Hintpath>$(NunitPath)</Hintpath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="ProtoAssociative">
+      <HintPath>$(OutputPath)\ProtoAssociative.dll</HintPath>
+    </Reference>
+    <Reference Include="ProtoCore">
+      <HintPath>$(OutputPath)\ProtoCore.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ProtoImperative">
+      <HintPath>$(OutputPath)\ProtoImperative.dll</HintPath>
+    </Reference>
+    <Reference Include="ProtoOptions">
+      <HintPath>$(OutputPath)\ProtoOptions.dll</HintPath>
+    </Reference>
+    <Reference Include="ProtoScript">
+      <HintPath>$(OutputPath)\ProtoScript.dll</HintPath>
+    </Reference>
+    <Reference Include="DesignScript.Editor.Common">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\DesignScript.Editor.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="AutomationSupport\PlaybackSnapshot.xaml.cs">
+      <DependentUpon>PlaybackSnapshot.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AutomationSupport\StressTesting\Generator.cs" />
+    <Compile Include="AutomationSupport\AddAssert.xaml.cs">
+      <DependentUpon>AddAssert.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AutomationSupport\AssertionResult.cs" />
+    <Compile Include="AutomationSupport\AutomationResult.cs" />
+    <Compile Include="AutomationSupport\CommandPlayer.cs" />
+    <Compile Include="AutomationSupport\CommandRecorder.cs" />
+    <Compile Include="AutomationSupport\PlaybackVisualizer.xaml.cs">
+      <DependentUpon>PlaybackVisualizer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DisassemblyWindow\Disassembly.xaml.cs">
+      <DependentUpon>Disassembly.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="EditorExtension.cs" />
+    <Compile Include="InspectionWindow\InspectionView.cs" />
+    <Compile Include="LoggerWrapper.cs" />
+    <Compile Include="OutputWindow\OutputWindow.xaml.cs">
+      <DependentUpon>OutputWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorWindow\ErrorWindow.xaml.cs">
+      <DependentUpon>ErrorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Supplementary\DialogProvider.cs" />
+    <Compile Include="Supplementary\EditorWidgetBar.xaml.cs">
+      <DependentUpon>EditorWidgetBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Supplementary\ExceptionWindow.xaml.cs">
+      <DependentUpon>ExceptionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Supplementary\ReadOnlyPrompt.xaml.cs">
+      <DependentUpon>ReadOnlyPrompt.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AutomationSupport\StressTesting\Strategy.cs" />
+    <Compile Include="Supplementary\RuggedProgressBar.xaml.cs">
+      <DependentUpon>RuggedProgressBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StartUpScreen\StartUpScreen.xaml.cs">
+      <DependentUpon>StartUpScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StartUpScreen\StartUpWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TextEditorControl\FindReplacePanel.xaml.cs">
+      <DependentUpon>FindReplacePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditorControl\RowHeightConverter.cs" />
+    <Compile Include="TextEditorControl\CurvyTabControl.cs" />
+    <Compile Include="TextEditorControl\TextEditorCanvas.cs" />
+    <Compile Include="InspectionWindow\InspectionData.cs" />
+    <Compile Include="InspectionWindow\InspectionDataCollection.cs" />
+    <Compile Include="InspectionWindow\LevelToIndentConverter.cs" />
+    <Compile Include="TextEditorControl\TextEditorControl.Accelerator.cs" />
+    <Compile Include="TextEditorControl\TextEditorControl.Keyboard.cs" />
+    <Compile Include="TextEditorControl\TextEditorControl.Mouse.cs" />
+    <Compile Include="TextEditorControl\TextEditorControl.Utility.cs" />
+    <Compile Include="InspectionWindow\InspectionViewControl.xaml.cs">
+      <DependentUpon>InspectionViewControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditorControl\ReportIssueFeedbackDialog.xaml.cs">
+      <DependentUpon>ReportIssueFeedbackDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VisualLayers\AuxiliaryLayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VisualLayers\EditorVisualHost.cs" />
+    <Compile Include="VisualLayers\HighlightLayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VisualLayers\LineHeadingLayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VisualLayers\SourceDisplayLayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VisualLayers\VisualLayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="DisassemblyWindow\Disassembly.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Supplementary\RuggedProgressBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AutomationSupport\AddAssert.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AutomationSupport\PlaybackSnapshot.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AutomationSupport\PlaybackVisualizer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OutputWindow\OutputWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ErrorWindow\ErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Supplementary\EditorWidgetBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Supplementary\ExceptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Supplementary\ReadOnlyPrompt.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="TextEditorControl\FindReplacePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StartUpScreen\StartUpScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextEditorControl\StyleDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextEditorControl\TextEditorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="TextEditorControl\TextEditorControl.xaml.cs">
+      <DependentUpon>TextEditorControl.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="InspectionWindow\InspectionViewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TextEditorControl\ReportIssueFeedbackDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DesignScriptLogger\DesignScript.Logger.csproj">
+      <Project>{97105AA6-8AFC-422C-BEA1-5462A572CFCC}</Project>
+      <Name>DesignScript.Logger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DesignScriptParser\DesignScript.Editor.Parser.csproj">
+      <Project>{1F163F32-D301-4A19-B791-D38404A47AA1}</Project>
+      <Name>DesignScript.Editor.Parser</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\DesignScriptEditorCore\DesignScript.Editor.Core.csproj">
+      <Project>{C77E627F-1B0C-4603-93F5-D52747523FA2}</Project>
+      <Name>DesignScript.Editor.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\breakpoint.png" />
+    <Resource Include="Resources\execution-cursor.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\main-next.png" />
+    <Resource Include="Resources\main-open.png" />
+    <Resource Include="Resources\main-redo.png" />
+    <Resource Include="Resources\main-run.png" />
+    <Resource Include="Resources\main-save-as.png" />
+    <Resource Include="Resources\main-save.png" />
+    <Resource Include="Resources\main-step-in.png" />
+    <Resource Include="Resources\main-step-out.png" />
+    <Resource Include="Resources\main-stop.png" />
+    <Resource Include="Resources\main-undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\main-settings.png" />
+    <Resource Include="Resources\output-message.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\main-new-file.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\assert-fail.png" />
+    <Resource Include="Resources\assert-pass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\main-report.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\auto-constructor.png" />
+    <Resource Include="Resources\auto-fields.png" />
+    <Resource Include="Resources\auto-methods.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\auto-missing.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\startupscreen-icon.png" />
+    <Resource Include="Resources\status-warning.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\status-error.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\status-info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\main-rundebug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\main-hover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\main-click.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\error_symbol.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\warning_symbol.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\run_indicator.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\error_button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\error_edit_button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\error_symbol_bottomtab.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\warning_symbol_bottomtab.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\reportissue_background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\background_texture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\aboutback.png" />
+    <Resource Include="Resources\autodeskLogo.png" />
+    <Resource Include="Resources\DesignScriptLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\slide_button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\collectinfo_titlebar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\reportissue_feedback_error.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\startup-link-icon-0.png" />
+    <Resource Include="Resources\startup-link-icon-1.png" />
+    <Resource Include="Resources\startup-link-icon-2.png" />
+    <Resource Include="Resources\startup-link-icon-3.png" />
+    <Resource Include="Resources\startup-link-icon-4.png" />
+    <Resource Include="Resources\startup-link-icon-5.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\status-progress.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,25 @@
+[Imperative]
+{   
+
+ def ANDfunc:int(a:int,b:int)
+ { 
+  
+  return = a & b; 
+ 
+ }
+
+ def ORfunc:int(a:int,b:int)
+ {
+   
+   return = a|b;
+ 
+ }
+ 
+ e = 14;
+ 
+ f = 7;
+ 
+ c = ANDfunc(e,f); 
+ 
+ d = ORfunc(e,f);
+}

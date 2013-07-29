@@ -1,0 +1,13 @@
+class A
+{
+    x : int;
+    constructor A(i)
+    {
+        x = i;
+        y = 2;
+    }
+}
+
+a1 = A.A(1);
+x1 = a1.x;
+y1 = a1.y;

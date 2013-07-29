@@ -1,0 +1,8 @@
+class AAa
+    { x : var; }
+
+class aaA
+    { y : var; }
+
+a = AAa.AAa();
+a = aaA.aaA();

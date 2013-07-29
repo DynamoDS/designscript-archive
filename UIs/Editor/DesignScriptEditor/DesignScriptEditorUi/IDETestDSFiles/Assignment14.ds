@@ -1,0 +1,15 @@
+[Imperative]
+{
+  a = 3;
+  b = -4;
+  b = a + b; 
+  b = a - b;
+  b = a * b;
+  b = a / b; 
+  
+  c1 = 1 && 2;
+  c2 = 1 && 0;
+  c3 = null && true;
+  
+
+}

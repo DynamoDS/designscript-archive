@@ -1,0 +1,9 @@
+def DoubleIt : int(value : int) {
+    return = 2 * value;
+}
+
+arr = 1..8..1;
+arr2 = DoubleIt(arr);
+
+single = 1;
+doubleValue = DoubleIt(single);

@@ -1,0 +1,18 @@
+[Imperative]
+{
+    i = 5;
+    j = 0;
+    
+    while(i > 0)
+    {
+        j = j + 1;
+        
+        if (j == 2)
+            break;
+        
+        i = i - 1;
+    }
+    
+    Print(i);
+    Print(j);
+}

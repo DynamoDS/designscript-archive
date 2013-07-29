@@ -1,0 +1,12 @@
+[Imperative]
+{
+	a = true;
+	b = 2;
+	c = 2;
+ 
+	if( a )
+	b = false;
+ 
+	if( b==0 )
+	c = 1;
+ }

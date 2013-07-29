@@ -1,0 +1,7 @@
+[Imperative]
+{  
+	a = 14;  
+	b = 7;  
+	c = a & b; 
+	d = a|b;
+}

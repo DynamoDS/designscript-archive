@@ -1,0 +1,22 @@
+class A
+{
+    a : int = 0;
+    
+    constructor A(x : int)
+    {
+        a = x;
+    }
+}
+
+[Imperative]
+{
+    x = 9;
+    b = A.A(5);
+
+    while(x != b.a)
+    {
+        b.a = b.a + 1;
+        x = x - 1;
+    }
+}
+

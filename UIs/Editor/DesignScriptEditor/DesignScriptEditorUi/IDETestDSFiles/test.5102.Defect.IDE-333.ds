@@ -1,0 +1,23 @@
+y = 0;
+t = y * 2;
+[Imperative]
+{
+    c = 0;
+    [Associative]
+    {
+        def fadd : int(a : int)
+        {
+            return = a + 1;
+        }
+        
+        x = 1;
+        
+        a = fadd(x);
+        
+        b = 11;
+        c = a + b;
+        
+        x = 10;
+    }
+    y = c + 2;
+}

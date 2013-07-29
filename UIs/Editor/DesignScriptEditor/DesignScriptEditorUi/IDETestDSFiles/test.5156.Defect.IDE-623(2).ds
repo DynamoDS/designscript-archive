@@ -1,0 +1,12 @@
+class A
+{ 
+        x1 : var;  
+
+        constructor A () 
+        {       
+                x1  = 1;  
+        
+        }
+}
+
+a = A.A();

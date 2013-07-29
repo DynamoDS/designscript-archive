@@ -1,0 +1,36 @@
+[Imperative]
+{
+  e = 0;
+  a = 1 + 2;
+  b = 0.1 + 1.9;
+  b = a + b;
+  c = b - a - 1;
+  d = a + b -c;
+  if( c < a )
+  {
+     e = 1;
+  }
+  else
+  {
+    e = 2;
+  }
+
+  if( c < a || b > d)
+  {
+     e = 3;
+  }
+  else
+  {
+    e = 4;
+  }
+
+  if( c < a && b > d)
+  {
+     e = 3;
+  }
+  else
+  {
+    e = 4;
+  }
+
+}

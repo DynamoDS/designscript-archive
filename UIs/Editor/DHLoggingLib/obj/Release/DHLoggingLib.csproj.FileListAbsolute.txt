@@ -1,0 +1,6 @@
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Release\DHLoggingLib.dll
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Release\System.Data.SQLite.dll
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\obj\Release\ResolveAssemblyReference.cache
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\obj\Release\DHLoggingLib.dll
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Release\System.Data.SQLite.pdb
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Release\System.Data.SQLite.xml

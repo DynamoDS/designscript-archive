@@ -1,0 +1,13 @@
+x = 330;
+
+def foo(y : int)
+{
+    return = y + 222;
+}
+a;
+[Imperative]
+{
+    a = x > foo(22) ? foo(1) : 55;
+    a = x < foo(20) ? 44 : foo(55);
+    b = 2;
+}

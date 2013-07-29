@@ -1,0 +1,56 @@
+T2 - Copy_And_Paste_1
+T3 - Copy_And_Paste_2
+T4 - Cut_And_Paste_1
+T5 - Cut_And_Paste_2
+T6 - Delete_Text_Backspace_1
+T7 - Delete_Text_Backspace_2
+T8 - Drag_Drop_1
+T9 - Drag_Drop_2
+T10 - Highlight_Text
+T11 - Home_And_End_Key
+T12 - Verified Defect : IDE 20
+T13 - Verified Defect : IDE 18
+T14 - Verified Defect : IDE 15
+T15 - Verified Defect : IDE 19
+T16 - verified Defect : IDE 21
+T17 - verified Defect : IDE 22
+T18 - verified Defect : IDE 24
+T19 - verified Defect : IDE 26
+T20 - verified Defect : IDE 31 
+T21 - verified Defect : IDE 32
+T22 - verified Defect : IDE 33,IDE 23 (Duplicates)
+T23 - verified Defect : IDE 09
+T24 - verified Defect : IDE 35
+T25 - Keyboard Navigation
+T26 - Backspace Key
+T27 - Delete Key
+T28 - CTRL c,V
+T29 - verified Defect : IDE 45
+T30 - CTRLZ
+T31 - CTRL Y
+T32 - CTRL A
+T33 - SHIFT key
+T34 - TAB Navigation
+T35 - Multiple Tab copy/paste
+T36 - Sprint 16 - 1457317
+T37 - Sprint 16 - 1457199
+T38 - Sprint 16 - 1457198
+T39 - Sprint 16 - 1456371
+T40 - Sprint 16 - 1456203
+T41 - Sprint 16 - 1456195
+T42 - Sprint 16 - 1456103
+T43 - Sprint 14 - 1450499
+T44 - verified Defect : IDE 27
+t45 - verified Defect : IDE 1
+T46 - verified Defect : IDE 34
+T47 - verified Defect : IDE 55
+T48 - verified Defect : IDE 43
+T49 - verified Defect : IDE 57
+T50 - verified Defect : IDE 52
+T51 - verified Defect : IDE 14
+T52 - verified Defect : IDE 12
+T53 - Sprint 16 - 1456106
+T54 - Sprint 16 - 1456101
+T55 - verified Defect : IDE 66
+T56 - verified Defect : IDE 47
+T57 - verified Defect : IDE 88

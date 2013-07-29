@@ -1,0 +1,25 @@
+﻿<Window x:Class="DesignScript.Editor.Automation.AddAssert"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Assert" MaxHeight ="280" MaxWidth="350" MinHeight="280" MinWidth="350" ResizeMode="NoResize" >
+    <Grid>
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Margin="5,5,5,5"> Property </Label>
+                <ComboBox Name="PropertyList" Margin="25,10,10,10" Width="174" ItemsSource="{Binding}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Margin="5,5,5,5">Value</Label>
+                <ScrollViewer Margin="40,10,10,10" VerticalScrollBarVisibility="Auto" Height="36" Width="169">
+                <TextBlock Name="PropertyValue" Margin="0,0,0,0" TextWrapping="Wrap"/>
+                </ScrollViewer>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center" Margin="5,5,5,5">Assert Value</Label>
+                <TextBox Name="AssertValue" Margin="5,10,10,10" Width="171" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Height="50"/>
+            </StackPanel>
+            <Button Margin ="0,20,0,0 " Content="Add" Height="34" Name="AddButton" Width="111" />
+            <TextBlock Name="tbMessage" />
+        </StackPanel>
+    </Grid>
+</Window>

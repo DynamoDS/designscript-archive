@@ -1,0 +1,16 @@
+[Imperative]
+{
+	a = false;
+        b = 0;
+	d = 0;
+
+	if( a == null)
+	{
+	    d = d + 1;
+	}
+
+    if( b == null)
+	{
+	    d = d + 1;
+	}	
+}

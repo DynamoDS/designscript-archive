@@ -1,0 +1,13 @@
+class Fruits
+{
+    constructor Fruits()
+    {
+        //orange = 6;
+    }
+    orange : var;
+}
+
+    
+fruits = Fruits.Fruits();
+x = fruits.orange;
+g = 33;

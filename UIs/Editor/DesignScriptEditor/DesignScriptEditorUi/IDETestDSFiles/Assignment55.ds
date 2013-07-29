@@ -1,0 +1,18 @@
+def f(input)
+{
+    return = input * 2;
+}
+    
+    val = [Imperative]
+    {
+        sum = 0;
+        depend = 0;
+        
+        for(i in 1..2)
+        {
+            sum = sum + f(i);
+            if (sum > 0)
+                depend = 100;
+        }      
+        return = sum;
+    }

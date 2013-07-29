@@ -1,0 +1,8 @@
+import("ProtoGeometry.dll");
+WCS = CoordinateSystem.Identity();
+z = 0;
+p1 = Point.ByCartesianCoordinates(WCS, 0, 0, z);
+p2 = Point.ByCartesianCoordinates(WCS, 7, 0, z);
+p3 = Point.ByCartesianCoordinates(WCS, 5, 8, z);
+p4 = Point.ByCartesianCoordinates(WCS, 0, 10, z);
+points = { p1, p2, p3, p4, p1 };

@@ -1,0 +1,11 @@
+[Imperative]
+{
+	 def add:double( n1:int, n2:double )
+	 {	  
+		  return = n1 + n2;
+	 }
+
+	 test = add(2,2.5);
+	 test1 = add(2,1);
+}
+

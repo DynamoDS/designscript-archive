@@ -1,0 +1,16 @@
+class A
+    { a : var; }
+
+class B
+{
+   // c : int;
+    
+    constructor create()
+    {
+        a1 = A.A();
+       // c = 33;
+    }
+}
+
+b = B.create();
+f = 3;

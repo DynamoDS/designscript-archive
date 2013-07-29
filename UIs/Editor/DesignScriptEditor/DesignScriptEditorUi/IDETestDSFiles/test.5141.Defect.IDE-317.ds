@@ -1,0 +1,8 @@
+[Associative]
+{
+    x = 10;
+    y = 5;
+    z = 6;
+    result = (y > x) ? x : 1 + 2;
+    s = 12321;
+}

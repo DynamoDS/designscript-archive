@@ -1,0 +1,4 @@
+class  AAa
+    { x : var; }
+
+a = AA.AA();

@@ -1,0 +1,13 @@
+class point
+{
+    x : int;
+
+}
+//Please add f to watch window
+s += point.point();
+S++;
+f = { 1, 2, 3, 4,  }; //expand f and also expand f[4] after this line
+f += { 1, 2,  }; //After stepping through this line, kindly note that f[4] still show type as "point". 
+//It is only after clicking on the collapse symbol [-] that the values get updated.
+n += 2;
+f--;

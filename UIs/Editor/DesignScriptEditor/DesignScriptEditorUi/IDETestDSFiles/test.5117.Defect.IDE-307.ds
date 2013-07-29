@@ -1,0 +1,17 @@
+class collection
+{
+	
+	public a : var;
+	
+	constructor create( b )
+	{
+		a = { 1,2,b };
+	}
+}
+
+[Associative]
+{
+	c1 = collection.create( 3 );
+	
+
+}

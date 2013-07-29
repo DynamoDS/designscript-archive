@@ -1,0 +1,10 @@
+a = 10;
+b = 5;
+
+def foo: int(x:int)
+{
+    x = 4;   
+    return = x;
+}
+g = foo(5);
+d = c;

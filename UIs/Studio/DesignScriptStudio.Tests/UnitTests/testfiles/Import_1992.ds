@@ -1,0 +1,12 @@
+import("Math.dll");
+import("ProtoGeometry.dll");
+WCS = CoordinateSystem.Identity();
+def CreateTriangle(CS : CoordinateSystem, distX : double, distY : double)
+{
+    p1 = CS.Origin;
+    p2 = CS.Origin.Translate(CS.XAxis, distX);
+    p3 = CS.Origin.Translate(CS.YAxis, distY);
+    Pointforprofile1 = { p1, p2, p3, p1 };
+    return = BSplineCurve.ByControlVertices(Pointforprofile1, 1, true);
+}
+

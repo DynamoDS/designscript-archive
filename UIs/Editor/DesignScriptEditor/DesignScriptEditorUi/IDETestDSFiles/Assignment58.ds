@@ -1,0 +1,9 @@
+[Imperative]
+{
+    
+    a = 19;
+    b = 20;
+    c = 122;
+	error = 091;
+    check = 223;
+}

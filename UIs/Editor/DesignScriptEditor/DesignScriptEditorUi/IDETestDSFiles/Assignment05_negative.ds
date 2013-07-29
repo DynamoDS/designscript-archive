@@ -1,0 +1,4 @@
+[Imperative]
+{
+    b = a = 2;
+}

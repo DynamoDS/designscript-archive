@@ -1,0 +1,7 @@
+import("Math.dll");
+x = 330;
+a = 0;
+
+a = x > Math.GoldenRatio ? Math.Cos(60) : Math.Cos(45);
+b = 22;
+

@@ -1,0 +1,8 @@
+def foo : int(x : int)
+{
+    x = x * 33;
+    return = x;
+}
+
+c = 33;
+d = 222;

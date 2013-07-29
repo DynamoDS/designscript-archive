@@ -1,0 +1,25 @@
+class A
+{
+    a : var;
+}
+
+class B
+{
+    b : var;
+    a1 : A;
+    
+    constructor Create()
+    {
+        b = 2;
+        a1 = A.A();
+    }
+    
+    public def foo()
+    {
+        a1 = A.A();
+        b = 2;
+    }
+}
+
+b1 = B.Create();
+b2 = b1.foo();

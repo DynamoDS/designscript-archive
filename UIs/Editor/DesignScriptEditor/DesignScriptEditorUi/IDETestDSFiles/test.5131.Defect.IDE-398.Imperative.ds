@@ -1,0 +1,12 @@
+class A
+{
+    x;
+}
+
+[Imperative]
+{
+    a = A.A();
+    x = a.x;
+    a.x = a;
+    b = 33;
+}

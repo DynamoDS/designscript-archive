@@ -1,0 +1,57 @@
+class Point_2
+{
+	z1 : var;
+	z2 : var;
+	
+	constructor Create_2( )
+	{
+		z1 = 10;
+		z2 = 10;
+	}
+}
+
+
+
+class Point_1
+{
+	x : var;
+	y : var;
+	
+	constructor Create_1( _x : Point_2, _y : int[])
+	{
+		x = _x;
+		y = _y;
+	}
+}
+
+
+
+class Complex
+{
+	
+	a : var;
+	p : var;
+	c : var;
+	
+	constructor Create( _a:int, _p : Point_1, _p1 : Point_1 )
+	{
+		a = _a;
+		p = _p;
+		c = { 3, {2,1}, _p1 };
+	}
+}
+
+
+[Imperative]
+{
+	p2 = Point_2.Create_2();
+	
+	p1_1 = Point_1.Create_1( p2, {11,12} );
+	
+	p1_2 = Point_1.Create_1( p2, {12,13} ); 
+	
+	test = Complex.Create( 17, p1_1, p1_2 );
+	
+}
+
+		
