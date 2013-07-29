@@ -1,0 +1,24 @@
+class Point
+{
+    u;
+    v = 5;
+    w : double[][];
+    x : double[];
+    y:int ;
+    z : int[]..[];
+    
+    constructor Point(_x : int, _y : int, _z : int)
+    {
+        x = _x;
+        y = _y;
+        z = _z;
+    }
+}
+
+def foo : int[](p : Point)
+{
+    a = { p.x, p.y, p.z };
+    return = a;
+}
+
+p = Point.Point(3 ,  4 , 5 );

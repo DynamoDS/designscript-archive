@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LibraryItem xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <QualifiedName>Root</QualifiedName>
+  <ItemType>None</ItemType>
+  <Children>
+    <!--<LibraryItem>
+            <QualifiedName>Render view</QualifiedName>
+            <ItemType>None</ItemType>
+        </LibraryItem>
+        <LibraryItem>
+            <QualifiedName>Speech</QualifiedName>
+            <ItemType>None</ItemType>
+        </LibraryItem>-->
+    <LibraryItem>
+      <QualifiedName>Special Nodes</QualifiedName>
+      <IsExternal>false</IsExternal>
+      <ItemType>None</ItemType>
+      <Children>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>CodeBlock Node</QualifiedName>
+          <ItemType>CodeBlock</ItemType>
+        </LibraryItem>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>Driver Node</QualifiedName>
+          <ItemType>Driver</ItemType>
+        </LibraryItem>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>Identifier Node</QualifiedName>
+          <ItemType>Identifier</ItemType>
+        </LibraryItem>
+        <!--<LibraryItem>
+                <QualifiedName>Render</QualifiedName>
+                <ItemType>Render</ItemType>
+              </LibraryItem>-->
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>Range</QualifiedName>
+          <ItemType>None</ItemType>
+          <Children>
+            <LibraryItem>
+              <Assembly>Special Nodes</Assembly>
+              <QualifiedName>Range.ByIncrementValue</QualifiedName>
+              <ItemType>Function</ItemType>
+              <Type>Constructor</Type>
+              <IsOverloaded>true</IsOverloaded>
+              <ArgumentTypes>double,double,double</ArgumentTypes>
+              <ArgumentNames>Start,End,Increment</ArgumentNames>
+            </LibraryItem>
+            <LibraryItem>
+              <Assembly>Special Nodes</Assembly>
+              <QualifiedName>Range.ByIntervals</QualifiedName>
+              <ItemType>Function</ItemType>
+              <Type>Constructor</Type>
+              <IsOverloaded>true</IsOverloaded>
+              <ArgumentTypes>double,double,int</ArgumentTypes>
+              <ArgumentNames>Start,End,#Intervals</ArgumentNames>
+            </LibraryItem>
+            <LibraryItem>
+              <Assembly>Special Nodes</Assembly>
+              <QualifiedName>Range.ByApproximateIncrementValue</QualifiedName>
+              <ItemType>Function</ItemType>
+              <Type>Constructor</Type>
+              <IsOverloaded>true</IsOverloaded>
+              <ArgumentTypes>double,double,double</ArgumentTypes>
+              <ArgumentNames>Start,End,Approximate Increment</ArgumentNames>
+            </LibraryItem>
+          </Children>
+        </LibraryItem>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>+</QualifiedName>
+          <ItemType>Function</ItemType>
+          <ArgumentTypes>double,double</ArgumentTypes>
+          <ArgumentNames>val1,val2</ArgumentNames>
+        </LibraryItem>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>-</QualifiedName>
+          <ItemType>Function</ItemType>
+          <ArgumentTypes>double,double</ArgumentTypes>
+          <ArgumentNames>val1,val2</ArgumentNames>
+        </LibraryItem>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>*</QualifiedName>
+          <ItemType>Function</ItemType>
+          <ArgumentTypes>double,double</ArgumentTypes>
+          <ArgumentNames>val1,val2</ArgumentNames>
+        </LibraryItem>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>/</QualifiedName>
+          <ItemType>Function</ItemType>
+          <ArgumentTypes>double,double</ArgumentTypes>
+          <ArgumentNames>val1,val2</ArgumentNames>
+        </LibraryItem>
+        <LibraryItem>
+          <Assembly>Special Nodes</Assembly>
+          <QualifiedName>%</QualifiedName>
+          <ItemType>Function</ItemType>
+          <ArgumentTypes>double,double</ArgumentTypes>
+          <ArgumentNames>val1,val2</ArgumentNames>
+        </LibraryItem>
+      </Children>
+    </LibraryItem>
+  </Children>
+</LibraryItem>

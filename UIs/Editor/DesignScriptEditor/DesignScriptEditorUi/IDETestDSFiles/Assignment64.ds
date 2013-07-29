@@ -1,0 +1,14 @@
+class fruits
+{
+    pear : var;
+    tangerine : var;
+    raspberry : var;
+    lychee : var;
+    kiwifruit : var;
+    jackfruit : var;
+    sapodilla : var;
+    maprang : var;
+    longan : var;
+    mangosteen : var;
+    mafai : var;
+}

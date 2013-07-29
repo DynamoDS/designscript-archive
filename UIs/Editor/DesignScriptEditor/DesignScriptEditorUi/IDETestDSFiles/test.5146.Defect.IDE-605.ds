@@ -1,0 +1,35 @@
+class A
+{
+    a : var;
+    a2 : var;
+    a4 : var;
+    
+    
+    constructor A(x : var)
+    {
+        a = x;
+    }
+    def update(x : var)
+    {
+        a = {
+            x => a1;
+            a1 > 10 ? true : false => a4;
+            
+        }
+        return = x;
+    }
+}
+
+class B
+{}
+
+a1 = A.A(0);
+a1 = A.A();
+x = a1.update(1);
+y = { a1.a1, a1.a4 };
+a = 1;
+b = 2;
+
+b1 = B.B();
+x1 = b1.x;
+n = 22;

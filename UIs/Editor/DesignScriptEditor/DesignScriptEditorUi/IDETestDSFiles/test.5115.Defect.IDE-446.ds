@@ -1,0 +1,10 @@
+a : int;
+b : int;
+
+[Associative]
+{
+    a = 10;
+    b = 2 * a;
+    c = 2 / a;
+    a = a + 1;
+}

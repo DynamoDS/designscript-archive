@@ -1,0 +1,20 @@
+import("ProtoGeometry.dll");
+
+class A
+{
+    x : Point = null;
+	constructor A (x1: Point)
+	{
+	    x = [Imperative]
+		{
+		    if( x1.X == 0 )
+			{
+			    x = x1 ;
+			}
+			else
+			{
+			    x = Point.ByCoordinates(10,10,10);
+			}
+		}
+    }
+}

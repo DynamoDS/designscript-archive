@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+
+<TextEditorCommand CommandNumber="1" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>CreateNewScript</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="173">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="16">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">28</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>FindReplace</MethodName>
+  <Arguments>
+    <anyType xsi:nil="true" />
+    <anyType xsi:nil="true" />
+    <anyType xsi:type="xsd:int">8</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>LoadScriptFromFile</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:string">C:\integration\ds_source\autodeskresearch\trunk\DesignScript\Editor\DesignScriptEditor\DesignScriptEditorUi\IDETestDSFiles\Assignment71.ds</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="35">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="8" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">54</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="9" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="34" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>FindReplace</MethodName>
+  <Arguments>
+    <anyType xsi:nil="true" />
+    <anyType xsi:nil="true" />
+    <anyType xsi:type="xsd:int">8</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="37" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">3</anyType>
+    <anyType xsi:type="xsd:int">6</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=46}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=25,Y=46}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="38" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="3">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=2,Y=7}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="4">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=10,Y=7}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="39" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="5">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=2,Y=8}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="6">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=10,Y=8}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="40" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="7">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=9}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="8">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=2,Y=9}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="41" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="9">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=46}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="10">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=25,Y=46}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="42" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="11">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=48}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="12">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=40,Y=48}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="43" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="44" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="13">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=2,Y=22}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="14">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=9,Y=22}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="45" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="46" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="15">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=48}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="16">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=40,Y=48}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="47" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="17">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=50}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="18">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=40,Y=50}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="48" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="19">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=52}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="20">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=41,Y=52}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="49" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="21">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=2,Y=37}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="22">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=9,Y=37}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="50" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="51" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="23">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=2,Y=39}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="24">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=24,Y=39}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="52" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="25">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=40}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="26">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=2,Y=40}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="53" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="27">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=52}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="28">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=41,Y=52}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="54" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="55" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="56" IntervalTime="169">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="57" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Stop</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="58" IntervalTime="10">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="59" IntervalTime="4">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="60" IntervalTime="24">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="61" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+
+</Commands>

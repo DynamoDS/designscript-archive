@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+<TextEditorCommand CommandNumber="1" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>LoadScriptFromFile</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:string">C:\integration\ds_source\autodeskresearch\trunk\DesignScript\Editor\DesignScriptEditor\DesignScriptEditorUi\IDETestDSFiles\Assignment13.ds</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+    <anyType xsi:type="xsd:int">4</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="2000">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+    <anyType xsi:type="xsd:int">4</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">6</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=1,Y=4}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=12,Y=6}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="3">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue> b = a + b; 
+  b = a - b;
+  b = a * b;</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+</Commands>

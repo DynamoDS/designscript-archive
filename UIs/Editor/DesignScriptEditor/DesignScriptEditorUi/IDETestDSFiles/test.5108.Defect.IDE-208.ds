@@ -1,0 +1,37 @@
+b1 = 1;
+class B
+{
+    x : var;
+    constructor B(y)
+    {
+        x = y;
+    }
+    constructor B()
+    {
+        x = 5;
+    }
+    
+    def foo()
+    {
+        return = 90;
+    }
+}
+
+x = 7;
+a =
+{
+    x => a1;
+    0.5 => a2;
+    a2 * 4 => a3;
+    false => a4;
+    a1..2 => a5;
+    { a3, a3 } => a6;
+    B.B(a1) => a7;
+    B.B() => a8;
+    foo();
+    B.B(a1).x => a9;
+    b1 + a9 => a10;
+    a10 + 2 => a11;
+};
+
+b1 = 2;

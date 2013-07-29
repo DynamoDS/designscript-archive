@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+
+<TextEditorCommand CommandNumber="1" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>CreateNewScript</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="213">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="19">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">28</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>FindReplace</MethodName>
+  <Arguments>
+    <anyType xsi:nil="true" />
+    <anyType xsi:nil="true" />
+    <anyType xsi:type="xsd:int">8</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">54</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="144">
+  <Modifiers>0</Modifiers>
+  <MethodName>LoadScriptFromFile</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:string">C:\integration\ds_source\autodeskresearch\trunk\DesignScript\Editor\DesignScriptEditor\DesignScriptEditorUi\IDETestDSFiles\test.5117.Defect.IDE-307.ds</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="14">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="8" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="9" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="10" IntervalTime="53">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">53</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="11" IntervalTime="23">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">52</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="12" IntervalTime="25">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">51</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="13" IntervalTime="20">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">50</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="14" IntervalTime="47">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">46</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="15" IntervalTime="22">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">41</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="16" IntervalTime="27">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">39</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="17" IntervalTime="18">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">36</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="18" IntervalTime="30">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">34</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="19" IntervalTime="25">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">33</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="20" IntervalTime="24">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">31</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="21" IntervalTime="23">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">30</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="22" IntervalTime="38">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">29</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="23" IntervalTime="41">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">28</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="24" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">27</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=1,Y=13}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=29,Y=13}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="31" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="32" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="5">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=-1,Y=-1}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="6">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=-1,Y=-1}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="33" IntervalTime="160">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="34" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Stop</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="35" IntervalTime="4">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="36" IntervalTime="3">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="37" IntervalTime="6">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="38" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+
+</Commands>

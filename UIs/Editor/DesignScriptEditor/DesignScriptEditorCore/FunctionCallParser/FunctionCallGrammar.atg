@@ -1,0 +1,293 @@
+﻿
+COMPILER FunctionCallParser
+
+CHARACTERS
+
+    uppercaseletter = 'A'..'Z'.
+    lowercaseletter = 'a'..'z'.
+    letter = uppercaseletter + lowercaseletter.
+    digit = '0'..'9'.
+    cr  = '\r'. 
+    lf  = '\n'.
+    tab = '\t'.
+    anyExcludingQuote = ANY - '"'.
+    anyButApostrophe = ANY - '\''.
+    anychar = ANY.
+
+TOKENS
+    ident = (letter | '_' | '@'){letter | digit | '_' | '@'}.
+    number = digit {digit} .
+    float = digit {digit} '.' digit {digit} [('E' | 'e') ['+'|'-'] digit {digit}].
+    textstring = '"' {anyExcludingQuote} '"'.
+    char = '\'' {anyButApostrophe} '\''.
+    period = '.'.
+
+    openbracket = '['.
+    closebracket = ']'.
+    openparen = '('.
+    closeparen = ')'.
+
+    not = '!'.
+    neg = '-'.
+    pipe = '|'.
+    lessthan = '<'.
+    greaterthan = '>'.
+    lessequal = "<=".
+    greaterequal = ">=".
+    equal = "==".
+    notequal = "!=".
+    endline = ';'.
+    rangeop = "..".
+
+    kw_native = "native".
+    kw_class = "class".
+    kw_constructor = "constructor".
+    kw_def = "def".
+    kw_external = "external".
+    kw_extend = "extends".
+    kw_heap = "__heap".
+    kw_if = "if".
+    kw_elseif = "elseif".
+    kw_else = "else".
+    kw_while = "while".
+    kw_for = "for".
+    kw_import = "import".
+    kw_prefix = "prefix".
+    kw_from = "from".
+    kw_break = "break".
+    kw_continue = "continue".
+    kw_static = "static".
+
+    literal_true = "true".
+    literal_false = "false".
+    literal_null = "null".
+
+COMMENTS FROM "/*" TO "*/" 
+COMMENTS FROM "//" TO lf
+
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+
+FunctionCallParser
+=   (. rootFunctionCallPart = new FunctionCallPart(); .)
+    CommonExpression<rootFunctionCallPart>
+.
+
+CommonExpression<FunctionCallPart part>
+=
+    (
+        CommonLogicalExpression<part>
+    |
+        CommonTernaryOperation<part>
+    )
+.
+
+CommonLogicalExpression<FunctionCallPart part>
+=
+    CommonComparisonExpression<part>
+    {
+        CommonLogicalOperator<part>
+        CommonComparisonExpression<part>
+    }
+.
+
+CommonComparisonExpression<FunctionCallPart part>
+=
+    CommonRangeExpression<part>
+    {
+        CommonComparisonOperator<part>
+        CommonRangeExpression<part>
+    }
+.
+
+CommonRangeExpression<FunctionCallPart part>
+=
+    CommonArithmeticExpression<part>
+    [
+        rangeop
+        CommonArithmeticExpression<part>
+        [
+            rangeop
+            [ ( '#' | '~' ) ]
+            CommonArithmeticExpression<part>
+        ]
+    ]
+.
+
+CommonArithmeticExpression<FunctionCallPart part>
+=
+    CommonTerm<part>
+    {
+        CommonMathOperator<part>
+        CommonTerm<part>
+    }
+.
+
+CommonTerm<FunctionCallPart part>
+=
+    (
+        literal_true
+    |
+        literal_false
+    |
+        literal_null
+    |
+        CommonCharacter<part>
+    |
+        CommonString<part>
+    |
+        CommonNegativeExpression<part>
+    |
+        not CommonTerm<part>
+    )
+.
+
+CommonCharacter<FunctionCallPart part>
+=
+    char
+.
+
+CommonString<FunctionCallPart part>
+=
+    textstring
+.
+
+CommonIdentifierList<FunctionCallPart part>
+=                                               (. string partName = string.Empty;  .)
+    CommonNameReference<part>                   (. partName = part.Identifier;      .)
+    {
+        period
+        CommonNameReference<part>               (.
+                                                    string newPartName = part.Identifier;
+                                                    part.Identifier = partName + "." + newPartName;
+                                                    partName = part.Identifier;
+                                                .)
+    }
+.
+
+CommonNegativeExpression<FunctionCallPart part>
+=
+    [
+        neg                 (. part.AppendIdentifier(t); .)
+    ]
+    (
+        ( number | float )  (. part.AppendIdentifier(t); .)
+    |
+        CommonIdentifierList<part>
+    )
+.
+
+CommonNameReference<FunctionCallPart part>
+=
+    (
+        CommonFunctionCall<part>
+    |
+        CommonArrayExpression<part>
+    )
+
+    [
+        openbracket                     (. part.AppendIdentifier(t); part.SetEndPoint(t, false); .)
+        [
+            CommonExpression<part>      (. part.SetEndPoint(t, false); .)
+        ]
+        closebracket                    (. part.AppendIdentifier(t); part.SetEndPoint(t, false); .)
+        {
+            openbracket                 (. part.AppendIdentifier(t); part.SetEndPoint(t, false); .)
+            [
+                CommonExpression<part>  (. part.SetEndPoint(t, false); .)
+            ]
+            closebracket                (. part.AppendIdentifier(t); part.SetEndPoint(t, false); .)
+        }
+    ]
+.
+
+CommonMathOperator<FunctionCallPart part>
+=
+    ( '+' | '-' | '*' | '/' | '%' )
+.
+
+CommonLogicalOperator<FunctionCallPart part>
+=
+    ( "&&" | "||" )
+.
+
+CommonComparisonOperator<FunctionCallPart part>
+=
+    ( '>' | ">=" | '<' | "<=" | "==" | "!=" )
+.
+
+CommonTernaryOperation<FunctionCallPart part>
+=
+    '?' CommonExpression<part> ':' CommonExpression<part>
+.
+
+CommonFunctionCall<FunctionCallPart part>
+=
+    CommonIdentifier<part>
+    {
+        CommonArguments<part>
+    }
+.
+
+CommonIdentifier<FunctionCallPart part>
+=
+    ident (. part.Identifier = t.val; .)
+.
+
+CommonArrayExpression<FunctionCallPart part>
+=
+    '{'                                         (. part.SetStartPoint(t, false);                           .)
+        [                                       (. FunctionCallPart elementPart = new FunctionCallPart();  .)
+            CommonExpression<elementPart>       (. part.AddArgumentPart(elementPart);                      .)
+            {
+                ','                             (. elementPart = new FunctionCallPart();                   .)
+                CommonExpression<elementPart>   (. part.AddArgumentPart(elementPart);                      .)
+            }
+        ]
+    '}'                                         (. part.SetEndPoint(t, true);                              .)
+.
+
+CommonArguments<FunctionCallPart part>
+=
+    openparen                           (.
+                                            part.SetStartPoint(t, false);
+                                            part.SetEndPoint(la, true);
+                                            System.Drawing.Point openBracket = PointFromToken(t, false);
+                                        .)
+    [
+                                        (.
+                                            FunctionCallPart parentCallPart = part;
+                                            part = new FunctionCallPart();
+                                            part.SetStartPoint(t, false);
+                                        .)
+        CommonExpression<part>          (.
+                                            part.SetEndPoint(t, false);
+                                            parentCallPart.AddArgumentPart(part);
+                                            part = parentCallPart;
+                                        .)
+        {
+            WEAK ','                    (.
+                                            parentCallPart = part;
+                                            part = new FunctionCallPart();
+                                            part.SetStartPoint(t, false);
+                                        .)
+            CommonExpression<part>      (.
+                                            part.SetEndPoint(la, true);
+                                            parentCallPart.AddArgumentPart(part);
+                                            part = parentCallPart;
+                                        .)
+        }
+    ]
+                                        (.
+                                            if (part.HasArgument == false) {
+                                                // See "AddDefaultArgument" for details.
+                                                System.Drawing.Point closeBracket = PointFromToken(la, true);
+                                                part.AddDefaultArgument(openBracket, closeBracket);
+                                            }
+                                        .)
+
+    closeparen                          (. part.SetEndPoint(t, true); .)
+.
+
+END FunctionCallParser .

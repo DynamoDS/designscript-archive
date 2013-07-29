@@ -1,0 +1,17 @@
+[Imperative]
+{
+    def foo : int(x : int)
+    {
+        return = x * 119;
+    }
+    
+    def foo : int(x : int, y : int)
+    {
+        return = x * y;
+    }
+    
+    f = foo(11);
+    g = foo(12);
+    p = Print(f);
+    y = Print(g);
+}

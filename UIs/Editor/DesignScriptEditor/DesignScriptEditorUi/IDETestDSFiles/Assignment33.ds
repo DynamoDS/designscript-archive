@@ -1,0 +1,12 @@
+[Imperative]
+{
+	def check:double( _a:double, _b:int )
+	{
+	_c = _a * _b;
+	return = _c;
+	} 
+
+	_a_test = check(2.5,5);
+	_b = 4.5;
+	_c = true;
+}

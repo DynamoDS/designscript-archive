@@ -1,0 +1,8 @@
+a = { 1, 2, 3 };
+b = a;
+c1 = a[0];
+b[0] = 10;
+c2 = a[0];
+testArray = a;
+testArrayMember1 = c1;
+testArrayMember2 = c2;

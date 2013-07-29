@@ -1,0 +1,26 @@
+[Associative]
+{
+	a = 4;
+	b = a + 2;
+	[Imperative]
+	{
+		b = 0;
+		c = 0;
+		if ( a == 4 )
+		{
+			b = 4;
+		}			
+		else
+		{
+			c = 5;
+		}
+
+		d = b;
+		e = c;	
+        g2 = g1;	
+	}
+	f = a * 2;
+    g1 = 3;
+    g3 = g2;
+      
+}

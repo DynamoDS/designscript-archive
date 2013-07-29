@@ -1,0 +1,20 @@
+def foo : int(x : int)
+{
+    x = 55 + x; //Line-3
+    return = x * 33;
+}
+
+def foo1 : int(x : int, y : int)
+{
+    x = foo(6);
+    return = x;
+}
+
+def foo2 : int(x : int, y : int)
+{
+    x = foo1(5, 2);
+    return = x;
+}
+
+        g = foo2(1, 6);
+            k = foo1(3, 5);

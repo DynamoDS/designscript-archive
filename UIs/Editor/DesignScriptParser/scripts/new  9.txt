@@ -1,0 +1,228 @@
+public class AST
+    {
+        public AST()
+        {
+        }
+
+        public ProtoAssociative.DependencyPass.DependencyTracker GetDemoTracker2(ProtoCore.Core core)
+        {
+            ProtoCore.DSParser.Scanner s = new ProtoCore.DSParser.Scanner(@"..\..\Scripts\expr.ds");
+            ProtoCore.DSParser.Parser p = new ProtoCore.DSParser.Parser(s, core);
+            p.Parse();
+
+            CodeBlockNode code = p.root;
+
+            DependencyTracker tempTracker = new DependencyTracker();
+            Dictionary<string, List<Node>> names = new Dictionary<string, List<Node>>();
+            code.ConsolidateNames(ref(names));
+            tempTracker.GenerateDependencyGraph(code.Body;
+            return tempTracker;
+        }
+
+        public ProtoAssociative.DependencyPass.DependencyTracker GetDemoTracker3(out ProtoCore.DSASM.SymbolTable symbols, string pathFilename, ProtoCore.Core core)
+        {
+            ProtoCore.DSParser.Scanner s = new ProtoCore.DSParser.Scanner(pathFilename);
+            ProtoCore.DSParser.Parser p = new ProtoCore.DSParser.Parser(s, core);
+            p.Parse();
+            CodeBlockNode code = p.root;
+            symbols = code.symbols;
+
+            DependencyTracker tempTracker = new DependencyTracker();
+
+#if TEST_DIRECT
+            foreach (Node node in code.Body)
+            {
+                tempTracker.AllNodes.Add(node);
+            }
+#else
+            Dictionary<string, List<Node>> names = new Dictionary<string, List<Node>>();
+            code.ConsolidateNames(ref(names));
+            tempTracker.GenerateDependencyGraph(code.Body);
+#endif
+            return tempTracker;
+        }
+        /*
+        public DependencyPass.DependencyTracker generateAST(ProtoCore.CodeBlock codeblock)
+        {
+            DependencyTracker tempTracker = new DependencyTracker();
+
+            foreach (Object obj in codeblock.Body)
+            {
+                Debug.Assert(obj is ProtoAssociative.DependencyPass.Node);
+                Node node = obj as ProtoAssociative.DependencyPass.Node;
+                tempTracker.AllNodes.Add(node);
+            }
+            return tempTracker;
+        }
+         * */
+
+        public ProtoAssociative.DependencyPass.DependencyTracker GetDemoTracker()
+        {
+            IdentifierNode a = new IdentifierNode();
+            a.Value = "1..1000..+1";
+
+            FunctionCallNode b = new FunctionCallNode();
+            b.Function = new IdentifierNode() { Value = "SQRT" };
+            b.FormalArguments.Add(a);
+
+            BinaryExpressionNode c = new BinaryExpressionNode();
+            c.LeftNode = a;
+            c.Optr = ProtoCore.DSASM.Operator.mul;
+            IdentifierNode _2Node = new IdentifierNode() { Value = "2" };
+            c.RightNode = _2Node;
+
+            BinaryExpressionNode d = new BinaryExpressionNode();
+            d.LeftNode = c;
+            d.RightNode = c;
+            d.Optr = ProtoCore.DSASM.Operator.mul;
+
+            FunctionCallNode e = new FunctionCallNode();
+            e.Function = new IdentifierNode() { Value = "LineFromPoint" };
+            e.FormalArguments.Add(a);
+            e.FormalArguments.Add(b);
+            e.FormalArguments.Add(d);
+
+            Node f = new FunctionCallNode() { Function = new IdentifierNode() { Value = "Trim" } };
+            Node g = new FunctionCallNode() { Function = new IdentifierNode() { Value = "Rotate" } };
+
+            DependencyPass.DependencyTracker tracker = new DependencyPass.DependencyTracker();
+            tracker.AllNodes.Add(a);
+            tracker.AllNodes.Add(b);
+            tracker.AllNodes.Add(c);
+            tracker.AllNodes.Add(_2Node);
+            tracker.AllNodes.Add(d);
+            tracker.AllNodes.Add(e);
+            tracker.AllNodes.Add(f);
+            tracker.AllNodes.Add(g);
+
+            tracker.DirectContingents.Add(a, new List<Node>() { });
+            tracker.DirectContingents.Add(_2Node, new List<Node>() { });
+
+            tracker.DirectContingents.Add(b, new List<Node>() { a });
+            tracker.DirectContingents.Add(c, new List<Node>() { a, _2Node });
+            tracker.DirectContingents.Add(d, new List<Node>() { c });
+            tracker.DirectContingents.Add(e, new List<Node>() { a, b, d });
+            tracker.DirectContingents.Add(f, new List<Node>() { e });
+            tracker.DirectContingents.Add(g, new List<Node>() { f });
+
+            tracker.DirectDependents.Add(a, new List<Node>() { b, c, e });
+            tracker.DirectDependents.Add(b, new List<Node>() { e });
+            tracker.DirectDependents.Add(c, new List<Node>() { d });
+            tracker.DirectDependents.Add(d, new List<Node>() { e });
+            tracker.DirectDependents.Add(e, new List<Node>() { f });
+            tracker.DirectDependents.Add(f, new List<Node>() { g });
+            tracker.DirectDependents.Add(g, new List<Node>() { });
+
+            tracker.DirectDependents.Add(_2Node, new List<Node>() { c });
+
+            return tracker;
+        }
+
+
+        // a = 25
+        // b = 4 + 20 / 5
+        // c = a - 20 * 5
+        public DependencyPass.DependencyTracker GetDemoTrackerJun()
+        {
+            DependencyPass.DependencyTracker tracker = new DependencyPass.DependencyTracker();
+
+
+            string varIdent = null;
+
+            //========================================================
+            // a = 25
+            BinaryExpressionNode i1 = new BinaryExpressionNode();
+
+            varIdent = "a";
+            IdentifierNode fAssignLeft = new IdentifierNode() { Value = varIdent, type = /*SDD*/(int)ProtoCore.PrimitiveType.kTypeVar };
+            // SDD - automatic allocation
+            //tracker.Allocate(varIdent, (int)FusionCore.DSASM.Constants.kGlobalScope, (int)FusionCore.DSASM.Constants.kPrimitiveSize);
+
+            i1.LeftNode = fAssignLeft;
+            i1.Optr = ProtoCore.DSASM.Operator.assign;
+            IdentifierNode fAssignRight = new IdentifierNode() { Value = "25", type = (int)ProtoCore.PrimitiveType.kTypeInt };
+            i1.RightNode = fAssignRight;
+
+            //========================================================
+
+
+            // b = 4 + 20 / 5
+
+            // 20 / 5
+            BinaryExpressionNode sDiv = new BinaryExpressionNode();
+            IdentifierNode sDivLeft = new IdentifierNode() { Value = "20", /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeInt };
+            sDiv.LeftNode = sDivLeft;
+            sDiv.Optr = ProtoCore.DSASM.Operator.div;
+            IdentifierNode sDivRight = new IdentifierNode() { Value = "5", /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeInt };
+            sDiv.RightNode = sDivRight;
+
+
+            // 4 + ( 20 / 5 )
+            BinaryExpressionNode sAdd = new BinaryExpressionNode();
+            IdentifierNode sAddLeft = new IdentifierNode() { Value = "4", /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeInt };
+            sAdd.LeftNode = sAddLeft;
+            sAdd.Optr = ProtoCore.DSASM.Operator.add;
+            BinaryExpressionNode sAddRight = new BinaryExpressionNode();
+            sAddRight = sDiv;
+            sAdd.RightNode = sAddRight;
+
+
+            // b = 4 + 20 / 5
+            BinaryExpressionNode i2 = new BinaryExpressionNode();
+
+            varIdent = "b";
+            IdentifierNode sAssignLeft = new IdentifierNode() { Value = varIdent, /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeVar };
+            // SDD - automatic allocation
+            //tracker.Allocate(varIdent, (int)FusionCore.DSASM.Constants.kGlobalScope, (int)FusionCore.DSASM.Constants.kPrimitiveSize);
+
+            i2.LeftNode = sAssignLeft;
+            i2.Optr = ProtoCore.DSASM.Operator.assign;
+            BinaryExpressionNode sAssignRight = new BinaryExpressionNode();
+            sAssignRight = sAdd;
+            i2.RightNode = sAssignRight;
+
+
+
+            // c = a - 20 * 5
+
+            // 20 * 5
+            BinaryExpressionNode sMul = new BinaryExpressionNode();
+            IdentifierNode sMulLeft = new IdentifierNode() { Value = "20", /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeInt };
+            sMul.LeftNode = sMulLeft;
+            sMul.Optr = ProtoCore.DSASM.Operator.mul;
+            IdentifierNode sMulRight = new IdentifierNode() { Value = "5", /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeInt };
+            sMul.RightNode = sMulRight;
+
+
+            // a - ( 20 * 5 )
+            BinaryExpressionNode sSub = new BinaryExpressionNode();
+            IdentifierNode sSubLeft = new IdentifierNode() { Value = "a", /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeVar };
+            sSub.LeftNode = sSubLeft;
+            sSub.Optr = ProtoCore.DSASM.Operator.sub;
+            BinaryExpressionNode sSubRight = new BinaryExpressionNode();
+            sSubRight = sMul;
+            sSub.RightNode = sSubRight;
+
+
+            // c = a - 20 * 5
+            BinaryExpressionNode i3 = new BinaryExpressionNode();
+
+            varIdent = "c";
+            IdentifierNode si3Left = new IdentifierNode() { Value = varIdent, /*SDD*/type = (int)ProtoCore.PrimitiveType.kTypeVar };
+            // SDD - automatic allocation
+            //tracker.Allocate(varIdent, (int)FusionCore.DSASM.Constants.kGlobalScope, (int)FusionCore.DSASM.Constants.kPrimitiveSize);
+
+            i3.LeftNode = si3Left;
+            i3.Optr = ProtoCore.DSASM.Operator.assign;
+            BinaryExpressionNode si3Right = new BinaryExpressionNode();
+            si3Right = sSub;
+            i3.RightNode = si3Right;
+
+
+            tracker.AllNodes.Add(i1);
+            tracker.AllNodes.Add(i2);
+            tracker.AllNodes.Add(i3);
+
+            return tracker;
+        }
+    }

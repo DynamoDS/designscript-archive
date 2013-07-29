@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="DesignScriptStudio.Graph.Ui.ZoomAndPanControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:DesignScriptStudio.Graph.Ui"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="34"
+             Background="Transparent">
+    <UserControl.Resources>
+        <ResourceDictionary Source="StyleDictionary.xaml">
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Border Width="34" Height="100">
+        <Border.Background>
+            <ImageBrush ImageSource="/DesignScriptStudio.Graph.Ui;component/Resources/toolsbackground.png"/>
+        </Border.Background>
+        <Grid Margin="7,4,7,3">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="5"/>
+        </Grid.RowDefinitions>
+       
+        <Button Grid.Row="1" Click="OnZoomToFitClick">
+            <Button.Resources>
+                <Image x:Key="Inactive"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/viewall.png" />
+                <Image x:Key="Hover"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/viewall_active.png" />
+            </Button.Resources>
+            <Button.Style>
+                <Style BasedOn="{StaticResource ZoomAndPanButton}" TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="false">
+                            <Setter Property="Content" Value="{StaticResource Inactive}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Content" Value="{StaticResource Hover}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Grid.Row="3" Click="OnZoomInClick">
+            <Button.Resources>
+                <Image x:Key="Inactive"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/zoomin.png" />
+                <Image x:Key="Hover"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/zoomin_active.png" />
+            </Button.Resources>
+            <Button.Style>
+                <Style BasedOn="{StaticResource ZoomAndPanButton}" TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="false">
+                            <Setter Property="Content" Value="{StaticResource Inactive}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Content" Value="{StaticResource Hover}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Grid.Row="5" Click="OnZoomOutClick">
+            <Button.Resources>
+                <Image x:Key="Inactive"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/zoomout.png" />
+                <Image x:Key="Hover"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/zoomout_active.png" />
+            </Button.Resources>
+            <Button.Style>
+                <Style BasedOn="{StaticResource ZoomAndPanButton}" TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="false">
+                            <Setter Property="Content" Value="{StaticResource Inactive}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Content" Value="{StaticResource Hover}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+        <Button Grid.Row="7" Click="OnPanClick">
+            <Button.Resources>
+                <Image x:Key="Inactive"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/pan.png" />
+                <Image x:Key="Hover"
+                       Source="/DesignScriptStudio.Graph.Ui;component/Resources/pan_active.png" />
+            </Button.Resources>
+            <Button.Style>
+                <Style BasedOn="{StaticResource ZoomAndPanButton}" TargetType="{x:Type Button}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="false">
+                            <Setter Property="Content" Value="{StaticResource Inactive}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Content" Value="{StaticResource Hover}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+    </Grid>
+    </Border>
+</UserControl>

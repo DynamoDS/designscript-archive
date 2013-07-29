@@ -1,0 +1,12 @@
+[Imperative]
+{
+	def neg_float:double(x:double,y:double)
+	{
+	a = x;
+	b = y;
+	return = a + b;
+	}
+
+	z = neg_float(-2.3,-5.8);
+ 
+}

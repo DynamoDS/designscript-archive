@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="DesignScript.Editor.Common.UpdateNotificationControl"
+             xmlns:local="clr-namespace:DesignScript.Editor.Common"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="180">
+    <Control.Resources>
+        <Style x:Key="InstallButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Button Width="180" FontSize="10.667" VerticalAlignment="Stretch" HorizontalAlignment="Right" BorderBrush="#FF8B8B8B" Foreground="#FFB4380D" FontWeight="SemiBold" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+                            <Button.Background>
+                                <SolidColorBrush Color="#FFE4CF95"></SolidColorBrush>
+                            </Button.Background>
+                            <ContentPresenter></ContentPresenter>
+                        </Button>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True"/>
+                            <Trigger Property="IsDefaulted" Value="True"/>
+                            <Trigger Property="IsMouseOver" Value="True"/>
+                            <Trigger Property="IsPressed" Value="True"/>
+                            <Trigger Property="IsEnabled" Value="False"/>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Control.Resources>
+    <Grid>
+        <Button x:Name="InstallButton" Style="{DynamicResource InstallButtonStyle}" Foreground="#FFAB5A5A">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal" Margin="4,0,4,0">
+                    <TextBlock Margin="0,0,6,0" Foreground="Black">Install new update</TextBlock>
+                    <Image Source="/DesignScript.Editor.Common;component/Resources/DownloadIcon.png" Width="13" Height="10"></Image>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+    </Grid>
+</UserControl>

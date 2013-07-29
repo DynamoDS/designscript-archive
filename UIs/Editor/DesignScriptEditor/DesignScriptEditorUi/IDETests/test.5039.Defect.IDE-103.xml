@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+<TextEditorCommand CommandNumber="1" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>CreateNewScript</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="1390">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="125">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="78">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">15</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>LoadScriptFromFile</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:string">C:\integration\ds_source\autodeskresearch\trunk\DesignScript\Editor\DesignScriptEditor\DesignScriptEditorUi\IDETestDSFiles\Assignment13.ds</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="203">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="93">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="9" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="8" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="10" IntervalTime="1549">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetCursorPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="11" IntervalTime="56">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="12" IntervalTime="1409">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="13" IntervalTime="400">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetCursorPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="14" IntervalTime="49">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="15" IntervalTime="655">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="16" IntervalTime="359">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetCursorPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">4</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="17" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="18" IntervalTime="625">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="19" IntervalTime="343">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetCursorPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="20" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="21" IntervalTime="624">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="22" IntervalTime="343">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetCursorPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="23" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="24" IntervalTime="605">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="25" IntervalTime="359">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetCursorPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">7</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="26" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="27" IntervalTime="951">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="28" IntervalTime="109">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetCursorPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">-1</anyType>
+    <anyType xsi:type="xsd:int">-1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="29" IntervalTime="1131">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="30" IntervalTime="388">
+  <Modifiers>0</Modifiers>
+  <MethodName>Stop</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="32" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="31" IntervalTime="1416">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="34" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="33" IntervalTime="117">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="36" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="35" IntervalTime="1141">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">116</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="37" IntervalTime="222">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">101</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="38" IntervalTime="283">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">115</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="39" IntervalTime="266">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">116</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="41" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="40" IntervalTime="1634">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="42" IntervalTime="47">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>[Imperative]test
+</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=17,Y=0}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="3">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=0}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="43" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="45" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">17</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="44" IntervalTime="109">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="46" IntervalTime="734">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+</Commands>

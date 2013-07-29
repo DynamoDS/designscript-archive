@@ -1,0 +1,6 @@
+[Imperative]
+{
+	b = true;
+	c = 4.5;
+	d = c * b;
+}

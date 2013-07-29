@@ -1,0 +1,22 @@
+[Imperative]
+{
+    def foo : int()
+    {
+        return = 3;
+    }
+    
+    def foo1 : int(x : int)
+    {
+        return = x * 3;
+    }
+    
+    x = 1;
+    h = foo1(0);
+    
+    while(x < foo())
+    {
+        h = foo1(x);
+        x = x + 1;
+    }
+}
+

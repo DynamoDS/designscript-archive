@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+<TextEditorCommand CommandNumber="1" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>CreateNewScript</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="1243">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="151">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="182">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">29</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>LoadScriptFromFile</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:string">C:\integration\ds_source\autodeskresearch\trunk\DesignScript\Editor\DesignScriptEditor\DesignScriptEditorUi\IDETestDSFiles\Assignment13.ds</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="359">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="108">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="9" IntervalTime="0">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="8" IntervalTime="250">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="11" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">12</anyType>
+    <anyType xsi:type="xsd:int">5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="10" IntervalTime="1728">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">12</anyType>
+    <anyType xsi:type="xsd:int">5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="13" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="12" IntervalTime="1188">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">5</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=2,Y=5}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=12,Y=5}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="3">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>b = a - b;</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="15" IntervalTime="0">
+  <Modifiers>2</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+    <anyType xsi:type="xsd:int">8</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="14" IntervalTime="2000">
+  <Modifiers>2</Modifiers>
+  <MethodName>DoCopyText</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:boolean">true</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="4">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=2,Y=5}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="17" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">3</anyType>
+    <anyType xsi:type="xsd:int">5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="16" IntervalTime="2000">
+  <Modifiers>2</Modifiers>
+  <MethodName>UndoEditing</MethodName>
+  <Asserts>
+    <CommandAssert AssertNumber="5">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=12,Y=5}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="18" IntervalTime="2000">
+  <Modifiers>2</Modifiers>
+  <MethodName>RedoEditing</MethodName>
+  <Asserts>
+    <CommandAssert AssertNumber="6">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=2,Y=5}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="19" IntervalTime="2000">
+  <Modifiers>2</Modifiers>
+  <MethodName>UndoEditing</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="21" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="20" IntervalTime="2000">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="23" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">10</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="22" IntervalTime="941">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">10</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="25" IntervalTime="0">
+  <Modifiers>2</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">10</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="24" IntervalTime="765">
+  <Modifiers>2</Modifiers>
+  <MethodName>DoCopyText</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:boolean">true</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="27" IntervalTime="0">
+  <Modifiers>2</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">3</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="26" IntervalTime="2000">
+  <Modifiers>2</Modifiers>
+  <MethodName>DoPasteText</MethodName>
+  <Asserts>
+    <CommandAssert AssertNumber="7">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=10,Y=3}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="29" IntervalTime="0">
+  <Modifiers>2</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="28" IntervalTime="2000">
+  <Modifiers>2</Modifiers>
+  <MethodName>UndoEditing</MethodName>
+  <Asserts>
+    <CommandAssert AssertNumber="8">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=2,Y=3}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="30" IntervalTime="2000">
+  <Modifiers>2</Modifiers>
+  <MethodName>UndoEditing</MethodName>
+  <Asserts>
+    <CommandAssert AssertNumber="9">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=10,Y=3}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="31" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="33" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">13</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="32" IntervalTime="115">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="33" IntervalTime="108">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="34" IntervalTime="1000">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+</Commands>

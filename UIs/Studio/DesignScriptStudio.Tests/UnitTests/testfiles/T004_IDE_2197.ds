@@ -1,0 +1,221 @@
+import("ProtoGeometry.dll");
+
+def CountEdgeFaces : int(_edge : Edge) = Count(_edge.AdjacentFaces);
+
+def FaceEdgeCoordinateSystem (_face : Face)
+{
+    _edges = _face.Edges;
+    edgeCentroids = EdgeCentroid(_edges);
+    directionToCenters = edgeCentroids.DirectionTo(_face.Centroid);
+    edgeNormals   = EdgeNormal(_edges);
+    edgeDirections = EdgeDirection(_edges);
+    // Print("edgeDirections = " + edgeDirections);
+    correctedEdgeDirections = CheckDirection(edgeDirections,  directionToCenters.Cross(edgeNormals));;
+    // Print("correctedEdgeDirections = " + correctedEdgeDirections);
+    return = CoordinateSystem.ByOriginVectors(edgeCentroids, correctedEdgeDirections, edgeNormals); // , directionToCenters);
+}
+
+def EdgeCentroid : Point (_edge : Edge)
+{
+    _start = _edge.CurveGeometry.StartPoint;
+    _end =  _edge.CurveGeometry.EndPoint;
+    return = Point.ByCoordinates(Average({ _start.X, _end.X }), Average({ _start.Y, _end.Y }), Average({ _start.Z, _end.Z }));
+}
+
+def EdgeDirection : Vector (_edge : Edge)
+{
+    _start = _edge.CurveGeometry.StartPoint;
+    _end =  _edge.CurveGeometry.EndPoint;
+    return = _start.DirectionTo(_end);
+}
+
+def ExtendEdgeGeometry : Line (_edge : Edge, extension : double)
+{
+    _start = _edge.CurveGeometry.StartPoint;
+    _end =  _edge.CurveGeometry.EndPoint;
+    direction = _start.DirectionTo(_end).Normalize();
+    newStart = _start.Translate(direction.Scale(-1.0), extension);
+    newEnd = _end.Translate(direction, extension);
+    
+    return = Line.ByStartPointEndPoint(newStart, newEnd);
+}
+
+def EdgeNormal : Vector(_edge : Edge)
+{
+    _faceNormals = FaceNormal(_edge.AdjacentFaces);
+    Print("Count(_faceNormals) = " + Count(_faceNormals));
+    return = Count(_faceNormals) > 1 ? Vector.ByCoordinates(Average(_faceNormals.X), Average(_faceNormals.Y), Average(_faceNormals.Z)).Normalize() : _faceNormals[0].Normalize();
+}
+
+
+def VertexNormal : Vector(_vertex : Vertex)
+{
+    _faceNormals = FaceNormal(_vertex.AdjacentFaces);
+    return = Vector.ByCoordinates(Average(_faceNormals.X), Average(_faceNormals.Y), Average(_faceNormals.Z)).Normalize();
+}
+
+def FaceNormal : Vector(_face : Face)
+{
+    _points = _face.Vertices.PointGeometry;
+    _vector0 =  _points[0].DirectionTo(_points[1]).Normalize();
+    _vector1 =  _points[1].DirectionTo(_points[2]).Normalize();
+    return = _vector0.Cross(_vector1).Normalize();
+}
+
+def CheckDirection : Vector(directionA : Vector, directionB : Vector)
+{
+    return = (directionA.Dot(directionB) > 0.0 ? directionA : directionA.Scale(-1.0)).Normalize();
+}
+
+class FacadePanel
+{
+    PanelSolid : Solid;
+    Inset : double;
+    Offset : double;
+    Thickness : double;
+    
+    constructor FromFace(_face : Face, offset : double,  internalInset : double, externalInset : double, thickness : double)
+    {
+        faceEdgeCS = FaceEdgeCoordinateSystem(_face);
+        
+        insetToUse = CountEdgeFaces(_face.Edges) > 1 ? internalInset : externalInset;
+        edgePlanes = Plane.ByOriginNormal(faceEdgeCS.Origin, faceEdgeCS.ZAxis, 2.0).Offset(-insetToUse).SetColor(Color.Red);
+        offsetFacePlane = Plane.ByOriginNormal(_face.Centroid, FaceNormal(_face), 2.0).Offset(offset);
+        curves = edgePlanes[-1..1].Intersect(edgePlanes[0..2]);
+        
+        projectionPoints = curves.EndPoint.Project(offsetFacePlane, curves.EndPoint.DirectionTo(curves.StartPoint));
+        controlVertices = Concat(projectionPoints, { projectionPoints[0] });
+            
+        PanelCurves[0] = BSplineCurve.ByControlVertices(controlVertices, 1).SetColor(Color.Red);
+        PanelCurves[1] = PanelCurves[0].Translate(FaceNormal(_face), thickness).SetColor(Color.Blue);
+        
+        PanelSolid = Solid.LoftFromCrossSections(PanelCurves).SetColor(Color.Cyan);
+    }
+}
+
+class EdgeMember
+{
+    Section : Solid = null;
+    Flange = null;
+    CuttingSurface : Surface;
+    LocalCS : CoordinateSystem = null;
+        
+    constructor ByEdge (_edge : Edge, selectPoint : Point, sectionCutback : double, sectionRadius : double, flangeOffset : double,  flangeDepth : double, flangeThickness : double, gap : double)
+    {
+        vertexNormals = VertexNormal({ _edge.StartVertex, _edge.EndVertex }).Scale(-1.0);
+        
+        // _start = _edge.CurveGeometry.StartPoint;
+        // _end =  _edge.CurveGeometry.EndPoint;
+        _start =  _edge.StartVertex.PointGeometry;
+        _end = _edge.EndVertex.PointGeometry;
+        
+        _direction = _start.DirectionTo(_end).Normalize();
+        _length = _start.DistanceTo(_end);
+        
+        LocalCS = CoordinateSystem.ByOriginVectors(_start, _direction, vertexNormals[0]).SetVisibility(false);
+        
+        correctedStart = _start.Translate(_direction, sectionCutback);
+        correctedEnd = _end.Translate(_direction.Scale(-1.0), sectionCutback);
+        centerLine = Line.ByStartPointEndPoint(correctedStart, correctedEnd);
+        
+        countFaces = Count(_edge.AdjacentFaces);
+        /*
+        [Imperative]
+        {
+            if (countFaces > 1)
+            {
+                edgeCentroid = EdgeCentroid(_edge);
+                
+                directionToFaceCentroids[0] = edgeCentroid.DirectionTo(_edge.AdjacentFaces[0].Centroid).Normalize();
+                directionToFaceCentroids[1] = edgeCentroid.DirectionTo(_edge.AdjacentFaces[1].Centroid).Normalize();
+                
+                outerLimit = sectionRadius * 4.0;
+                
+                startControlPoints = _start.Translate(directionToFaceCentroids, outerLimit);
+                endControlPoints = _end.Translate(directionToFaceCentroids, outerLimit);
+                
+                crossSections[0] = BSplineCurve.ByControlVertices({ startControlPoints[0], _start, startControlPoints[1] }, 1);
+                crossSections[1] = BSplineCurve.ByControlVertices({ endControlPoints[0], _end, endControlPoints[1] }, 1);
+            
+               // CuttingSurface = LoftedSurface.FromCrossSections(crossSections).SetColor(Color.Red);
+                cuttingSurfaceA = LoftedSurface.FromCrossSections(crossSections).SetColor(Color.Red);
+                edgeNormal = EdgeNormal(_edge);
+                
+                // selectPoint = EdgeCentroid(_edge).Translate(edgeNormal, outerLimit);
+                
+                cone = Cone.ByStartPointEndPointRadius(correctedStart, correctedEnd, sectionRadius, sectionRadius);
+            
+                cone = cone.Trim(cuttingSurfaceA, selectPoint).SetColor(Color.Cyan);
+                
+                // flangeStartPoints = _start.Translate(vertexNormals[0], { flangeOffset, flangeDepth });
+                // flangeEndPoints = _end.Translate(vertexNormals[1], { flangeOffset, flangeDepth });
+                
+                flangeStartPoints = _start.Translate(vertexNormals[0], { -(flangeOffset+flangeDepth), -flangeOffset });
+                flangeEndPoints = _end.Translate(vertexNormals[1], { -(flangeOffset+flangeDepth), -flangeOffset });
+               
+                profile = Line.ByStartPointEndPoint(flangeStartPoints, flangeEndPoints);
+                Flange = LoftedSurface.FromCrossSections(profile).Thicken(flangeThickness, true).SetColor(Color.Cyan);
+                
+                directionsToFaceCentroidsStart = _edge.StartVertex.PointGeometry.DirectionTo(_edge.AdjacentFaces.Centroid);
+                directionsToFaceCentroidsEnd   = _edge.EndVertex.PointGeometry.DirectionTo(_edge.AdjacentFaces.Centroid);
+                
+                edgeCentroid = EdgeCentroid(_edge);
+                
+                startVertexNormal = VertexNormal(_edge.StartVertex);
+                endVertexNormal = VertexNormal(_edge.EndVertex);
+                
+                planeNormalsStart = directionsToFaceCentroidsStart.Cross(startVertexNormal);  
+                planeNormalsEnd = directionsToFaceCentroidsEnd.Cross(endVertexNormal);
+                
+                planesStart = Plane.ByOriginNormal(_edge.StartVertex.PointGeometry, planeNormalsStart).Translate(planeNormalsStart, { gap, -gap });
+                planesEnd = Plane.ByOriginNormal(_edge.EndVertex.PointGeometry, planeNormalsEnd).Translate(planeNormalsStart, { gap, -gap });
+                
+                sectionRadius = 1.0;
+                
+                cone = Cone.ByStartPointEndPointRadius(_edge.StartVertex.PointGeometry, _edge.EndVertex.PointGeometry, sectionRadius, sectionRadius);
+                
+                cuttingPlanes = Flatten({ planesStart, planesEnd });
+                
+                Section = cone.Trim(cuttingPlanes, edgeCentroid).SetColor(Color.Cyan);
+                
+                Flange = Flange.Trim(cuttingPlanes, edgeCentroid).SetColor(Color.Cyan);
+            }
+            
+            else
+            {
+                Section = null; //Cone.ByStartPointEndPointRadius(correctedStart, correctedEnd, sectionRadius, sectionRadius).SetColor(Color.Cyan);
+                Print("NO");
+            }
+        }
+		*/
+    }   
+}
+
+
+def EdgeOffSetMitrePlanes : Plane[](_edge : Edge, offset : double)
+{
+    tstLine = _edge._ExtractGeometry(Color.Red);
+    
+    directionsToFaceCentroidsStart = _edge.StartVertex.PointGeometry.DirectionTo(_edge.AdjacentFaces.Centroid);
+    directionsToFaceCentroidsEnd   = _edge.EndVertex.PointGeometry.DirectionTo(_edge.AdjacentFaces.Centroid);
+    
+    edgeCentroid = EdgeCentroid(_edge);
+    
+    startVertexNormal = VertexNormal(_edge.StartVertex);
+    endVertexNormal = VertexNormal(_edge.EndVertex);
+    
+    planeNormalsStart = directionsToFaceCentroidsStart.Cross(startVertexNormal);  
+    planeNormalsEnd = directionsToFaceCentroidsEnd.Cross(endVertexNormal);
+    
+    edgeCentroids = EdgeCentroid(_edge);
+    directionStartToEdgeCentroid = _edge.StartVertex.PointGeometry.DirectionTo(edgeCentroids);
+    directionEndToEdgeCentroid = _edge.EndVertex.PointGeometry.DirectionTo(edgeCentroids);
+    
+    planeNormalsStart = CheckDirection(planeNormalsStart, directionStartToEdgeCentroid);
+    planeNormalsEnd = CheckDirection(planeNormalsEnd, directionEndToEdgeCentroid);
+    
+    planesStart = Plane.ByOriginNormal(_edge.StartVertex.PointGeometry, planeNormalsStart).Translate(planeNormalsStart, offset);
+    planesEnd = Plane.ByOriginNormal(_edge.EndVertex.PointGeometry, planeNormalsEnd).Translate(planeNormalsEnd, offset);
+    
+    return = Flatten({ planesStart, planesEnd });
+}

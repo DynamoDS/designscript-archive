@@ -1,0 +1,17 @@
+class A
+{
+    static def foo(y : int)
+    {
+        return = y * 2;
+    }
+    
+}
+
+x = 33;
+
+def foo : int(y : int)
+{
+    return = y + 222;
+}
+
+a = x < A.foo(22) ? foo(1) : A.foo(4);

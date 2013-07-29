@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{01837719-A846-4B48-A066-DFBA9D1151BB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Autodesk.DesignScript.Geometry</RootNamespace>
+    <AssemblyName>DSProtoGeometry</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="Config\DesignScript.CS.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <NoWarn>1591</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Core\Color.cs" />
+    <Compile Include="Core\GeometryConfiguration.cs" />
+    <Compile Include="Core\Application.cs" />
+    <Compile Include="Core\GeometryDataProvider.cs" />
+    <Compile Include="Core\GeometryDataSerializer.cs" />
+    <Compile Include="Core\GeometryExpressionBuilder.cs" />
+    <Compile Include="Core\GraphicDataProvider.cs" />
+    <Compile Include="Geometry\Arc.cs" />
+    <Compile Include="Geometry\Block.cs" />
+    <Compile Include="Geometry\BSplineCurve.cs" />
+    <Compile Include="Geometry\BSplineSurface.cs" />
+    <Compile Include="Geometry\LoftedSurface.cs" />
+    <Compile Include="Geometry\NonManifoldSolid.cs" />
+    <Compile Include="Geometry\PatchSurface.cs" />
+    <Compile Include="Geometry\RevolvedSurface.cs" />
+    <Compile Include="Geometry\SurfaceCurvature.cs" />
+    <Compile Include="Geometry\SweptSurface.cs" />
+    <Compile Include="Geometry\Text.cs" />
+    <Compile Include="ObjHandler\Group.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ObjHandler\MeshData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ObjHandler\MeshFace.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ObjHandler\ObjHandler.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Topology\Cell.cs" />
+    <Compile Include="Topology\CellFace.cs" />
+    <Compile Include="Geometry\Circle.cs" />
+    <Compile Include="Geometry\Cone.cs" />
+    <Compile Include="Geometry\CoordinateSystem.cs" />
+    <Compile Include="Geometry\Cuboid.cs" />
+    <Compile Include="Geometry\Curve.cs" />
+    <Compile Include="Geometry\Cylinder.cs" />
+    <Compile Include="Topology\Edge.cs" />
+    <Compile Include="Topology\Face.cs" />
+    <Compile Include="Geometry\Geometry.cs" />
+    <Compile Include="Core\HostFactory.cs" />
+    <Compile Include="Geometry\Line.cs" />
+    <Compile Include="Geometry\Plane.cs" />
+    <Compile Include="Geometry\Point.cs" />
+    <Compile Include="Geometry\Polygon.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Topology\Mesh.cs" />
+    <Compile Include="Topology\Shell.cs" />
+    <Compile Include="Geometry\Solid.cs" />
+    <Compile Include="Geometry\Sphere.cs" />
+    <Compile Include="Geometry\SubDivisionMesh.cs" />
+    <Compile Include="Geometry\Surface.cs" />
+    <Compile Include="Topology\Topology.cs" />
+    <Compile Include="Geometry\UnknownCurve.cs" />
+    <Compile Include="Core\GeometryExtension.cs" />
+    <Compile Include="Geometry\Vector.cs" />
+    <Compile Include="Topology\Vertex.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HostInterfaces.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ProtoInterface\ProtoInterface.csproj">
+      <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
+      <Name>ProtoInterface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

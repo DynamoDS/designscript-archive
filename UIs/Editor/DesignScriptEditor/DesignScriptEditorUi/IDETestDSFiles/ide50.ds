@@ -1,0 +1,10 @@
+import("ProtoGeometry.dll");
+
+[Imperative]
+{
+	y = 0;
+	for ( x in { 10, 15, 20 } )
+	{
+		y = x;
+	}
+}

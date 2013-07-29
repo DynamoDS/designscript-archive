@@ -1,0 +1,22 @@
+class Dummy
+{
+    value : var;
+    constructor Dummy()
+    {
+        value = 5;
+    }
+
+    def _Dispose()
+    {
+        value = -1;
+        return = null;
+    }
+}
+
+def GetValue(d : Dummy)
+{
+    return = d.value;
+}
+
+arr = {Dummy.Dummy(), Dummy.Dummy(), Dummy.Dummy(), Dummy.Dummy()};
+val = GetValue(arr);

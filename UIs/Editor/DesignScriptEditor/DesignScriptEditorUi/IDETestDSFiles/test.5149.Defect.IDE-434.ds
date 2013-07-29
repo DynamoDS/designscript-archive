@@ -1,0 +1,65 @@
+class A
+{
+    a : int;
+    def foo()
+    {
+        a = 10;
+        b = 2 * a;
+        a = 1;
+        return = b;
+    }
+    
+}
+
+class B
+{
+    x : var;
+    constructor B(y)
+    {
+        x = y;
+    }
+    
+    def foo()
+    {
+        return = 90;
+    }
+}
+
+class C
+{
+    static count : var = 0;
+    constructor C()
+    {
+        count = count + 1;
+    }   
+}
+
+class D
+{
+    static count : var = 0;
+    constructor D()
+    {
+        count = count + 1;
+    }
+}
+
+x = 1;
+a =
+{
+    x => a1;
+    - 0.5 => a2;
+    a2 * 4 => a3;
+    a1 > 10 ? true : false => a4;
+    a1..2 => a5;
+    { a3, a3 } => a6;
+    B.B(a1) => a7;
+    foo();
+    B.B(a1).x => a8;
+}
+
+a = A.A();
+b = a.foo();
+
+
+
+z = C.C();

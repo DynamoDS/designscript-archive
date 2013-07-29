@@ -1,0 +1,23 @@
+[Imperative]
+{
+    def fo1 : int(a : int)
+    {
+        return = a;
+    }
+    
+    a = 400;
+    b = 100;
+
+
+	smallest2   =   (fo1(a))	<   (fo1(b))  ?   (fo1(a))	:	(fo1(b));	//100
+	largest2	=   (fo1(a)) >   (fo1(b))  ?   (fo1(a))	:	(fo1(b)); //400
+}
+
+
+
+
+
+
+
+
+

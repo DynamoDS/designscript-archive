@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+	<FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)..\Prototype\bin\$(Platform)\$(Configuration)</FINAL_BIN>
+	<OutputPath Condition=" '$(OutputPath)' == '' ">$(FINAL_BIN)</OutputPath>
+	<NunitPath Condition=" '$(NunitPath)' == '' ">$(SolutionDir)..\nunit\framework\nunit.framework.dll</NunitPath>
+	<Project>Studio</Project>
+    <BaseIntermediateOutputPath>$(OutputPath)\int\</BaseIntermediateOutputPath>
+    <CodeAnalysisLogFile>$(SolutionDir)..\Prototype\bin\$(Platform)\$(Configuration)\tmp\$(AssemblyName).CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='Win32'">
+    <FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)..\Prototype\bin\x86\$(Configuration)\</FINAL_BIN>
+	<OutputPath Condition=" '$(OutputPath)' == '' ">$(FINAL_BIN)</OutputPath>
+  <BaseIntermediateOutputPath>$(OutputPath)int\</BaseIntermediateOutputPath>
+	</PropertyGroup>
+</Project>

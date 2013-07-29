@@ -1,0 +1,42 @@
+class Jun
+{
+    x : var;
+    y : int = 99;
+    
+}
+
+a = Jun.Jun();
+b = 3;
+n = 33;
+
+class Dummy
+{
+    x : var;
+    y : int;
+}
+
+def GetValue(d : Dummy)
+{
+}
+
+arr = { Dummy.Dummy(), Dummy.Dummy() };
+val = GetValue(arr);
+
+class A
+{
+    x : int;
+    
+    constructor Bam()
+    {
+        x = 1;
+    }
+    
+    def foo()
+    {
+        return = 90;
+    }
+}
+
+a = A.A();
+b = a.foo();
+c = 0;

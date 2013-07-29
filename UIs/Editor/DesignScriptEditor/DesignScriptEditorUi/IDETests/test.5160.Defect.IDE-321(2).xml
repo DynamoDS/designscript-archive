@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+
+<TextEditorCommand CommandNumber="1" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>LoadScriptFromFile</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:string">C:\integration\ds_source\autodeskresearch\trunk\DesignScript\Editor\DesignScriptEditor\DesignScriptEditorUi\IDETestDSFiles\test.5160.Defect.IDE-321(2).ds</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="189">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="42">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="13">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">28</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="44">
+  <Modifiers>0</Modifiers>
+  <MethodName>FindReplace</MethodName>
+  <Arguments>
+    <anyType xsi:nil="true" />
+    <anyType xsi:nil="true" />
+    <anyType xsi:type="xsd:int">8</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">7</anyType>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="10">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">54</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="11" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="20" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">27</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=0,Y=17}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=10,Y=17}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="21" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="3">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=8,Y=9}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="4">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=14,Y=9}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="22" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="5">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=8,Y=10}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="6">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=15,Y=10}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="23" IntervalTime="220">
+  <Modifiers>1</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">3</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="7">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=0,Y=17}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="8">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=10,Y=17}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="24" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="25" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="9">
+      <PropertyName>ExecutionCursorStart</PropertyName>
+      <PropertyValue>{X=-1,Y=-1}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="10">
+      <PropertyName>ExecutionCursorEnd</PropertyName>
+      <PropertyValue>{X=-1,Y=-1}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="26" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Step</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="27" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>Stop</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="28" IntervalTime="14">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="29" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+
+</Commands>

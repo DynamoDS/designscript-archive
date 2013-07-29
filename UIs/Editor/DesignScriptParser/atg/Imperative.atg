@@ -1,0 +1,1209 @@
+Imperative<out Node codeBlockNode> 
+=	
+							(. 
+								Node node = null; 
+                                DesignScript.Parser.Imperative.CodeBlockNode codeblock = new DesignScript.Parser.Imperative.CodeBlockNode();
+							    codeblock.Col = la.col;
+								codeblock.Line = la.line;
+							.)							
+    {  
+        IF(la.kind != _EOF && la.val !="}")   
+                            (. bool valid = false; .)
+        (
+			(
+				Imperative_stmt<out node>           (. valid = true; .)
+			)
+			|
+			(
+				Imperative_functiondecl<out node>   (. valid = true; .)
+			)	
+		)
+                            (. if(!valid) Get(); .)
+                            (. if (node != null)
+							   {
+                                   codeblock.Body.Add(node);
+                               } 
+                            .)
+    }                           
+                            (. codeBlockNode = codeblock; .)
+.
+
+
+
+
+Imperative_languageblock<out Node node>			
+=										
+										(. 
+											node = null; 
+											DesignScript.Parser.Imperative.LanguageBlockNode langblock = new DesignScript.Parser.Imperative.LanguageBlockNode(); 
+										.)	
+										(. if (la.val == "[") langblock.OpenParenPos.setValue(la.col, la.line, la.val); .)
+	openbracket							(. langblock.Col = t.col; langblock.Line = t.line; .)
+	ident                               (. if (t.val == "Imperative" || t.val == "Associative") langblock.IdentPos.setValue(t.col, t.line, t.val); .)
+										(.
+											if( 0 == t.val.CompareTo("Imperative")) {
+												langblock.CodeBlock.language = ProtoCore.Language.kImperative;
+											}
+											else if( 0 == t.val.CompareTo("Associative")) {
+												langblock.CodeBlock.language = ProtoCore.Language.kAssociative; 
+											}
+										.)
+	{
+		','									(. string key; .)	
+                                            (. DesignScript.Parser.Imperative.IDEHelpNode commaPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode };.)
+									        (. langblock.ParaPosList.Add(commaPos); .)		
+		ident								(. key = t.val; .)
+                                            (. DesignScript.Parser.Imperative.IDEHelpNode identPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.IdentNode };.)
+									        (. langblock.ParaPosList.Add(identPos); .)	
+		'='			                        (. DesignScript.Parser.Imperative.IDEHelpNode assignPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode };.)
+									        (. langblock.ParaPosList.Add(assignPos); .)	
+		textstring							(. DesignScript.Parser.Imperative.StringNode textstringPos = new DesignScript.Parser.Imperative.StringNode() { Col = t.col, Line = t.line, value = t.val }; .)
+									        (. langblock.TextStringList.Add(textstringPos); .)	
+                                            (.	
+												if ("fingerprint" == key)
+												{
+													langblock.CodeBlock.fingerprint = t.val; 
+													langblock.CodeBlock.fingerprint = langblock.CodeBlock.fingerprint.Remove(0,1); 
+													langblock.CodeBlock.fingerprint = langblock.CodeBlock.fingerprint.Remove(langblock.CodeBlock.fingerprint.Length-1,1); 
+												}
+												else if ("version" == key)
+												{
+													langblock.CodeBlock.version = t.val; 
+													langblock.CodeBlock.version = langblock.CodeBlock.version.Remove(0,1); 
+													langblock.CodeBlock.version = langblock.CodeBlock.version.Remove(langblock.CodeBlock.version.Length-1,1);
+												}
+											 .)			
+	}
+											(. if (la.val == "]" && langblock.OpenParenPos.Value != null) langblock.CloseParenPos.setValue(la.col, la.line, la.val); else if (la.val != "]") langblock.OpenParenPos.Value = null; .)			
+	closebracket							(. if (la.val == "{") langblock.OpenCurlyBracePos.setValue(la.col, la.line, la.val); .)	 
+	'{'                                     
+                                            (. Node codeBlockNode = null; .)
+     (
+    IF( langblock.CodeBlock.language == ProtoCore.Language.kAssociative )
+    Hydrogen<out codeBlockNode>              
+    |    
+    IF( langblock.CodeBlock.language == ProtoCore.Language.kImperative )
+    Imperative<out codeBlockNode>              
+    )
+    (
+    IF( langblock.CodeBlock.language == ProtoCore.Language.kInvalid )
+                                            (. int openCurlyBraceCount = 0, closeCurlyBraceCount = 0; .)
+                                            (. DesignScript.Parser.Imperative.CodeBlockNode codeBlockInvalid = new DesignScript.Parser.Imperative.CodeBlockNode(); .)
+    {
+    IF (closeCurlyBraceCount <= openCurlyBraceCount) 
+    (																			
+		Imperative_languageblock<out codeBlockNode>     (. codeBlockInvalid.Body.Add(codeBlockNode); .)
+		|		
+		'{'									(. openCurlyBraceCount++; .)
+		|
+											(. if (la.val == "}" && langblock.OpenCurlyBracePos.Value != null) langblock.CloseCurlyBracePos.setValue(la.col, la.line, la.val); else if(la.val != "}") langblock.OpenCurlyBracePos.Value = null; .)
+		'}'									(. closeCurlyBraceCount++; .)
+        |
+        EOF
+        '}'                                 (. break; .)        
+        |
+        IF(true)                            (. Get(); .)
+    )  
+    }                                    
+                                            (. codeBlockNode = codeBlockInvalid; .)
+    |
+    IF(true)								(. if (la.val == "}" && langblock.OpenCurlyBracePos.Value != null) langblock.CloseCurlyBracePos.setValue(la.col, la.line, la.val); else if(la.val != "}") langblock.OpenCurlyBracePos.Value = null; .)
+    '}' 
+    )                                       
+                                            (. langblock.CodeBlockNode = codeBlockNode; .)	                                        
+                                            (. node = langblock; .)	
+.  
+
+Imperative_stmt<out Node node>
+=
+								(. node = null; .)
+    //SYNC
+	(
+    //Imperative_vardecl is never recognized
+//		( IF( isVariableDecl())			
+//			Imperative_vardecl<out node>	 
+//								(. node.Col = t.col; node.Line = t.line; .)
+//			endline				(. DesignScript.Parser.Imperative.VarDeclNode vdNode = node as DesignScript.Parser.Imperative.VarDeclNode; .)	
+//                              (. vdNode.EndlinePos = new DesignScript.Parser.Imperative.IDEHelpNode(); .)
+//                              (. vdNode.EndlinePos.setValue(t.col, t.line, t.val); .)
+//                              (. node = vdNode; .)
+//		)
+//		|
+		( IF( isFunctionCall()) 
+			Imperative_functioncall<out node> 
+			endline             (. DesignScript.Parser.Imperative.FunctionCallNode fcNode = node as DesignScript.Parser.Imperative.FunctionCallNode; .)	
+                                (. fcNode.EndlinePos.setValue(t.col, t.line, t.val); .)
+                                (. node = fcNode; .)
+		)
+		|
+		Imperative_assignstmt<out node>
+        /*|
+        returnstmt<out node>
+        */
+        |
+        Imperative_ifstmt<out node>
+        |
+        Imperative_whilestmt<out node>
+		|
+		Imperative_forloop<out node>
+		|
+		Imperative_languageblock<out node>		
+		|
+		(
+			Kw_break			(. DesignScript.Parser.Imperative.BreakNode bnode = new DesignScript.Parser.Imperative.BreakNode(); .)
+								(. if (t.kind == _Kw_break) bnode.KwBreak.setValue(t.col, t.line, t.val); .)
+			endline				(. if (t.kind == _endline) bnode.EndLine.setValue(t.col, t.line, t.val); .)
+								(. node = bnode; .)
+		)
+		|
+		(
+			Kw_continue			(. DesignScript.Parser.Imperative.ContinueNode cnode = new DesignScript.Parser.Imperative.ContinueNode(); .)
+								(. if (t.kind == _Kw_continue) cnode.KwContinue.setValue(t.col, t.line, t.val); .)
+			endline				(. if (t.kind == _endline) cnode.EndLine.setValue(t.col, t.line, t.val); .)
+								(. node = cnode; .)
+		)
+		|
+		endline	                (. DesignScript.Parser.Imperative.IDEHelpNode endlineNode = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+                                (. node = endlineNode; .)
+	)	
+.
+
+Imperative_stmtlist<.out List<Node> NodeList.> 
+=
+					(. NodeList = new List<Node>(); .)
+{ 
+					(. Node node = null; .)
+	Imperative_stmt<out node>	(. if (node != null)
+							       {
+                                       NodeList.Add(node);
+                                   } 
+                                .)
+}
+.
+
+Imperative_assignstmt<out Node node> 		
+                        (. node = null; .)
+= 
+						(. Node lhsNode = null; .)	
+										
+	(					(. isLeft = true; .) 
+		Imperative_DecoratedIdentifier<out lhsNode>					
+	)
+                                (. node = lhsNode; .)
+								(. isLeft = false; .) 
+	                            (. if (!(lhsNode is DesignScript.Parser.Imperative.PostFixNode)) { .)	
+ 
+								(. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = null; .)
+	'=' 						(. if (t.val == "=") operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+						        
+										(. DesignScript.Parser.Imperative.IDEHelpNode endline = null; .)
+								(. Node rhsNode = null; .)
+    (
+		( IF (la.val == "[")
+	        Imperative_languageblock<out rhsNode> 												
+        )
+		|	
+		(
+			IF(HasMoreAssignmentStatements())
+                Imperative_assignstmt<out rhsNode>
+		)
+		|
+        (
+	        Imperative_expr<out rhsNode> 							
+	        endline				(. if (t.kind == _endline) endline = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)	
+        )
+        
+    )
+								(.
+									DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+									bNode.LeftNode = lhsNode;
+									bNode.RightNode = rhsNode;
+									bNode.Optr = Operator.assign;
+									bNode.OperatorPos = operatorPos;
+									bNode.Col = lhsNode.Col;
+									bNode.Line = lhsNode.Line;
+									bNode.EndlinePos = endline;
+									node = bNode;
+								.)
+    (. } .)
+.
+
+
+//returnstmt<out Node node>
+//=
+							//(. node = null; .)
+    //kw_return	
+    //[
+        //Imperative_expr<out node>
+    //]
+							//(. 
+								//DesignScript.Parser.Imperative.ReturnNode retNode = new DesignScript.Parser.Imperative.ReturnNode(); 
+								//retNode.ReturnExpr = node;
+								//node = retNode; 
+							//.)	
+    //endline
+//.
+
+
+Imperative_ifstmt<out Node node>  
+= 
+									(. DesignScript.Parser.Imperative.IfStmtNode ifStmtNode = new DesignScript.Parser.Imperative.IfStmtNode(); .)
+									(. List<Node> body = null; .)
+    kw_if							(. ifStmtNode.Col = t.col; ifStmtNode.Line = t.line; .)
+                                    (. ifStmtNode.KeywordPos.setValue(t.col, t.line, t.val); .)
+									(. if (la.val == "(") ifStmtNode.OpenParenPos.setValue(la.col, la.line, la.val); .)
+	'('								
+		Imperative_expr<out node>				(. ifStmtNode.IfExprNode = node; .)	
+									(. if (la.val == ")" && ifStmtNode.OpenParenPos.Value != null) 
+											ifStmtNode.CloseParenPos.setValue(la.col, la.line, la.val);
+										else if (la.val != ")") ifStmtNode.OpenParenPos.Value = null; .)				
+	')'								
+	(           
+		(
+												(. if (la.val == "{")  ifStmtNode.OpenCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)			
+			'{' 							
+				Imperative_stmtlist<out body>	(. ifStmtNode.IfBody = body; .)	
+												(. if (la.val == "}" && ifStmtNode.OpenCurlyBracePos != null)  ifStmtNode.CloseCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode };  else if (la.val != "}") ifStmtNode.OpenCurlyBracePos = null; .)
+			'}'								
+		)
+		|
+		(							(. Node singleStmt = null; .)
+			Imperative_stmt<out singleStmt>	(. ifStmtNode.IfBody.Add(singleStmt); .)
+		)
+	)
+     
+    { 
+                                    (. DesignScript.Parser.Imperative.ElseIfBlock elseifBlock = new DesignScript.Parser.Imperative.ElseIfBlock(); .)									
+        kw_elseif					(. elseifBlock.Col = t.col; elseifBlock.Line = t.line; .)
+                                    (. elseifBlock.KeywordPos.setValue(t.col, t.line, t.val); .)
+									(. if (la.val == "(") elseifBlock.OpenParenPos.setValue(la.col, la.line, la.val); .)
+		'('							
+			Imperative_expr<out node>			(. elseifBlock.Expr = node; .)	
+									(. if (la.val == ")" && elseifBlock.OpenParenPos.Value != null) elseifBlock.CloseParenPos.setValue(la.col, la.line, la.val); else if (la.val != ")") elseifBlock.OpenParenPos.Value = null; .)
+		')'							
+		(
+			(    
+														(. if (la.val == "{") elseifBlock.OpenCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+				'{'							
+					Imperative_stmtlist<out body>		(. elseifBlock.Body = body; .)
+														(. if (la.val == "}" && elseifBlock.OpenCurlyBracePos != null) elseifBlock.CloseCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; else if(la.val != "}") elseifBlock.CloseCurlyBracePos.Value = null; .)	        
+				'}'							
+			)
+			|
+			(						(. Node singleStmt = null; .)
+				Imperative_stmt<out singleStmt>(. elseifBlock.Body.Add(singleStmt); .)
+			)
+			
+		)
+                                    (. ifStmtNode.ElseIfList.Add(elseifBlock); .)
+    } 
+
+    [ 
+        kw_else								(. ifStmtNode.ElsePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.KeywordNode }; .)
+		(
+			( 
+														(. if (la.val == "{") ifStmtNode.ElseOpenCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+				'{'							
+					Imperative_stmtlist<out body>		(. ifStmtNode.ElseBody = body; .)
+														(. if (la.val == "}" && ifStmtNode.ElseOpenCurlyBracePos != null) ifStmtNode.ElseCloseCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; else if (la.val != "}") ifStmtNode.ElseOpenCurlyBracePos = null; .)	              
+				'}'							
+			)
+			|
+			(								(. Node singleStmt = null; .)
+				Imperative_stmt<out singleStmt>		(. ifStmtNode.ElseBody.Add(singleStmt); .)
+			)
+			
+		)
+    ]    
+                                    (. node = ifStmtNode; .)	                    
+.
+
+Imperative_whilestmt<out Node node>  
+= 
+									(. DesignScript.Parser.Imperative.WhileStmtNode whileStmtNode = new DesignScript.Parser.Imperative.WhileStmtNode(); .)
+									(. List<Node> body = null; .)
+        kw_while					(. whileStmtNode.Col = t.col; whileStmtNode.Line = t.line; .)
+                                    (. whileStmtNode.KeywordPos.setValue(t.col, t.line, t.val); .)
+									(. if (la.val == "(") whileStmtNode.OpenParenPos.setValue(la.col, la.line, la.val); .)
+        '('							
+		    Imperative_expr<out node>		    (. whileStmtNode.Expr = node; .)		
+									(. if (la.val == ")" && whileStmtNode.OpenParenPos.Value != null) whileStmtNode.CloseParenPos.setValue(la.col, la.line, la.val); else if (la.val != ")") whileStmtNode.OpenParenPos.Value = null; .)			
+	    ')'							(. if (la.val == "{") whileStmtNode.OpenCurlyBracePos.setValue(la.col, la.line, la.val); .)
+        '{'							
+			Imperative_stmtlist<out body>		(. whileStmtNode.Body = body; .)	              
+									(. if (la.val == "}" && whileStmtNode.OpenCurlyBracePos.Value != null) whileStmtNode.CloseCurlyBracePos.setValue(la.col, la.line, la.val); else if (la.val != "}") whileStmtNode.OpenCurlyBracePos.Value = null; .)
+		'}'							
+                                    (. node = whileStmtNode; .)	                    
+.
+
+Imperative_forloop<out Node forloop>
+=
+										(. 
+											Node node = null;	
+											DesignScript.Parser.Imperative.ForLoopNode loopNode = new DesignScript.Parser.Imperative.ForLoopNode();										
+											List<Node> body = null;   
+										.)
+		kw_for							(. loopNode.Col = t.col; loopNode.Line = t.line; .)
+                                        (. loopNode.KeywordPos.setValue(t.col, t.line, t.val); .)
+										(. if (la.val == "(") loopNode.OpenParenPos.setValue(la.col, la.line, la.val);.)
+		'('								
+			Imperative_Ident<out node>				(. loopNode.id = node; .)	
+		"in"							(. loopNode.KwInPos.setValue(t.col, t.line, t.val); .)
+			Imperative_expr<out node>				(. loopNode.expression = node; .)
+										(. if (la.val == ")" && loopNode.OpenParenPos.Value != null) loopNode.CloseParenPos.setValue(la.col, la.line, la.val); else if (la.val != ")") loopNode.OpenParenPos.Value = null; .)
+		')'								
+		(
+			(
+											(. if (la.val == "{") loopNode.OpenCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)			
+				'{'						
+					Imperative_stmtlist<out body>			(. loopNode.body = body; .)
+											(. if (la.val == "}" && loopNode.OpenCurlyBracePos != null) loopNode.CloseCurlyBracePos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; else if (la.val != "}") loopNode.OpenCurlyBracePos = null; .)
+				'}'						
+			)
+			|
+			(								(. Node singleStmt = null; .)
+				Imperative_stmt<out singleStmt>		(. loopNode.body.Add(singleStmt); .)
+			)
+		)		
+										(. forloop = loopNode; .)
+.
+
+
+Imperative_expr<out Node node>   		
+=						(. node = null; .)	
+	(
+		Imperative_binexpr<out node>
+	)
+	{
+												(. DesignScript.Parser.Imperative.InlineConditionalNode inlineConNode = new DesignScript.Parser.Imperative.InlineConditionalNode(); .)
+												(. inlineConNode.ConditionExpression = node; .)
+		"?"										(. if (t.val == "?") inlineConNode.QuestionPos.setValue(t.col, t.line, t.val); .)
+												(. node = null; .)
+		Imperative_expr<out node>				(. inlineConNode.TrueExpression = node; .)
+		":"										(. if (t.val == ":") inlineConNode.ColonPos.setValue(t.col, t.line, t.val); .)
+												(. node = null; .)
+		Imperative_expr<out node>               (. inlineConNode.FalseExpression = node; .)
+												(. node = inlineConNode; .)
+	}							
+.
+
+Imperative_identifierList<out Node node>
+=										(. node = null; 
+										.)
+	Imperative_NameReference<out node>		
+	{
+		'.'								(. Node rnode = null; .)
+                                        (. DesignScript.Parser.Imperative.IDEHelpNode dotPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+		Imperative_NameReference<out rnode>
+										(.
+											DesignScript.Parser.Imperative.IdentifierListNode bnode = new DesignScript.Parser.Imperative.IdentifierListNode(); 
+                                            List<DesignScript.Parser.Imperative.IDEHelpNode> dotPosList = new List<DesignScript.Parser.Imperative.IDEHelpNode>();
+											dotPosList.Add(dotPos);
+											bnode.LeftNode = node; 
+											bnode.Optr = Operator.dot; 
+											bnode.RightNode = rnode; 
+											bnode.Col = node.Col;
+											bnode.Line = node.Line;
+                                            bnode.DotPosList = dotPosList;
+											node = bnode; 
+										.)
+	}										
+.	
+
+Imperative_NameReference<out Node node>
+=
+									(. node = null;
+										DesignScript.Parser.Imperative.ArrayNode array = null;   .)
+	((
+		Imperative_parenExp<out node>
+	)
+	|
+	( IF(isFunctionCall())
+		Imperative_functioncall<out node>
+		|
+		Imperative_Ident<out node>
+		|
+		(								(. DesignScript.Parser.Imperative.ExprListNode exprlist = new DesignScript.Parser.Imperative.ExprListNode(); .)
+		                                (. if (la.val == "{") exprlist.OpenCurlyBracePos.setValue(la.col, la.line, la.val); .)	
+		    '{'							
+				[
+		                                
+					Imperative_expr<out node>          (. exprlist.list.Add(node); 
+		                                       exprlist.Col = t.col;
+										       exprlist.Line = t.line; .)
+					{
+						','             (. DesignScript.Parser.Imperative.IDEHelpNode commaPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode };.)
+										(. exprlist.ExprCommaPosList.Add(commaPos); .)
+						Imperative_expr<out node>  (. exprlist.list.Add(node); .)
+					}
+		     
+				]						(. if (la.val == "}" && exprlist.OpenCurlyBracePos.Value != null) exprlist.CloseCurlyBracePos.setValue(la.col, la.line, la.val); else if (la.val != "}") exprlist.OpenCurlyBracePos.Value = null; .)
+		    '}'							
+		                                (. node = exprlist; .)
+		)
+	))	
+	[
+	Imperative_arrayIndices<out array>				(. array.Ident = node; node = array; .)
+	]
+.
+
+Imperative_DecoratedIdentifier<out Node node>
+=                           (. node = null; .)
+(
+		(IF (IsTypedVariable())
+		    (							
+				Imperative_vardecl<out node>
+			)
+		)
+		|
+		Imperative_identifierList<out node>
+)
+.
+Imperative_unaryexpr<out Node node>
+=										(. DesignScript.Parser.Imperative.UnaryExpressionNode an = new DesignScript.Parser.Imperative.UnaryExpressionNode(); .)
+										(. node = null; .)
+	(
+	    (
+            Imperative_NegExpression<out an>
+        )
+    |
+        (
+            Imperative_BitUnaryExpression<out an>
+        )
+	)									(. node = an; .)
+.
+
+Imperative_BitUnaryExpression<out DesignScript.Parser.Imperative.UnaryExpressionNode node>
+=										(. DesignScript.Parser.Imperative.UnaryExpressionNode unary = new DesignScript.Parser.Imperative.UnaryExpressionNode(); .)									
+										(. DesignScript.Parser.Imperative.IDEHelpNode IDEop = unary.Operator; .)
+						
+	Imperative_unaryop<out IDEop>			
+										(. Node exprNode = null; .)
+	Imperative_factor<out exprNode>	
+										(. unary.Expression = exprNode; .)
+										(. unary.Operator = IDEop; .)
+									    (. node = unary; .)
+
+.
+
+Imperative_NegExpression<out DesignScript.Parser.Imperative.UnaryExpressionNode node>
+=                       (. node = new Imperative.UnaryExpressionNode() ; .)
+						(. DesignScript.Parser.Imperative.IDEHelpNode op = node.Operator; .)
+                        (. Node exprNode = null; .)
+    Imperative_negop<out op>
+    (
+        (
+            Imperative_identifierList<out exprNode>			
+        )
+    |
+        (
+            '('
+            Imperative_expr<out exprNode>    
+            ')'
+        )
+    )
+                        (.  
+						DesignScript.Parser.Imperative.UnaryExpressionNode unary = new DesignScript.Parser.Imperative.UnaryExpressionNode(); 
+						unary.Operator = op;
+						unary.Expression = exprNode;
+						node = unary;
+
+                        .)
+.
+
+Imperative_negop<out DesignScript.Parser.Imperative.IDEHelpNode op>
+=						(. op = new DesignScript.Parser.Imperative.IDEHelpNode(DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode); .)
+(
+| '-'					(. op.setValue(t.col, t.line, t.val); .)
+)
+
+.
+
+
+Imperative_binexpr<out Node node>   		
+=							
+								(. node = null;.)								
+	Imperative_logicalexpr<out node>  
+	{ 		
+								(. Operator op; .)
+		Imperative_logicalop<out op>		(. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .) 
+								(. Node rhsNode = null; .)	
+		Imperative_logicalexpr<out rhsNode>	
+								(. 
+									DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+									bNode.LeftNode = node;
+									bNode.RightNode = rhsNode;
+									bNode.Optr = op;
+									bNode.Col = node.Col;
+									bNode.Line = node.Line;
+									bNode.OperatorPos = operatorPos;
+									node = bNode;
+								.)					
+	}
+.
+
+Imperative_logicalexpr<out Node node>   		
+=							
+								(. node = null;.)								
+	Imperative_RangeExpr<out node>  
+	{ 		
+								(. Operator op; .)
+		Imperative_relop<out op>			(. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+								(. Node rhsNode = null; .)	
+		Imperative_RangeExpr<out rhsNode>	
+								(. 
+									DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+									bNode.LeftNode = node;
+									bNode.RightNode = rhsNode;
+									bNode.Optr = op;
+									bNode.Col = node.Col;
+									bNode.Line = node.Line;
+									bNode.OperatorPos = operatorPos;
+									node = bNode;
+								.)					
+	}
+.
+
+Imperative_RangeExpr<out Node node>
+=
+Imperative_rel<out node>
+[
+									(.	DesignScript.Parser.Imperative.RangeExprNode rnode = new DesignScript.Parser.Imperative.RangeExprNode();										
+										rnode.FromNode = node;
+										rnode.Col = node.Col;
+										rnode.Line = node.Line;
+									.)
+	rangeop							(. rnode.FirstRangeOpPos.setValue(t.col, t.line, t.val); .)
+	Imperative_rel<out node>		(. rnode.ToNode = node; .)
+									(. if (!(t.val == "..")&&(la.val == "..")) { .)
+	[								(. RangeStepOperator op; .)
+		rangeop						(. rnode.SecondRangeOpPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+		Imperative_rangeStepOperator<out op>	(. if (op != RangeStepOperator.stepsize)
+                                       {
+                                            rnode.StepOpPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode };
+                                       } .)
+									(.   rnode.stepoperator = op; .)	
+		Imperative_rel<out node>				(. rnode.StepNode = node; .)
+	]								(. } .)
+									(. node = rnode; .)
+]
+.
+
+Imperative_rel<out Node node>  		
+=		
+								(. node = null;.)								
+	Imperative_term<out node>			
+	{ 		
+								(. Operator op; .)
+		Imperative_addop<out op>			(. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+								(. Node rhsNode = null; .)	
+		Imperative_term<out rhsNode>	
+								(. 
+									DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+									bNode.LeftNode = node;
+									bNode.RightNode = rhsNode;
+									bNode.Optr = op;
+									bNode.Col = node.Col;
+									bNode.Line = node.Line;
+									bNode.OperatorPos = operatorPos;
+									node = bNode;
+								.)					
+	}
+.
+
+Imperative_term<out Node node> 		
+=			
+								(. node = null;.)				
+	Imperative_interimfactor<out node> 
+	{ 
+								(. Operator op; .)
+		Imperative_mulop<out op>			(. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+								(. Node rhsNode = null; .)	
+		Imperative_interimfactor<out rhsNode>					
+		
+								(. 
+									DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+									bNode.LeftNode = node;
+									bNode.RightNode = rhsNode;
+									bNode.Optr = op;
+									bNode.Col = node.Col;
+									bNode.Line = node.Line;
+									bNode.OperatorPos = operatorPos;
+									node = bNode;
+								.)
+				
+	}
+.
+
+Imperative_interimfactor<out Node node>
+=
+							(. node = null;.)				
+	Imperative_factor<out node> 
+	{ 
+								(. Operator op; .)
+		Imperative_bitop<out op>           (. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+								(. Node rhsNode = null; .)	
+		Imperative_factor<out rhsNode>					
+		
+								(. 
+									DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+									bNode.LeftNode = node;
+									bNode.RightNode = rhsNode;
+									bNode.Optr = op;
+									bNode.Col = node.Col;
+									bNode.Line = node.Line;
+									bNode.OperatorPos = operatorPos;
+									node = bNode;
+								.)
+				
+	}
+.
+
+Imperative_Char<out Node node>
+=           (. node = null; .)
+    char
+            (. 
+                DesignScript.Parser.Imperative.CharNode _node = null;
+				if (t.val.Length <= 2) {
+				   errors.SemErr(t.line, t.col, "Empty character literal.");
+				}
+				if (t.kind == _char)
+				{
+					_node = new DesignScript.Parser.Imperative.CharNode() { value = t.val};
+				    _node.IDEValue.setValue(t.line, t.col, t.val);
+					_node.Line = t.line;
+					_node.Col = t.col;
+				}
+				node = _node;
+            .)
+
+.
+Imperative_String<out Node node>
+=           (. node = null; .)
+    textstring
+            (. 
+                DesignScript.Parser.Imperative.StringNode _node = null;
+				node = new DesignScript.Parser.Imperative.StringNode(); 
+				if (t.kind == _textstring)
+				    {
+				        _node = new DesignScript.Parser.Imperative.StringNode() { value = t.val };
+				        _node.IDEValue.setValue(t.line, t.col, t.val);
+				        _node.Line = t.line;
+				        _node.Col = t.col;
+				    }
+				node = _node;
+            .)
+.			
+
+Imperative_factor<out Node node>  	
+					(. node = null; .)
+= 	(
+		( IF(IsNumber())
+			Imperative_num<out node>						
+		)
+	)
+	|
+	(		
+		( IF( isFunctionCall())										                             
+			Imperative_functioncall<out node> 
+		)
+	)	
+    |
+	(
+		literal_true			(. node = new DesignScript.Parser.Imperative.BooleanNode()  {Col = t.col, Line = t.line, value = ProtoCore.DSASM.Literal.True }; .)		
+	)
+	|
+	(
+		literal_false			(. node = new DesignScript.Parser.Imperative.BooleanNode() { Col = t.col, Line = t.line, value = ProtoCore.DSASM.Literal.False }; .)	
+	)	
+    |
+    (
+        literal_null	        (. node = new DesignScript.Parser.Imperative.NullNode() { Col = t.col, Line = t.line }; .)
+    )
+    |
+	(
+        Imperative_Char<out node>
+    )
+    |
+    (
+        Imperative_String<out node>
+    )
+
+	|
+	(
+		Imperative_identifierList<out node>
+	)
+	|
+	(
+		Imperative_unaryexpr<out node>
+	)	
+	|
+	(
+		Imperative_languageblock<out node>
+	)
+.
+
+ Imperative_parenExp<out Node node>
+										(. Node exp = null; DesignScript.Parser.Imperative.ParenExpressionNode pNode = new DesignScript.Parser.Imperative.ParenExpressionNode(); .)
+ =
+										(. if (la.val == "(") pNode.openParen.setValue(la.col, la.line, la.val); else pNode.openParen.setValue(0, 0, null); pNode.Line = pNode.openParen.Line; pNode.Col = pNode.openParen.Col; .)
+	'('									
+	Imperative_expr<out exp>		    (. pNode.expression = exp; .)
+										(. if (la.val == ")" && pNode.openParen.Value != null) pNode.closeParen.setValue(la.col, la.line, la.val); else if (la.val != ")") pNode.openParen.setValue(0, 0, null); .)
+	')'									
+										(. node = pNode; .)
+ .
+
+Imperative_functioncall<out Node node> 	
+= 								
+	ident							(. DesignScript.Parser.Imperative.IdentifierNode function = new DesignScript.Parser.Imperative.IdentifierNode() { Value = t.val, Name = t.val, Col = t.col, Line = t.line }; .)
+									(. List<Node> arglist = new List<Node>(); 
+                                       List<DesignScript.Parser.Imperative.IDEHelpNode> argCommaPosList = new List<DesignScript.Parser.Imperative.IDEHelpNode>();.)																
+									(. DesignScript.Parser.Imperative.IDEHelpNode openParenPos = null; DesignScript.Parser.Imperative.IDEHelpNode closeParenPos = null; .)
+									(. if (la.val == "(") openParenPos = new DesignScript.Parser.Imperative.IDEHelpNode()  { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+	'('                             
+		[
+									(. Node argNode = null;		 .)
+			Imperative_expr<out argNode>		(. arglist.Add(argNode); .)			
+			{ 
+				','                 (. 
+                                       DesignScript.Parser.Imperative.IDEHelpNode commaPos = new DesignScript.Parser.Imperative.IDEHelpNode()  { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; 
+									   argCommaPosList.Add(commaPos); .)
+				Imperative_expr<out argNode>	(. arglist.Add(argNode); .)		
+			}
+		]							(. if (la.val == ")" && openParenPos != null) closeParenPos = new DesignScript.Parser.Imperative.IDEHelpNode()  { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; else if (la.val != ")") openParenPos = null; .)
+	')'                             
+									(.
+										DesignScript.Parser.Imperative.FunctionCallNode funcNode = new DesignScript.Parser.Imperative.FunctionCallNode(); 
+										funcNode.Col = function.Col; 
+										funcNode.Line = function.Line;
+                                        funcNode.OpenParenPos = openParenPos;
+                                        funcNode.CloseParenPos = closeParenPos;
+                                        funcNode.ArgCommaPosList = argCommaPosList;
+										funcNode.Function = function;
+										funcNode.FormalArguments = arglist;
+										node = funcNode; 
+									.)
+.
+
+Imperative_Ident<out Node node> 
+=                                   (.	ProtoCore.DSASM.UnaryOperator op = ProtoCore.DSASM.UnaryOperator.None; 
+					                    DesignScript.Parser.Imperative.IdentifierNode var = null;
+				                    .) 
+	ident	(. 
+				int ltype = (0 == String.Compare(t.val, "return")) ? (int)ProtoCore.PrimitiveType.kTypeReturn : (int)ProtoCore.PrimitiveType.kTypeVar;
+				DesignScript.Parser.Imperative.IdentifierNode var2 = new DesignScript.Parser.Imperative.IdentifierNode() 
+				{
+					// TODO Jun: Move the primitive types into a class table 
+					Col = t.col,
+					Line = t.line,
+					Name = t.val, 
+					type = ltype,
+					datatype = (ProtoCore.PrimitiveType)ltype 
+				}; 
+				if (t.val == "return") var2.Return.setValue(t.col, t.line, t.val); else var2.Value = t.val;
+				var = var2;
+			.)
+    (. #if ENABLE_INC_DEC_FIX .)
+	[
+		Imperative_PostFixOp<out op>	(.	DesignScript.Parser.Imperative.PostFixNode pfNode = new DesignScript.Parser.Imperative.PostFixNode();
+                                            pfNode.OperatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode };
+											pfNode.Operator = op;
+											pfNode.Identifier = var;
+                                            pfNode.Line = var.Line;
+                                            pfNode.Col = var.Col;
+											var = pfNode;							
+										.)
+	]
+	(. #endif .)
+
+
+	(. node = var; .)
+.
+Imperative_arrayIndices<out DesignScript.Parser.Imperative.ArrayNode array>
+=
+								(. array = new DesignScript.Parser.Imperative.ArrayNode(); 
+									DesignScript.Parser.Imperative.IDEHelpNode openBracketPos = null; .)
+								(. if (la.val == "[") openBracketPos = new DesignScript.Parser.Imperative.IDEHelpNode()  { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+	openbracket                 
+								(. Node node = null; .)
+								
+        [                        
+			Imperative_expr<out node>	
+		]
+            	                (. 
+                                    array.Col = t.col; 
+									array.Line = t.line;
+                                    array.OpenBracketPos = openBracketPos;
+                                    array.Expr = node; 
+                                    array.Type = null;
+                                .)
+								 (. if (la.val == "]" && array.OpenBracketPos != null) array.CloseBracketPos.setValue(la.col, la.line, la.val); else if (la.val != "]") array.OpenBracketPos = null; .)
+	closebracket               
+	{							(. DesignScript.Parser.Imperative.IDEHelpNode openBracketPos2 = null; .)
+                                (. if (la.val == "[") openBracketPos2 = new DesignScript.Parser.Imperative.IDEHelpNode()  { Col = la.col, Line = la.line, Value = la.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+		openbracket             
+                                (. node = null; .)
+		[
+			Imperative_expr<out node>  
+		]
+                                (.
+                                    DesignScript.Parser.Imperative.ArrayNode array2 = new DesignScript.Parser.Imperative.ArrayNode();
+									array2.Col = t.col; 
+									array2.Line = t.line;
+                                    array2.OpenBracketPos = openBracketPos2;
+                                    array2.Expr = node; 
+                                    array2.Type = array;
+									
+                                .)
+								(. if (la.val == "]" && array2.OpenBracketPos != null) array2.CloseBracketPos.setValue(la.col, la.line, la.val); else if (la.val != "]") array2.OpenBracketPos = null;  .)
+		closebracket			(. array = array2; .)  
+	}					
+								
+.
+
+//Imperative_arrayident<out Node node> 
+//= 
+//	Imperative_Ident<out node>					(. DesignScript.Parser.Imperative.IdentifierNode var = node as DesignScript.Parser.Imperative.IdentifierNode; .)
+//	[											(. DesignScript.Parser.Imperative.ArrayNode array = null; .)
+//		Imperative_arrayIndices<out array>			(. var.ArrayDimensions = array; .)
+//	]											
+//.
+Imperative_vardecl<out Node node>
+														(. DesignScript.Parser.Imperative.VarDeclNode varDeclNode = new DesignScript.Parser.Imperative.VarDeclNode(); .) 
+= 
+	ident												(. varDeclNode.Line = t.line; varDeclNode.Col = t.col; varDeclNode.name.setValue(t.col, t.line, t.val); .)
+														(. if (t.kind == _ident) varDeclNode.name.setValue(t.col, t.line, t.val); .)
+														
+	[													(. DesignScript.Parser.Imperative.TypeNode IDEType = new DesignScript.Parser.Imperative.TypeNode(); .)
+		Imperative_TypeRestriction<out IDEType>			(. varDeclNode.IDEArgumentType = IDEType; .)
+	]
+    [
+        '='												(. if (t.val == "=") varDeclNode.equal.setValue(t.col, t.line, t.val); .)
+														(. Node rhsNode = null; .)		
+        Imperative_expr<out rhsNode> 					(. varDeclNode.NameNode = rhsNode; .)	
+    ]													(. node = varDeclNode; .)
+.
+Imperative_TypeRestriction<out DesignScript.Parser.Imperative.TypeNode IDEType>
+										(. IDEType = new DesignScript.Parser.Imperative.TypeNode(); .)
+=	WEAK
+	':'									(. if (t.val == ":") IDEType.colon.setValue(t.col, t.line, t.val); .)
+	(
+		( Kw_double | Kw_int | Kw_var | Kw_function) (. IDEType.BuildInTypeSetValue(t.val, t.line, t.col); .)
+		|
+		ident							(. IDEType.UserDefinedTypeSetValue(t.val, t.line, t.col); .)
+	)
+	{									(. string openBracket = null; string closeBracket = null; .)
+										(. if (la.val == "[")  openBracket = la.val; int bracket_line = la.line; int bracket_col = la.col; .)
+	openbracket							(. if (la.val == "]") closeBracket = la.val; .)
+	closebracket						(. if (openBracket != null && closeBracket != null) IDEType.AddBracket(openBracket, bracket_line, bracket_col, closeBracket, t.line, t.col); .)
+
+	[									
+		rangeop							(. IDEType.op.setValue(t.col, t.line, t.val); .)
+										(. string multiDimOpenBracket = null; string multiDimCloseBracket = null; .)
+										(. if (la.val == "[")  multiDimOpenBracket = la.val; int bracket2_line = la.line; int bracket2_col = la.col; .)
+		openbracket						(. if (la.val == "]")  multiDimCloseBracket = la.val; .)
+		closebracket					(. if (multiDimOpenBracket != null && multiDimCloseBracket != null) 
+											IDEType.AddMultiDimNodes(multiDimOpenBracket, bracket2_line, bracket2_col, multiDimCloseBracket, t.line, t.col); .)
+	]
+	}
+.
+//Imperative_vardecl<out Node node>	
+//= 
+//							        (.
+//                                        DesignScript.Parser.Imperative.IdentifierNode tNode = null; 
+//                                        DesignScript.Parser.Imperative.VarDeclNode varDeclNode = new DesignScript.Parser.Imperative.VarDeclNode(); 
+//                                        varDeclNode.memregion = ProtoCore.DSASM.MemoryRegion.kMemStack;
+//										varDeclNode.Col = la.col;
+//										varDeclNode.Line = la.line;
+//                                    .)
+
+//    [
+//        kw_heap						(. varDeclNode.memregion = ProtoCore.DSASM.MemoryRegion.kMemHeap; .)									
+//                                    (. varDeclNode.KeywordPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.KeywordNode }; .)
+//    ]
+
+//	( IF( isArrayAccess())	                                        
+//		Imperative_arrayident<out node>	    (. 
+//                                        tNode = node as DesignScript.Parser.Imperative.IdentifierNode; 
+//                                        varDeclNode.NameNode = tNode;
+//                                    .)	
+//		|
+//		ident					    (. 
+//                                        tNode = new DesignScript.Parser.Imperative.IdentifierNode() 
+//                                        {
+//											Col = t.col,
+//											Line = t.line, 
+//                                            Value = t.val, 
+//                                            Name = t.val, 
+//                                            type = (int)ProtoCore.PrimitiveType.kTypeVar, 
+//                                            datatype = ProtoCore.PrimitiveType.kTypeVar 
+//                                        }; 
+//                                        varDeclNode.NameNode = tNode;
+//                                    .)	
+//	)
+
+//    [
+//        '='                         (. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+//						            (. Node rhsNode = null; .)		
+//        Imperative_expr<out rhsNode> 		
+//						            (.
+//							            DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+//							            bNode.LeftNode = tNode;
+//							            bNode.RightNode = rhsNode;
+//                                        bNode.Col = tNode.Col;
+//                                        bNode.Line = tNode.Line;
+//                                        bNode.OperatorPos = operatorPos;
+//							            bNode.Optr = Operator.assign;
+//							            varDeclNode.NameNode = bNode;		
+//						            .)	
+//    ]	
+
+//								    (. 
+//								        node = varDeclNode; 
+//								        if(!isGlobalScope) {
+//								            localVarCount++;
+//								        }
+//								    .)
+
+//.
+
+//Imperative_ArgDecl<out Node node>	
+//= 
+//							        (.
+//                                        DesignScript.Parser.Imperative.IdentifierNode tNode = null; 
+//                                        DesignScript.Parser.Imperative.VarDeclNode varDeclNode = new DesignScript.Parser.Imperative.VarDeclNode(); 
+//										varDeclNode.Col = la.col;
+//										varDeclNode.Line = la.line;
+//                                        //varDeclNode.memregion = ProtoCore.DSASM.MemoryRegion.kMemStack;
+//                                    .)
+//
+//    [
+//        kw_heap               //(. varDeclNode.memregion = ProtoCore.DSASM.MemoryRegion.kMemHeap; .)
+//                                    (. varDeclNode.KeywordPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.KeywordNode }; .)
+//    ]
+//
+//		ident					    (. 
+//                                        tNode = new DesignScript.Parser.Imperative.IdentifierNode() 
+//                                        { 
+//											Col = t.col,
+//											Line = t.line, 
+//                                            Value = t.val, 
+//                                            Name = t.val, 
+//                                            type = (int)ProtoCore.PrimitiveType.kTypeVar, 
+//                                            datatype = ProtoCore.PrimitiveType.kTypeVar 
+//                                        }; 
+//                                        varDeclNode.NameNode = tNode;
+//                                    .)	
+//	
+//	[
+//    ':'                             (. varDeclNode.TypeColonPos = new DesignScript.Parser.Imperative.IDEHelpNode(); .)
+//                                    (. varDeclNode.TypeColonPos.setValue(t.col, t.line, t.val); .)
+//									(. varDeclNode.ArgumentTypePos = new DesignScript.Parser.Imperative.IDEHelpNode(); .)
+//	(
+//		(Kw_int | Kw_double | Kw_var | Kw_function)	(. varDeclNode.ArgumentTypePos.Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.KeywordNode; .)
+//		|
+//		ident					    (. varDeclNode.ArgumentTypePos.Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.TypeNode; .)
+//	)								(. varDeclNode.IDEArgumentType = new DesignScript.Parser.Imperative.TypeNode();  .)		
+//									(. varDeclNode.ArgumentTypePos.setValue(t.col, t.line, t.val); .)
+//	{								(. string _open = null; int _open_line = 0; int _open_col = 0; string _close = null; if (la.val == "[") { _open = la.val; _open_line = la.line; _open_col = la.col; } .)
+//		openbracket					(. if(la.val == "]") _close = la.val; .)
+//		closebracket				(. if (_open != null && _close != null) { varDeclNode.Brackets.Add(new DesignScript.Parser.Imperative.IDEHelpNode() { Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode, Value = _open, Line = _open_line, Col = _open_col }); varDeclNode.Brackets.Add(new DesignScript.Parser.Imperative.IDEHelpNode() { Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode, Value = _close, Line = t.line, Col = t.col }); } .)
+//	}
+//		
+//                                    
+//    ]
+//    [
+//        '='                         (. DesignScript.Parser.Imperative.IDEHelpNode operatorPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode }; .)
+//						            (. Node rhsNode = null; .)		
+//        Imperative_expr<out rhsNode> 		
+//						            (.
+//							            DesignScript.Parser.Imperative.BinaryExpressionNode bNode = new DesignScript.Parser.Imperative.BinaryExpressionNode();
+//							            bNode.LeftNode = tNode;
+//							            bNode.RightNode = rhsNode;
+//                                        bNode.Col = tNode.Col;
+//                                        bNode.Line = tNode.Line;
+//                                        bNode.OperatorPos = operatorPos;
+//							            bNode.Optr = Operator.assign;
+//							            varDeclNode.NameNode = bNode;		
+//						            .)	
+//    ]	
+//
+//								    (. 
+//								        node = varDeclNode; 
+//								        if(!isGlobalScope) {
+//								            localVarCount++;
+//								        }
+//								    .)
+//
+//.
+//
+
+Imperative_functiondecl<out Node node>	
+= 							
+										    (. DesignScript.Parser.Imperative.FunctionDefinitionNode funcDecl = new DesignScript.Parser.Imperative.FunctionDefinitionNode(); .)
+    kw_def									(. funcDecl.KeywordPos.setValue(t.col, t.line, t.val); .)
+											(. funcDecl.Col = t.col; funcDecl.Line = t.line; .)
+	ident								    (. funcDecl.Name = t.val;
+                                               funcDecl.NamePos.setValue(t.col, t.line, t.val); .)
+	[
+    ':'										(. funcDecl.TypeColonPos = new DesignScript.Parser.Imperative.IDEHelpNode(); .)
+                                            (. funcDecl.TypeColonPos.setValue(t.col, t.line, t.val); .)
+											(. funcDecl.ReturnTypePos = new DesignScript.Parser.Imperative.IDEHelpNode(); .)
+	(
+		(Kw_int | Kw_double | Kw_var | Kw_function)		(. funcDecl.ReturnTypePos.Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.KeywordNode; .)
+		|
+		ident   							(. funcDecl.ReturnTypePos.Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.TypeNode; .)
+	)										(. funcDecl.ReturnType = new ProtoCore.Type() { Name = t.val }; .)					    
+                                            (. funcDecl.ReturnTypePos.setValue(t.col, t.line, t.val); .)
+    {									(. string _open = null; int _open_line = 0; int _open_col = 0; string _close = null; if (la.val == "[") { _open = la.val; _open_line = la.line; _open_col = la.col; } .)
+		openbracket						(. if(la.val == "]") _close = la.val; .)
+		closebracket					(. if (_open != null && _close != null) { funcDecl.Brackets.Add(new DesignScript.Parser.Imperative.IDEHelpNode() { Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode, Value = _open, Line = _open_line, Col = _open_col }); funcDecl.Brackets.Add(new DesignScript.Parser.Imperative.IDEHelpNode() { Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode, Value = _close, Line = t.line, Col = t.col }); } .)
+	}
+	]										(. if (la.val == "(") funcDecl.OpenParenPos.setValue(la.col, la.line, la.val); .)
+	'('										
+		[
+										    (. DesignScript.Parser.Imperative.ArgumentSignatureNode args = new DesignScript.Parser.Imperative.ArgumentSignatureNode(); 
+											   args.Col = t.col;
+											   args.Line = t.line; .)
+										    (. Node argdecl = null; .) 
+			Imperative_vardecl<out argdecl>            
+										    (. args.AddArgument(argdecl as DesignScript.Parser.Imperative.VarDeclNode); .) 	              
+										                  
+			{ 
+				','						    (. DesignScript.Parser.Imperative.IDEHelpNode commaPos = new DesignScript.Parser.Imperative.IDEHelpNode() { Col = t.col, Line = t.line, Value = t.val, Type = DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode };
+											   funcDecl.ArgCommaPosList.Add(commaPos); .)
+				Imperative_vardecl<out argdecl>	    
+										    (. args.AddArgument(argdecl as DesignScript.Parser.Imperative.VarDeclNode); .) 		
+			} 
+                                            (. funcDecl.Signature = args; .)
+		]									(. if (la.val == ")" && funcDecl.OpenParenPos.Value != null) funcDecl.CloseParenPos.setValue(la.col, la.line, la.val); else if (la.val != ")") funcDecl.OpenParenPos.Value = null; .)
+	')'										
+	
+                                            (. isGlobalScope = false; .)
+											(. if (la.val == "{") funcDecl.OpenCurlyBracePos.setValue(la.col, la.line, la.val); .)
+	'{' 									
+											(. 
+												funcDecl.FunctionBody = new DesignScript.Parser.Imperative.CodeBlockNode(); 
+												funcDecl.FunctionBody.Col = t.col;
+											    funcDecl.FunctionBody.Line = t.line;
+												List<Node> body = null;
+											.)
+		Imperative_stmtlist<out body> 
+											(. if (la.val == "}" && funcDecl.OpenCurlyBracePos.Value != null) funcDecl.CloseCurlyBracePos.setValue(la.col, la.line, la.val); else if (la.val != "}") funcDecl.OpenCurlyBracePos.Value = null; .)
+	'}'										
+											(. 
+                                                funcDecl.localVars = localVarCount;
+												funcDecl.FunctionBody.Body = body;
+												node = funcDecl; 
+
+                                                isGlobalScope = true;
+                                                localVarCount=  0;
+											.)
+.
+
+Imperative_num<out Node node>			
+			(. node = null; DesignScript.Parser.Imperative.IntNode INode = new DesignScript.Parser.Imperative.IntNode(); .)
+=
+	[
+		('-'	(. if (t.val == "-") INode.SignPos.setValue(t.col, t.line, t.val); .)
+         |
+         '+' 
+        )		(. if (t.val == "+") INode.SignPos.setValue(t.col, t.line, t.val); .)
+	]
+	(
+		number	(. if (t.kind == _number) INode.IDEValue.setValue(t.col, t.line, t.val); node = INode;.)
+		| 
+		float	(. if (t.kind == _float) { DesignScript.Parser.Imperative.DoubleNode DNode = new DesignScript.Parser.Imperative.DoubleNode(); DNode.SignPos = INode.SignPos; DNode.IDEValue.setValue(t.col, t.line, t.val); node = DNode; }  .)
+	)
+.
+
+Imperative_mulop<out Operator op>		
+			(. op = Operator.none; .)	
+= 						
+	'*'		(. op = Operator.mul; .)
+	| 
+	'/'		(. op = Operator.div; .)
+	|
+	'%'		(. op = Operator.mod; .)
+.
+
+Imperative_bitop<out Operator op>		
+			(. op = Operator.none; .)	
+= 						
+	'&'		(. op = Operator.bitwiseand; .)
+	| 
+	'|'		(. op = Operator.bitwiseor; .)
+	|
+	'^'		(. op = Operator.bitwisexor; .)
+.
+
+Imperative_logicalop<out Operator op>		
+			(. op = Operator.none; .)	
+= 						
+	"&&"		(. op = Operator.and; .)
+	| 
+	"||"		(. op = Operator.or; .)
+.
+
+Imperative_addop<out Operator op>		
+			(. op = Operator.none; .)	
+= 							
+	'+'		(. op = Operator.add; .)
+	|	
+	'-'		(. op = Operator.sub; .)
+.
+
+Imperative_relop<out Operator op>	
+			(. op = Operator.none; .)	
+ =			
+
+	greaterthan	(. op = Operator.gt; .)
+	| 
+	lessthan	(. op = Operator.lt; .)
+	| 
+	greaterequal	(. op = Operator.ge; .)
+	| 
+	lessequal	(. op = Operator.le; .)
+	| 
+	equal	(. op = Operator.eq; .)
+	| 
+	notequal	(. op = Operator.nq; .)
+.
+
+Imperative_unaryop<out DesignScript.Parser.Imperative.IDEHelpNode op>		
+= 				(. op = new DesignScript.Parser.Imperative.IDEHelpNode(DesignScript.Parser.Imperative.IDEHelpNode.HelpNodeType.PunctuationNode);  .)
+	(			
+						
+		'!'		(. op.setValue(t.col, t.line, t.val);  .)
+		|	
+		'~'		(. op.setValue(t.col, t.line, t.val);  .)
+				(. #if ENABLE_INC_DEC_FIX .)
+		|
+		Imperative_PostFixOp<ref op> (. #endif .)
+	)
+	(.
+		#if ENABLE_INC_DEC_FIX
+		#else
+		if (la.val == "++" || la.val == "--") Get();
+		#endif
+	.)
+.
+
+Imperative_PostFixOp<ref DesignScript.Parser.Imperative.IDEHelpNode op>			
+=			
+	(
+		"++"	(. op.setValue(t.col, t.line, t.val); .)
+		|
+		"--"	(. op.setValue(t.col, t.line, t.val); .)
+	)
+.
+
+Imperative_rangeStepOperator<out RangeStepOperator op>
+						(. op = RangeStepOperator.stepsize; .)
+= 
+	[
+		'#'				(. op = RangeStepOperator.num; .)
+		| '~'			(. op = RangeStepOperator.approxsize; .)
+	]
+.

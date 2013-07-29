@@ -1,0 +1,1311 @@
+Hydrogen<out Node node>
+    (.
+        DesignScript.Parser.Associative.CodeBlockNode code = null;
+        code = new DesignScript.Parser.Associative.CodeBlockNode();
+        code.Line = la.line; code.Col = la.col; node = null;
+    .)
+=
+    {
+        IF(la.kind != _EOF && la.val != "}")    (. bool valid = false; .)
+        (
+            (
+                Import_Statement<out node>      (. valid = true; .)
+            )
+            |
+            (
+                Assoc_Statement<out node>       (. valid = true; .)
+            )
+            |
+            (
+                Assoc_FunctionDecl<out node>    (. valid = true; .)
+            )
+            |
+            (
+                Assoc_ClassDecl<out node>       (. valid = true; .)
+            )
+            |
+            (
+                Assoc_LanguageBlock<out node>   (. valid = true; .)
+            )
+        )       (.  if (false == valid)
+                        Get();
+                    if (node != null)
+                        code.Body.Add(node);
+                .)
+  }             (. node = code; .)
+.
+
+Import_Statement<out Node node>
+                                    (.
+                                        DesignScript.Parser.Associative.ImportNode importNode = null;
+                                        importNode = new DesignScript.Parser.Associative.ImportNode();
+                                    .)
+=  SYNC
+        Kw_import                   (. if (t.kind == _Kw_import) importNode.KwImport.SetValue(t.val, t.line, t.col); .)
+                                    (. if (la.val == "(") importNode.OpenParen.SetValue(la.val, la.line, la.col); .)
+        '('
+            (
+                (
+                    textstring      (. if (t.kind == _textstring) { DesignScript.Parser.Associative.StringNode path = new DesignScript.Parser.Associative.StringNode() { value = t.val, Line = t.line, Col = t.col }; importNode.Path = path; } .)
+                )
+                |
+                (
+                    ident           (. if (t.kind == _ident) importNode.Identifier.SetValue(t.val, t.line, t.col); .)
+                    Kw_from         (. if (t.kind == _Kw_from) importNode.KwFrom.SetValue(t.val, t.line, t.col); .)
+                    textstring      (. if (t.kind == _textstring) { DesignScript.Parser.Associative.StringNode path = new DesignScript.Parser.Associative.StringNode() { value = t.val, Line = t.line, Col = t.col }; importNode.Path = path; } .)
+                )
+            ) 
+                                    (. if (la.val == ")" && importNode.OpenParen.Value != null) importNode.CloseParen.SetValue(la.val, la.line, la.col); else if (la.val != ")") importNode.OpenParen.Value = null; .)
+        ')'
+        [
+            Kw_prefix               (. if (t.kind == _Kw_prefix) importNode.KwPrefix.SetValue(t.val, t.line, t.col); .)
+            ident                   (. if (t.kind == _ident) importNode.PrefixIdent.SetValue(t.val, t.line, t.col);  .)
+        ]
+        endline                     (. 
+                                        if (t.val == ";")
+                                            importNode.EndLine.SetValue(t.val, t.line, t.col);
+                                        else
+                                        {
+                                            if (null != importNode.OpenParen)
+                                                importNode.OpenParen.SetValue(string.Empty, -1, -1);
+                                            if (null != importNode.CloseParen)
+                                                importNode.CloseParen.SetValue(string.Empty, -1, -1);
+                                        }
+
+                                        // We only allow "import" statements at the beginning of files, 
+                                        // so if any actual code started (anything that is not an import
+                                        // statement), we will mark this import statement as invalid.
+                                        // 
+                                        if (false != codeSegmentStarted)
+                                        {
+                                            if (null != importNode.KwImport)
+                                            importNode.KwImport.SetValue(string.Empty, -1, -1);
+                                        }
+                                    .)
+    (.
+        string ModuleName = null; 
+        if (importNode.Path != null && importNode.Path.value != null && (ModuleName = GetImportedModuleFullPath(importNode.Path.value)) != null && Path.GetExtension(ModuleName) == ".ds")
+        {
+            if (GlobalModuleTable == null) 
+            {
+                GlobalModuleTable = new Dictionary<string, DesignScript.Parser.Associative.ImportNode>();
+                if (core.Options.RootModulePathName != null)
+                    GlobalModuleTable[core.Options.RootModulePathName] = null;
+            }
+
+            if (GlobalModuleTable.ContainsKey(ModuleName)) 
+            {
+                importNode.CodeNode = null;
+                importNode.HasBeenImported = true;
+            }
+            else 
+            {
+        
+                GlobalModuleTable[ModuleName] = importNode;
+
+                string curDirectory = Directory.GetCurrentDirectory();
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(ModuleName));
+
+                DesignScript.Parser.Scanner scanner = new DesignScript.Parser.Scanner(ModuleName);
+                DesignScript.Parser.Parser parser = new DesignScript.Parser.Parser(scanner, core);
+                parser.GlobalModuleTable = GlobalModuleTable;
+
+                parser.Parse();
+                Directory.SetCurrentDirectory(curDirectory);
+
+                //if (parseErrors.ToString() != String.Empty)
+                    //core.BuildStatus.LogSyntaxError(parseErrors.ToString());
+                //core.BuildStatus.errorCount += parser.errors.count;
+
+                importNode.CodeNode = parser.root as DesignScript.Parser.Associative.CodeBlockNode;
+            }
+        } 
+
+        node = importNode;
+
+    .)
+.
+
+
+
+
+Assoc_Statement<out Node node>
+    (.
+        codeSegmentStarted = true;
+        DesignScript.Parser.Associative.StatementNode Node = new DesignScript.Parser.Associative.StatementNode(); 
+        Node stmtNode = null; DesignScript.Parser.Associative.IDEHelpNode Endline = Node.endLine; 
+        Node.Line = la.line; Node.Col = la.col;
+    .)
+=  
+SYNC
+(
+        Assoc_FunctionalStatement<out stmtNode, ref Endline> 
+    |
+        Assoc_LanguageBlock<out stmtNode>
+    |
+        endline (. if (t.val == ";") Endline.SetValue(t.val, t.line, t.col); .)
+)               (. Node.Statement = stmtNode;  Node.endLine = Endline; node = Node; .)
+.
+
+Assoc_StatementList<.out List<Node> NodeList.> 
+										(. NodeList = new List<Node>(); .)
+=					
+{ 
+										(. Node node = null; .)
+	Assoc_Statement<out node>			(. if (node != null) NodeList.Add(node); .)
+}
+.
+
+Assoc_ClassDecl<out Node node>
+    (.
+        codeSegmentStarted = true;
+        DesignScript.Parser.Associative.ClassDeclNode classnode;
+        classnode = new DesignScript.Parser.Associative.ClassDeclNode()
+        {
+            Line = la.line,
+            Col = la.col
+        };
+    .)
+=
+                    (. if (la.val == "class") classnode.Kwclass.SetValue(la.val, la.line, la.col);      .)
+    kw_class        (. if (la.kind == _ident) classnode.ClassName.SetValue(la.val, la.line, la.col);    .)
+    ident
+    [               (. if (la.kind == _kw_extend) classnode.Kwextend.SetValue(la.val, la.line, la.col); .)
+        kw_extend   (. if (la.kind == _ident) classnode.AddExt(la.val, la.line, la.col);                .)
+        ident       (. if (la.kind == _ident) classnode.AddExt(la.val, la.line, la.col);                .)
+        {
+            ident
+        }
+    ]               (. if (la.val == "{") classnode.openBrace.SetValue(la.val, la.line, la.col);        .)
+    '{'
+        { IF (la.kind != _EOF && la.val != "}")
+            SYNC
+            (                                               (. int kwstaticline = -1, kwstaticcol = -1;             .)
+                [                                           (. classnode.AddAccessLabel(la.val, la.line, la.col);   .)
+                ( kw_public | kw_private | kw_protected )
+                ]
+                [ 
+                    Kw_static                               (. if (t.kind == _Kw_static) kwstaticline = t.line; kwstaticcol = t.col; .)
+                ]
+                (
+                    (
+                        (. Node constr = null; .)
+                        Assoc_constructordecl<out constr>
+                        (.
+                            if (kwstaticline != -1)
+                            {
+                                DesignScript.Parser.Associative.ConstructorDefinitionNode constrNode = null;
+                                constrNode = (constr as DesignScript.Parser.Associative.ConstructorDefinitionNode);
+                                if (null != constrNode)
+                                    constrNode.KwStatic.SetValue("static", kwstaticline, kwstaticcol);
+                            }
+
+                            classnode.funclist.Add(constr);
+                        .)
+                    )
+                    |
+                    (
+                        (. Node varnode = null; .)
+                        Assoc_vardecl<out varnode>
+                        (.
+                            classnode.varlist.Add(varnode);
+                            if (kwstaticline != -1)
+                            {
+                                DesignScript.Parser.Associative.VarDeclNode varDeclNode = null;
+                                varDeclNode = (varnode as DesignScript.Parser.Associative.VarDeclNode);
+                                if (null != varDeclNode)
+                                    varDeclNode.KwStatic.SetValue("static", kwstaticline, kwstaticcol);
+                            }
+                        .)
+
+                        SYNC        (. if (la.val == ";") classnode.AddVarDeclComma(la.val, la.line, la.col); .)
+                        endline
+                    )
+                    |
+                    (
+                        (. Node funcnode = null; .)
+                        Assoc_FunctionDecl<out funcnode>
+                        (.
+                            if (kwstaticline != -1)
+                            {
+                                DesignScript.Parser.Associative.FunctionDefinitionNode funcDefNode = null;
+                                funcDefNode = (funcnode as DesignScript.Parser.Associative.FunctionDefinitionNode);
+                                if (null != funcDefNode)
+                                    funcDefNode.KwStatic.SetValue("static", kwstaticline, kwstaticcol);
+                            }
+                            classnode.funclist.Add(funcnode);
+                        .)
+                    )
+                )
+            )
+        }       (.
+                    if (la.val == "}" && classnode.openBrace.Value != null)
+                        classnode.closeBrace.SetValue(la.val, la.line, la.col);
+                    else if (la.val != "}")
+                        classnode.openBrace.Value = null;
+                .)
+    '}'         (. node = classnode; .)
+.
+
+
+
+Assoc_LanguageBlock<out Node node>
+    (.
+        codeSegmentStarted = true;
+        DesignScript.Parser.Associative.LanguageBlockNode langblock = null;
+        langblock = new DesignScript.Parser.Associative.LanguageBlockNode();
+    .)
+=
+    (.
+        if (la.val == "[")
+            langblock.openBracket.SetValue(la.val, la.line, la.col);
+    .)
+
+    openbracket
+    (.
+        langblock.Line = t.line;
+        langblock.Col = t.col;
+    .)
+    (.
+        if (la.val == "Imperative" || la.val == "Associative")
+            langblock.language.SetValue(la.val, la.line, la.col);
+    .)
+    (.
+        if (la.val == "Imperative")
+            langblock.languageblock.language = ProtoCore.Language.kImperative;
+        else if (la.val == "Associative")
+            langblock.languageblock.language = ProtoCore.Language.kAssociative;
+    .)
+
+    ident
+    {                   (. string comma = null; string key = null; string equal = null;                     .)
+        ','             (. if (t.val == ",") comma = t.val; int comma_line = t.line; int comma_col = t.col; .)
+        ident           (. if (t.kind == _ident) key = t.val; int key_line = t.line; int key_col = t.col;   .)
+        '='             (. if (t.val == "=") equal = t.val; int equal_line = t.line; int equal_col = t.col; .)
+        textstring      (.
+                            DesignScript.Parser.Associative.StringNode stringNode = null;
+                            stringNode = new DesignScript.Parser.Associative.StringNode();
+                            if (t.kind == _textstring)
+                            {
+                                stringNode.value = t.val;
+                                stringNode.Line = t.line;
+                                stringNode.Col = t.col;
+                            }
+
+                            langblock.AddProperty(comma, comma_line, comma_col, key, key_line, key_col, equal, equal_line, equal_col, stringNode);
+                        .)
+    }                   (. if (la.val == "]" && langblock.openBracket.Value != null) langblock.closeBracket.SetValue(la.val, la.line, la.col); else if (la.val != "]") langblock.openBracket.Value = null; .)
+    closebracket        (. if (la.val == "{") langblock.openBrace.SetValue(la.val, la.line, la.col); .)
+    '{'                 (. Node codeNode = null; .)
+    (
+        IF(langblock.languageblock.language == ProtoCore.Language.kAssociative)
+        Hydrogen<out codeNode>
+        |
+        IF(langblock.languageblock.language == ProtoCore.Language.kImperative)
+        Imperative<out codeNode>
+    )
+    (
+        IF (langblock.languageblock.language == ProtoCore.Language.kInvalid)
+        (.
+            int openCurlyBraceCount = 0, closeCurlyBraceCount = 0;
+            DesignScript.Parser.Associative.CodeBlockNode codeBlockInvalid;
+            codeBlockInvalid = new DesignScript.Parser.Associative.CodeBlockNode();
+        .)
+        {
+            IF (closeCurlyBraceCount <= openCurlyBraceCount)  
+            (
+                Assoc_LanguageBlock<out codeNode>   (. codeBlockInvalid.Body.Add(codeNode); .)
+                |
+                '{'                                 (. openCurlyBraceCount++; .)
+                |
+                                                    (.
+                                                        if (la.val == "}" && langblock.openBrace.Value != null)
+                                                            langblock.closeBrace.SetValue(la.val, la.line, la.col);
+                                                        else if (la.val != "}")
+                                                            langblock.openBrace.Value = null;
+                                                    .)
+                '}'                                 (. closeCurlyBraceCount++; .)
+                |
+                EOF
+                '}'                                 (. break; .) 
+                |
+                IF(true)                            (. Get(); .)
+            )
+        }                                           (. codeNode = codeBlockInvalid; .)
+        |
+        IF(true)                                    (.
+                                                        if (la.val == "}" && langblock.openBrace.Value != null)
+                                                            langblock.closeBrace.SetValue(la.val, la.line, la.col);
+                                                        else if (la.val != "}")
+                                                            langblock.openBrace.Value = null;
+                                                    .)
+        '}'
+    )                                               (. langblock.code = codeNode; node = langblock; .)
+.
+
+
+Assoc_constructordecl<out Node constrNode>
+															(. DesignScript.Parser.Associative.ConstructorDefinitionNode constr = new DesignScript.Parser.Associative.ConstructorDefinitionNode() { Line = la.line, Col = la.col }; .)
+=                      
+	kw_constructor											(. constr.Kwconstructor.SetValue(t.val, t.line, t.col); .)
+															(. DesignScript.Parser.Associative.IDEHelpNode IdentName = constr.name; DesignScript.Parser.Associative.TypeNode IDEType = new DesignScript.Parser.Associative.TypeNode(); .)
+															(. DesignScript.Parser.Associative.ArgumentSignatureNode argumentSignature = null; DesignScript.Parser.Associative.Pattern pattern = null; .)
+	Assoc_MethodSignature<out argumentSignature, out pattern,  ref IdentName, ref IDEType>
+															(. constr.name = IdentName; constr.IDEReturnType = IDEType; constr.Pattern = pattern; constr.Signature = argumentSignature; .)					
+    [
+        ':'													(. constr.SetColonToken(t); .)
+        Assoc_BaseConstructorCall<constr>
+    ]
+(															(. Node functionBody = null; .)
+    Assoc_FunctionalMethodBodyMultiLine<out functionBody>	(. constr.FunctionBody = functionBody as DesignScript.Parser.Associative.CodeBlockNode; .)
+)															(. constrNode = constr; .)
+.
+
+//------------------------------------------------------------------------
+
+Assoc_BaseConstructorCall<DesignScript.Parser.Associative.ConstructorDefinitionNode constr>
+=                                   (. 
+                                       DesignScript.Parser.Associative.FunctionCallNode f = null;
+                                       if (la.val == "base")
+                                       {
+                                           Get();
+                                           constr.CreateBaseConstructorNode();
+                                           f = constr.BaseConstructorNode;
+                                           constr.KwBase.SetValue(t.val, t.line, t.col);
+                                       }
+                                    .)                                    
+
+    "."								(. constr.SetDotToken(t); .)
+
+    [                               (. Node identNode = null; .)
+        Assoc_Ident<out identNode>  (. constr.SetBaseConstructor(identNode); .)
+    ]
+    Assoc_Arguments<ref f>
+
+.
+
+//------------------------------------------------------------------------
+Assoc_ExternalLibraryReference<ref DesignScript.Parser.Associative.FunctionDefinitionNode f>
+=	
+									
+										(. if (la.val == "(") f.libOpenBrace.SetValue(la.val, la.line, la.col); .)
+  '('									
+  										
+    textstring							(. DesignScript.Parser.Associative.StringNode libName = new DesignScript.Parser.Associative.StringNode(); .) 
+										(. if (t.kind == _textstring) { libName.value = t.val; libName.Line = t.line; libName.Col = t.col; } else Get(); .)
+									
+										(. if (la.val == ")" && f.libOpenBrace.Value != null) f.libCloseBrace.SetValue(la.val, la.line, la.col); else if (la.val != ")") f.libOpenBrace.Value = null; f.libName = libName; .)
+  ')'                                   
+.
+
+//------------------------------------------------------------------------
+Assoc_FunctionDecl<out Node node>
+    (.
+        codeSegmentStarted = true;
+        DesignScript.Parser.Associative.FunctionDefinitionNode f = null;
+        f = new DesignScript.Parser.Associative.FunctionDefinitionNode()
+        {
+            Line = la.line,
+            Col = la.col
+        };
+    .)
+=
+    [
+        kw_external     (.
+                            if (t.val == "external")
+                                f.Kwexternal.SetValue(t.val, t.line, t.col);
+                        .) // TODO do we want to add libtype? e.g. dll/py etc?
+        [
+            kw_native   (.
+                            if (t.val == "native")
+                                f.Kwnative.SetValue(t.val, t.line, t.col);
+                        .)
+        ]
+        Assoc_ExternalLibraryReference<ref f>
+    ]
+    
+    kw_def      (.
+                    if (t.val == "def")
+                        f.Kwdef.SetValue(t.val, t.line, t.col);
+                    else
+                        Get();
+
+                    DesignScript.Parser.Associative.IDEHelpNode IdentName = f.name;
+                    DesignScript.Parser.Associative.TypeNode IDEType = new DesignScript.Parser.Associative.TypeNode(); 
+
+                    DesignScript.Parser.Associative.ArgumentSignatureNode argumentSignature = null;
+                    DesignScript.Parser.Associative.Pattern pattern = null;
+                .)
+
+    Assoc_MethodSignature<out argumentSignature, out pattern, ref IdentName, ref IDEType> 
+    (.
+        f.IDEReturnType = IDEType;
+        f.name = IdentName;
+        f.Pattern = pattern;
+        f.Singnature = argumentSignature;
+    .)
+
+    SYNC            (. Node functionBody = null; .)
+    (
+        endline     (. f.endLine.SetValue(t.val, t.line, t.col); .)
+        |
+		( 
+            '='
+										(.
+                                            DesignScript.Parser.Associative.CodeBlockNode func = new DesignScript.Parser.Associative.CodeBlockNode(); 
+											DesignScript.Parser.Associative.BinaryExpressionNode binaryExpr = new DesignScript.Parser.Associative.BinaryExpressionNode();
+                                            binaryExpr.op.SetValue(t.val, t.line, t.col);
+											Node expr;
+                                        .)
+			Assoc_Expression<out expr>
+                                        (. 
+                                            binaryExpr.RightNode = expr;
+                                            List<Node> body = new List<Node>(); 
+											body.Add(binaryExpr);
+											func.Body = body;
+											f.FunctionBody = func as DesignScript.Parser.Associative.CodeBlockNode; 
+										.)
+			endline						(.
+											f.endLine.SetValue(t.val, t.line, t.col); 
+										.)
+        )
+		|
+        Assoc_FunctionalMethodBodyMultiLine<out functionBody>
+            (. f.FunctionBody = functionBody as DesignScript.Parser.Associative.CodeBlockNode; .)
+    )       (. node = f; .)
+.
+
+//------------------------------------------------------------------------
+Assoc_MethodSignature<out DesignScript.Parser.Associative.ArgumentSignatureNode argumentSign, out DesignScript.Parser.Associative.Pattern pattern, ref DesignScript.Parser.Associative.IDEHelpNode IDEName, ref DesignScript.Parser.Associative.TypeNode typeNode>
+=
+
+ident														(. if (t.kind == _ident) IDEName.SetValue(t.val, t.line, t.col); .)
+[						
+    Assoc_TypeRestriction<out typeNode>	
+]										
+Assoc_ArgumentSignatureDefinition<out argumentSign>  
+															(. pattern = null; .)                                  
+[ 
+    Assoc_PatternExpression<out pattern>
+]
+		
+								
+.
+
+
+//------------------------------------------------------------------------
+Assoc_ArgumentSignatureDefinition<out DesignScript.Parser.Associative.ArgumentSignatureNode argumentSign>
+												(. DesignScript.Parser.Associative.ArgumentSignatureNode argumentSignature = new DesignScript.Parser.Associative.ArgumentSignatureNode() { Line = la.line, Col = la.col }; .)
+= 
+SYNC											(. if (la.val == "(") argumentSignature.openBrace.SetValue(la.val, la.line, la.col); .)
+'('												
+    [											(. Node arg;.)
+        Assoc_FunctionParameterDecl<out arg>	(. argumentSignature.AddArgument(arg); .)
+        {
+			WEAK
+            ','									(. if (t.val == ",") argumentSignature.AddComma(t.val, t.line, t.col); .)
+           Assoc_FunctionParameterDecl<out arg>	(. argumentSignature.AddArgument(arg); .)
+        }
+    ]											(. if (la.val == ")" && argumentSignature.openBrace.Value != null) argumentSignature.closeBrace.SetValue(la.val, la.line, la.col); else if (la.val != ")") argumentSignature.openBrace.Value = null; argumentSign = argumentSignature; .)
+')'												
+.
+
+Assoc_FunctionParameterDecl<out Node node>	
+														(. DesignScript.Parser.Associative.VarDeclNode varDeclNode = new DesignScript.Parser.Associative.VarDeclNode(); .)
+= 
+		ident											(. varDeclNode.Line = t.line; varDeclNode.Col = t.col; varDeclNode.name.SetValue(t.val, t.line, t.col); .)	
+														(. if (t.kind == _ident) varDeclNode.name.SetValue(t.val, t.line, t.col); .)
+	[													(. DesignScript.Parser.Associative.TypeNode IDEType = new DesignScript.Parser.Associative.TypeNode(); .)
+		Assoc_TypeRestriction<out IDEType>				(. varDeclNode.IDEArgumentType = IDEType; .)
+	]
+	[
+        '='												(. if (t.val == "=") varDeclNode.equal.SetValue(t.val, t.line, t.col); .)
+														(. Node rhsNode = null; .)		
+        Assoc_Expression<out rhsNode> 					(. varDeclNode.NameNode = rhsNode; .)	
+    ]													(.  node = varDeclNode; .)
+.
+
+Assoc_vardecl<out Node node>
+														(. DesignScript.Parser.Associative.VarDeclNode varDeclNode = new DesignScript.Parser.Associative.VarDeclNode(); .) 
+= 
+	ident												(. varDeclNode.Line = t.line; varDeclNode.Col = t.col; varDeclNode.name.SetValue(t.val, t.line, t.col); .)
+														(. if (t.kind == _ident) varDeclNode.name.SetValue(t.val, t.line, t.col); .)
+														
+	[													(. DesignScript.Parser.Associative.TypeNode IDEType = new DesignScript.Parser.Associative.TypeNode(); .)
+		Assoc_TypeRestriction<out IDEType>				(. varDeclNode.IDEArgumentType = IDEType; .)
+	]
+    [
+        '='												(. if (t.val == "=") varDeclNode.equal.SetValue(t.val, t.line, t.col); .)
+														(. Node rhsNode = null; .)		
+        Assoc_Expression<out rhsNode> 					(. varDeclNode.NameNode = rhsNode; .)	
+    ]													(. node = varDeclNode; .)
+.
+
+//------------------------------------------------------------------------
+Assoc_PatternExpression<out DesignScript.Parser.Associative.Pattern pattern>
+=							(. DesignScript.Parser.Associative.Pattern p = new DesignScript.Parser.Associative.Pattern(); .)
+'|'							(. p.bitOr.SetValue(t.val, t.line, t.col); p.Line = t.line; p.Col = t.col; .)
+							(. Node exp = null; .)
+Assoc_Expression<out exp>   (. p.Expression = exp; pattern = p; .)
+.
+
+
+//------------------------------------------------------------------------
+Assoc_BinaryOps<ref DesignScript.Parser.Associative.IDEHelpNode IDEop>  
+= Assoc_AddOp<ref IDEop>
+| Assoc_MulOp<ref IDEop>
+| Assoc_ComparisonOp<ref IDEop>
+| Assoc_LogicalOp<ref IDEop>
+.
+
+//------------------------------------------------------------------------
+Assoc_TypeRestriction<out DesignScript.Parser.Associative.TypeNode IDEType>
+										(. IDEType = new DesignScript.Parser.Associative.TypeNode(); .)
+=	WEAK
+	':'									(. if (t.val == ":") IDEType.colon.SetValue(t.val, t.line, t.col); .)
+	(
+		( Kw_double | Kw_int | Kw_var | Kw_function) (. IDEType.BuildInTypeSetValue(t.val, t.line, t.col); .)
+		|
+		ident							(. IDEType.UserDefinedTypeSetValue(t.val, t.line, t.col); .)
+	)
+	{									(. string openBracket = null; string closeBracket = null; .)
+										(. if (la.val == "[")  openBracket = la.val; int bracket_line = la.line; int bracket_col = la.col; .)
+	openbracket							(. if (la.val == "]") closeBracket = la.val; .)
+	closebracket						(. if (openBracket != null && closeBracket != null) IDEType.AddBracket(openBracket, bracket_line, bracket_col, closeBracket, t.line, t.col); .)
+
+	[									
+		rangeop							(. IDEType.op.SetValue(t.val, t.line, t.col); .)
+										(. string multiDimOpenBracket = null; string multiDimCloseBracket = null; .)
+										(. if (la.val == "[")  multiDimOpenBracket = la.val; int bracket2_line = la.line; int bracket2_col = la.col; .)
+		openbracket						(. if (la.val == "]")  multiDimCloseBracket = la.val; .)
+		closebracket					(. if (multiDimOpenBracket != null && multiDimCloseBracket != null) 
+											IDEType.AddMultiDimNodes(multiDimOpenBracket, bracket2_line, bracket2_col, multiDimCloseBracket, t.line, t.col); .)
+	]
+	}
+.
+
+//------------------------------------------------------------------------
+//Assoc_ClassReference<ref DesignScript.Parser.Associative.TypeNode IDEType>
+//=                                
+ //(
+	//(Kw_double | Kw_int | Kw_var | Kw_function)	(. IDEType.BuildInTypeSetValue(t.val, t.line, t.col); .)
+	//|
+	//ident					     (. IDEType.UserDefinedTypeSetValue(t.val, t.line, t.col); .)
+ //)                               (. type.Name = t.val; .)
+                                 //(. type.UID = 0; .)
+                                 
+                                 // TODO Jun: Luke made changes to array representation, handle this
+                                 //(. type.IsArray = false; .)
+//.
+
+
+
+//------------------------------------------------------------------------
+Assoc_FunctionalMethodBodyMultiLine<out Node funcBody>
+=										(.
+											DesignScript.Parser.Associative.CodeBlockNode functionBody = new DesignScript.Parser.Associative.CodeBlockNode(); 
+											List<Node> body = new List<Node>(); 
+										.)           
+										(. if (la.val == "{") functionBody.openBrace.SetValue(la.val, la.line, la.col); functionBody.Line = la.line; functionBody.Col = la.col; .)
+    '{'									
+                                         
+            Assoc_StatementList<out body>                                        
+        
+                                        
+                                        (. functionBody.Body =body;  .)
+										(. if (la.val == "}" && functionBody.openBrace.Value != null) functionBody.closeBrace.SetValue(la.val, la.line, la.col); else if (la.val != "}") functionBody.openBrace.Value = null; .)
+    '}'									
+										(. funcBody = functionBody; .)
+.
+
+
+//------------------------------------------------------------------------
+Assoc_FunctionalStatement<out Node node, ref DesignScript.Parser.Associative.IDEHelpNode Endline> 
+										(. DesignScript.Parser.Associative.BinaryExpressionNode expressionNode = new DesignScript.Parser.Associative.BinaryExpressionNode(); .)
+=
+ SYNC									(. Node leftNode = null; .)
+										(. isLeft = true; .)                                        							
+ Assoc_DecoratedIdentifier<out leftNode>		(. expressionNode.Line = leftNode.Line; expressionNode.Col = leftNode.Col; expressionNode.LeftNode = leftNode; .)
+										(. isLeft = false; .)                
+										(. node = leftNode; .)
+                                        (. if(!(leftNode is DesignScript.Parser.Associative.PostFixNode)) {.)
+ '='									(. 
+											Node rightNode = null; 
+											if (t.val == "=") { expressionNode.op.SetValue(t.val, t.line, t.col); }
+											else { expressionNode.op.SetValue(null, 0, 0); }
+										.)
+ (
+ 
+	 (  IF (la.val == "[")
+	    Assoc_LanguageBlock<out rightNode> (. Endline = null; .)
+     )
+     |
+	 (
+		IF(HasMoreAssignmentStatements())
+            Assoc_FunctionalStatement<out rightNode, ref Endline>
+	 )
+	 |
+     (  IF (!IsModifierStack())	
+        Assoc_Expression<out rightNode>		
+        SYNC
+        endline							(. if(t.val == ";") Endline.SetValue(t.val, t.line, t.col); else Endline.SetValue(null, -1, -1); .)
+     )
+     |
+     (	IF (IsModifierStack())			(. DesignScript.Parser.Associative.ModifierStackNode mstack = new DesignScript.Parser.Associative.ModifierStackNode(); .)
+										(. 
+											if (la.val == "{") { mstack.openSharpBrace.SetValue(la.val, la.line, la.col); mstack.Line = la.line; mstack.Col = la.col; }
+											else { 	mstack.openSharpBrace.SetValue(null, 0, 0); }
+										.)
+        "{"							
+										(. string name = null; .)
+										(. DesignScript.Parser.Associative.BinaryExpressionNode expression = new DesignScript.Parser.Associative.BinaryExpressionNode(); ; Node expression2 = null; .)
+            Assoc_Expression<out expression2> 
+            [							(. string _arr = null; int _line = 0; int _col = 0; .)
+                "=>"					(. if (t.val == "=>") _arr = t.val; _line = t.line; _col = t.col; .)
+				ident					(. if (t.kind == _ident) { name = t.val; mstack.AddArrow(_arr, _line, _col, t.val, t.line, t.col); } else { name = null; mstack.AddArrow(_arr, _line, _col, null, 0, 0); }.)
+            ]
+										(.  
+											expression.LeftNode = leftNode;
+											expression.op = expressionNode.op;
+											expression.RightNode = expression2;
+											mstack.AddElementNode(expression, name);
+										.)
+		
+            SYNC endline				(. if (t.val == ";") mstack.AddEndLine(t.val, t.line, t.col); else mstack.AddEndLine(null, 0, 0); .)
+            {
+										(. name = null; .)
+										(. bool bHasOperator = false; expression = new DesignScript.Parser.Associative.BinaryExpressionNode(); expression2 = null; .)
+										(. bHasOperator = true; DesignScript.Parser.Associative.IDEHelpNode IDEop = expression.op; .)
+				[						
+                   (	
+                        Assoc_BinaryOps<ref IDEop>
+                   )
+                ]
+                Assoc_Expression<out expression2>
+                [							(. string _arr = null; int _line = 0; int _col = 0; .)
+                      "=>"					(. if (t.val == "=>") _arr = t.val; _line = t.line; _col = t.col; .)
+					  ident					(. if (t.kind == _ident) { name = t.val; mstack.AddArrow(_arr, _line, _col, t.val, t.line, t.col); } else { name = null; mstack.AddArrow(_arr, _line, _col, null, 0, 0); }.)
+                ]
+											(. 
+												if(!bHasOperator)
+												{
+													expression.RightNode = expression2;
+													expression.LeftNode = leftNode; 
+													expression.op = expressionNode.op;
+													mstack.AddElementNode(expression, name);
+												}
+												else
+												{ 
+													expression.LeftNode = leftNode;
+													DesignScript.Parser.Associative.BinaryExpressionNode expression3 = new DesignScript.Parser.Associative.BinaryExpressionNode();
+													expression3.LeftNode = leftNode;
+													expression3.op = IDEop;
+													expression3.RightNode = expression2;
+													expression.LeftNode = leftNode;
+													expression.RightNode = expression3;
+													expression.op = expressionNode.op;
+													mstack.AddElementNode(expression, name);
+												}
+											.)
+                endline						(. if (t.val == ";") mstack.AddEndLine(t.val, t.line, t.col); else mstack.AddEndLine(null, 0, 0); .)
+            }
+											(. if (la.val == "}" && mstack.openSharpBrace.Value != null) mstack.closeBrace.SetValue(la.val, la.line, la.col); else if (la.val != "}") mstack.openSharpBrace.SetValue(null, 0, 0); rightNode = mstack;.)          
+        "}"									
+     )						
+ )											(.  expressionNode.RightNode = rightNode; node = expressionNode;
+                                                if (rightNode is DesignScript.Parser.Associative.ExprListNode) {
+                                                    DesignScript.Parser.Associative.IdentifierNode identNode = 
+                                                        expressionNode.LeftNode as DesignScript.Parser.Associative.IdentifierNode;
+                                                    if (null != identNode) {
+                                                        DesignScript.Parser.Associative.IDEHelpNode identValue = identNode.IdentValue;
+                                                        rightNode.Name = ((null != identValue) ? identValue.Value : null);
+                                                    }
+                                                }
+                                            } .)
+.
+
+//------------------------------------------------------------------------
+Assoc_Expression<out Node node>
+													(. node = null; .)
+=				
+	(
+		Assoc_LogicalExpression<out node>
+	)
+	
+    {
+        Assoc_TernaryOp<ref node>
+    }
+
+.
+Assoc_TernaryOp<ref Node node>
+=
+	{
+												(. DesignScript.Parser.Associative.InlineConditionalNode inlineConNode = new DesignScript.Parser.Associative.InlineConditionalNode(); .)
+												(. inlineConNode.ConditionExpression = node; .)
+		"?"										(. if (t.val == "?") inlineConNode.Question.SetValue(t.val, t.line, t.col); .)
+												(. node = null; .)
+		Assoc_Expression<out node>				(. inlineConNode.TrueExpression = node; .)
+		":"										(. if (t.val == ":") inlineConNode.Colon.SetValue(t.val, t.line, t.col); .)
+												(. node = null; .)
+		Assoc_Expression<out node>              (. inlineConNode.FalseExpression = node; .)
+												(. node = inlineConNode; .)
+	}			
+
+.
+
+Assoc_UnaryExpression<out Node node>
+=										(. DesignScript.Parser.Associative.UnaryExpressionNode an = new DesignScript.Parser.Associative.UnaryExpressionNode(); .)
+										(. node = null; .)
+	(
+	    (
+            Assoc_NegExpression<out an>
+        )
+    |
+        (
+            Assoc_BitUnaryExpression<out an>
+        )
+	)									(. node = an; .)
+.
+
+Assoc_BitUnaryExpression<out DesignScript.Parser.Associative.UnaryExpressionNode node>
+=										(. DesignScript.Parser.Associative.UnaryExpressionNode unary = new DesignScript.Parser.Associative.UnaryExpressionNode(); .)
+										(. DesignScript.Parser.Associative.IDEHelpNode IDEop = unary.op; .)
+						
+	Assoc_unaryop<out IDEop>			
+										(. Node exprNode = null; .)
+	Assoc_Factor<out exprNode>	
+										(. unary.Expression = exprNode; .)
+										(. unary.op = IDEop; .)
+									    (. node = unary; .)
+
+.
+
+Assoc_NegExpression<out DesignScript.Parser.Associative.UnaryExpressionNode node>
+=                       (. node = new Associative.UnaryExpressionNode() ; .)
+						(. DesignScript.Parser.Associative.IDEHelpNode op = node.op; .)
+                        (. Node exprNode = null; .)
+    Assoc_negop<out op>
+    (
+        (
+            Assoc_IdentifierList<out exprNode>
+        )
+    |
+        (
+            '('
+            Assoc_Expression<out exprNode>    
+            ')'
+        )
+    )
+                        (.  
+						DesignScript.Parser.Associative.UnaryExpressionNode unary = new DesignScript.Parser.Associative.UnaryExpressionNode(); 
+						unary.op = op;
+						unary.Expression = exprNode;
+						node = unary;
+                        .)
+.
+
+Assoc_negop<out DesignScript.Parser.Associative.IDEHelpNode op>
+=						(. op = new Associative.IDEHelpNode(Associative.IDEHelpNode.NodeType.PunctuationNode); .)
+(
+| '-'					(. op.SetValue(t.val, t.line, t.col); .)
+)
+
+.
+
+Assoc_LogicalExpression<out Node node>
+													(. node = null; .)
+=																			
+Assoc_ComparisonExpression<out node>
+{									
+													(. DesignScript.Parser.Associative.BinaryExpressionNode binaryNode = new DesignScript.Parser.Associative.BinaryExpressionNode(); .)
+													(. DesignScript.Parser.Associative.IDEHelpNode IDEop = binaryNode.op; binaryNode.LeftNode = node; .)
+		Assoc_LogicalOp<ref IDEop>					(. binaryNode.op = IDEop; .)
+													(. node = null; .)
+		Assoc_ComparisonExpression<out node>		(. binaryNode.RightNode = node; .)
+													(. node = binaryNode; .)
+}
+.
+
+//TODO: dont allow spacing?
+//------------------------------------------------------------------------
+Assoc_ComparisonOp<ref DesignScript.Parser.Associative.IDEHelpNode IDEop>
+= ">"						(. IDEop.SetValue(t.val, t.line, t.col); .)
+| ">="						(. IDEop.SetValue(t.val, t.line, t.col); .)
+| "<"						(. IDEop.SetValue(t.val, t.line, t.col); .)
+| "<="						(. IDEop.SetValue(t.val, t.line, t.col); .)
+| "=="						(. IDEop.SetValue(t.val, t.line, t.col); .)
+| "!="						(. IDEop.SetValue(t.val, t.line, t.col); .)
+.
+
+//------------------------------------------------------------------------
+Assoc_ComparisonExpression<out Node node>
+=								
+Assoc_RangeExpr<out node>
+{									(. DesignScript.Parser.Associative.BinaryExpressionNode binaryNode = new DesignScript.Parser.Associative.BinaryExpressionNode(); .)
+									(. DesignScript.Parser.Associative.IDEHelpNode IDEop = binaryNode.op; .)
+    Assoc_ComparisonOp<ref IDEop>	(. binaryNode.op = IDEop; .)
+									(. Node expr2 = null; .)
+    Assoc_RangeExpr<out expr2>		(. binaryNode.LeftNode = node; binaryNode.RightNode = expr2; .)
+			                        (. node = binaryNode; .)
+}
+.
+
+//------------------------------------------------------------------------
+Assoc_RangeExpr<out Node node>
+=
+    Assoc_ArithmeticExpression<out node>
+    [
+															(.	DesignScript.Parser.Associative.RangeExprNode rnode = new DesignScript.Parser.Associative.RangeExprNode(); .)
+															(.  rnode.FromNode = node; rnode.Line = node.Line; rnode.Col = node.Col; .)
+	    rangeop												(. rnode.op.SetValue(t.val, t.line, t.col); node = null; .)
+	    Assoc_ArithmeticExpression<out node>				(. rnode.ToNode = node; .)
+															(. if (!(t.val == "..")&&(la.val == "..")) { .)
+	    [													
+		    rangeop											(. rnode.stepOp.SetValue(t.val, t.line, t.col); DesignScript.Parser.Associative.IDEHelpNode stepOp2 = rnode.stepOp2; .)
+			Assoc_rangeStepOperator<ref stepOp2>			(. rnode.stepOp2 = stepOp2; node = null; .)
+		    Assoc_ArithmeticExpression<out node>			(. rnode.StepNode = node; .)
+	    ]													(. } .)
+															(. node = rnode; .)
+	]
+.
+//------------------------------------------------------------------------
+/*
+Assoc_ForLoop<out Node forLoop>
+=										(. 
+											Node node;
+											DesignScript.Parser.Associative.ForLoopNode loop = new DesignScript.Parser.Associative.ForLoopNode(); 
+											List<Node> forBody = null; 
+										.)
+	"for"								(. loop.Kwfor.SetValue(t.val, t.line, t.col); .)
+										(. if (la.val == "(") loop.openParen.SetValue(la.val, la.line, la.col); .)
+	'('							    
+		Assoc_IdentifierList<out node>		(. loop.id = node; .)
+	"in"								(. loop.Kwin.SetValue(t.val, t.line, t.col); .)
+		Assoc_Expression<out node>		(. loop.expression = node; .)
+										(. if (la.val == ")" && loop.openParen.Value != null) loop.closeParen.SetValue(la.val, la.line, la.col); else if (la.val != ")") loop.openParen.Value = null; .)
+	')'									(. if (la.val == "{") loop.openBrace.SetValue(la.val, la.line, la.col); .)
+	'{'									
+		Assoc_StatementList<out forBody>(. loop.body = forBody; .)
+										(. if (la.val == "}" && loop.openBrace.Value != null) loop.closeBrace.SetValue(la.val, la.line, la.col); else if (la.val != "}") loop.openBrace.Value = null; .)	
+	'}'									
+										(.forLoop = loop; .)
+.
+*/
+
+//------------------------------------------------------------------------
+Assoc_AddOp<ref DesignScript.Parser.Associative.IDEHelpNode IDEop>
+=					
+  ( "+"             (. IDEop.SetValue(t.val, t.line, t.col); .)
+  | "-"				(. IDEop.SetValue(t.val, t.line, t.col); .)
+  ).
+
+
+//------------------------------------------------------------------------
+Assoc_MulOp<ref DesignScript.Parser.Associative.IDEHelpNode IDEop>
+=
+  ( 
+  "*"				(. IDEop.SetValue(t.val, t.line, t.col); .)
+  | 
+  "/"				(. IDEop.SetValue(t.val, t.line, t.col); .)
+  | 
+  "%"				(. IDEop.SetValue(t.val, t.line, t.col); .)
+  ).
+
+Assoc_BitOp<ref DesignScript.Parser.Associative.IDEHelpNode IDEop>
+=
+  ( '&'				(. IDEop.SetValue(t.val, t.line, t.col); .)
+  | '^'				(. IDEop.SetValue(t.val, t.line, t.col); .)
+  | '|'				(. IDEop.SetValue(t.val, t.line, t.col); .)
+  ).
+
+/*------------------------------------------------------------------------*/
+Assoc_LogicalOp<ref DesignScript.Parser.Associative.IDEHelpNode IDEop>
+=                   
+(					
+    "&&"            (. IDEop.SetValue(t.val, t.line, t.col); .)
+	| 
+    "||"            (. IDEop.SetValue(t.val, t.line, t.col); .)
+ )
+ .
+
+Assoc_unaryop<out DesignScript.Parser.Associative.IDEHelpNode IDEop>		
+=				(. IDEop = new Associative.IDEHelpNode(Associative.IDEHelpNode.NodeType.PunctuationNode); .)
+	( 			
+		'!'		(. IDEop.SetValue(t.val, t.line, t.col); .)
+		|	
+		'~'		(. IDEop.SetValue(t.val, t.line, t.col); .)
+				(. #if ENABLE_INC_DEC_FIX .)
+		| 
+		Associative_PostFixOp<ref IDEop> (. #endif .)
+	)
+	(.
+		#if ENABLE_INC_DEC_FIX
+		#else
+		if (la.val == "++" || la.val == "--") Get();
+		#endif
+	.)
+.
+
+Associative_PostFixOp<ref DesignScript.Parser.Associative.IDEHelpNode IDEop>			
+=
+	(
+		"++"			(. IDEop.SetValue(t.val, t.line, t.col); .)
+		|
+		"--"			(. IDEop.SetValue(t.val, t.line, t.col); .)
+	)
+.
+
+Assoc_rangeStepOperator<ref DesignScript.Parser.Associative.IDEHelpNode stepOp2>
+= 
+	[
+		'#'				(. stepOp2.SetValue(t.val, t.line, t.col); .)
+		| 
+		'~'				(. stepOp2.SetValue(t.val, t.line, t.col); .)
+	]
+.
+
+Assoc_ArithmeticExpression<out Node node>
+=								
+    Assoc_Term<out node>
+    {									(. DesignScript.Parser.Associative.BinaryExpressionNode binaryNode = new DesignScript.Parser.Associative.BinaryExpressionNode(); .)
+										(. DesignScript.Parser.Associative.IDEHelpNode IDEop = binaryNode.op; .)
+        Assoc_AddOp<ref IDEop>			(. binaryNode.op = IDEop; binaryNode.LeftNode = node; node = null; .)
+        Assoc_Term<out node>			(. binaryNode.RightNode = node; .)
+										(. node = binaryNode; .)
+	}
+.
+
+
+//------------------------------------------------------------------------
+
+                               
+Assoc_Term<out Node node>
+=								
+    Assoc_interimfactor<out node>		
+    {										(. DesignScript.Parser.Associative.BinaryExpressionNode binaryNode = new DesignScript.Parser.Associative.BinaryExpressionNode(); .)
+											(. DesignScript.Parser.Associative.IDEHelpNode IDEop = binaryNode.op; binaryNode.LeftNode = node; .)
+        Assoc_MulOp<ref IDEop>				(. binaryNode.op = IDEop; node = null; .)
+        Assoc_interimfactor<out node>		(. binaryNode.RightNode = node; .)									
+											(. node = binaryNode; .)
+
+    }
+.
+
+Assoc_interimfactor<out Node node>
+= 
+    Assoc_Factor<out node>			
+    {							(. DesignScript.Parser.Associative.BinaryExpressionNode binaryNode = new DesignScript.Parser.Associative.BinaryExpressionNode(); .)
+                                (. DesignScript.Parser.Associative.IDEHelpNode IDEop = binaryNode.op; .)
+        Assoc_BitOp<ref IDEop>  (. binaryNode.op = IDEop; node = null; .)
+        Assoc_Factor<out node>  (. binaryNode.RightNode = node; .)
+								(. node = binaryNode; .)
+    }
+.
+
+
+Assoc_Number<out Node node>				
+							(. node = null; String localvalue = null; int line = -1; int col = -1; .)
+= 
+	[
+		'-'					(. localvalue = "-"; line = t.line; col = t.col; .)
+	]
+	(
+		number				(. 
+								DesignScript.Parser.Associative.IntNode _node = null;
+								if (t.kind == _number)
+								{
+									_node = new DesignScript.Parser.Associative.IntNode() { value = localvalue + t.val };
+									_node.Line = t.line; _node.Col = t.col;  
+									_node.sign.SetValue(localvalue, line, col);
+									_node.IDEValue.SetValue(t.val, t.line, t.col); 
+								}
+								node = _node; 
+							.)
+		| 
+		float				(. 
+								DesignScript.Parser.Associative.DoubleNode _node = null;
+								if (t.kind == _float)
+								{
+									_node= new DesignScript.Parser.Associative.DoubleNode() { value = localvalue + t.val }; 
+									_node.Line = t.line; 
+									_node.Col = t.col;  
+									_node.sign.SetValue(localvalue, line, col);
+									_node.IDEValue.SetValue(t.val, t.line, t.col); 
+								}
+								node = _node; 
+							.)
+	)
+.
+
+Assoc_Char<out Node node>
+=           (. node = null; .)
+    char
+            (. 
+                DesignScript.Parser.Associative.CharNode _node = null;
+				if (t.val.Length <= 2) {
+				   errors.SemErr(t.line, t.col, "Empty character literal.");
+				}
+				if (t.kind == _char)
+				{
+					_node = new DesignScript.Parser.Associative.CharNode() { value = t.val};
+				    _node.IDEValue.SetValue(t.val, t.line, t.col);
+					_node.Line = t.line;
+					_node.Col = t.col;
+				}
+				node = _node;
+            .)
+
+.
+Assoc_String<out Node node>
+=           (. node = null; .)
+    textstring
+            (. 
+                DesignScript.Parser.Associative.StringNode _node = null;
+				node = new DesignScript.Parser.Associative.StringNode(); 
+				if (t.kind == _textstring)
+				    {
+				        _node = new DesignScript.Parser.Associative.StringNode() { value = t.val };
+				        _node.IDEValue.SetValue(t.val, t.line, t.col);
+				        _node.Line = t.line;
+				        _node.Col = t.col;
+				    }
+				node = _node;
+            .)
+.				
+
+Assoc_Factor<out Node node>			
+											(.node = null; .)
+=
+	(
+		(IF(IsNumber())
+			Assoc_Number<out node>
+		)
+		|		
+		(
+			literal_true					(. node = new DesignScript.Parser.Associative.BooleanNode(){ value = t.val, Line = t.line, Col = t.col }; .)		
+		)
+		|
+		(
+			literal_false					(. node = new DesignScript.Parser.Associative.BooleanNode(){ value = t.val, Line = t.line, Col = t.col }; .)	
+		)	
+        |
+        (
+            literal_null	                (. node = new DesignScript.Parser.Associative.NullNode(){ value = t.val, Line = t.line, Col = t.col }; .)
+        )
+		| 
+		(
+            Assoc_Char<out node>
+        )
+        |
+        (
+            Assoc_String<out node>
+        )
+        |
+		(                	                 
+			Assoc_IdentifierList<out node>			
+		)
+		|
+		(
+			Assoc_UnaryExpression<out node>
+		)
+		|
+		(
+			Assoc_LanguageBlock<out node>
+		)
+	 )
+	 (. if(IsReplicationGuideIdent()) { .)
+				Assoc_ReplicationGuideIdent<ref node>
+	 (. } .)
+ .
+
+ Assoc_ParenExp<out Node node>
+										(. Node exp = null; DesignScript.Parser.Associative.ParenExpressionNode pNode = new DesignScript.Parser.Associative.ParenExpressionNode(); .)
+ =
+										(. if (la.val == "(") pNode.openParen.SetValue(la.val, la.line, la.col); else pNode.openParen.SetValue(null, 0, 0); pNode.Line = pNode.openParen.Line; pNode.Col = pNode.openParen.Col; .)
+	'('									
+	Assoc_Expression<out exp>			(. pNode.expression = exp; .)
+										(. if (la.val == ")" && pNode.openParen.Value != null) pNode.closeParen.SetValue(la.val, la.line, la.col); else if (la.val != ")") pNode.openParen.SetValue(null, 0, 0); .)
+	')'									
+										(. node = pNode; .)
+ .
+
+Assoc_Ident<out Node node> 
+											(. DesignScript.Parser.Associative.IdentifierNode identNode = new DesignScript.Parser.Associative.IdentifierNode(); .)
+=                                       					                
+	ident				(. if (t.kind == _ident) { 
+							if (t.val != "return") identNode.IdentValue.SetValue(t.val, t.line, t.col); 
+							else identNode.IdentValueReturn.SetValue(t.val, t.line, t.col); } .)
+							
+	(. #if ENABLE_INC_DEC_FIX .)
+	[										(.	DesignScript.Parser.Associative.PostFixNode pfNode = new DesignScript.Parser.Associative.PostFixNode(); .)
+											(. DesignScript.Parser.Associative.IDEHelpNode pfOperator = pfNode.OperatorPos; .)
+		Associative_PostFixOp<ref pfOperator>
+											(. pfNode.OperatorPos = pfOperator; pfNode.Line = node.Line; pfNode.Col = node.Col; pfNode.Identifier = node;  .)
+											(. node = pfNode; .)
+	]  
+	(. #endif .)
+	
+
+
+											(. node = identNode; .)
+	
+.
+
+Assoc_ArrayExprList<out Node node>
+										(. DesignScript.Parser.Associative.ExprListNode exprlist = new DesignScript.Parser.Associative.ExprListNode(); exprlist.Line = la.line; exprlist.Col = la.col; .)
+=
+										(. if (la.val == "{") exprlist.openBrace.SetValue(la.val, la.line, la.col);  .)
+'{'										
+	[
+										
+		Assoc_Expression<out node>			(. exprlist.list.Add(node); .)
+		{
+			','							(. exprlist.AddComma(t.val, t.line, t.col); .)
+			Assoc_Expression<out node>	(. exprlist.list.Add(node); .)
+		}
+										
+	]									(. if (la.val == "}" && exprlist.openBrace.Value != null) exprlist.closeBrace.SetValue(la.val, la.line, la.col); else if (la.val != "}") exprlist.openBrace.Value = null; .) 
+'}'										(. node = exprlist; .)								
+.
+
+Assoc_arrayIndices<out DesignScript.Parser.Associative.ArrayNode array>
+										(. array = new DesignScript.Parser.Associative.ArrayNode(); 
+											Node exp = null; .)
+=
+										(. if (la.val == "[") array.openBracket.SetValue(la.val, la.line, la.col); array.Line = la.line; array.Col = la.col; .)
+openbracket								
+[
+    Assoc_Expression<out exp>
+]
+            							(. 
+											array.Expr = exp; 
+											array.Type = null;
+										.)
+										(. if (la.val == "]" && array.openBracket.Value != null) array.closeBracket.SetValue(la.val, la.line, la.col); else if (la.val != "]") array.openBracket.Value = null; .)
+closebracket							
+{										(. DesignScript.Parser.Associative.ArrayNode array2 = new DesignScript.Parser.Associative.ArrayNode(); .)
+										(. if (la.val == "[") array2.openBracket.SetValue(la.val, la.line, la.col); array2.Line = la.line; array2.Col = la.col; .)
+    openbracket							
+										(. exp = null; .)
+    [
+	    Assoc_Expression<out exp>  
+    ]
+										(.
+											array2.Expr = exp; 
+											array2.Type = null;
+										.)
+										(. if (la.val == "]" && array2.openBracket.Value != null) array2.closeBracket.SetValue(la.val, la.line, la.col); else if (la.val != "]") array2.openBracket.Value = null; array2.Type = array; array = array2;.)
+    closebracket						
+}
+.
+
+Assoc_arrayIdent<out Node node> 
+=
+
+Assoc_Ident<out node>						(. DesignScript.Parser.Associative.IdentifierNode var = node as DesignScript.Parser.Associative.IdentifierNode; .)
+[											(. DesignScript.Parser.Associative.ArrayNode array = null; .)
+    Assoc_arrayIndices<out array>			(. var.ArrayDimensions = array; .)
+]
+.
+
+Assoc_NameReference<out Node node>
+=											(. node = null; .)
+											(. DesignScript.Parser.Associative.ArrayNode array = null; .)
+((
+    
+	Assoc_ParenExp<out node>
+)
+|
+( IF(isFunctionCall())
+    Assoc_FunctionCall<out node>
+    |
+    Assoc_arrayIdent<out node>
+	|
+	Assoc_ArrayExprList<out node>
+))
+(. if(hasIndices()) { .)
+Assoc_arrayIndices<out array>				(. array.Ident = node; node = array; .)
+(. } .)
+
+.
+Assoc_DecoratedIdentifier<out Node node>
+=                           (. node = null; .)
+(
+		(IF (IsTypedVariable())
+		    (							
+				Assoc_vardecl<out node>
+			)
+		)
+		|
+		Assoc_IdentifierList<out node>
+)
+.
+Assoc_IdentifierList<out Node node>		
+=										(. node = null; .)			                                  
+	
+		Assoc_NameReference<out node>			
+		{								(. DesignScript.Parser.Associative.IdentifierListNode identlist = new DesignScript.Parser.Associative.IdentifierListNode(); .)
+			'.'							(. identlist.dot.SetValue(t.val, t.line, t.col); .)
+										(. Node rhs = null; .)
+			Assoc_NameReference<out rhs>
+										(.
+											identlist.LeftNode = node; 
+											identlist.Optr = Operator.dot; 
+											identlist.RightNode = rhs; 
+											node = identlist; 
+										.)
+		}
+.
+
+
+Assoc_FunctionCall<out Node node>
+=
+	Assoc_Ident<out node>					(. DesignScript.Parser.Associative.FunctionCallNode f = new DesignScript.Parser.Associative.FunctionCallNode(); f.Line = node.Line; f.Col = node.Col; .)
+	Assoc_Arguments<ref f>					(. f.Function = node; .)
+								    		(. node = f; .)
+.
+
+
+Assoc_Arguments<ref DesignScript.Parser.Associative.FunctionCallNode f>
+=						
+											(. if (la.val == "(") f.openParen.SetValue(la.val, la.line, la.col); .)											
+	'('										
+		[									(. Node n; .)
+			Assoc_Expression<out n>			(. f.FormalArguments.Add(n); .)
+			{
+				WEAK ','					(. f.AddComma(t.val, t.line, t.col); .)							
+				Assoc_Expression<out n>		(. f.FormalArguments.Add(n); .)							
+			}
+		]									(. if (la.val == ")" && f.openParen.Value != null) f.closeParen.SetValue(la.val, la.line, la.col); else if (la.val != ")") f.openParen.SetValue(null, 0, 0); .)
+	')'										
+.  
+
+Assoc_ReplicationGuideIdent<ref Node node>
+=
+									
+									(. DesignScript.Parser.Associative.ReplicationGuideNode RepGuideNode = new DesignScript.Parser.Associative.ReplicationGuideNode(); .)
+									(. RepGuideNode.factor = node; .)
+									
+									(. List<Node> guides = new List<Node>();.)
+									(. string _open = null; string _close = null; Node numNode = null; .)
+									(. string _num = null; int num_line = -1; int num_col = -1; .)
+									(. if (la.val == "<") _open = la.val; int _line = la.line; int _col = la.col; .)
+	lessthan						
+		number						(. if (t.kind == _number) { _num = t.val; num_line = t.line; num_col = t.col; } .)
+									(. if (la.val == ">") _close = la.val; .)
+	greaterthan						
+									(. if (_open != null && _close != null) RepGuideNode.AddBrackets(_open, _line, _col, _num, num_line, num_col, _close, t.line, t.col); .)
+									(. guides.Add(numNode); .)
+									
+	{								(. _open = null; _close = null; numNode = null; .)
+									(. if (la.val == "<") _open = la.val; _line = la.line; _col = la.col; .)
+		lessthan						
+		number						(. if (t.kind == _number) { _num = t.val; num_line = t.line; num_col = t.col; } .)
+									(. if (la.val == ">") _close = la.val; .)
+	greaterthan						
+									(. if (_open != null && _close != null) RepGuideNode.AddBrackets(_open, _line, _col, _num, num_line, num_col, _close, t.line, t.col); .)
+									(. guides.Add(numNode); .)
+	}
+									(. RepGuideNode.ReplicationGuides = guides; .)
+									(. node = RepGuideNode; .)
+.

@@ -1,0 +1,607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Autodesk.DesignScript.Geometry.Application" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="66" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAIAAQgIAAAAAAAIAAAAAABAAAQAIAAAAAAAg=</HashCode>
+      <FileName>Core\Application.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Color" Collapsed="true">
+    <Position X="67.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAGAAQAABAAAhAkiBAAAAQBBAAAAAAAAAAQEDEAAAA=</HashCode>
+      <FileName>Core\Color.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.ProtoGeometryConfigurationManager" Collapsed="true">
+    <Position X="71.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAgAAAAAAAAAA=</HashCode>
+      <FileName>Core\GeometryConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.ProtoGeometryConfiguration" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="69.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACBAAAAAAAAAAAAAQAE=</HashCode>
+      <FileName>Core\GeometryConfiguration.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.GeometryFactory" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="71.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QCACAAwAAkgBVAYBAGgoAAIAAGIAgEAAoAICAIhBFAQ=</HashCode>
+      <FileName>Core\GeometryFactory.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.HostFactory" Collapsed="true">
+    <Position X="67.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAIAAAAQIAAAAAAAAAAEABAAQAAAAAAAgAA=</HashCode>
+      <FileName>Core\HostFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.GeometrySettings" Collapsed="true">
+    <Position X="66" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAQAAAAAABAAAAAAAAAAAAAAAIgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\HostFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Utils" Collapsed="true">
+    <Position X="69.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAIAOMAABAGQAAKggAgAIAAAIAGAEAABIODAAAjQAIE=</HashCode>
+      <FileName>Core\Utils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Arc" Collapsed="true">
+    <Position X="38.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgJAABBAAQAAAoGgACAAEAQAIGIAESABYUJQIAAAAg=</HashCode>
+      <FileName>Geometry\Arc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Block" Collapsed="true">
+    <Position X="0.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEABAAAAAIkAIAABJAAAAAAgAEAAIAAAABFAhAI=</HashCode>
+      <FileName>Geometry\Block.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.BSplineCurve" Collapsed="true">
+    <Position X="32" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEEAAAAAADACgAgGIcAAAEAQyABAEEAAgQYAQARCQAg=</HashCode>
+      <FileName>Geometry\BSplineCurve.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.BSplineSurface" Collapsed="true">
+    <Position X="14" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAEAACACgBgEAAAAAACCwARAAkAAgEABQAQCQwI=</HashCode>
+      <FileName>Geometry\BSplineSurface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Circle" Collapsed="true">
+    <Position X="36.5" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIEAAAABAgAAgEiAAAAEBAAIEIAEQABQQBQgAAAAg=</HashCode>
+      <FileName>Geometry\Circle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Cone" Collapsed="true">
+    <Position X="5" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCIACCAARCAAQAgABAAAAAJAAEQEAFAAAACAABAABAo=</HashCode>
+      <FileName>Geometry\Cone.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.CoordinateSystem" Collapsed="true">
+    <Position X="50" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gFAIkEMBBiSQAIkEhEIJIcQAEQCAQEEJwOJEACo2dA0=</HashCode>
+      <FileName>Geometry\CoordinateSystem.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Cuboid" Collapsed="true">
+    <Position X="9.5" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAABBCAAAAwAREAAIEBAAAAAAEAAAAAAAAAAAAg=</HashCode>
+      <FileName>Geometry\Cuboid.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Curve" Collapsed="true">
+    <Position X="36.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AsAACCAAmCwA0AQIAJAKCFBAAAAUBEAyAQxCQYAgy4g=</HashCode>
+      <FileName>Geometry\Curve.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Cylinder" Collapsed="true">
+    <Position X="11.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAADDAAAAyABAAAAAAAAAgAAFAAAgAAAAAAAAg=</HashCode>
+      <FileName>Geometry\Cylinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.DesignScriptEntity" Collapsed="true">
+    <Position X="32" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQQAAAAACAAAAAEgAAAAAAAAAAACIAAgAAAAAAAAAE=</HashCode>
+      <FileName>Geometry\Geometry.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Geometry" Collapsed="true">
+    <Position X="24.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IoQQgAAAEjAAEAAhBAAECYYAIAQRAEAIUA0EoAAACgg=</HashCode>
+      <FileName>Geometry\Geometry.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.DoubleComparer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="69.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Geometry\Geometry.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Line" Collapsed="true">
+    <Position X="34.25" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAhAEAAAAAgEgCAAAEBAACDAAGIAAQQAQAAAAAg=</HashCode>
+      <FileName>Geometry\Line.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.LoftedSurface" Collapsed="true">
+    <Position X="18.5" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAApAgAAAAAAAAAAAAkAAIQAAAAAABAI=</HashCode>
+      <FileName>Geometry\LoftedSurface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.NonManifoldSolid" Collapsed="true">
+    <Position X="7.25" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAQACAAAAAEAAIAAAAAAAgABEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Geometry\NonManifoldSolid.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.PatchSurface" Collapsed="true">
+    <Position X="23" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAQAAAAAAAAAAAAkAAABAAACAAAAA=</HashCode>
+      <FileName>Geometry\PatchSurface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Plane" Collapsed="true">
+    <Position X="29.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QoAAAAAAACAAkCgFgAAACAAAAQAIIEAAAIAEIAoAiAg=</HashCode>
+      <FileName>Geometry\Plane.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Point" Collapsed="true">
+    <Position X="43.25" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAIAAoQBgEAEAiGkSiBCBAAAAAQREBRAOBkAAAWaAk=</HashCode>
+      <FileName>Geometry\Point.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Polygon" Collapsed="true">
+    <Position X="45.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAABAAAAgAgABAAAgAAAAAQIAEEgkAIAAAAAAIA=</HashCode>
+      <FileName>Geometry\Polygon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.RevolvedSurface" Collapsed="true">
+    <Position X="27.5" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAACACBAAAAAQoQAAAAAgAAAAAAA0AAABEAAIAAAAA=</HashCode>
+      <FileName>Geometry\RevolvedSurface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Solid" Collapsed="true">
+    <Position X="7.25" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AogggICRwKCRkY4EAAAEgggAUAgqAEKgEBIEAYOADEA=</HashCode>
+      <FileName>Geometry\Solid.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Sphere" Collapsed="true">
+    <Position X="2.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAgAAgADAAAAAAAAAAAAkAABAAAAAAAAAg=</HashCode>
+      <FileName>Geometry\Sphere.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.SubDivisionMesh" Collapsed="true">
+    <Position X="16.25" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQBQgAgBgCBgQAgAAAIBABAAAABSAkSgEAIUJABAAAA=</HashCode>
+      <FileName>Geometry\SubDivisionMesh.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Surface" Collapsed="true">
+    <Position X="20.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AogAAACgBSSAkAAAAACAAIgAQAIwJkCQAEAAlQBCjEI=</HashCode>
+      <FileName>Geometry\Surface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.GenericSurface" Collapsed="true">
+    <Position X="20.75" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAA=</HashCode>
+      <FileName>Geometry\Surface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.SurfaceCurvature" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="67.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAEAAAiQAAQAABABEAIAAAA4AAEAIQEAAAAAAAAA=</HashCode>
+      <FileName>Geometry\SurfaceCurvature.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.SweptSurface" Collapsed="true">
+    <Position X="25.25" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAoAAAAAAABAAAAAAkAAABAAAAAAAAA=</HashCode>
+      <FileName>Geometry\SweptSurface.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Text" Collapsed="true">
+    <Position X="47.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAgECAAAAgAAAAAAAEAAAAAAIBQABIA=</HashCode>
+      <FileName>Geometry\Text.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.UnknownCurve" Collapsed="true">
+    <Position X="41" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAAAAAAAEAAAQQAQAAAAAg=</HashCode>
+      <FileName>Geometry\UnknownCurve.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Vector" Collapsed="true">
+    <Position X="71.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAhAABAAQAAAAE1AMAABRACACAAKAAgALkAQAAYgE=</HashCode>
+      <FileName>Geometry\Vector.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Cell" Collapsed="true">
+    <Position X="52.25" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAKEAAIAEAAABAAAQAgAAAACAAAIAAaAAAAA=</HashCode>
+      <FileName>Topology\Cell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.CellFace" Collapsed="true">
+    <Position X="54.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAYAEAAAAAAAQCAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Topology\CellFace.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Edge" Collapsed="true">
+    <Position X="56.75" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAA6AAAAAEAgAAAAAQAAAAAAJAgAAAAAAAAAA=</HashCode>
+      <FileName>Topology\Edge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Face" Collapsed="true">
+    <Position X="59" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAgAABACEAAIAEAAABAEAQCAAAgACgEAACAYAAAAg=</HashCode>
+      <FileName>Topology\Face.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Shell" Collapsed="true">
+    <Position X="61.25" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAACAAAIAEAAAAAAAQAgAAAAAAAIAAAAAAAAA=</HashCode>
+      <FileName>Topology\Shell.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Topology" Collapsed="true">
+    <Position X="58" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAiAAAAAQBAAAAIAQAAABAEAIQAgAgAAAgAA=</HashCode>
+      <FileName>Topology\Topology.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Vertex" Collapsed="true">
+    <Position X="63.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAACAAAAAEAgAAACAQAAAAIABAAAAAAAAgAAA=</HashCode>
+      <FileName>Topology\Vertex.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Autodesk.DesignScript.Geometry.Properties.Resources" Collapsed="true">
+    <Position X="66" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gGAgAAACgEABAAAKgIIREAGgAQAAASAEAABIAgQAAqA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Autodesk.DesignScript.Geometry.IProtoGeometryConfiguration" Collapsed="true">
+    <Position X="71.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAE=</HashCode>
+      <FileName>Core\GeometryConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IFFIObject" Collapsed="true">
+    <Position X="69.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IFFIObjectEntity" Collapsed="true">
+    <Position X="22.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IDisplayable" Collapsed="true">
+    <Position X="67.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAIQAgAgAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IPersistentObject" Collapsed="true">
+    <Position X="69.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IPersistentHostManager" Collapsed="true">
+    <Position X="67.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ICoordinateSystemEntity" Collapsed="true">
+    <Position X="3" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAABAAAABIAEAAIIIUAAAAAAAAAAAAIEADoAAAQ=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IGeometryEntity" Collapsed="true">
+    <Position X="16.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAAAAAACAAAAAAQAAAAAAAAAgAAAAQAAAABA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IPointEntity" Collapsed="true">
+    <Position X="18.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAE=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ICurveEntity" Collapsed="true">
+    <Position X="31.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIgEAAAwAAABIACSEAgAAAQAEAQAAACAQAgQwg=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ILineEntity" Collapsed="true">
+    <Position X="30" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ICircleEntity" Collapsed="true">
+    <Position X="32.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAAAAAAAAAAAAAAIAAAABAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IArcEntity" Collapsed="true">
+    <Position X="34.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAAAAIAAAAAAAAAAAAIAAAABAAAAIAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IBSplineCurveEntity" Collapsed="true">
+    <Position X="27.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAABAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IBRepEntity" Collapsed="true">
+    <Position X="21.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAQAAAAAAAgAAAAAAAAAAEIABAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ISurfaceEntity" Collapsed="true">
+    <Position X="12" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAQAxAAgAEAACEAEAQIAJAEQQABIFAAAohA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IBSplineSurfaceEntity" Collapsed="true">
+    <Position X="12" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAABAAAAEgABABAQAAAAgAAIAEgAAACEAAACQA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IPlaneEntity" Collapsed="true">
+    <Position X="16.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAQAAAAAAACAAAAAAIAAAAAAAAAAgAAAI=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ISolidEntity" Collapsed="true">
+    <Position X="16.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAYgAoAwAIAqAAEGAgAAQBgGCIAGQAEEAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IPrimitiveSolidEntity" Collapsed="true">
+    <Position X="16.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IConeEntity" Collapsed="true">
+    <Position X="14.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAEAAAAABAAAAAAAAAAAAAQAgEAAg=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ICuboidEntity" Collapsed="true">
+    <Position X="16.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAABAAAAAAAAAAAAAAEBAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ISphereEntity" Collapsed="true">
+    <Position X="18.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IPolygonEntity" Collapsed="true">
+    <Position X="5.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAEAAAAggIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ISubDMeshEntity" Collapsed="true">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>SAQFAAEAAAAEAAAAAEAgAAAAAAgAAAAAQkAABIhAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IBlockEntity" Collapsed="true">
+    <Position X="14.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAAAAAQAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IBlockHelper" Collapsed="true">
+    <Position X="66" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEAAAAAAAAEAAQAAAAAEAgAAAAggAAKQAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ITopologyEntity" Collapsed="true">
+    <Position X="39.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IShellEntity" Collapsed="true">
+    <Position X="36.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEIAIAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ICellEntity" Collapsed="true">
+    <Position X="38.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAAAAAAAAAAAAgCAEIAIAAEAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IFaceEntity" Collapsed="true">
+    <Position X="40.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAgQAAIAAAAgCEAAAIAgABAAARAAEAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ICellFaceEntity" Collapsed="true">
+    <Position X="43" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IVertexEntity" Collapsed="true">
+    <Position X="45.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAACBAAAAAAAAAAAABAAACAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IEdgeEntity" Collapsed="true">
+    <Position X="34" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAgAABAAAAAAAAAAAgAAAACAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.ITextEntity" Collapsed="true">
+    <Position X="9.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAABAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IGeometrySettings" Collapsed="true">
+    <Position X="66" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Autodesk.DesignScript.Interfaces.IGeometryFactory" Collapsed="true">
+    <Position X="71.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QCACAAwAAkgBVAYBAGgoAAIAAGIAgEAAoAICAIhBFAQ=</HashCode>
+      <FileName>Core\Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="Autodesk.DesignScript.Geometry.Orientation" Collapsed="true">
+    <Position X="66" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Geometry\Text.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

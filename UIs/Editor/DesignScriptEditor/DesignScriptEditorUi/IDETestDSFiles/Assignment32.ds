@@ -1,0 +1,11 @@
+[Imperative]
+{
+	def func:int(a:int,b:int)
+	{
+	return = b + a;
+	}
+	a = 3;
+	b = -1;
+	d = func(a,b);
+
+} 

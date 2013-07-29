@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1FFB9069-9880-4DA6-8249-0C9C8ABB5587}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DesignScriptStudio.Graph.Ui</RootNamespace>
+    <AssemblyName>DesignScriptStudio.Graph.Ui</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <NoWarn>3001;3002;3003;3009</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>TRACE;DEBUG;CODECOVERAGE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineConstants>TRACE;CODECOVERAGE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DesignScript.Editor.Core">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\DesignScript.Editor.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DesignScript.Editor.Common">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\DesignScript.Editor.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="GraphToDSCompiler">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\GraphToDSCompiler.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Windows.Shell">
+      <HintPath>..\DesignScriptStudio.App\libs\Microsoft.Windows.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="ProtoInterface">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\ProtoInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CustomTextBox.xaml.cs">
+      <DependentUpon>CustomTextBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExceptionWindow.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>ExceptionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExtendedPreview.xaml.cs">
+      <DependentUpon>ExtendedPreview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FeedbackMessage.xaml.cs">
+      <DependentUpon>FeedbackMessage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GraphCanvas.xaml.cs">
+      <DependentUpon>GraphCanvas.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GraphControl.Accelerator.cs" />
+    <Compile Include="GraphControl.xaml.cs">
+      <DependentUpon>GraphControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GraphVisualHost.cs" />
+    <Compile Include="IntroVideoPlayer.xaml.cs">
+      <DependentUpon>IntroVideoPlayer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LibraryTreeViewModel.cs" />
+    <Compile Include="LibraryView.xaml.cs">
+      <DependentUpon>LibraryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LoggerWrapper.cs" />
+    <Compile Include="PopupDialog.xaml.cs">
+      <DependentUpon>PopupDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Page Include="IntroVideoPlayer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PopupDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="GraphTabControl.xaml.cs">
+      <DependentUpon>GraphTabControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Splash.xaml.cs">
+      <DependentUpon>Splash.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ZoomAndPanControl.xaml.cs">
+      <DependentUpon>ZoomAndPanControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ZoomAndPanHelper.cs" />
+    <Compile Include="..\..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DesignScriptStudio.Graph.Core\DesignScriptStudio.Graph.Core.csproj">
+      <Project>{DC06125F-B32A-44DF-A367-7450B1B5D80A}</Project>
+      <Name>DesignScriptStudio.Graph.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="CustomTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExceptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExtendedPreview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FeedbackMessage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GraphCanvas.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GraphControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GraphTabControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Splash.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StyleDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibraryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ZoomAndPanControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AddLib.png" />
+    <Resource Include="Resources\CollapseLib.png" />
+    <Resource Include="Resources\ExpandLib.png" />
+    <Resource Include="Resources\SearchLib.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\radial_blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pan.png" />
+    <Resource Include="Resources\viewall.png" />
+    <Resource Include="Resources\zoomin.png" />
+    <Resource Include="Resources\zoomout.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\close_hover.png" />
+    <Resource Include="Resources\close_inactive.png" />
+    <Resource Include="Resources\logo.png" />
+    <Resource Include="Resources\max_hover.png" />
+    <Resource Include="Resources\max_inactive.png" />
+    <Resource Include="Resources\min_hover.png" />
+    <Resource Include="Resources\min_inactive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\new.png" />
+    <Resource Include="Resources\new_disabled.png" />
+    <Resource Include="Resources\new_hover.png" />
+    <Resource Include="Resources\open.png" />
+    <Resource Include="Resources\open_disabled.png" />
+    <Resource Include="Resources\open_hover.png" />
+    <Resource Include="Resources\redo.png" />
+    <Resource Include="Resources\redo_disabled.png" />
+    <Resource Include="Resources\redo_hover.png" />
+    <Resource Include="Resources\save.png" />
+    <Resource Include="Resources\save_disabled.png" />
+    <Resource Include="Resources\save_hover.png" />
+    <Resource Include="Resources\undo.png" />
+    <Resource Include="Resources\undo_disabled.png" />
+    <Resource Include="Resources\undo_hover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\clickbox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\tick_normal.png" />
+    <Resource Include="Resources\tick_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\all_tabs.png" />
+    <Resource Include="Resources\all_tabs_clicked.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\arc_add.cur" />
+    <Resource Include="Resources\arc_select.cur" />
+    <Resource Include="Resources\arc_remove.cur" />
+    <Resource Include="Resources\hand.cur" />
+    <Resource Include="Resources\hand_pan.cur" />
+    <Resource Include="Resources\hand_pan_active.cur" />
+    <Resource Include="Resources\pointer.cur" />
+    <Resource Include="Resources\rectangular_selection.cur" />
+    <Resource Include="Resources\resize_diagonal.cur" />
+    <Resource Include="Resources\resize_horizontal.cur" />
+    <Resource Include="Resources\resize_vertical.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\tomax_hover.png" />
+    <Resource Include="Resources\tomax_inactive.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\add_arc_end.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save_small.png" />
+    <Resource Include="Resources\save_small_hover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\condense.cur" />
+    <Resource Include="Resources\expand.cur" />
+    <Resource Include="Resources\hand_drag.cur" />
+    <Resource Include="Resources\resize_diagonal_inv.cur" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\confirmation.png" />
+    <Resource Include="Resources\error.png" />
+    <Resource Include="Resources\pan_active.png" />
+    <Resource Include="Resources\toolsbackground.png" />
+    <Resource Include="Resources\warning.png" />
+    <Resource Include="Resources\zoomin_active.png" />
+    <Resource Include="Resources\zoomout_active.png" />
+    <Resource Include="Resources\viewall_active.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\alphalogo.png" />
+    <Resource Include="Resources\feedback.png" />
+    <Resource Include="Resources\feedback_disabled.png" />
+    <Resource Include="Resources\feedback_hover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\splash_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\intro.wmv" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\intro_next.png" />
+    <Resource Include="Resources\intro_prev.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save_dialog.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

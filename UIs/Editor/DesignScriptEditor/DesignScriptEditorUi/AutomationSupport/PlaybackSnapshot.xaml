@@ -1,0 +1,28 @@
+﻿<Window x:Class="DesignScript.Editor.Automation.PlaybackSnapshot"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             Title="Runtime Properties Snapshot" ResizeMode="CanResizeWithGrip"
+             mc:Ignorable="d" Width="640" Height="400"
+             d:DesignHeight="640" d:DesignWidth="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="24"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock VerticalAlignment="Center" Margin="4,0,4,0">Assertable Properties</TextBlock>
+        <ListView Grid.Row="1" x:Name="PropertyListView" FontFamily="Consolas">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Property" Width="200" DisplayMemberBinding="{Binding Path=PropertyName}"></GridViewColumn>
+                    <GridViewColumn Header="Value" Width="400" DisplayMemberBinding="{Binding Path=PropertyValue}"></GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <TextBlock Grid.Row="2" VerticalAlignment="Center" Margin="4,0,4,0" HorizontalAlignment="Right">
+            <Hyperlink x:Name="StepNextCommand">Step to next command</Hyperlink>
+        </TextBlock>
+    </Grid>
+</Window>

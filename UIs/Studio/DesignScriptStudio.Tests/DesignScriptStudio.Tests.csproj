@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9F05A563-2D71-4288-9A70-FCD9DFD6CDCF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DesignScriptStudio.Tests</RootNamespace>
+    <AssemblyName>DesignScriptStudio.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <NoWarn>3001;3002;3003;3009</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>TRACE;DEBUG;CODECOVERAGE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineConstants>TRACE;CODECOVERAGE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GraphToDSCompiler">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\GraphToDSCompiler.dll</HintPath>
+    </Reference>
+    <Reference Include="ProtoCore">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\ProtoCore.dll</HintPath>
+    </Reference>
+    <Reference Include="DesignScriptStudio.Renderer">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(FINAL_BIN)\DesignScriptStudio.Renderer.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>$(NunitPath)</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Samples\House.cs" />
+    <Compile Include="Samples\Vehicle.cs" />
+    <Compile Include="UnitTests\AsynchronousTests.cs" />
+    <Compile Include="UnitTests\BinaryStorageTests.cs" />
+    <Compile Include="UnitTests\ImplicitConnectionTests.cs" />
+    <Compile Include="UnitTests\LibraryLoadingTests.cs" />
+    <Compile Include="UnitTests\DeleteTests.cs" />
+    <Compile Include="UnitTests\ErrorMessageTests.cs" />
+    <Compile Include="UnitTests\RenderNodeTests.cs" />
+    <Compile Include="UnitTests\GraphController.InternalsTests.cs" />
+    <Compile Include="UnitTests\GraphController.CommandHandlersTests.cs" />
+    <Compile Include="UnitTests\IdentifierNodeTests.cs" />
+    <Compile Include="UnitTests\CondensedNodeTests.cs" />
+    <Compile Include="UnitTests\DataHeaderTests.cs" />
+    <Compile Include="UnitTests\FileStorageTests.cs" />
+    <Compile Include="UnitTests\FunctionNodeTests.cs" />
+    <Compile Include="UnitTests\GraphCommandTests.cs" />
+    <Compile Include="UnitTests\GraphControllerTests.cs" />
+    <Compile Include="UnitTests\DriverNodeTests.cs" />
+    <Compile Include="UnitTests\IdGeneratorTests.cs" />
+    <Compile Include="UnitTests\CodeBlockNodeTests.cs" />
+    <Compile Include="UnitTests\NodeConnectionTests.cs" />
+    <Compile Include="UnitTests\NodeOperationTest.cs" />
+    <Compile Include="UnitTests\SlotTests.cs" />
+    <Compile Include="UnitTests\StatementTest.cs" />
+    <Compile Include="UnitTests\TestHelpers.cs" />
+    <Compile Include="UnitTests\UndoRedoOperationTests.cs" />
+    <Compile Include="UnitTests\UndoRedoRecorderTests.cs" />
+    <Compile Include="UnitTests\UtilitiesTest.cs" />
+    <Compile Include="UnitTests\VariableSlotInfoTest.cs" />
+    <Compile Include="UnitTests\VisualEdgeTests.cs" />
+    <Compile Include="UnitTests\VisualNodeTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DesignScriptStudio.Graph.Core\DesignScriptStudio.Graph.Core.csproj">
+      <Project>{DC06125F-B32A-44DF-A367-7450B1B5D80A}</Project>
+      <Name>DesignScriptStudio.Graph.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

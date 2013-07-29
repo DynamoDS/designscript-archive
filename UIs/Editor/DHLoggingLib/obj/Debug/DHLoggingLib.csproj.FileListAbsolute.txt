@@ -1,0 +1,13 @@
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\obj\Debug\ResolveAssemblyReference.cache
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Debug\DHLoggingLib.dll
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Debug\DHLoggingLib.pdb
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Debug\System.Data.SQLite.dll
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Debug\System.Data.SQLite.pdb
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\bin\Debug\System.Data.SQLite.xml
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\obj\Debug\DHLoggingLib.dll
+C:\ResearchCO\trunk\Projects\DataHarvest\Logging\DHLoggingLib\DHLoggingLib\obj\Debug\DHLoggingLib.pdb
+C:\ACO\trunk\DesignScript\Editor\DHLoggingLib\bin\Debug\DHLoggingLib.dll
+C:\ACO\trunk\DesignScript\Editor\DHLoggingLib\bin\Debug\DHLoggingLib.pdb
+C:\ACO\trunk\DesignScript\Editor\DHLoggingLib\obj\Debug\ResolveAssemblyReference.cache
+C:\ACO\trunk\DesignScript\Editor\DHLoggingLib\obj\Debug\DHLoggingLib.dll
+C:\ACO\trunk\DesignScript\Editor\DHLoggingLib\obj\Debug\DHLoggingLib.pdb

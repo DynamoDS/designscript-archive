@@ -1,0 +1,19 @@
+x = {true, 0,{1},false,null,{false}};
+
+m = 2.56;
+
+a = {
+
+CountFalse(x) => a1;
+
+CountFalse(x[5]) => a2;
+
+CountFalse(x[CountFalse(x)]) => a3;
+
+m => a4;
+
+CountFalse({a4}) => a5;
+
+}
+
+result = {a1,a2,a3,a4,a5};

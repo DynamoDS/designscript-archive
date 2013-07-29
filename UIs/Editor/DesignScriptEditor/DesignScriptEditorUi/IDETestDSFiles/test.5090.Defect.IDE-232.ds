@@ -1,0 +1,49 @@
+class Fruits
+{
+    apple : var;
+    orange : var;
+    strawberry : var;
+    mango : var;
+    watermelon : var;
+    apricot : var;
+    papaya : var;
+    ananas : var;
+    olive : var;
+    pineapple : var;
+    pear : var;
+    tangerine : var;
+    raspberry : var;
+    lychee : var;
+    kiwifruit : var;
+    jackfruit : var;
+    sapodilla : var;
+    maprang : var;
+    longan : var;
+    mangosteen : var;
+    mafai : var;
+    
+    def foo()
+    {
+        a = a + 2;
+    }
+    
+    def foo : int(x : int)
+    {
+        return = x;
+    }
+    
+    def fruitNames()
+    {
+        milkshake = apple + orange;
+    }
+}
+class Sweets
+{
+	rashgolla : var;
+}
+    
+    fruits = Fruits.Fruits();
+	y = Sweets.Sweets();
+    x = fruits.apple;
+	h = y.rashgolla;
+    arrayList = {fruits, fruits, fruits, fruits, fruits, y };

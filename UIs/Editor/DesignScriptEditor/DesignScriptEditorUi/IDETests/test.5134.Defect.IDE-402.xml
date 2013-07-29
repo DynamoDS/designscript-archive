@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+
+<TextEditorCommand CommandNumber="1" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>CreateNewScript</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="196">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="12">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">28</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>FindReplace</MethodName>
+  <Arguments>
+    <anyType xsi:nil="true" />
+    <anyType xsi:nil="true" />
+    <anyType xsi:type="xsd:int">8</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="133">
+  <Modifiers>0</Modifiers>
+  <MethodName>LoadScriptFromFile</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:string">C:\integration\ds_source\autodeskresearch\trunk\DesignScript\Editor\DesignScriptEditor\DesignScriptEditorUi\IDETestDSFiles\test.5134.Defect.IDE-402.ds</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="15">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="8" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=4,Y=0}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="9" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="10" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>    [Imperative]
+</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="3">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=0}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="4">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=17,Y=0}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="11" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">4</anyType>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="12" IntervalTime="74">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">4</anyType>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="13" IntervalTime="136">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">4</anyType>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="14" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">9</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="15" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="5">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=8,Y=2}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="16" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="17" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="18" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="6">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>        def foo : int(x : int)
+</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="7">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=2}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="8">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=31,Y=2}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="19" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">14</anyType>
+    <anyType xsi:type="xsd:int">7</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="20" IntervalTime="118">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">14</anyType>
+    <anyType xsi:type="xsd:int">7</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="21" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">14</anyType>
+    <anyType xsi:type="xsd:int">7</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="22" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+    <anyType xsi:type="xsd:int">1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="23" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="9">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=16,Y=7}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="24" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">7</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="25" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">7</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="26" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">5</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="10">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>    def foo :   int(x : int, y : int)
+</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="11">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=7}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="12">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=38,Y=7}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="27" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">17</anyType>
+    <anyType xsi:type="xsd:int">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="28" IntervalTime="96">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">17</anyType>
+    <anyType xsi:type="xsd:int">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="29" IntervalTime="116">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">17</anyType>
+    <anyType xsi:type="xsd:int">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="30" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">17</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="31" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="13">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=20,Y=9}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="32" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="33" IntervalTime="127">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">9</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="34" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">3</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="14">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>        return =    x * y;
+</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="15">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=9}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="16">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=27,Y=9}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="35" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">15</anyType>
+    <anyType xsi:type="xsd:int">12</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="36" IntervalTime="75">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">15</anyType>
+    <anyType xsi:type="xsd:int">12</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="37" IntervalTime="10">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">15</anyType>
+    <anyType xsi:type="xsd:int">12</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="38" IntervalTime="74">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">15</anyType>
+    <anyType xsi:type="xsd:int">12</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="39" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">17</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="40" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="17">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=16,Y=12}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="41" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">12</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="42" IntervalTime="137">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">12</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="43" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">3</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="18">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>    f = foo(11) ;
+</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="19">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=12}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="20">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=18,Y=12}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="44" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">4</anyType>
+    <anyType xsi:type="xsd:int">15</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="45" IntervalTime="86">
+  <Modifiers>8</Modifiers>
+  <MethodName>SetMouseDownPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">4</anyType>
+    <anyType xsi:type="xsd:int">15</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="46" IntervalTime="136">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseUpPosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">4</anyType>
+    <anyType xsi:type="xsd:int">15</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="47" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">16</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="48" IntervalTime="220">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="21">
+      <PropertyName>CursorPosition</PropertyName>
+      <PropertyValue>{X=0,Y=15}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="49" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">15</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="50" IntervalTime="169">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">15</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="51" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">8</anyType>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="22">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>y = Print(g);
+</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="23">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=15}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="24">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=14,Y=15}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="52" IntervalTime="4">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="53" IntervalTime="3">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="54" IntervalTime="220">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="55" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+
+</Commands>

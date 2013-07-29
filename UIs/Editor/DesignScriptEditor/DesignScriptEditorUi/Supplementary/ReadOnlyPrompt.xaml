@@ -1,0 +1,24 @@
+﻿<Window x:Class="DesignScript.Editor.ReadOnlyPrompt"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Save of Read-Only File" Height="190" Width="450" ResizeMode="NoResize">
+    <Grid Height="153" Width="444">
+        <StackPanel Orientation="Vertical" Margin="0,0,12,1">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/DesignScript.Editor.Ui;component/Resources/warning_symbol_bottomtab.png" Width="26" Height="24" Margin="7,0,10,20"/>
+                <StackPanel>
+                    <TextBlock Name ="WarningBlock" HorizontalAlignment="Left" Margin="0,20,0,0" 
+                               Text="The file cannot be saved because it is write-protected." VerticalAlignment="Top" Width="353" />
+                    <TextBlock Name ="InfoBlock"  Height="51" HorizontalAlignment="Left" Margin="0,10,0,0" TextWrapping="Wrap"
+                   Text="You can either save the file in a different location or DesignScript Studio can attempt to remove the write-protection and overwrite the file in its current location."
+                   VerticalAlignment="Top" Width="388" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="4,0,0,0" Width="352">
+                <Button Content="Save As" Height="23" HorizontalAlignment="Left" Margin="0,10,10,10" Name="SaveAsButton" VerticalAlignment="Top" Width="75" />
+                <Button Content="Overwrite" Height="23" HorizontalAlignment="Left" Margin="50,10,10,10" Name="OverwriteButton" VerticalAlignment="Top" Width="75" />
+                <Button Content="Cancel" Height="23" Margin="50,10,10,10" Name="CancelButton" Width="75" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

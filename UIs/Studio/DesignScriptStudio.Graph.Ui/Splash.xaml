@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="DesignScriptStudio.Graph.Ui.Splash"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="{x:Type CheckBox}" TargetType="{x:Type CheckBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource CheckBoxFocusVisual}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Border x:Name="Border"
+                                        Width="13"
+                                        Height="13"
+                                        CornerRadius="0"
+                                        BorderBrush="White"
+                                        Background="Transparent"
+                                        BorderThickness="1">
+                                    <Grid>
+                                        <Path Visibility="Collapsed"
+                                              Width="7"
+                                              Height="7"
+                                              x:Name="CheckMark"
+                                              SnapsToDevicePixels="False"
+                                              StrokeThickness="2"
+                                              Data="M 0 0 L 7 7 M 0 7 L 7 0">
+                                            <Path.Stroke>
+                                                <SolidColorBrush Color="White" />
+                                            </Path.Stroke>
+                                        </Path>
+                                        <Path Visibility="Collapsed"
+                                              Width="7"
+                                              Height="7"
+                                              x:Name="InderminateMark"
+                                              SnapsToDevicePixels="False"
+                                              StrokeThickness="2"
+                                              Data="M 0 7 L 7 0">
+                                            <Path.Stroke>
+                                                <SolidColorBrush Color="White" />
+                                            </Path.Stroke>
+                                        </Path>
+                                    </Grid>
+                                </Border>
+                            </BulletDecorator.Bullet>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CheckStates">
+                                    <VisualState x:Name="Checked">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                                           Storyboard.TargetName="CheckMark">
+                                                <DiscreteObjectKeyFrame KeyTime="0"
+                                                                        Value="{x:Static Visibility.Visible}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Unchecked" />
+                                    <VisualState x:Name="Indeterminate">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                                           Storyboard.TargetName="InderminateMark">
+                                                <DiscreteObjectKeyFrame KeyTime="0"
+                                                                        Value="{x:Static Visibility.Visible}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentPresenter Margin="4,0,0,0"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Left"
+                                              RecognizesAccessKey="True" />
+                        </BulletDecorator>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Border Background="#A5000000" Height="180">
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="20"/>
+            </Grid.RowDefinitions>
+            <Image x:Name="icon" Grid.Column="0" Grid.RowSpan="2" Width="100" Height="100" Source="pack://application:,,,/DesignScriptStudio.Graph.Ui;component/Resources/Splash_icon.png" HorizontalAlignment="Left"/>
+            <TextBlock x:Name="message" Grid.Column="2" Grid.Row="0" FontFamily="Segoe UI" FontSize="22" Foreground="White" TextWrapping="Wrap" VerticalAlignment="Center" 
+                       Width="360"
+                       Text="Looks like you are using the alpha release version. Who knows, it might actually work!"/>
+            <CheckBox x:Name="dontShow" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                      MouseDown="OnDontShowPreviewMouseDown">
+                <TextBlock FontFamily="Segoe UI" FontSize="12" Foreground="White">Do not show again</TextBlock>
+            </CheckBox>
+        </Grid>
+    </Border>
+</UserControl>

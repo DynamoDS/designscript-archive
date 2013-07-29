@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Commands xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" EnableSmartFormatting="true">
+<TextEditorCommand CommandNumber="1" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>CreateNewScript</MethodName>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="2" IntervalTime="1359">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="3" IntervalTime="125">
+  <Modifiers>0</Modifiers>
+  <MethodName>ChangeScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="4" IntervalTime="78">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetPageSize</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">15</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="5" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">91</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="6" IntervalTime="276">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">73</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="7" IntervalTime="208">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">109</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="8" IntervalTime="178">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">112</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="9" IntervalTime="69">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">101</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="10" IntervalTime="108">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">114</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="11" IntervalTime="166">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">97</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="12" IntervalTime="83">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">116</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="13" IntervalTime="108">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">105</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="14" IntervalTime="149">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">118</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="15" IntervalTime="88">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">101</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="16" IntervalTime="144">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">91</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="17" IntervalTime="699">
+  <Modifiers>0</Modifiers>
+  <MethodName>DoControlCharacter</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="18" IntervalTime="52">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">93</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="19" IntervalTime="472">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="20" IntervalTime="774">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">123</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="21" IntervalTime="208">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="22" IntervalTime="131">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="23" IntervalTime="1108">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">100</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="24" IntervalTime="58">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">101</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="25" IntervalTime="183">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">102</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="26" IntervalTime="125">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="27" IntervalTime="108">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">102</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="28" IntervalTime="149">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">111</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="29" IntervalTime="208">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">111</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="30" IntervalTime="1166">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">58</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="31" IntervalTime="641">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="32" IntervalTime="141">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">105</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="33" IntervalTime="66">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">110</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="34" IntervalTime="67">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">116</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="35" IntervalTime="166">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="36" IntervalTime="1157">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">40</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="37" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="38" IntervalTime="318">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">97</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="39" IntervalTime="316">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="40" IntervalTime="274">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">58</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="41" IntervalTime="243">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="42" IntervalTime="189">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">105</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="43" IntervalTime="75">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">110</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="44" IntervalTime="77">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">116</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="45" IntervalTime="630">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="46" IntervalTime="912">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">41</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="47" IntervalTime="296">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="48" IntervalTime="640">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="49" IntervalTime="875">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">123</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="50" IntervalTime="312">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="51" IntervalTime="234">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="52" IntervalTime="250">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="53" IntervalTime="656">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">114</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="54" IntervalTime="109">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">101</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="55" IntervalTime="218">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">116</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="56" IntervalTime="140">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">117</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="57" IntervalTime="125">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">114</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="58" IntervalTime="93">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">110</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="59" IntervalTime="218">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="60" IntervalTime="140">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">61</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="61" IntervalTime="140">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">32</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="62" IntervalTime="234">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">97</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="63" IntervalTime="250">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">59</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="64" IntervalTime="421">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="65" IntervalTime="265">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">9</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="66" IntervalTime="375">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">125</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="67" IntervalTime="421">
+  <Modifiers>0</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">10</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="68" IntervalTime="328">
+  <Modifiers>1</Modifiers>
+  <MethodName>InsertText</MethodName>
+  <Arguments>
+    <anyType xmlns:q1="http://microsoft.com/wsdl/types/" xsi:type="q1:char">125</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="70" IntervalTime="0">
+  <Modifiers>0</Modifiers>
+  <MethodName>SetMouseMovePosition</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+    <anyType xsi:type="xsd:int">6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="69" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="71" IntervalTime="78">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="72" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-1</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="73" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-2</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="74" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="75" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-3</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="76" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-4</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="77" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-4</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="78" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="79" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="80" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="81" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="82" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="83" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-5</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="84" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="85" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="86" IntervalTime="46">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="87" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="88" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="89" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="90" IntervalTime="62">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="91" IntervalTime="93">
+  <Modifiers>0</Modifiers>
+  <MethodName>SelectLines</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">6</anyType>
+    <anyType xsi:type="xsd:int">-6</anyType>
+  </Arguments>
+  <Asserts>
+    <CommandAssert AssertNumber="1">
+      <PropertyName>SelectionStart</PropertyName>
+      <PropertyValue>{X=0,Y=0}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="2">
+      <PropertyName>SelectionEnd</PropertyName>
+      <PropertyValue>{X=1,Y=6}</PropertyValue>
+    </CommandAssert>
+    <CommandAssert AssertNumber="3">
+      <PropertyName>SelectionText</PropertyName>
+      <PropertyValue>[Imperative]
+{
+    def foo : int(a : int)
+    {
+        return = a;
+    }
+}</PropertyValue>
+    </CommandAssert>
+  </Asserts>
+</TextEditorCommand>
+<TextEditorCommand CommandNumber="92" IntervalTime="2000">
+  <Modifiers>0</Modifiers>
+  <MethodName>CloseScript</MethodName>
+  <Arguments>
+    <anyType xsi:type="xsd:int">0</anyType>
+  </Arguments>
+</TextEditorCommand>
+</Commands>

@@ -1,0 +1,9 @@
+class Point
+{
+    a : int = 3;
+}
+
+[Associative]
+{
+    p = Point.Point();
+}

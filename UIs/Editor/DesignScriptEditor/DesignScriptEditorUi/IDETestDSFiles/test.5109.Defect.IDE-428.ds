@@ -1,0 +1,16 @@
+class Dummy
+{
+    value : var;
+    constructor Dummy()
+    {
+        value = 5;
+    }
+}
+
+def GetValue(d : Dummy)
+{
+    return = d.value;
+}
+
+arr = { Dummy.Dummy(), Dummy.Dummy(), Dummy.Dummy(), Dummy.Dummy() };
+val = GetValue(arr);

@@ -1,0 +1,531 @@
+﻿<UserControl x:Class="DesignScriptStudio.Graph.Ui.LibraryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:c="clr-namespace:DesignScriptStudio.Graph.Core;assembly=DesignScriptStudio.Graph.Core"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:DesignScriptStudio.Graph.Ui"
+             x:Name="DesignScriptEditor"
+             Cursor="Resources/pointer.cur"
+             Background="White"
+             Focusable="True"
+             d:DesignHeight="400"
+             d:DesignWidth="250"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary Source="StyleDictionary.xaml" />
+    </UserControl.Resources>
+
+    <Grid PreviewKeyDown="OnLibraryKeyDown">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Header  -->
+        <Grid Grid.Row="0" Background="#444444">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5" />
+                <RowDefinition Height="20" />
+            </Grid.RowDefinitions>
+
+            <Thumb x:Name="topThumb"
+                   Grid.Row="0"
+                   VerticalAlignment="Top"
+                   Cursor="Resources/resize_vertical.cur"
+                   DragDelta="OnTopThumbDragDelta"
+                   PreviewMouseLeftButtonUp="OnTopThumbMouseUp"
+                   Background="Transparent"
+                   Panel.ZIndex="500"
+                   Opacity="0"
+                   Height="10"
+                   Margin="0,-5,0,0"/>
+            <Button Grid.Row="1"
+                    Height="23"
+                    Margin="0,-3,0,0"
+                    Click="OnMaxiMinimizeClick"
+                    Style="{StaticResource LibraryWindowButton}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="225" />
+                        <ColumnDefinition Width="25" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Column="0"
+                           Content="Library"
+                           DataContext="{Binding}"
+                           FontFamily="Segoe UI"
+                           FontSize="14"
+                           Foreground="#c2c2c2"
+                           IsEnabled="False"
+                           Padding="8 0 0 0" />
+
+                    <Image x:Name="MinimizeView"
+                           Grid.Column="1"
+                           Width="7"
+                           Height="10"
+                           Margin="0 0.5 0 0"
+                           Source="/DesignScriptStudio.Graph.Ui;component/Resources/Arrow.png"
+                           Visibility="Visible" />
+                    <Image x:Name="MaximizeView"
+                           Grid.Column="1"
+                           Width="7"
+                           Height="10"
+                           Margin="0 0.5 0 0"
+                           Source="/DesignScriptStudio.Graph.Ui;component/Resources/Arrow.png"
+                           Visibility="Hidden">
+                        <Image.LayoutTransform>
+                            <ScaleTransform ScaleY="-1" />
+                        </Image.LayoutTransform>
+                    </Image>
+                </Grid>
+            </Button>
+        </Grid>
+
+        <!--  Content  -->
+        <Border Name="content"
+                Grid.Row="1"
+                Height="375"
+                Panel.ZIndex="-1"
+                Background="White"
+                BorderBrush="#bbbbbb"
+                BorderThickness="1 0 1 1"
+                Focusable="True">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="60"
+                                  Direction="270"
+                                  Opacity="0.2"
+                                  ShadowDepth="50" />
+            </Border.Effect>
+            <Grid>
+                <Grid.Resources>
+                    <Color x:Key="SelectedBackgroundColor">#f5f5f5</Color>
+                    <Color x:Key="SelectedUnfocusedColor">#f9f9f9</Color>
+                    <Style x:Key="TreeViewItemFocusVisual">
+                        <Setter Property="Control.Template">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <Border>
+                                        <Rectangle Margin="0,0,0,0"
+                                                   StrokeThickness="5"
+                                                   Stroke="Black"
+                                                   StrokeDashArray="1 2"
+                                                   Opacity="0" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+
+                    <!-- Style for item background-->
+                    <Style x:Key="ItemBorder" TargetType="{x:Type Border}" >
+                        <EventSetter Event="MouseMove" Handler="OnTreeViewItemMouseMove" />
+                        <EventSetter Event="PreviewMouseLeftButtonUp" Handler="OnTreeViewItemExpandCollapse" />
+                        <EventSetter Event="PreviewMouseRightButtonUp" Handler="OnTreeViewItemClick" />
+                        <Setter Property="ContextMenu" Value="{Binding CM}" />
+                    </Style>
+                    <Style x:Key="RootItemBorder" TargetType="{x:Type Border}" BasedOn="{StaticResource ItemBorder}">
+                        <Setter Property="Background" Value="#ededed" />
+                        <Setter Property="BorderBrush" Value="#dedede" />
+                        <Setter Property="BorderThickness" Value="0,1" />
+                    </Style>
+                    <Style x:Key="ChildItemBorder" TargetType="{x:Type Border}" BasedOn="{StaticResource ItemBorder}">
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="BorderBrush" Value="#f5f5f5" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                    </Style>
+
+                    <Style x:Key="RootLibraryItem" TargetType="{x:Type TreeViewItem}">
+                        <EventSetter Event="MouseDoubleClick" Handler="OnTreeViewItemDoubleClick"/>
+                        <EventSetter Event="RequestBringIntoView" Handler="OnTreeViewItemRequestBringIntoView"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="Padding" Value="1,0,0,0" />
+                        <Setter Property="Margin" Value="0,0,0,1" />
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        <Setter Property="Visibility" Value="{Binding Visibility, Mode=TwoWay}" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="19" Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="ExpansionStates">
+                                                <VisualState x:Name="Expanded">
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                                                       Storyboard.TargetName="ItemsHost">
+                                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                                    Value="{x:Static Visibility.Visible}" />
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Collapsed" />
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <Border x:Name="Exp"
+                                                Grid.Column="0"
+                                                Style="{StaticResource RootItemBorder}"
+                                                Margin="-80 0 0 0"
+                                                Padding="80 0 0 0">
+                                            <ToggleButton x:Name="Expander"
+                                                          IsChecked="{Binding IsChildVisible}"
+                                                          Style="{StaticResource TreeViewExpanderButton}"/>
+                                        </Border>
+                                        <Border x:Name="Bd"
+                                                Grid.Column="1"
+                                                Style="{StaticResource RootItemBorder}"
+                                                Padding="0,0,10,0">
+                                            <ContentPresenter x:Name="PART_Header"
+                                                              ContentSource="Header"
+                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                        </Border>
+                                        <ItemsPresenter x:Name="ItemsHost"
+                                                        Grid.Row="1"
+                                                        Grid.Column="1"
+                                                        Visibility="Collapsed" />
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="HasItems" Value="false">
+                                            <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="HasHeader" Value="false" />
+                                                <Condition Property="Width" Value="Auto" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="PART_Header" Property="MinWidth" Value="75" />
+                                        </MultiTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="HasHeader" Value="false" />
+                                                <Condition Property="Height" Value="Auto" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="PART_Header" Property="MinHeight" Value="19" />
+                                        </MultiTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="ChildLibraryItem" TargetType="{x:Type TreeViewItem}">
+                        <EventSetter Event="MouseDoubleClick" Handler="OnTreeViewItemDoubleClick"/>
+                        <EventSetter Event="RequestBringIntoView" Handler="OnTreeViewItemRequestBringIntoView"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="Padding" Value="1,0,0,0" />
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                        <Setter Property="Visibility" Value="{Binding Visibility, Mode=TwoWay}" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="19"
+                                                              Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroup x:Name="SelectionStates">
+                                                <VisualState x:Name="Selected">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Bd"
+                                                                                      Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource SelectedBackgroundColor}" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Exp"
+                                                                                      Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0" Value="{StaticResource SelectedBackgroundColor}" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Unselected" />
+                                                <VisualState x:Name="SelectedInactive">
+                                                    <Storyboard>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Bd"
+                                                                                      Storyboard.TargetProperty="(Panel.Background).
+                                                                                      (SolidColorBrush.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0"
+                                                                                 Value="{StaticResource SelectedUnfocusedColor}" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Exp"
+                                                                                      Storyboard.TargetProperty="(Panel.Background).
+                                                                                      (SolidColorBrush.Color)">
+                                                            <EasingColorKeyFrame KeyTime="0"
+                                                                                 Value="{StaticResource SelectedUnfocusedColor}" />
+                                                        </ColorAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                            <VisualStateGroup x:Name="ExpansionStates">
+                                                <VisualState x:Name="Expanded">
+                                                    <Storyboard>
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)"
+                                                                                       Storyboard.TargetName="ItemsHost">
+                                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                                    Value="{x:Static Visibility.Visible}" />
+                                                        </ObjectAnimationUsingKeyFrames>
+                                                    </Storyboard>
+                                                </VisualState>
+                                                <VisualState x:Name="Collapsed" />
+                                            </VisualStateGroup>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <Border x:Name="Exp"
+                                                Grid.Column="0"
+                                                Style="{StaticResource ChildItemBorder}"
+                                                Margin="-80 0 0 0"
+                                                Padding="80 0 0 0">
+                                            <ToggleButton x:Name="Expander"
+                                                          IsChecked="{Binding IsChildVisible}"
+                                                          Style="{StaticResource TreeViewExpanderButton}"/>
+                                        </Border>
+                                        <Border x:Name="Bd"
+                                                Grid.Column="1"
+                                                Style="{StaticResource ChildItemBorder}"
+                                                BorderThickness="0,0,0,1"
+                                                Padding="0,0,10,0">
+                                            <ContentPresenter x:Name="PART_Header"
+                                                              ContentSource="Header"
+                                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                        </Border>
+                                        <ItemsPresenter x:Name="ItemsHost"
+                                                        Grid.Row="1"
+                                                        Grid.Column="1"
+                                                        Visibility="Collapsed" />
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="HasItems" Value="false">
+                                            <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="HasHeader" Value="false" />
+                                                <Condition Property="Width" Value="Auto" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="PART_Header" Property="MinWidth" Value="75" />
+                                        </MultiTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="HasHeader" Value="false" />
+                                                <Condition Property="Height" Value="Auto" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="PART_Header" Property="MinHeight" Value="19" />
+                                        </MultiTrigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Control Bar  -->
+                <Border Grid.Row="0"
+                        Grid.Column="0"
+                        BorderBrush="#bbbbbb"
+                        BorderThickness="0 0 1 1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="25" />
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="AddNew"
+                                Grid.Column="0"
+                                Click="OnAddNewClick"
+                                ToolTip="Add into library"
+                                Style="{StaticResource FunctionButton}">
+                            <Image Width="11"
+                                   Height="11"
+                                   Source="/DesignScriptStudio.Graph.Ui;component/Resources/AddLib.png" />
+                        </Button>
+                        <Button x:Name="Expand"
+                                Grid.Column="1"
+                                Click="OnExpandClick"
+                                ToolTip="Expand"
+                                Style="{StaticResource FunctionButton}">
+                            <Image Width="11"
+                                   Height="11"
+                                   Source="/DesignScriptStudio.Graph.Ui;component/Resources/ExpandLib.png" />
+                        </Button>
+                        <Button x:Name="Collapse"
+                                Grid.Column="2"
+                                Click="OnCollapseClick"
+                                ToolTip="Collapse"
+                                Style="{StaticResource FunctionButton}">
+                            <Image Width="11"
+                                   Height="11"
+                                   Source="/DesignScriptStudio.Graph.Ui;component/Resources/CollapseLib.png" />
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!--  Search Bar  -->
+                <Border Grid.Row="0"
+                        Grid.Column="1"
+                        BorderBrush="#bbbbbb"
+                        BorderThickness="0 0 0 1"
+                        Background="White"
+                        MouseDown="OnSearchBarClick">
+                    <Grid>
+                        <Grid.Resources>
+                            <!--  Library Search Box  -->
+                            <Style x:Key="LibrarySearchBox"
+                                   BasedOn="{StaticResource {x:Type TextBox}}"
+                                   TargetType="{x:Type TextBox}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type TextBox}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="22" />
+                                                </Grid.ColumnDefinitions>
+                                                <ScrollViewer x:Name="PART_ContentHost"
+                                                              Grid.Column="0"
+                                                              Margin="0 2 0 0"
+                                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                <Border Grid.Column="0" BorderThickness="0">
+                                                    <TextBlock x:Name="textBlock"
+                                                               Margin=" 5 3 0 0"
+                                                               Background="Transparent"
+                                                               Focusable="False"
+                                                               Style="{StaticResource LibraryTextBlock}"
+                                                               Text="{TemplateBinding Tag}"
+                                                               Visibility="Collapsed" />
+                                                </Border>
+                                                <Button x:Name="closeSearch"
+                                                        Grid.Column="1"
+                                                        ToolTip="Clear search"
+                                                        HorizontalAlignment="Center"
+                                                        Click="OnCloseSearch"
+                                                        Focusable="False"
+                                                        Style="{StaticResource FunctionButton}"
+                                                        Visibility="Visible">
+                                                    <Grid>
+                                                        <Rectangle Fill="Transparent" />
+                                                        <Line RenderTransformOrigin="0.5,0.5"
+                                                              Margin="3 0 0 0"
+                                                              Stroke="#898989"
+                                                              StrokeThickness="1"
+                                                              X1="0"
+                                                              X2="7"
+                                                              Y1="0"
+                                                              Y2="7" />
+                                                        <Line RenderTransformOrigin="0.5,0.5"
+                                                              Margin="3 0 0 0"
+                                                              Stroke="#898989"
+                                                              StrokeThickness="1"
+                                                              X1="0"
+                                                              X2="7"
+                                                              Y1="7"
+                                                              Y2="0" />
+                                                    </Grid>
+                                                </Button>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsFocused" Value="False" />
+                                                        <Condition Property="Text" Value="" />
+                                                    </MultiTrigger.Conditions>
+                                                    <Setter TargetName="textBlock" Property="Visibility" Value="Visible" />
+                                                    <Setter TargetName="closeSearch" Property="Visibility" Value="Collapsed" />
+                                                </MultiTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="Search"
+                                Grid.Column="0"
+                                ToolTip="Search"
+                                Style="{StaticResource FunctionButton}">
+                            <Image Width="11"
+                                   Height="11"
+                                   Margin="-1 0 0 0"
+                                   Source="/DesignScriptStudio.Graph.Ui;component/Resources/SearchLib.png" />
+                        </Button>
+                        <TextBox x:Name="SearchTextBox"
+                                 Grid.Column="1"
+                                 KeyUp="OnSearchTextBoxKeyUp"
+                                 Style="{DynamicResource LibrarySearchBox}">
+                            <TextBox.Tag>Search</TextBox.Tag>
+                        </TextBox>
+                    </Grid>
+                </Border>
+
+                <!--  Library  -->
+                <Grid Grid.Row="1"
+                      Grid.ColumnSpan="2">
+                    <TreeView x:Name="InternalTreeView"
+                              ItemsSource="{Binding RootItems}"
+                              Visibility="Visible"
+                              AllowDrop="True"
+                              Background="White"
+                              BorderThickness="0"
+                              ItemContainerStyle="{StaticResource RootLibraryItem}"
+                              Padding="0"
+                              MouseLeftButtonUp="OnLibraryTreeViewClick">
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate x:Name="ItemHeader" ItemsSource="{Binding Children}"
+                                                      ItemContainerStyle="{StaticResource ChildLibraryItem}">
+                                <StackPanel x:Name="HeaderText" Orientation="Horizontal" TextBlock.FontWeight="SemiBold">
+                                    <TextBlock x:Name="PrePiece" Text="{Binding PrePiece, Mode= TwoWay}" Style="{StaticResource LibraryTextBlock}" Margin ="0 2 0 0"/>
+                                    <Border x:Name="HighlightBorder"
+                                            Background="#fff9ce"
+                                            BorderBrush="#ffe154"
+                                            BorderThickness="0">
+                                        <TextBlock x:Name="HighlightPiece" Text="{Binding HighlightPiece, Mode= TwoWay}" Style="{StaticResource LibraryTextBlock}" TextBlock.FontWeight="SemiBold" Margin ="0 2 0 0" />
+                                    </Border>
+                                    <TextBlock x:Name="PostPiece" Text="{Binding PostPiece, Mode= TwoWay}" Style="{StaticResource LibraryTextBlock}" Margin ="0 2 0 0" />
+                                </StackPanel>
+                                <HierarchicalDataTemplate.ItemTemplate>
+                                    <HierarchicalDataTemplate x:Name="ItemHeader" ItemsSource="{Binding Children}">
+                                        <StackPanel x:Name="HeaderText" Orientation="Horizontal">
+                                            <TextBlock x:Name="PrePiece" Text="{Binding PrePiece, Mode= TwoWay}" Style="{StaticResource LibraryTextBlock}" Margin ="0 2 0 0"/>
+                                            <Border x:Name="HighlightBorder"
+                                                    Background="#fff9ce"
+                                                    BorderBrush="#ffe154"
+                                                    BorderThickness="0">
+                                                <TextBlock x:Name="HighlightPiece" Text="{Binding HighlightPiece, Mode= TwoWay}" Style="{StaticResource LibraryTextBlock}" TextBlock.FontWeight="SemiBold" Margin ="0 2 0 0" />
+                                            </Border>
+                                            <TextBlock x:Name="PostPiece" Text="{Binding PostPiece, Mode= TwoWay}" Style="{StaticResource LibraryTextBlock}" Margin ="0 2 0 0" />
+                                        </StackPanel>
+                                    </HierarchicalDataTemplate>
+                                </HierarchicalDataTemplate.ItemTemplate>
+
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

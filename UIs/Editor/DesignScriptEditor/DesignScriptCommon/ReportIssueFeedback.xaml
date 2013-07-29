@@ -1,0 +1,55 @@
+﻿<Window x:Class="DesignScript.Editor.Common.ReportIssueFeedback"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:DesignScript.Editor.Common"
+        x:Name="Window" WindowStartupLocation="CenterOwner"
+        Title="Report Issue" Height="400" Width="500" Background="Transparent" 
+        WindowStyle="SingleBorderWindow" ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary Source="StyleDictionary.xaml" />
+    </Window.Resources>
+    <Grid x:Name="LayoutRoot" Grid.Row="1" Background="#444444">
+        <Grid x:Name="ContentGrid" Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="32"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid x:Name="TopRowInnerGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="0,0,10,0" VerticalAlignment="Center" Text="Write to the DesignScript team for " FontSize="12" Foreground="#FFC4C4C4"/>
+                <ComboBox Grid.Column="1" Height="24" HorizontalAlignment="Stretch" Name="cbFeedbackType" Grid.ColumnSpan="2">
+                    <ComboBoxItem Name="cbi1">general feedback</ComboBoxItem>
+                    <ComboBoxItem Name="cbi2">a defect</ComboBoxItem>
+                    <ComboBoxItem Name="cbi3">a feature request</ComboBoxItem>
+                </ComboBox>
+            </Grid>
+            <TextBox Grid.Row="1" Name="txtResponse" Margin="0,8,0,8" TextWrapping="Wrap" BorderThickness="0" Foreground="#FF545454" FontSize="12" GotFocus="OnTxtResponseGotFocus" LostFocus="OnTxtResponseLostFocus">
+            </TextBox>
+            <Grid x:Name="BottomRowInnerGrid" Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="75"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" FontSize="12" Foreground="#FFC4C4C4">Reply to my email id (optional):</TextBlock>
+                <TextBox Grid.Column="1" Name="ReportContent" HorizontalAlignment="Stretch" TextWrapping="Wrap" VerticalAlignment="Center" Margin="8,0,8,0"
+                                 BorderThickness="0"
+                                 Foreground="#FF626262" Background="#FFF3F3F3" FontSize="12" GotFocus="OnReportContentGotFocus" LostFocus="OnReportContentLostFocus"/>
+                <Button Grid.Column="2" Name="SubmitButton" Width="70" Style="{StaticResource DialogButton}" Content="Send" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="#FF232323">
+                    <Button.Background>
+                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                            <GradientStop Color="#FFFEFEFE" Offset="0"/>
+                            <GradientStop Color="#FFF0F0F0" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

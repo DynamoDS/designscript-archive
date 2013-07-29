@@ -1,0 +1,7 @@
+﻿<Window x:Class="DesignScript.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DesignScript Editor(Lite)" Height="600" Width="800" WindowStartupLocation="CenterScreen">
+    <Grid x:Name="EditorGrid">
+    </Grid>
+</Window>

@@ -1,0 +1,73 @@
+class a
+{
+    def foo1()
+    {
+    }
+def foo1(i:int)
+{
+}
+ 
+def foo1(i:double)
+{
+}
+
+def foo1(i:int, j:int)
+{
+}
+
+def foo1(i:int, j:double)
+{
+}
+
+def foo1(i: bool, j:bool)
+{
+}
+def foo1(i:int, j:int, k:int)
+{
+}
+def foo1(i:int, j:double, k:double)
+{
+}
+def foo1(i:double, j:double, k:double)
+{
+}
+   
+    
+    def foo2()
+    {
+    }
+    def foo3()
+    {
+    }
+    def foo4()
+    {
+    }
+    def foo5()
+    {
+    }
+    def foo6()
+    {
+    }
+    def foo7()
+    {
+    }
+    def foo8()
+    {
+    }
+    def foo9()
+    {
+    }
+    def foo10()
+    {
+    }
+    def foo11()
+    {
+    }
+    def foo12()
+    {
+    }
+    def foo13()
+    {
+    }
+    
+}

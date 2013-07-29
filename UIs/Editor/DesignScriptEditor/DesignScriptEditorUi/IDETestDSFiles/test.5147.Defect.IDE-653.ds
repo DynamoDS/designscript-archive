@@ -1,0 +1,6 @@
+import("ProtoGeometry.dll");
+
+sphere = Sphere.ByCenterPointRadius(Point.ByCoordinates(0, 0, 0), 1);
+sface = sphere.Faces[0];
+surfaceGeom = sface.SurfaceGeometry.SetVisibility(true);
+surfaceGeom = sphere.Faces[0].SurfaceGeometry.SetVisibility(true);

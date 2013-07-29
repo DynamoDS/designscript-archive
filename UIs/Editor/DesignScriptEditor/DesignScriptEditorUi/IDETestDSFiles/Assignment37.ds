@@ -1,0 +1,7 @@
+[Imperative]
+{
+	a = true;
+	b = a + 1;
+	c = null + 2;
+
+ }

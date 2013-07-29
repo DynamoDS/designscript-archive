@@ -1,0 +1,2 @@
+import("math.dll");
+x1 = (Math.Sin((i/100 ) * 180)) * 8;
