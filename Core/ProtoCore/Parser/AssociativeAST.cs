@@ -8,13 +8,6 @@ namespace ProtoCore.AST.AssociativeAST
     public abstract class AssociativeNode : Node
     {
         public bool IsModifier;
-        //allow the assignment node to be part of dependency struture?
-        //this lead to entiely different set of results in optimization
-        protected static bool AssignNodeDependencyEnabled = true;
-
-        //even if the '=' is not a link between LHS and RHS, can we keep it in dependency graph?
-        //protected static bool AssignNodeDependencyEnabledLame = true;
-
 
         public AssociativeNode()
         {
@@ -286,6 +279,8 @@ namespace ProtoCore.AST.AssociativeAST
 
     public class IdentifierListNode : AssociativeNode
     {
+        public bool isLastSSAIdentListFactor { get; set; }
+
         public AssociativeNode LeftNode
         {
             get;
@@ -306,6 +301,7 @@ namespace ProtoCore.AST.AssociativeAST
 
         public IdentifierListNode()
         {
+            isLastSSAIdentListFactor = false;
         }
 
         public IdentifierListNode(IdentifierListNode rhs) : base(rhs)
@@ -313,6 +309,7 @@ namespace ProtoCore.AST.AssociativeAST
             Optr = rhs.Optr;
             LeftNode = NodeUtils.Clone(rhs.LeftNode);
             RightNode = NodeUtils.Clone(rhs.RightNode);
+            isLastSSAIdentListFactor = rhs.isLastSSAIdentListFactor;
         }
 
         public override bool Compare(Node other)
@@ -1043,6 +1040,7 @@ namespace ProtoCore.AST.AssociativeAST
         public int exprUID { get; set; }
         public int modBlkUID { get; set; }
         public bool isSSAAssignment { get; set; }
+        public bool isSSAPointerAssignment { get; set; }
         public bool isMultipleAssign { get; set; }
         public AssociativeNode LeftNode { get; set; }
         public ProtoCore.DSASM.Operator Optr { get; set; }
@@ -1056,6 +1054,7 @@ namespace ProtoCore.AST.AssociativeAST
         public BinaryExpressionNode(AssociativeNode left = null, AssociativeNode right = null, ProtoCore.DSASM.Operator optr = DSASM.Operator.none)
         {
             isSSAAssignment = false;
+            isSSAPointerAssignment = false;
             isMultipleAssign = false;
             exprUID = ProtoCore.DSASM.Constants.kInvalidIndex;
             modBlkUID = ProtoCore.DSASM.Constants.kInvalidIndex;
@@ -1067,6 +1066,7 @@ namespace ProtoCore.AST.AssociativeAST
         public BinaryExpressionNode(BinaryExpressionNode rhs) : base(rhs)
         {
             isSSAAssignment = rhs.isSSAAssignment;
+            isSSAPointerAssignment = rhs.isSSAPointerAssignment;
             isMultipleAssign = rhs.isMultipleAssign;
             exprUID = rhs.exprUID;
             modBlkUID = rhs.modBlkUID;

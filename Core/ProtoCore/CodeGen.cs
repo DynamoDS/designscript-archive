@@ -76,6 +76,10 @@ namespace ProtoCore
 
         protected bool isEmittingImportNode = false;
 
+
+        // Contains the list of Nodes in an identifier list
+        protected List<ProtoCore.AST.AssociativeAST.AssociativeNode> ssaPointerList;
+
         public CodeGen(Core coreObj, ProtoCore.DSASM.CodeBlock parentBlock = null)
         {
             Debug.Assert(coreObj != null);
@@ -129,7 +133,8 @@ namespace ProtoCore
                     core.AsmOutput = Console.Out;
                 }
             }
- 
+
+            ssaPointerList = new List<AST.AssociativeAST.AssociativeNode>();
         }
 
         protected ProtoCore.DSASM.AddressType GetOpType(ProtoCore.PrimitiveType type)
@@ -2613,6 +2618,98 @@ namespace ProtoCore
             EmitPush(opRes);
         }
 
+
+        /*
+            proc EmitIdentifierListNode(identListNode, graphnode)
+	            // Build the dependency given the SSA form
+	            BuildSSADependency(identListNode, graphnode) 
+
+                // Build the dependency based on the non-SSA code
+	            BuildRealDependency(identListNode, graphnode)
+            end
+
+            proc BuildSSADependency(identListNode, graphnode)
+	            // This is the current implementation
+            end
+
+
+            proc BuildRealDependency(identListNode, graphnode)
+	            dependent = new graphnode
+	            dependent.Push(ssaPtrList.GetAll())
+                dependent.Push(identListNode.rhs)
+                graphnode.PushDependent(dependent)
+            end
+        */
+
+
+        private void BuildSSADependency(Node node, AssociativeGraph.GraphNode graphNode)
+        {
+            // Jun Comment: set the graphNode dependent as this identifier list
+            ProtoCore.Type type = new ProtoCore.Type();
+            type.UID = globalClassIndex;
+            ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef = new AssociativeGraph.UpdateNodeRef();
+            DFSGetSymbolList(node, ref type, nodeRef);
+
+            if (null != graphNode && nodeRef.nodeList.Count > 0)
+            {
+                ProtoCore.AssociativeGraph.GraphNode dependentNode = new ProtoCore.AssociativeGraph.GraphNode();
+                dependentNode.updateNodeRefList.Add(nodeRef);
+                graphNode.PushDependent(dependentNode);
+            }
+        }
+
+
+        private ProtoCore.AST.AssociativeAST.IdentifierListNode BuildIdentifierList(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astIdentList)
+        {
+            //Validity.Assert(astIdentList.Count >= 2);
+
+            // TODO Jun: Replace this condition or handle this case prior to this call
+            if (astIdentList.Count < 2)
+            {
+                return null;
+            }
+
+            // Build the first ident list
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identList = new AST.AssociativeAST.IdentifierListNode();
+            identList.LeftNode = astIdentList[0];
+            identList.RightNode = astIdentList[1];
+
+            // Build the rest
+            for (int n = 2; n < astIdentList.Count; ++n)
+            {
+                identList = new AST.AssociativeAST.IdentifierListNode();
+                identList.LeftNode = identList;
+                identList.RightNode = astIdentList[n];
+            }
+
+            return identList;
+        }
+
+        private void BuildRealDependency(AssociativeGraph.GraphNode graphNode)
+        {
+	        AssociativeGraph.GraphNode dependent = new AssociativeGraph.GraphNode();
+
+            // Push all dependent pointers
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identList = BuildIdentifierList(ssaPointerList);
+
+            // Comment Jun: perhaps this can be an assert?
+            if (null != identList)
+            {
+                ProtoCore.Type type = new ProtoCore.Type();
+                type.UID = globalClassIndex;
+                ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef = new AssociativeGraph.UpdateNodeRef();
+                DFSGetSymbolList(identList, ref type, nodeRef);
+
+                if (null != graphNode && nodeRef.nodeList.Count > 0)
+                {
+                    ProtoCore.AssociativeGraph.GraphNode dependentNode = new ProtoCore.AssociativeGraph.GraphNode();
+                    dependentNode.updateNodeRefList.Add(nodeRef);
+                    graphNode.PushDependent(dependentNode);
+                }
+            }
+        }
+
+
         protected void EmitIdentifierListNode(Node node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone, ProtoCore.AST.Node bnode = null)
         {
             if (subPass == DSASM.AssociativeSubCompilePass.kUnboundIdentifier)
@@ -2646,19 +2743,32 @@ namespace ProtoCore
 
 
 
-            // Jun Comment: set the graphNode dependent as this identifier list
-            ProtoCore.Type type = new ProtoCore.Type();
-            type.UID = globalClassIndex;
-            ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef = new AssociativeGraph.UpdateNodeRef();
-            DFSGetSymbolList(node, ref type, nodeRef);
+            //// Jun Comment: set the graphNode dependent as this identifier list
+            //ProtoCore.Type type = new ProtoCore.Type();
+            //type.UID = globalClassIndex;
+            //ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef = new AssociativeGraph.UpdateNodeRef();
+            //DFSGetSymbolList(node, ref type, nodeRef);
 
-            if (null != graphNode && nodeRef.nodeList.Count > 0)
+            //if (null != graphNode && nodeRef.nodeList.Count > 0)
+            //{
+            //    ProtoCore.AssociativeGraph.GraphNode dependentNode = new ProtoCore.AssociativeGraph.GraphNode();
+            //    dependentNode.updateNodeRefList.Add(nodeRef);
+            //    graphNode.PushDependent(dependentNode);
+            //}
+            BuildSSADependency(node, graphNode);
+            if (core.Options.FullSSA)
             {
-                ProtoCore.AssociativeGraph.GraphNode dependentNode = new ProtoCore.AssociativeGraph.GraphNode();
-                dependentNode.updateNodeRefList.Add(nodeRef);
-                graphNode.PushDependent(dependentNode);
-            }
+                BuildRealDependency(graphNode);
 
+                if (node is ProtoCore.AST.AssociativeAST.IdentifierListNode)
+                {
+                    if ((node as ProtoCore.AST.AssociativeAST.IdentifierListNode).isLastSSAIdentListFactor)
+                    {
+                        Validity.Assert(null != ssaPointerList);
+                        ssaPointerList.Clear();
+                    }
+                }
+            }
 
             bool isCollapsed;
             EmitGetterSetterForIdentList(node, ref inferedType, graphNode, subPass, out isCollapsed);

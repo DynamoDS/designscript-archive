@@ -85,6 +85,9 @@ namespace ProtoAssociative
 
         private Dictionary<int, ClassDeclNode> unPopulatedClasses;
 
+
+        // This variable is used to keep track of the expression ID being traversed by the code generator
+        private int currentExpressionID = ProtoCore.DSASM.Constants.kInvalidIndex;
         
         // This constructor is only called for Preloading of assemblies and 
         // precompilation of CodeBlockNode nodes in GraphUI for global language blocks - pratapa
@@ -2297,6 +2300,7 @@ namespace ProtoAssociative
                 string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
                 var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
                 BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, node, Operator.assign);
+                bnode.isSSAPointerAssignment = true;
                 astlist.Add(bnode);
                 ssaStack.Push(tmpIdent);
             }
@@ -2313,23 +2317,8 @@ namespace ProtoAssociative
                 }
                 else
                 {
-
                     // Recursively traversse the left of the ident list
                     SSAIdentList(identList.LeftNode, ref ssaStack, ref astlist);
-
-                    //if (identList.RightNode is FunctionCallNode)
-                    //{
-                    //    FunctionCallNode fcNode = identList.RightNode as FunctionCallNode;
-                    //    for (int idx = 0; idx < fcNode.FormalArguments.Count; idx++)
-                    //    {
-                    //        AssociativeNode arg = fcNode.FormalArguments[idx];
-
-                    //        Stack<AssociativeNode> ssaStack1 = new Stack<AssociativeNode>();
-                    //        DFSEmitSSA_AST(arg, ssaStack1, ref astlist);
-                    //        AssociativeNode argNode = ssaStack.Pop();
-                    //        fcNode.FormalArguments[idx] = argNode is BinaryExpressionNode ? (argNode as BinaryExpressionNode).LeftNode : argNode;
-                    //    }
-                    //}
 
                     // Build the rhs identifier list containing the temp pointer
                     IdentifierListNode rhsIdentList = new IdentifierListNode();
@@ -2341,6 +2330,7 @@ namespace ProtoAssociative
                     string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
                     var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
                     BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
+                    bnode.isSSAPointerAssignment = true;
                     astlist.Add(bnode);
                     ssaStack.Push(tmpIdent);
                 }
@@ -2513,9 +2503,14 @@ namespace ProtoAssociative
             }
             else if (node is IdentifierListNode)
             {
-                //DfsSSAIeentList(node, ref ssaStack, ref astlist);
-
                 SSAIdentList(node, ref ssaStack, ref astlist);
+                AssociativeNode lastNode = astlist[astlist.Count - 1];
+                Validity.Assert(lastNode is BinaryExpressionNode);
+
+                AssociativeNode identList = (lastNode as BinaryExpressionNode).RightNode;
+                Validity.Assert(identList is IdentifierListNode);
+
+                (identList as IdentifierListNode).isLastSSAIdentListFactor = true;
             }
             else if (node is ExprListNode)
             {
@@ -6924,6 +6919,7 @@ namespace ProtoAssociative
             rightType.IsIndexable = false;
 
             DebugProperties.BreakpointOptions oldOptions = core.DebugProps.breakOptions;
+            
             /*
             proc emitbinaryexpression(node)
                 if node is assignment
@@ -6963,6 +6959,40 @@ namespace ProtoAssociative
             end
             */
 
+            /*
+                Building the graphnode dependencies from the SSA transformed identifier list is illustrated in the following functions:
+
+                ssaPtrList = new List
+
+                proc EmitBinaryExpression(bnode, graphnode)
+	                if bnode is assignment
+                        graphnode = new graphnode
+
+                        if bnode is an SSA pointer expression
+	                        if bnode.rhs is an identifier
+		                        // Push the start pointer
+		                        ssaPtrList.push(node.rhs)
+	                        else if bnode.rhs is an identifierlist
+		                        // Push the rhs of the dot operator
+		                        ssaPtrList.push(node.rhs.rhs)
+	                        else
+		                        Assert unhandled
+	                        end
+                        end
+
+		                emit(bnode.rhs)
+                        emit(bnode.lhs)
+
+                        if (bnode is an SSA pointer expression 
+                            and bnode is the last expression in the SSA factor/term
+	                        ssaPtrList.Clear()
+                        end
+	                end
+                end
+
+            */
+
+
             // If this is an assignment statement, setup the top level graph node
             bool isGraphInScope = false;
             if (ProtoCore.DSASM.Operator.assign == bnode.Optr)
@@ -6978,6 +7008,38 @@ namespace ProtoAssociative
                     graphNode.procIndex = globalProcIndex;
                     graphNode.classIndex = globalClassIndex;
                     graphNode.languageBlockId = codeBlock.codeBlockId;
+
+                    if (core.Options.FullSSA)
+                    {
+                        // All associative code is SSA'd and we want to keep track of the original identifier nodes of an identifier list:
+                        //      i.e. x.y.z
+                        // These identifiers will be used to populate the real graph nodes dependencies
+                        if (bnode.isSSAPointerAssignment)
+                        {
+                            Validity.Assert(null != ssaPointerList);
+
+                            // Determine if the ssa pointerlist needs to be reset for the next SSA expression
+                            //if (currentExpressionID != bnode.exprUID)
+                            //{
+                            //    ssaPointerList.Clear();
+                            //}
+                            //currentExpressionID = bnode.exprUID;
+
+                            if (bnode.RightNode is IdentifierNode)
+                            {
+                                ssaPointerList.Add(bnode.RightNode);
+                            }
+                            else if (bnode.RightNode is IdentifierListNode)
+                            {
+                                ssaPointerList.Add((bnode.RightNode as IdentifierListNode).RightNode);
+                            }
+                            else
+                            {
+                                Validity.Assert(false);
+                            }
+                        }
+                    }
+                    
 
                     //
                     // Comment Jun: 
