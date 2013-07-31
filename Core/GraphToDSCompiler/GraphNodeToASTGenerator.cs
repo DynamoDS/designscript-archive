@@ -163,6 +163,11 @@ namespace GraphToDSCompiler
                 AssociativeNode statement = null;
                 TraverseToSplit(funcDotNode.FunctionCall, out statement, ref splitList);
                 funcDotNode.FunctionCall = (statement as FunctionCallNode);
+                TraverseToSplit(funcDotNode.DotCall.FormalArguments[0], out statement, ref splitList);
+                if (statement is BinaryExpressionNode)
+                    funcDotNode.DotCall.FormalArguments[0] = (statement as BinaryExpressionNode).LeftNode;
+                else
+                    funcDotNode.DotCall.FormalArguments[0] = statement;
                 outNode = funcDotNode;
             }
             else if (node is ProtoCore.AST.AssociativeAST.ImportNode)
@@ -199,6 +204,27 @@ namespace GraphToDSCompiler
             //{
             //    k
             //}
+            else if (node is ProtoCore.AST.AssociativeAST.RangeExprNode)
+            {
+                RangeExprNode rangeExprNode = node as RangeExprNode;
+                AssociativeNode statement = null;
+                TraverseToSplit(rangeExprNode.FromNode, out statement, ref splitList);
+                TraverseToSplit(rangeExprNode.StepNode, out statement, ref splitList);
+                TraverseToSplit(rangeExprNode.ToNode, out statement, ref splitList);
+                if (rangeExprNode.FromNode is BinaryExpressionNode)
+                {
+                    rangeExprNode.FromNode = (rangeExprNode.FromNode as BinaryExpressionNode).LeftNode;
+                }
+                if (rangeExprNode.StepNode is BinaryExpressionNode)
+                {
+                    rangeExprNode.StepNode = (rangeExprNode.StepNode as BinaryExpressionNode).LeftNode;
+                }
+                if (rangeExprNode.ToNode is BinaryExpressionNode)
+                {
+                    rangeExprNode.ToNode = (rangeExprNode.ToNode as BinaryExpressionNode).LeftNode;
+                }
+                outNode = rangeExprNode;
+            }
             else
             {
                 outNode = node;
@@ -513,7 +539,8 @@ namespace GraphToDSCompiler
                 ben.LeftNode = astList[0];
                 ben.Optr = ProtoCore.DSASM.Operator.assign;
                 ProtoCore.AST.AssociativeAST.AssociativeNode statement = null;
-                DFSTraverse(childNodes[0], out statement);
+                foreach (KeyValuePair<int, Node> kvp in childNodes)
+                    DFSTraverse(kvp.Value, out statement);
                 ben.RightNode = statement;
                 astList[0] = ben;
             }
@@ -566,7 +593,7 @@ namespace GraphToDSCompiler
                 BinaryExpressionNode ben = argNode as BinaryExpressionNode;
                 Validity.Assert(ben != null);
                 //ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(ben);
-                ProtoCore.SourceGen sourceGen = new ProtoCore.SourceGen(ben);
+                AstCodeBlockTraverse sourceGen = new AstCodeBlockTraverse(ben);
                 ProtoCore.AST.AssociativeAST.AssociativeNode right = bNode.RightNode;
                 sourceGen.DFSTraverse(ref right);
                 bNode.RightNode = right;
@@ -592,8 +619,42 @@ namespace GraphToDSCompiler
             }
             else if (!funcQualifier.Contains("."))
             {
-                // Create AssociativeAST.FunctionCallNode for global and built-in functions
-                EmitFunctionCallNode(node, out fNode);
+                if (node.isProperty)
+                {
+                    Dictionary<int, Node> nodes = node.GetChildrenWithIndices();
+                    Validity.Assert(nodes.Count == 1);
+                    for (int i = 0; i < nodes.Count; ++i)
+                    {
+                        AssociativeNode instanceNode = null;
+                        DFSTraverse(nodes[i], out instanceNode);
+                        
+                        EmitFunctionCallNode(node, out fNode);
+                        ((fNode as FunctionCallNode).Function as IdentifierNode).Value = ProtoCore.DSASM.Constants.kGetterPrefix + ((fNode as FunctionCallNode).Function as IdentifierNode).Value;
+                        //string className = (node.Name.Split('.'))[0];
+                        //IdentifierNode inode = new IdentifierNode(className);
+
+                        fNode = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(instanceNode, fNode as FunctionCallNode);
+                    }
+                }
+                else if (node.isMemberFunction)
+                {
+                    Dictionary<int, Node> nodes = node.GetChildrenWithIndices();                    
+                    
+                    AssociativeNode instanceNode = null;
+                    DFSTraverse(nodes[0], out instanceNode);
+
+                    EmitFunctionCallNode(node, out fNode);
+                    //string className = (node.Name.Split('.'))[0];
+                    //IdentifierNode inode = new IdentifierNode(className);
+
+                    fNode = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(instanceNode, fNode as FunctionCallNode);                    
+                }
+                else
+                {
+                    // Create AssociativeAST.FunctionCallNode for global and built-in functions
+                    EmitFunctionCallNode(node, out fNode);
+                }
+                
             }
             else
             {
@@ -633,11 +694,15 @@ namespace GraphToDSCompiler
             FunctionCallNode fNode = new FunctionCallNode();
             List<ProtoCore.AST.AssociativeAST.AssociativeNode> args = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             
-            if(node.Name.Contains("."))
+            if (node.Name.Contains("."))
             {
                 string funcName = (node.Name.Split('.'))[1];
                 fNode.Function = new IdentifierNode(funcName);
             }
+            //else if (node.GetChildrenWithIndices().Count != 0)
+            //{
+
+            //}
             else
                 fNode.Function = new IdentifierNode(node.Name);
 
@@ -645,13 +710,16 @@ namespace GraphToDSCompiler
             for (int i = 0; i < node.numParameters; i++)
                 args.Add(new NullNode());
 
-            Dictionary<int, Node> nodes = node.GetChildrenWithIndices();
-            for (int i = 0; i < nodes.Count; ++i )
+            if (args.Count > 0)
             {
-                AssociativeNode argNode = null;
-                DFSTraverse(nodes[i], out argNode);
-                args.RemoveAt(i);
-                args.Insert(i, argNode);
+                Dictionary<int, Node> nodes = node.GetChildrenWithIndices();
+                for (int i = 0; i < nodes.Count; ++i)
+                {
+                    AssociativeNode argNode = null;
+                    DFSTraverse(nodes[i], out argNode);
+                    args.RemoveAt(i);
+                    args.Insert(i, argNode);
+                }
             }
 
             fNode.FormalArguments = args;

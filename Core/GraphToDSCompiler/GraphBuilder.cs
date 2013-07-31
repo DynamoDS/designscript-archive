@@ -152,6 +152,8 @@ namespace GraphToDSCompiler
                                 {
                                     if (!(functionQualifers[0]).Equals("Built-in Functions"))
                                     {
+                                        //if (functionQualifers[0].Contains(@":\"))
+                                        //    functionQualifers[0] = GraphUtilities.ConvertAbsoluteToRelative(functionQualifers[0]);
                                         CreateImportNodeIfRequired(functionQualifers[0]);
                                     }
                                     gc.CreateFunctionNode(node.Id, functionQualifers[1], funcargs, functionQualifers[3], functionQualifers[4]);
@@ -167,13 +169,13 @@ namespace GraphToDSCompiler
                             CreateImportNodeIfRequired(methodQualifers[0]);
 
                             //gc.CreateImportNode(importNodesMapping[methodQualifers[0]], methodQualifers[0]);
-                            gc.CreateMethodNode(node.Id, methodQualifers[1], args, methodQualifers[3]);
+                            gc.CreateMethodNode(node.Id, methodQualifers[1], args, methodQualifers[3], true);
                         }
                         else
                         {
                             CreateImportNodeIfRequired(methodQualifers[0]);
 
-                            gc.CreateMethodNode(node.Id, methodQualifers[1], args, methodQualifers[3], methodQualifers[4]);
+                            gc.CreateMethodNode(node.Id, methodQualifers[1], args, methodQualifers[3], methodQualifers[4], true);
                         }
                         break;
                     case SnapshotNodeType.Property: string[] propertyQualifers = node.Content.Split(';');
