@@ -1354,6 +1354,11 @@ namespace ProtoCore.AST.AssociativeAST
             Type = null;
         }
 
+        public ArrayNode(AssociativeNode expr, AssociativeNode type)
+        {
+            Expr = expr;
+            Type = type;
+        }
 
         public ArrayNode(ArrayNode rhs) : base(rhs)
         {
