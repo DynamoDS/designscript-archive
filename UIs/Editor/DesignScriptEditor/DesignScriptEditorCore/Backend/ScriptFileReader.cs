@@ -46,7 +46,7 @@ namespace DesignScript.Editor.Core
                     if (false != foundLineBreak)
                     {
                         sb.Append('\n');
-                        internalLines.Add sb.ToString());
+                        internalLines.Add(sb.ToString());
                         sb.Clear();
                     }
                     else
@@ -56,10 +56,10 @@ namespace DesignScript.Editor.Core
                     }
                 }
 
-                if  sb.Length > 0)
+                if  (sb.Length > 0)
                 {
                     // Something remained in the buffer.
-                    internalLines.Add sb.ToString());
+                    internalLines.Add(sb.ToString());
                 }
             }
             catch (Exception e)
