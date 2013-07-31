@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using ProtoCore.AST;
@@ -75,6 +76,17 @@ namespace ProtoCore
         protected bool IsAssociativeArrayIndexing { get; set; }
 
         protected bool isEmittingImportNode = false;
+
+        // The parser currently inteprets floating point literal values as being 
+        // separated by a period character '.', in cultural settings like German,
+        // this will not be the case (they use ',' as decimal separation character).
+        // For this reason, whenever "Convert.ToDouble" method is used to convert 
+        // a 'string' value into a 'double' value, the conversion cannot be based 
+        // on the current system culture (e.g. "de-DE"), it needs to be able to 
+        // parse the string in "en-US" format (because that's how the parser is 
+        // made to recognize floating point numbers.
+        // 
+        protected CultureInfo cultureInfo = new CultureInfo("en-US");
 
         public CodeGen(Core coreObj, ProtoCore.DSASM.CodeBlock parentBlock = null)
         {
@@ -2148,7 +2160,7 @@ namespace ProtoCore
             try
             {
                 op.opdata = System.Convert.ToInt64(iNode.value);
-                op.opdata_d = System.Convert.ToDouble(iNode.value);
+                op.opdata_d = System.Convert.ToDouble(iNode.value, cultureInfo);
             }
             catch (System.OverflowException)
             {
@@ -2283,8 +2295,8 @@ namespace ProtoCore
 
             ProtoCore.DSASM.StackValue op = new ProtoCore.DSASM.StackValue();
             op.optype = ProtoCore.DSASM.AddressType.Double;
-            op.opdata = (Int64)System.Convert.ToDouble(dNode.value);
-            op.opdata_d = System.Convert.ToDouble(dNode.value);
+            op.opdata = System.Convert.ToInt64(dNode.value);
+            op.opdata_d = System.Convert.ToDouble(dNode.value, cultureInfo);
 
             if (core.Options.TempReplicationGuideEmptyFlag && emitReplicationGuide)
             {
