@@ -5,7 +5,6 @@ using System.Text;
 using System.IO;
 using System.Collections;
 using ProtoCore.Utils;
-
 namespace GraphToDSCompiler
 {
 
@@ -709,6 +708,8 @@ namespace GraphToDSCompiler
         public string replicationGuide;
         public bool isStatic;
         public bool isProperty;
+        public bool isMemberFunction = false;
+
         internal Func(string symbol, uint guid)
             : base(symbol, guid)
         {
@@ -921,7 +922,6 @@ namespace GraphToDSCompiler
         public List<AssignmentStatement> assignmentData { get; private set; }
         public uint splitFomUint=0;
 
-
         void add(string a, Statement s)
         {
             stats.Add(a, s);
@@ -953,6 +953,7 @@ namespace GraphToDSCompiler
             {
                 this.assignmentData.AddRange(assignments);
             }
+
         }
 
         /// <summary>
