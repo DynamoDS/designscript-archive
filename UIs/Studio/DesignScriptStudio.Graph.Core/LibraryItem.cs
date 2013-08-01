@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Windows;
+using ProtoCore.Mirror;
 
 namespace DesignScriptStudio.Graph.Core
 {
@@ -22,6 +23,7 @@ namespace DesignScriptStudio.Graph.Core
         }
 
         private string qualifiedName = string.Empty;
+        private StaticMirror dataMirror = null;
 
         #region Public Class Operational Methods
 
@@ -29,10 +31,27 @@ namespace DesignScriptStudio.Graph.Core
         {
             this.qualifiedName = String.Empty;
 
+            this.dataMirror = null;
             Level = -1;
             Type = MemberType.None;
             ItemType = NodeType.None;
             DisplayText = String.Empty;
+            Assembly = String.Empty;
+            ArgumentTypes = String.Empty;
+            ArgumentNames = String.Empty;
+            IsOverloaded = false;
+            IsExternal = false;
+        }
+
+        public LibraryItem(NodeType type, string qualifiedName, StaticMirror dataMirror)
+        {
+            this.qualifiedName = qualifiedName;
+            UpdateDisplayText();
+
+            this.dataMirror = dataMirror;
+            Level = -1;
+            Type = MemberType.None;
+            ItemType = type;
             Assembly = String.Empty;
             ArgumentTypes = String.Empty;
             ArgumentNames = String.Empty;
@@ -45,6 +64,7 @@ namespace DesignScriptStudio.Graph.Core
             this.qualifiedName = qualifiedName;
             UpdateDisplayText();
 
+            this.dataMirror = null;
             Level = -1;
             Type = MemberType.None;
             ItemType = type;
@@ -117,6 +137,13 @@ namespace DesignScriptStudio.Graph.Core
 
         #region Public Class Properties
 
+        public StaticMirror DataMirror
+        {
+            get
+            {
+                return this.dataMirror;
+            }
+        }
         public bool IsExternal { get; set; }
         public MemberType Type { get; set; }
         public int Level { get; set; }
