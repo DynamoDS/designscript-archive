@@ -165,12 +165,15 @@ namespace ProtoCore
 
         private void EmitArrayNode(AST.AssociativeAST.ArrayNode arrayNode)
         {
-            EmitCode("[");
-            DFSTraverse(arrayNode.Expr);
-            EmitCode("]");
-            if (arrayNode.Type != null)
+            if (null != arrayNode)
             {
-                DFSTraverse(arrayNode.Type);
+                EmitCode("[");
+                DFSTraverse(arrayNode.Expr);
+                EmitCode("]");
+                if (arrayNode.Type != null)
+                {
+                    DFSTraverse(arrayNode.Type);
+                }
             }
         }
 
@@ -221,12 +224,14 @@ namespace ProtoCore
             EmitCode("\"");
             EmitCode(");\n");
         }
-        
+
         protected virtual void EmitIdentifierNode(ProtoCore.AST.AssociativeAST.IdentifierNode identNode)
         {
             Validity.Assert(null != identNode);
             EmitCode(identNode.Value);
+            EmitArrayNode(identNode.ArrayDimensions);
         }
+
         protected virtual void EmitIdentifierListNode(ProtoCore.AST.AssociativeAST.IdentifierListNode identList)
         {
             Validity.Assert(null != identList);
@@ -235,6 +240,7 @@ namespace ProtoCore
             EmitCode(".");
             DFSTraverse(identList.RightNode);
         }
+
         protected virtual void EmitIntNode(ProtoCore.AST.AssociativeAST.IntNode intNode)
         {
             Validity.Assert(null != intNode);
