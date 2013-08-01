@@ -14,6 +14,7 @@ using System.Windows;
 using System.Collections.ObjectModel;
 using Autodesk.DesignScript.Interfaces;
 using System.Windows.Media.Imaging;
+using ProtoCore.Mirror;
 
 namespace DesignScriptStudio.Graph.Core
 {
@@ -472,6 +473,7 @@ namespace DesignScriptStudio.Graph.Core
             e.Result = LoadLibraryInternal();
         }
 
+#if !ImplementationWithMirrors
         private List<LibraryItem> LoadLibraryInternal()
         {
             LibraryItem rootItem = new LibraryItem();
@@ -526,7 +528,48 @@ namespace DesignScriptStudio.Graph.Core
 
             return root;
         }
+#else
+        private LibraryItem LoadLibraryInternal()
+        {
+            LibraryItem rootItem = new LibraryItem();
 
+            LoadBuiltInItems(rootItem);
+
+            try
+            {
+                ProcessImportBuiltInFunctions(StaticMirror.BuiltInMethods, rootItem);
+
+                List<string> assemblies = new List<string>();
+                assemblies.Add("ProtoGeometry.dll");
+                assemblies.Add("Math.dll");
+
+                if (coreComponent.studioSettings.LoadedAssemblies != null
+                && coreComponent.studioSettings.LoadedAssemblies.Count > 0)
+                {
+                    foreach (string externalLibrary in coreComponent.studioSettings.LoadedAssemblies)
+                        assemblies.Add(externalLibrary);
+                }
+
+                foreach (string assembly in assemblies)
+                    ProcessImportAssembly(assembly, rootItem);
+            }
+            catch (ProtoCore.BuildHaltException exception)
+            {
+                System.Diagnostics.Debug.WriteLine("DSS: " + exception.Message);
+                System.Diagnostics.Debug.WriteLine("DSS: " + exception.errorMsg);
+                System.Diagnostics.Debug.WriteLine("DSS: " + exception.StackTrace);
+            }
+            catch (Exception exception)
+            {
+                System.Diagnostics.Debug.WriteLine("DSS: " + exception.Message);
+                System.Diagnostics.Debug.WriteLine("DSS: " + exception.StackTrace);
+            }
+
+            SetLibraryItemLevel(rootItem, -1);
+            return rootItem;
+        }
+
+#endif
         private void OnLibraryLoaderCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             List<LibraryItem> root = e.Result as List<LibraryItem>;
@@ -634,6 +677,184 @@ namespace DesignScriptStudio.Graph.Core
             }
         }
 
+#if ImplementationWithMirrors
+        private void ProcessImportAssembly(string assembly, LibraryItem rootItem)
+        {
+            LibraryItem assemblyItem = new LibraryItem(NodeType.None, Path.GetFileName(assembly), null);
+
+            LibraryMirror assemblyMirror = GraphToDSCompiler.GraphUtilities.GetLibraryMirror(assembly);
+
+            // Global Functions in DS file
+            if (Path.GetExtension(assembly) == ".ds")
+            {
+                List<MethodMirror> globalFunctions = assemblyMirror.GetGlobalMethods();
+
+                foreach (MethodMirror globalFunctionMirror in globalFunctions)
+                {
+                    LibraryItem globalFunctionItem = new LibraryItem(NodeType.Function, globalFunctionMirror.MethodName, globalFunctionMirror);
+                    globalFunctionItem.ArgumentTypes = GetArgumentTypes(globalFunctionMirror.GetArgumentTypes());
+                    globalFunctionItem.Assembly = assemblyMirror.LibraryName;
+                    globalFunctionItem.Type = LibraryItem.MemberType.GlobalFunction;
+                    assemblyItem.AddChildItem(globalFunctionItem);
+                }
+
+                GroupOverloadedItem(assemblyItem);
+            }
+
+            foreach (ClassMirror classMirror in assemblyMirror.GetClasses())
+            {
+                LibraryItem classItem = new LibraryItem(NodeType.None, classMirror.ClassName, null);
+
+                ProcessClassItem(classMirror, classItem);
+
+                if (classItem != null && classItem.Children != null && classItem.Children.Count > 0)
+                    assemblyItem.AddChildItem(classItem);
+            }
+        }
+
+        private void ProcessClassItem(ClassMirror classMirror, LibraryItem classItem)
+        {
+            classItem.Assembly = classMirror.GetAssembly().LibraryName;
+
+            foreach (MethodMirror constructorMirror in classMirror.GetConstructors())
+            {
+                LibraryItem constructorItem = new LibraryItem(NodeType.Function, constructorMirror.MethodName, constructorMirror);
+                constructorItem.ArgumentTypes = GetArgumentTypes(constructorMirror.GetArgumentTypes());
+                constructorItem.Assembly = classMirror.GetAssembly().LibraryName;
+                constructorItem.Type = LibraryItem.MemberType.Constructor;
+                classItem.AddChildItem(constructorItem);
+            }
+
+            foreach (MethodMirror methodMirror in classMirror.GetFunctions())
+            {
+                if (!methodMirror.IsStatic)
+                    continue;
+
+                LibraryItem staticMethodItem = new LibraryItem(NodeType.Function, methodMirror.MethodName, methodMirror);
+                staticMethodItem.ArgumentTypes = GetArgumentTypes(methodMirror.GetArgumentTypes());
+                staticMethodItem.Assembly = classMirror.GetAssembly().LibraryName;
+                staticMethodItem.Type = LibraryItem.MemberType.StaticMethod;
+                classItem.AddChildItem(staticMethodItem);
+            }
+
+            GroupOverloadedItem(classItem);
+
+            foreach (PropertyMirror propertyMirror in classMirror.GetProperties())
+            {
+                if (!propertyMirror.IsStatic)
+                    continue;
+
+                LibraryItem staticPropertyItem = new LibraryItem(NodeType.Function, propertyMirror.PropertyName, propertyMirror);
+                staticPropertyItem.ArgumentTypes = string.Empty;//GetArgumentTypes(propertyMirror.
+                staticPropertyItem.Type = LibraryItem.MemberType.StaticProperty;
+
+                if (propertyMirror.IsSetter)
+                    staticPropertyItem.DisplayText += UiStrings.OverloadDisplayTextSetter;
+                else
+                    staticPropertyItem.DisplayText += UiStrings.OverloadDisplayTextGetter;
+
+                classItem.AddChildItem(staticPropertyItem);
+            }
+        }
+
+        private void ProcessImportBuiltInFunctions(List<MethodMirror> builtinFunctions, LibraryItem rootItem)
+        {
+            LibraryItem assemblyItem = new LibraryItem(NodeType.None, "Built-in Functions", null);
+
+            foreach (MethodMirror builtinFunction in builtinFunctions)
+            {
+                if (this.filteredClasses != string.Empty)
+                {
+                    string procedureName = "Built-in Functions;" + builtinFunction.MethodName + ';';
+                    if (filteredClasses.Contains(procedureName.ToLower()))
+                        continue;
+                }
+
+                LibraryItem builtinFunctionItem = new LibraryItem(NodeType.Function, builtinFunction.MethodName, builtinFunction);
+                builtinFunctionItem.ArgumentTypes = GetArgumentTypes(builtinFunction.GetArgumentTypes());
+                builtinFunctionItem.Assembly = assemblyItem.DisplayText;
+                builtinFunctionItem.Type = LibraryItem.MemberType.GlobalFunction;
+                assemblyItem.AddChildItem(builtinFunctionItem);
+            }
+
+            GroupOverloadedItem(assemblyItem);
+
+            if (assemblyItem.Children != null || assemblyItem.Children.Count > 0)
+                rootItem.AddChildItem(assemblyItem);
+        }
+
+        private void GroupOverloadedItem(LibraryItem parentItem)
+        {
+            int i = 0;
+            while (i < parentItem.Children.Count)
+            {
+                // find items that should be grouped together (from i to j)
+                int j = i + 1;
+                while (j < parentItem.Children.Count && parentItem.Children[i].DisplayText == parentItem.Children[j].DisplayText)
+                    j++;
+                j--;
+
+                // grouping
+                if (i < j && parentItem.Children[i].DisplayText == parentItem.Children[j].DisplayText)
+                {
+                    // create group folder
+                    LibraryItem groupItem = new LibraryItem(NodeType.None, parentItem.Children[i].QualifiedName, null);
+                    groupItem.Assembly = parentItem.Children[i].Assembly;
+                    groupItem.Type = parentItem.Children[i].Type;
+
+                    // group i to j to the folder
+                    for (int k = i; k <= j; k++)
+                    {
+                        parentItem.Children[i].IsOverloaded = true;
+
+                        if (parentItem.Children[i].ArgumentNames == "")
+                            parentItem.Children[i].DisplayText = UiStrings.OverloadDisplayTextNoParameter;
+                        else
+                        {
+                            List<string> argumentNames = ((MethodMirror)parentItem.Children[i].DataMirror).GetArgumentNames();
+                            parentItem.Children[i].DisplayText = GetArgumentNames(argumentNames);
+                        }
+
+                        groupItem.AddChildItem(parentItem.Children[i]);
+                        parentItem.Children.RemoveAt(i);
+                    }
+
+                    parentItem.AddChildItem(groupItem);
+                }
+                i++;
+            }
+        }
+
+        private string GetArgumentTypes(List<ProtoCore.Type> argumentTypeList)
+        {
+            string argumentTypes = string.Empty;
+
+            foreach (ProtoCore.Type argumentType in argumentTypeList)
+            {
+                if (argumentTypes == string.Empty)
+                    argumentTypes = argumentType.ToString();
+                else
+                    argumentTypes += ',' + argumentType.ToString();
+            }
+
+            return argumentTypes;
+        }
+
+        private string GetArgumentNames(List<string> argumentNamesList)
+        {
+            string argumentNames = string.Empty;
+
+            foreach (string argumentName in argumentNamesList)
+            {
+                if (argumentNames == string.Empty)
+                    argumentNames = argumentName;
+                else
+                    argumentNames += ',' + argumentName;
+            }
+
+            return argumentNames;
+        }
+#else
         private void ProcessImportClassTable(ProtoCore.DSASM.ClassTable classTable, LibraryItem parentItem, LibraryItem parentItemMethodProperty)
         {
             if (classTable == null && classTable.ClassNodes.Count <= (int)ProtoCore.PrimitiveType.kMaxPrimitives)
@@ -989,6 +1210,7 @@ namespace DesignScriptStudio.Graph.Core
                 i++;
             }
         }
+#endif
 
         private void SetLibraryItemLevel(LibraryItem item, int level)
         {
