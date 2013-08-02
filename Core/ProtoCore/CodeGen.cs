@@ -2755,18 +2755,6 @@ namespace ProtoCore
 
 
 
-            //// Jun Comment: set the graphNode dependent as this identifier list
-            //ProtoCore.Type type = new ProtoCore.Type();
-            //type.UID = globalClassIndex;
-            //ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef = new AssociativeGraph.UpdateNodeRef();
-            //DFSGetSymbolList(node, ref type, nodeRef);
-
-            //if (null != graphNode && nodeRef.nodeList.Count > 0)
-            //{
-            //    ProtoCore.AssociativeGraph.GraphNode dependentNode = new ProtoCore.AssociativeGraph.GraphNode();
-            //    dependentNode.updateNodeRefList.Add(nodeRef);
-            //    graphNode.PushDependent(dependentNode);
-            //}
             BuildSSADependency(node, graphNode);
             if (core.Options.FullSSA)
             {
