@@ -103,6 +103,7 @@
     <Compile Include="Associative\RedefinitionExpression.cs" />
     <Compile Include="Associative\ReferenceCount.cs" />
     <Compile Include="Associative\ReplicatorTest.cs" />
+    <Compile Include="Associative\SSATransformTest.cs" />
     <Compile Include="Associative\TypeSystemTests.cs" />
     <Compile Include="DebugTests\BasicTests.cs" />
     <Compile Include="DebugTests\RunEqualityTests.cs" />
@@ -182,29 +183,29 @@
     <Compile Include="UtilsTests\TextFxTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphToDSCompiler\GraphToDSCompiler.csproj">
+    <ProjectReference Include="..\..\Core\GraphToDSCompiler\GraphToDSCompiler.csproj">
       <Project>{593BE9FC-7482-4CD6-9F87-77E7AC5CDFF2}</Project>
       <Name>GraphToDSCompiler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ProtoInterface\ProtoInterface.csproj">
+      <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
+      <Name>ProtoInterface</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProtoAssembler\ProtoAssembler.csproj">
       <Project>{5FEC42E0-92BE-4C47-9DE2-70C18441D308}</Project>
       <Name>ProtoAssembler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProtoAssociative\ProtoAssociative.csproj">
+    <ProjectReference Include="..\..\Core\ProtoAssociative\ProtoAssociative.csproj">
       <Project>{7318D5E5-9D15-4ABE-8A51-92F58D4F0B85}</Project>
       <Name>ProtoAssociative</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProtoCore\ProtoCore.csproj">
+    <ProjectReference Include="..\..\Core\ProtoCore\ProtoCore.csproj">
       <Project>{7A9E0314-966F-4584-BAA3-7339CBB849D1}</Project>
       <Name>ProtoCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProtoImperative\ProtoImperative.csproj">
+    <ProjectReference Include="..\..\Core\ProtoImperative\ProtoImperative.csproj">
       <Project>{0D3D43DC-BD7E-46F0-93F7-1C6A6CC79948}</Project>
       <Name>ProtoImperative</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ProtoInterface\ProtoInterface.csproj">
-      <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
-      <Name>ProtoInterface</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProtoOptions\ProtoOptions.csproj">
       <Project>{0ACB1BA7-358E-4FA6-B476-AFD3B528D414}</Project>
@@ -214,7 +215,7 @@
       <Project>{53993A8F-99BE-41CA-AEFB-1EA8042FDC8D}</Project>
       <Name>ProtoPrint</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProtoScript\ProtoScript.csproj">
+    <ProjectReference Include="..\..\Core\ProtoScript\ProtoScript.csproj">
       <Project>{A4794476-7D0E-41C0-AD83-4AB929C0A46C}</Project>
       <Name>ProtoScript</Name>
     </ProjectReference>
