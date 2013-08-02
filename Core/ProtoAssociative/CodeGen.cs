@@ -2326,6 +2326,8 @@ namespace ProtoAssociative
 
                     // Build the rhs identifier list containing the temp pointer
                     IdentifierListNode rhsIdentList = new IdentifierListNode();
+                    rhsIdentList.Optr = Operator.dot;
+
                     AssociativeNode lhsNode = ssaStack.Pop();
                     if (lhsNode is BinaryExpressionNode)
                     {
@@ -2336,38 +2338,214 @@ namespace ProtoAssociative
                         rhsIdentList.LeftNode = lhsNode;
                     }
 
-                    rhsIdentList.Optr = Operator.dot;
 
                     IdentifierNode rnode = identList.RightNode as IdentifierNode;
                     rhsIdentList.RightNode = rnode;
-                    ssaStack.Push(rhsIdentList);
-                    DFSEmitSSA_AST(rnode.ArrayDimensions, ssaStack, ref astlist);
-                    //Validity.Assert(ssaStack.Peek() is BinaryExpressionNode);
-                    //rnode.ArrayDimensions.Expr = (ssaStack.Pop() as BinaryExpressionNode).LeftNode;
-                    rhsIdentList.RightNode = rnode;
 
-                    // Build the temp pointer
-                    string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
-                    var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
-                    BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
-                    bnode.isSSAPointerAssignment = true;
-                    astlist.Add(bnode);
-                    ssaStack.Push(tmpIdent);
+
+                    if (null == rnode.ArrayDimensions)
+                    {
+
+                        // New SSA expr for the current dot call
+                        string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+                        var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
+                        BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
+                        bnode.isSSAPointerAssignment = true;
+                        astlist.Add(bnode);
+                        ssaStack.Push(tmpIdent);
+                    }
+                    else
+                    {
+                        EmitSSAArrayIndex(rhsIdentList, ssaStack, ref astlist);
+
+                        //AssociativeNode nonIndexedIdent = nodeBuilder.BuildIdentfier(rnode.Name);
+                        //rhsIdentList.RightNode = nonIndexedIdent;
+
+
+                        //// New SSA expr for the current dot call
+                        //string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+                        //var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
+                        //BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
+                        //bnode.isSSAPointerAssignment = true;
+
+                        //astlist.Add(bnode);
+                        //ssaStack.Push(bnode);
+
+                        ////////////////////////////////////////////////////////////////////////
+
+
+                        //DFSEmitSSA_AST(rnode.ArrayDimensions.Expr, ssaStack, ref astlist);
+
+
+                        //// New SSA expr for the current dimension
+                        //bnode = new BinaryExpressionNode();
+                        //bnode.Optr = ProtoCore.DSASM.Operator.assign;
+
+                        //// Left node
+                        //tmpIdent = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                        //Validity.Assert(null != tmpIdent);
+                        //bnode.LeftNode = tmpIdent;
+
+                        //ArrayNode arrayNode = null;
+
+                        //// pop off the dimension
+                        //AssociativeNode dimensionNode = ssaStack.Pop();
+                        //if (dimensionNode is BinaryExpressionNode)
+                        //{
+                        //    arrayNode = new ArrayNode((dimensionNode as BinaryExpressionNode).LeftNode, null);
+                        //}
+                        //else
+                        //{
+                        //    arrayNode = new ArrayNode(dimensionNode, null);
+                        //}
+
+                        //// pop off the prev SSA variable
+                        //AssociativeNode bNodePrev = ssaStack.Pop();
+                        //Validity.Assert(bNodePrev is BinaryExpressionNode);
+                        //AssociativeNode rhsIdent = nodeBuilder.BuildIdentfier((bNodePrev as BinaryExpressionNode).LeftNode.Name);
+                        //(rhsIdent as IdentifierNode).ArrayDimensions = arrayNode;
+
+                        //bnode.RightNode = rhsIdent;
+
+                        //astlist.Add(bnode);
+                        //ssaStack.Push(bnode);
+
+                        //if (null != rnode.ArrayDimensions.Type)
+                        //{
+                        //    DFSEmitSSA_AST(rnode.ArrayDimensions.Type, ssaStack, ref astlist);
+                        //}
+                    }
                 }
             }
-            //else if (node is FunctionCallNode)
-            //{
-            //    FunctionCallNode fcNode = node as FunctionCallNode;
-            //    for (int idx = 0; idx < fcNode.FormalArguments.Count; idx++)
-            //    {
-            //        AssociativeNode arg = fcNode.FormalArguments[idx];
+        }
 
-            //        Stack<AssociativeNode> ssaStack1 = new Stack<AssociativeNode>();
-            //        DFSEmitSSA_AST(arg, ssaStack1, ref astlist);
-            //        AssociativeNode argNode = ssaStack.Pop();
-            //        fcNode.FormalArguments[idx] = argNode is BinaryExpressionNode ? (argNode as BinaryExpressionNode).LeftNode : argNode;
-            //    }
-            //}
+        /// <summary>
+        /// This function applies SSA tranform to an array indexed identifier or identifier list
+        /// 
+        /// The transform applies as such:
+        ///     i = 0
+        ///     j = 1
+        ///     x = a[i][j]
+        ///     
+        ///     t0 = a
+        ///     t1 = i
+        ///     t2 = t0[t1]
+        ///     t3 = j
+        ///     t4 = t2[t3]
+        ///     x = t4
+        /// 
+        /// </summary>
+        /// <param name="idendNode"></param>
+        /// <param name="ssaStack"></param>
+        /// <param name="astlist"></param>
+        private void EmitSSAArrayIndex(AssociativeNode node, Stack<AssociativeNode> ssaStack, ref List<AssociativeNode> astlist)
+        {
+            //
+            // Build the first SSA binary assignment of the identifier without its indexing
+            //  x = a[i][j] -> t0 = a
+            //
+            BinaryExpressionNode bnode = new BinaryExpressionNode();
+            bnode.Optr = ProtoCore.DSASM.Operator.assign;
+
+            // Left node
+            var tmpName = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+            bnode.LeftNode = tmpName;
+            bnode.isSSAAssignment = true;
+
+            IdentifierNode identNode = null;
+            if (node is IdentifierNode)
+            {
+                // Apply the array indexing directly to this identifier
+                identNode = node as IdentifierNode;
+
+                // Right node
+                bnode.RightNode = nodeBuilder.BuildIdentfier(identNode.Name);
+            }
+            else if (node is IdentifierListNode)
+            {
+                // Apply array indexing to the right node of the ident list
+                //      a = p.x[i] -> apply it to x
+                IdentifierListNode identList = node as IdentifierListNode;
+                AssociativeNode rhsNode = identList.RightNode;
+
+                Validity.Assert(rhsNode is IdentifierNode);
+                identNode = rhsNode as IdentifierNode;
+
+                // Replace the indexed identifier with a new ident with the same name
+                //      i.e. replace x[i] with x
+                AssociativeNode nonIndexedIdent = nodeBuilder.BuildIdentfier(identNode.Name);
+                identList.RightNode = nonIndexedIdent;
+
+                // Right node
+                bnode.RightNode = identList;
+
+                bnode.isSSAPointerAssignment = true;
+            }
+            else
+            {
+                Validity.Assert(false);
+            }
+
+            // Push the first SSA stmt
+            astlist.Add(bnode);
+            ssaStack.Push(bnode);
+
+            // Traverse the array index
+            //      t1 = i
+            DFSEmitSSA_AST(identNode.ArrayDimensions.Expr, ssaStack, ref astlist);
+
+            //
+            // Build the indexing statement
+            //      t2 = t0[t1]
+            BinaryExpressionNode indexedStmt = new BinaryExpressionNode();
+            indexedStmt.Optr = ProtoCore.DSASM.Operator.assign;
+
+
+            // Build the left node of the indexing statement
+#region SSA_INDEX_STMT_LEFT
+            AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+            Validity.Assert(null != tmpIdent);
+            indexedStmt.LeftNode = tmpIdent;
+#endregion
+
+            // Build the right node of the indexing statement
+#region SSA_INDEX_STMT_RIGHT
+            
+            ArrayNode arrayNode = null;
+
+            // pop off the dimension
+            AssociativeNode dimensionNode = ssaStack.Pop();
+            if (dimensionNode is BinaryExpressionNode)
+            {
+                arrayNode = new ArrayNode((dimensionNode as BinaryExpressionNode).LeftNode, null);
+            }
+            else
+            {
+                arrayNode = new ArrayNode(dimensionNode, null);
+            }
+
+            // pop off the prev SSA variable
+            AssociativeNode prevSSAStmt = ssaStack.Pop();
+
+            // Assign the curent dimension to the prev SSA variable
+            Validity.Assert(prevSSAStmt is BinaryExpressionNode);
+            AssociativeNode rhsIdent = nodeBuilder.BuildIdentfier((prevSSAStmt as BinaryExpressionNode).LeftNode.Name);
+            (rhsIdent as IdentifierNode).ArrayDimensions = arrayNode;
+
+            // Right node of the indexing statement
+            indexedStmt.RightNode = rhsIdent;
+
+            astlist.Add(indexedStmt);
+            ssaStack.Push(indexedStmt);
+
+
+            // Traverse the next dimension
+            //      [j]
+            if (null != identNode.ArrayDimensions.Type)
+            {
+                DFSEmitSSA_AST(identNode.ArrayDimensions.Type, ssaStack, ref astlist);
+            }
+#endregion
         }
 
 
@@ -2487,32 +2665,44 @@ namespace ProtoAssociative
 
                 // pop off the dimension
                 AssociativeNode dimensionNode = ssaStack.Pop();
+                ArrayNode currentDimensionNode = null;
                 if (dimensionNode is BinaryExpressionNode)
                 {
-                    arrayNode = new ArrayNode((dimensionNode as BinaryExpressionNode).LeftNode, null);
+                    currentDimensionNode = new ArrayNode((dimensionNode as BinaryExpressionNode).LeftNode, null);
                 }
                 else
                 {
-                    arrayNode = new ArrayNode(dimensionNode, null);
+                    currentDimensionNode = new ArrayNode(dimensionNode, null);
                 }
 
-                // pop off the prev SSA variable
+                // Pop the prev SSA node where the current dimension will apply
                 AssociativeNode nodePrev = ssaStack.Pop();
                 if (nodePrev is BinaryExpressionNode)
                 {
                     AssociativeNode rhsIdent = nodeBuilder.BuildIdentfier((nodePrev as BinaryExpressionNode).LeftNode.Name);
-                    (rhsIdent as IdentifierNode).ArrayDimensions = arrayNode;
+                    (rhsIdent as IdentifierNode).ArrayDimensions = currentDimensionNode;
 
                     bnode.RightNode = rhsIdent;
 
                     astlist.Add(bnode);
                     ssaStack.Push(bnode);
+
+                    if (null != arrayNode.Type)
+                    {
+                        DFSEmitSSA_AST(arrayNode.Type, ssaStack, ref astlist);
+                    }
                 }
                 else if (nodePrev is IdentifierListNode)
                 {
                     IdentifierNode iNode = (nodePrev as IdentifierListNode).RightNode as IdentifierNode;
                     Validity.Assert(null != iNode);
-                    iNode.ArrayDimensions = arrayNode;
+                    iNode.ArrayDimensions = currentDimensionNode;
+
+
+                    if (null != arrayNode.Type)
+                    {
+                        DFSEmitSSA_AST(arrayNode.Type, ssaStack, ref astlist);
+                    }
                 }
                 else
                 {
@@ -2523,11 +2713,6 @@ namespace ProtoAssociative
 
                 //astlist.Add(bnode);
                 //ssaStack.Push(bnode);
-
-                if (null != arrayNode.Type)
-                {
-                    DFSEmitSSA_AST(arrayNode.Type, ssaStack, ref astlist);
-                }
             }
             else if (node is IdentifierNode)
             {
@@ -2554,62 +2739,7 @@ namespace ProtoAssociative
                     }
                     else
                     {
-                        BinaryExpressionNode bnode = new BinaryExpressionNode();
-                        bnode.Optr = ProtoCore.DSASM.Operator.assign;
-
-                        // Left node
-                        var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
-                        bnode.LeftNode = identNode;
-
-                        // Right node
-                        bnode.RightNode = nodeBuilder.BuildIdentfier((node as IdentifierNode).Name);
-
-                        bnode.isSSAAssignment = true;
-
-                        astlist.Add(bnode);
-                        ssaStack.Push(bnode);
-
-                        //////////////////////////////////////////////////////////////////////
-
-
-                        DFSEmitSSA_AST(ident.ArrayDimensions.Expr, ssaStack, ref astlist);
-
-                        bnode = new BinaryExpressionNode();
-                        bnode.Optr = ProtoCore.DSASM.Operator.assign;
-
-                        // Left node
-                        AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
-                        Validity.Assert(null != tmpIdent);
-                        bnode.LeftNode = tmpIdent;
-
-                        ArrayNode arrayNode = null;
-
-                        // pop off the dimension
-                        AssociativeNode dimensionNode = ssaStack.Pop();
-                        if (dimensionNode is BinaryExpressionNode)
-                        {
-                            arrayNode = new ArrayNode((dimensionNode as BinaryExpressionNode).LeftNode, null);
-                        }
-                        else
-                        {
-                            arrayNode = new ArrayNode(dimensionNode, null);
-                        }
-
-                        // pop off the prev SSA variable
-                        AssociativeNode bNodePrev = ssaStack.Pop();
-                        Validity.Assert(bNodePrev is BinaryExpressionNode);
-                        AssociativeNode rhsIdent = nodeBuilder.BuildIdentfier((bNodePrev as BinaryExpressionNode).LeftNode.Name);
-                        (rhsIdent as IdentifierNode).ArrayDimensions = arrayNode;
-
-                        bnode.RightNode = rhsIdent;
-
-                        astlist.Add(bnode);
-                        ssaStack.Push(bnode);
-
-                        if (null != ident.ArrayDimensions.Type)
-                        {
-                            DFSEmitSSA_AST(ident.ArrayDimensions.Type, ssaStack, ref astlist);
-                        }
+                        EmitSSAArrayIndex(ident, ssaStack, ref astlist);
                     }
                 }
                 else
@@ -2663,13 +2793,31 @@ namespace ProtoAssociative
             else if (node is IdentifierListNode)
             {
                 SSAIdentList(node, ref ssaStack, ref astlist);
-                AssociativeNode lastNode = astlist[astlist.Count - 1];
-                Validity.Assert(lastNode is BinaryExpressionNode);
+                AssociativeNode lastNode = null;
+                Validity.Assert(astlist.Count > 0);
 
-                AssociativeNode identList = (lastNode as BinaryExpressionNode).RightNode;
-                Validity.Assert(identList is IdentifierListNode);
-
-                (identList as IdentifierListNode).isLastSSAIdentListFactor = true;
+                // Get the last identifierlist node and set its flag
+                // This is required to reset the pointerlist for every identifierlist traversed
+                // i.e. 
+                //      a = p.x
+                //      reset the flag after traversing p.x
+                //
+                //      b = p.x + g.y    
+                //      reset the flag after traversing p.x and p.y
+                //
+                for (int n = astlist.Count - 1; n >= 0 ; --n)
+                {
+                    lastNode = astlist[n];
+                    Validity.Assert(lastNode is BinaryExpressionNode);
+                    
+                    BinaryExpressionNode bnode = lastNode as BinaryExpressionNode;
+                    Validity.Assert(bnode.Optr == Operator.assign);
+                    if (bnode.RightNode is IdentifierListNode)
+                    {
+                        (bnode.RightNode as IdentifierListNode).isLastSSAIdentListFactor = true;
+                        break;
+                    }
+                }
             }
             else if (node is ExprListNode)
             {
