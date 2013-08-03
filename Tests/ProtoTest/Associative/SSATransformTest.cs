@@ -94,5 +94,44 @@ g.x = {{1},{100,200,300,400}};
             Obj o = mirror.GetValue("a");
             Assert.IsTrue((Int64)o.Payload == 302);
         }
+
+        [Test]
+        public void UpdateMemberArray3()
+        {
+
+            String code =
+@"
+class A
+{
+	x : var[];
+	
+	constructor A()
+	{
+		x = { B.B(), B.B(), B.B() };
+	}
+}
+
+class B
+{
+	y : var[]..[];
+	
+	constructor B()
+	{
+		y = { { 1, 2 }, { 3, 4 }, { 5, 6 }};		
+	}
+}
+
+a = { A.A(), A.A(), A.A() };
+
+g = 2;
+b = a[0].x[1].y[g][0]; 
+
+a[0].x[1].y[g][0] = 100;
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            Obj o = mirror.GetValue("b");
+            Assert.IsTrue((Int64)o.Payload == 100);
+        }
     }
 }
