@@ -2673,24 +2673,29 @@ namespace ProtoCore
 
         private ProtoCore.AST.AssociativeAST.IdentifierListNode BuildIdentifierList(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astIdentList)
         {
-            //Validity.Assert(astIdentList.Count >= 2);
-
             // TODO Jun: Replace this condition or handle this case prior to this call
             if (astIdentList.Count < 2)
             {
                 return null;
             }
 
+            AST.AssociativeAST.IdentifierListNode identList = null;
+
             // Build the first ident list
-            ProtoCore.AST.AssociativeAST.IdentifierListNode identList = new AST.AssociativeAST.IdentifierListNode();
+            identList = new AST.AssociativeAST.IdentifierListNode();
             identList.LeftNode = astIdentList[0];
             identList.RightNode = astIdentList[1];
 
             // Build the rest
             for (int n = 2; n < astIdentList.Count; ++n)
             {
+                // Build a new identllist for the prev identlist
+                AST.AssociativeAST.IdentifierListNode subIdentList = new AST.AssociativeAST.IdentifierListNode(identList);
+                subIdentList.Optr = Operator.dot;
+
+                // Build a new ident and assign it the prev identlist and the next identifier
                 identList = new AST.AssociativeAST.IdentifierListNode();
-                identList.LeftNode = identList;
+                identList.LeftNode = subIdentList;
                 identList.RightNode = astIdentList[n];
             }
 
