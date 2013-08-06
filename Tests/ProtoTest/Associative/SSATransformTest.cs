@@ -44,6 +44,51 @@ p.x = 10;
         }
 
         [Test]
+        public void ArrayAssignmentNoCycle1()
+        {
+
+            String code =
+@"
+// Script must not cycle
+a={0,1,2};
+x={10,11,12};
+
+
+a[0] = x[0];
+x[1] = a[1];
+
+y = x[1]; // 1
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            Obj o = mirror.GetValue("y");
+            Assert.IsTrue((Int64)o.Payload == 1);
+        }
+
+        [Test]
+        public void ArrayAssignmentNoCycle2()
+        {
+
+            String code =
+@"
+// Script must not cycle
+a={0,1,2};
+x={10,11,12};
+
+i = 1;
+
+a[0] = x[0];
+x[i] = a[i];
+
+y = x[i]; // 1
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            Obj o = mirror.GetValue("y");
+            Assert.IsTrue((Int64)o.Payload == 1);
+        }
+
+        [Test]
         public void UpdateMemberArray1()
         {
 
