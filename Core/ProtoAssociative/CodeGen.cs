@@ -2407,14 +2407,14 @@ namespace ProtoAssociative
             bnode.LeftNode = tmpName;
             bnode.isSSAAssignment = true;
             bnode.isSSAPointerAssignment = isSSAPointerAssignment;
+            bnode.isSSAFirstAssignment = true;
 
             IdentifierNode identNode = null;
             if (node is IdentifierNode)
             {
-                // Apply the array indexing directly to this identifier
                 identNode = node as IdentifierNode;
 
-                // Right node
+                // Right node - Array indexing will be applied to this new identifier
                 bnode.RightNode = nodeBuilder.BuildIdentfier(identNode.Name);
             }
             else if (node is IdentifierListNode)
@@ -3640,6 +3640,23 @@ namespace ProtoAssociative
             return isReplicationGuideEmitted;
         }
 
+        /*
+         proc EmitIdentNode(identnode, graphnode)
+	        if ssa
+		        // Check an if this identifier is array indexed
+		        // The array index is a secondary property and is not the original array property of the AST. this is required because this array index is meant only to resolve graphnode dependency with arrays
+		        if node.arrayindex.secondary is valid
+			        dimension = traverse(node.arrayindex.secondary)
+
+			        // Create a new dependent with the array indexing
+			        dependent = new GraphNode(identnode.name, dimension)
+			        graphnode.pushdependent(dependent)
+		        end
+	        end
+        end
+
+         */
+
         private void EmitIdentifierNode(AssociativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone, BinaryExpressionNode parentNode = null)
         {
             IdentifierNode t = node as IdentifierNode;
@@ -3892,6 +3909,16 @@ namespace ProtoAssociative
                         {
                             var curDep = graphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
                             curDep.dimensionNodeList.Add(updateNode);
+
+                            if (core.Options.FullSSA)
+                            {
+                                if (null != firstSSAGraphNode)
+                                {
+                                    curDepIndex = firstSSAGraphNode.dependentList.Count - 1;
+                                    ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
+                                    firstSSAUpdateNode.dimensionNodeList.Add(updateNode);
+                                }
+                            }
                         }
                     }
                 }
@@ -7272,6 +7299,11 @@ namespace ProtoAssociative
 
                     if (core.Options.FullSSA)
                     {
+                        if (bnode.isSSAFirstAssignment)
+                        {
+                            firstSSAGraphNode = graphNode;
+                        }
+
                         // All associative code is SSA'd and we want to keep track of the original identifier nodes of an identifier list:
                         //      i.e. x.y.z
                         // These identifiers will be used to populate the real graph nodes dependencies

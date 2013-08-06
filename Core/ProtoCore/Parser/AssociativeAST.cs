@@ -1041,6 +1041,7 @@ namespace ProtoCore.AST.AssociativeAST
         public int modBlkUID { get; set; }
         public bool isSSAAssignment { get; set; }
         public bool isSSAPointerAssignment { get; set; }
+        public bool isSSAFirstAssignment { get; set; }
         public bool isMultipleAssign { get; set; }
         public AssociativeNode LeftNode { get; set; }
         public ProtoCore.DSASM.Operator Optr { get; set; }
@@ -1055,6 +1056,7 @@ namespace ProtoCore.AST.AssociativeAST
         {
             isSSAAssignment = false;
             isSSAPointerAssignment = false;
+            isSSAFirstAssignment = false;
             isMultipleAssign = false;
             exprUID = ProtoCore.DSASM.Constants.kInvalidIndex;
             modBlkUID = ProtoCore.DSASM.Constants.kInvalidIndex;
@@ -1067,6 +1069,7 @@ namespace ProtoCore.AST.AssociativeAST
         {
             isSSAAssignment = rhs.isSSAAssignment;
             isSSAPointerAssignment = rhs.isSSAPointerAssignment;
+            isSSAFirstAssignment = rhs.isSSAFirstAssignment;
             isMultipleAssign = rhs.isMultipleAssign;
             exprUID = rhs.exprUID;
             modBlkUID = rhs.modBlkUID;
