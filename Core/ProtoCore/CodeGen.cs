@@ -95,6 +95,10 @@ namespace ProtoCore
         // The first graphnode of the SSA'd identifier
         protected ProtoCore.AssociativeGraph.GraphNode firstSSAGraphNode = null;
 
+        // These variables hold data when backtracking static SSA'd calls
+        protected string staticClass = null;
+        protected bool resolveStatic = false;
+
         public CodeGen(Core coreObj, ProtoCore.DSASM.CodeBlock parentBlock = null)
         {
             Debug.Assert(coreObj != null);
@@ -2781,6 +2785,17 @@ namespace ProtoCore
             bool isFirstIdent = true;
 
 
+            // Handle static calls to reflect the original call
+            if (resolveStatic)
+            {
+                ProtoCore.AST.AssociativeAST.IdentifierListNode identList = node as ProtoCore.AST.AssociativeAST.IdentifierListNode;
+                Validity.Assert(identList.LeftNode is ProtoCore.AST.AssociativeAST.IdentifierNode);
+                Validity.Assert(!string.IsNullOrEmpty(staticClass));
+                identList.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode(staticClass);
+
+                staticClass = null;
+                resolveStatic = false;
+            }
 
             BuildSSADependency(node, graphNode);
             if (core.Options.FullSSA)

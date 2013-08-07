@@ -88,6 +88,7 @@ namespace ProtoAssociative
 
         // This variable is used to keep track of the expression ID being traversed by the code generator
         private int currentExpressionID = ProtoCore.DSASM.Constants.kInvalidIndex;
+
         
         // This constructor is only called for Preloading of assemblies and 
         // precompilation of CodeBlockNode nodes in GraphUI for global language blocks - pratapa
@@ -7189,6 +7190,7 @@ namespace ProtoAssociative
             return false;
         }
 
+
         private void EmitBinaryExpressionNode(AssociativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone, bool isTempExpression = false)
         {
             BinaryExpressionNode bnode = null;
@@ -7311,13 +7313,6 @@ namespace ProtoAssociative
                         {
                             Validity.Assert(null != ssaPointerList);
 
-                            // Determine if the ssa pointerlist needs to be reset for the next SSA expression
-                            //if (currentExpressionID != bnode.exprUID)
-                            //{
-                            //    ssaPointerList.Clear();
-                            //}
-                            //currentExpressionID = bnode.exprUID;
-
                             if (bnode.RightNode is IdentifierNode)
                             {
                                 ssaPointerList.Add(bnode.RightNode);
@@ -7329,6 +7324,38 @@ namespace ProtoAssociative
                             else
                             {
                                 Validity.Assert(false);
+                            }
+                        }
+
+                        /*
+                           The following functions on codegen will perform the static call backtracking:
+
+                           string staticClass = null
+                           bool resolveStatic = false
+
+                           proc EmitBinaryExpr(node)
+                               if node.right is identifier
+                                   if node.right is a class
+                                       staticClass = node.right.name
+                                       resolveStatic = true
+                                   end
+                               end	
+                           end
+
+                           proc EmitIdentifierList(node, graphnode)
+                               if resolveStatic
+                                   node.left = new IdentifierNode(staticClass)	
+                               end	
+                           end
+                        */
+                        if (bnode.RightNode is IdentifierNode)
+                        {
+                            string identName = (bnode.RightNode as IdentifierNode).Name;
+                            if (core.ClassTable.DoesExist(identName))
+                            {
+                                staticClass = identName;
+                                resolveStatic = true;
+                                return;
                             }
                         }
                     }
