@@ -2383,7 +2383,8 @@ namespace ProtoAssociative
                         BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
                         bnode.isSSAPointerAssignment = true;
                         astlist.Add(bnode);
-                        ssaStack.Push(tmpIdent);
+                        //ssaStack.Push(tmpIdent);
+                        ssaStack.Push(bnode);
                     }
                     else
                     {
@@ -2756,6 +2757,27 @@ namespace ProtoAssociative
                                 Validity.Assert(argBinaryExpr.LeftNode is IdentifierNode);
                                 (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = (argBinaryExpr.RightNode as IdentifierNode).ReplicationGuides;
                             }
+                            else if (argBinaryExpr.RightNode is IdentifierListNode)
+                            {
+                                IdentifierListNode identList = argBinaryExpr.RightNode as IdentifierListNode;
+                                List<AssociativeNode> replicationGuides = null;
+
+                                // Get the replication guide and append it to the last identifier
+                                if (identList.RightNode is IdentifierNode)
+                                {
+                                    replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
+                                }
+                                else if (identList.RightNode is FunctionCallNode)
+                                {
+                                    replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
+                                }
+                                else
+                                {
+                                    Validity.Assert(false);
+                                }
+                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = replicationGuides;
+                            }
+
                             fcNode.FormalArguments[idx] = argBinaryExpr.LeftNode;
                         }
                         else
@@ -2763,7 +2785,35 @@ namespace ProtoAssociative
                             fcNode.FormalArguments[idx] = argNode;
                         }
 
+                        /*
+                        List<AssociativeNode> replicationGuides = null;
 
+                        // Get the replication guide and append it to the last identifier
+                        if (identList.RightNode is IdentifierNode)
+                        {
+                            replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
+                        }
+                        else if (identList.RightNode is FunctionCallNode)
+                        {
+                            replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
+                        }
+                        else
+                        {
+                            Validity.Assert(false);
+                        }
+
+                        // Set the replicationguide to the last index
+                        Validity.Assert(astlist[lastIndex] is BinaryExpressionNode);
+                        BinaryExpressionNode lastBinaryAssignment = astlist[lastIndex] as BinaryExpressionNode;
+                        if (lastBinaryAssignment.RightNode is IdentifierNode)
+                        {
+                            (lastBinaryAssignment.RightNode as IdentifierNode).ReplicationGuides = replicationGuides;
+                        }
+                        else if (lastBinaryAssignment.RightNode is FunctionCallNode)
+                        {
+                            (lastBinaryAssignment.RightNode as FunctionCallNode).ReplicationGuides = replicationGuides;
+                        }
+                        */
                     }
                 }
 
@@ -2787,6 +2837,7 @@ namespace ProtoAssociative
                 AssociativeNode lastNode = null;
                 Validity.Assert(astlist.Count > 0);
 
+
                 // Get the last identifierlist node and set its flag
                 // This is required to reset the pointerlist for every identifierlist traversed
                 // i.e. 
@@ -2796,7 +2847,8 @@ namespace ProtoAssociative
                 //      b = p.x + g.y    
                 //      reset the flag after traversing p.x and p.y
                 //
-                for (int n = astlist.Count - 1; n >= 0 ; --n)
+                int lastIndex = astlist.Count - 1;
+                for (int n = lastIndex; n >= 0 ; --n)
                 {
                     lastNode = astlist[n];
                     Validity.Assert(lastNode is BinaryExpressionNode);
@@ -2805,7 +2857,8 @@ namespace ProtoAssociative
                     Validity.Assert(bnode.Optr == Operator.assign);
                     if (bnode.RightNode is IdentifierListNode)
                     {
-                        (bnode.RightNode as IdentifierListNode).isLastSSAIdentListFactor = true;
+                        IdentifierListNode identList = bnode.RightNode as IdentifierListNode;
+                        identList.isLastSSAIdentListFactor = true;
                         break;
                     }
                 }
