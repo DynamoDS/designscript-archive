@@ -2352,12 +2352,30 @@ namespace ProtoAssociative
                         rhsIdentList.LeftNode = lhsNode;
                     }
 
+                    ArrayNode arrayDimension = null;
 
-                    IdentifierNode rnode = identList.RightNode as IdentifierNode;
+                    AssociativeNode rnode = null;
+                    if (identList.RightNode is IdentifierNode)
+                    {
+                        IdentifierNode identNode = identList.RightNode as IdentifierNode;
+                        arrayDimension = identNode.ArrayDimensions;
+                        rnode = identNode;
+                    }
+                    else if (identList.RightNode is FunctionCallNode)
+                    {
+                        FunctionCallNode fCallNode = identList.RightNode as FunctionCallNode;
+                        arrayDimension = fCallNode.ArrayDimensions;
+                        rnode = fCallNode;
+                    }
+                    else
+                    {
+                        Validity.Assert(false);
+                    }
+
+                    Validity.Assert(null != rnode);
                     rhsIdentList.RightNode = rnode;
 
-
-                    if (null == rnode.ArrayDimensions)
+                    if (null == arrayDimension)
                     {
                         // New SSA expr for the current dot call
                         string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
