@@ -65,6 +65,7 @@ y = x[1]; // 1
             Assert.IsTrue((Int64)o.Payload == 1);
         }
 
+
         [Test]
         public void ArrayAssignmentNoCycle2()
         {
@@ -177,6 +178,42 @@ a[0].x[1].y[g][0] = 100;
 
             Obj o = mirror.GetValue("b");
             Assert.IsTrue((Int64)o.Payload == 100);
+        }
+
+        [Test]
+        public void TestReplicationGuide01()
+        {
+
+            String code =
+@"
+a = {1,2};
+b = {1,2};
+c = a<1> + b<2>;
+x = c[0];
+y = c[1];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            thisTest.Verify("x", new object[] { 2, 3 });
+            thisTest.Verify("y", new object[] { 3, 4 });
+        }
+
+        [Test]
+        public void TestReplicationGuide02()
+        {
+
+            String code =
+@"
+a = {1,2};
+b = {1,2};
+a = a<1> + b<2>;
+x = a[0];
+y = a[1];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            thisTest.Verify("x", new object[] { 2, 3 });
+            thisTest.Verify("y", new object[] { 3, 4 });
         }
     }
 }

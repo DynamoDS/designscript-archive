@@ -2747,7 +2747,23 @@ namespace ProtoAssociative
                         AssociativeNode arg = fcNode.FormalArguments[idx];
                         DFSEmitSSA_AST(arg, ssaStack, ref astlist);
                         AssociativeNode argNode = ssaStack.Pop();
-                        fcNode.FormalArguments[idx] = argNode is BinaryExpressionNode ? (argNode as BinaryExpressionNode).LeftNode : argNode;
+
+                        if (argNode is BinaryExpressionNode)
+                        {
+                            BinaryExpressionNode argBinaryExpr = argNode as BinaryExpressionNode;
+                            if (argBinaryExpr.RightNode is IdentifierNode)
+                            {
+                                Validity.Assert(argBinaryExpr.LeftNode is IdentifierNode);
+                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = (argBinaryExpr.RightNode as IdentifierNode).ReplicationGuides;
+                            }
+                            fcNode.FormalArguments[idx] = argBinaryExpr.LeftNode;
+                        }
+                        else
+                        {
+                            fcNode.FormalArguments[idx] = argNode;
+                        }
+
+
                     }
                 }
 
