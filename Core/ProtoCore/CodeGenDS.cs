@@ -282,8 +282,15 @@ namespace ProtoCore
                     case "%mod":
                         EmitCode("%");
                         break;
+                    case "%Not":
+                        EmitCode("!");
+                        break;
                 }
-                DFSTraverse(funcCallNode.FormalArguments[1], true);
+
+                if (funcCallNode.FormalArguments.Count > 1)
+                {
+                    DFSTraverse(funcCallNode.FormalArguments[1], true);
+                }
                 EmitCode(")");
             }
             else
