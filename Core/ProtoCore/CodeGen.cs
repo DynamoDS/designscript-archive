@@ -2729,7 +2729,7 @@ namespace ProtoCore
             return identList;
         }
 
-        private void BuildRealDependencyForIdentList(AssociativeGraph.GraphNode graphNode)
+        protected void BuildRealDependencyForIdentList(AssociativeGraph.GraphNode graphNode)
         {
 	        AssociativeGraph.GraphNode dependent = new AssociativeGraph.GraphNode();
 

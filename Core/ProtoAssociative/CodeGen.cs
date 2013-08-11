@@ -2833,10 +2833,9 @@ namespace ProtoAssociative
                 // This can potentially be optimized by performing the dotcall transform in SSAIdentList
                 //
 
-                /*
-
-
                 ///////////////////////////
+
+                int x = 0;
 
                 for (int n = lastIndex; n >= 0; --n)
                 {
@@ -2856,7 +2855,9 @@ namespace ProtoAssociative
                             rcall.Function = new IdentifierNode(identNode);
                             rcall.Function.Name = ProtoCore.DSASM.Constants.kGetterPrefix + rcall.Function.Name;
 
-                            bnode.RightNode = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, rcall, core);
+                            FunctionDotCallNode dotCall = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, rcall, core);
+                            dotCall.isLastSSAIdentListFactor = identList.isLastSSAIdentListFactor;
+                            bnode.RightNode = dotCall;
 
                         }
                         else if (identList.RightNode is FunctionCallNode)
@@ -2878,8 +2879,6 @@ namespace ProtoAssociative
 
 
                 ///////////////////////////
-
-                */
             }
             else if (node is ExprListNode)
             {
@@ -5821,6 +5820,39 @@ namespace ProtoAssociative
             bool arrayIndexing = IsAssociativeArrayIndexing;
             IsAssociativeArrayIndexing = false;
 
+
+            // Handle static calls to reflect the original call
+            if (core.Options.FullSSA)
+            {
+                BuildRealDependencyForIdentList(graphNode);
+
+                if (node is FunctionDotCallNode)
+                {
+                    if ((node as FunctionDotCallNode).isLastSSAIdentListFactor)
+                    {
+                        Validity.Assert(null != ssaPointerList);
+                        ssaPointerList.Clear();
+                    }
+                }
+
+                if (resolveStatic)
+                {
+                    if (node is FunctionDotCallNode)
+                    {
+                        FunctionDotCallNode dotcall = node as FunctionDotCallNode;
+                        Validity.Assert(null != dotcall.DotCall);
+
+                        Validity.Assert(!string.IsNullOrEmpty(staticClass));
+                        dotcall.DotCall.FormalArguments[0] = nodeBuilder.BuildIdentfier(staticClass);
+
+                        staticClass = null;
+                        resolveStatic = false;
+
+                        ssaPointerList.Clear();
+                    }
+                }
+            }
+
             ProtoCore.DSASM.ProcedureNode procNode = TraverseFunctionCall(node, null, ProtoCore.DSASM.Constants.kInvalidIndex, 0, ref inferedType, graphNode, subPass, parentNode);
             emitReplicationGuide = emitReplicationGuideFlag;
             if (graphNode != null)
@@ -7467,11 +7499,23 @@ namespace ProtoAssociative
                             string identName = (bnode.RightNode as IdentifierNode).Name;
                             if (core.ClassTable.DoesExist(identName))
                             {
+                                ssaPointerList.Clear();
                                 staticClass = identName;
                                 resolveStatic = true;
                                 return;
                             }
                         }
+
+                        //if (bnode.RightNode is FunctionDotCallNode)
+                        //{
+                        //    string identName = (bnode.RightNode as FunctionDotCallNode).FunctionCall.Function.Name;
+                        //    if (core.ClassTable.DoesExist(identName))
+                        //    {
+                        //        ssaPointerList.Clear();
+                        //        staticClass = identName;
+                        //        resolveStatic = true;
+                        //    }
+                        //}
                     }
                     
 
