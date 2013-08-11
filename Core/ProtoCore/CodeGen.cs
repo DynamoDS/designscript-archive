@@ -2795,6 +2795,8 @@ namespace ProtoCore
 
                 staticClass = null;
                 resolveStatic = false;
+
+                ssaPointerList.Clear();
             }
 
             BuildSSADependency(node, graphNode);
