@@ -431,6 +431,15 @@ namespace ProtoCore.AST.AssociativeAST
 
     public class NullNode : AssociativeNode
     {
+        public override bool Compare(Node other)
+        {
+            if (other is NullNode)
+            {
+                return true;
+            }
+            else
+                return false;
+        }
     }
 
     public class ReturnNode : AssociativeNode
