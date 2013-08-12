@@ -2863,7 +2863,10 @@ namespace ProtoAssociative
                         else if (identList.RightNode is FunctionCallNode)
                         {
                             FunctionCallNode fCallNode = identList.RightNode as FunctionCallNode;
-                            bnode.RightNode = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, fCallNode, core);
+
+                            FunctionDotCallNode dotCall = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, fCallNode, core);
+                            dotCall.isLastSSAIdentListFactor = identList.isLastSSAIdentListFactor;
+                            bnode.RightNode = dotCall;
                         }
                         else
                         {
@@ -7465,7 +7468,17 @@ namespace ProtoAssociative
                             {
                                 FunctionDotCallNode dotcall = bnode.RightNode as FunctionDotCallNode;
                                 Validity.Assert(dotcall.FunctionCall.Function is IdentifierNode);
-                                ssaPointerList.Add(dotcall.FunctionCall.Function);
+
+                                if (ProtoCore.Utils.CoreUtils.IsGetterSetter(dotcall.FunctionCall.Function.Name))
+                                {
+                                    // This function is an internal getter or setter, store the identifier node
+                                    ssaPointerList.Add(dotcall.FunctionCall.Function);
+                                }
+                                else
+                                {
+                                    // This function is a member function, store the functioncall node
+                                    ssaPointerList.Add(dotcall.FunctionCall);
+                                }
                             }
                             else
                             {

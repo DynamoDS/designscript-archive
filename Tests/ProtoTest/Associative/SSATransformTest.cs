@@ -19,7 +19,7 @@ namespace ProtoTest.Associative
         }
 
         [Test]
-        public void UpdateMember()
+        public void UpdateMember01()
         {
 
             String code =
@@ -41,6 +41,46 @@ p.x = 10;
 
             Obj o = mirror.GetValue("a");
             Assert.IsTrue((Int64)o.Payload == 10);
+        }
+
+        [Test]
+        public void UpdateMember02()
+        {
+
+            String code =
+@"
+class complex
+{
+	mx : var;
+	my : var;
+	constructor complex(px : int, py : int)
+	{
+		mx = px; 
+		my = py; 
+	}
+	def scale : int(s : int)
+	{
+		mx = mx * s; 
+		my = my * s; 
+		return = 0;
+	}
+}
+
+p = complex.complex(8,16);
+i = p.mx;
+j = p.my;
+
+k1 = p.scale(2); 
+k2 = p.scale(10); 
+k3 = p.scale(10); 
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            Obj o = mirror.GetValue("i");
+            Assert.IsTrue((Int64)o.Payload == 1600);
+
+            o = mirror.GetValue("j");
+            Assert.IsTrue((Int64)o.Payload == 3200);
         }
 
         [Test]
