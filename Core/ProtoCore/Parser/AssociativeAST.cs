@@ -508,18 +508,21 @@ namespace ProtoCore.AST.AssociativeAST
         public FunctionCallNode DotCall { get; set; }
         public FunctionCallNode FunctionCall { get; set; }
         public FunctionCallNode NameMangledCall { get; set; }
+        public bool isLastSSAIdentListFactor { get; set; }
         public string lhsName { get; set; }
 
         public FunctionDotCallNode(FunctionCallNode callNode)
         {
             DotCall = new FunctionCallNode();
             FunctionCall = callNode;
+            isLastSSAIdentListFactor = false;
         }
 
         public FunctionDotCallNode(string lhsName, FunctionCallNode callNode)
         {
             this.lhsName = lhsName;
             FunctionCall = callNode;
+            isLastSSAIdentListFactor = false;
         }
 
         public FunctionDotCallNode(FunctionDotCallNode rhs): base(rhs)
@@ -527,6 +530,7 @@ namespace ProtoCore.AST.AssociativeAST
             DotCall = new FunctionCallNode(rhs.DotCall);
             FunctionCall = new FunctionCallNode(rhs.FunctionCall);
             lhsName = rhs.lhsName;
+            isLastSSAIdentListFactor = rhs.isLastSSAIdentListFactor;
         }
 
         public IdentifierListNode GetIdentList()
