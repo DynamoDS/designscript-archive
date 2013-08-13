@@ -233,7 +233,7 @@ namespace ProtoCore.AST.AssociativeAST
                 IsIndexable = false,
                 Name = null
             };
-            Value = identName;
+            Value = Name = identName;
         }
 
         public IdentifierNode(IdentifierNode rhs) : base(rhs)
