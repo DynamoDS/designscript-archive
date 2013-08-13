@@ -103,6 +103,7 @@
     <Compile Include="Associative\RedefinitionExpression.cs" />
     <Compile Include="Associative\ReferenceCount.cs" />
     <Compile Include="Associative\ReplicatorTest.cs" />
+    <Compile Include="Associative\SSATransformTest.cs" />
     <Compile Include="Associative\TypeSystemTests.cs" />
     <Compile Include="DebugTests\BasicTests.cs" />
     <Compile Include="DebugTests\RunEqualityTests.cs" />
@@ -186,6 +187,10 @@
       <Project>{593BE9FC-7482-4CD6-9F87-77E7AC5CDFF2}</Project>
       <Name>GraphToDSCompiler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ProtoInterface\ProtoInterface.csproj">
+      <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
+      <Name>ProtoInterface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProtoAssembler\ProtoAssembler.csproj">
       <Project>{5FEC42E0-92BE-4C47-9DE2-70C18441D308}</Project>
       <Name>ProtoAssembler</Name>
@@ -201,10 +206,6 @@
     <ProjectReference Include="..\..\Core\ProtoImperative\ProtoImperative.csproj">
       <Project>{0D3D43DC-BD7E-46F0-93F7-1C6A6CC79948}</Project>
       <Name>ProtoImperative</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\ProtoInterface\ProtoInterface.csproj">
-      <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
-      <Name>ProtoInterface</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProtoOptions\ProtoOptions.csproj">
       <Project>{0ACB1BA7-358E-4FA6-B476-AFD3B528D414}</Project>
