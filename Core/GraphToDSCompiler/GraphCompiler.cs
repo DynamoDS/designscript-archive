@@ -307,7 +307,7 @@ namespace GraphToDSCompiler
             graph.AddNode(op);
             return true;
         }
-        public bool CreateMethodNode(uint guid, string functionName, int args, string tempName)
+        public bool CreateMethodNode(uint guid, string functionName, int args, string tempName, bool isMemberFunction = false)
         {
             if (guid < 0)
                 throw new ArgumentException("Invalid argument value!", "guid");
@@ -315,11 +315,12 @@ namespace GraphToDSCompiler
                 throw new ArgumentException("Invalid argument value!", "methodName");
             Func op = new Func(functionName, guid, args);
             op.isStatic = false;
+            op.isMemberFunction = isMemberFunction;
             op.tempName = tempName;
             graph.AddNode(op);
             return true;
         }
-        public bool CreateMethodNode(uint guid, string functionName, int args, string tempName, string replicationGuides)
+        public bool CreateMethodNode(uint guid, string functionName, int args, string tempName, string replicationGuides, bool isMemberFunction = false)
         {
             if (guid < 0)
                 throw new ArgumentException("Invalid argument value!", "guid");
@@ -327,6 +328,7 @@ namespace GraphToDSCompiler
                 throw new ArgumentException("Invalid argument value!", "methodName");
             Func op = new Func(functionName, guid, args, replicationGuides);
             op.isStatic = false;
+            op.isMemberFunction = isMemberFunction;
             op.tempName = tempName;
             graph.AddNode(op);
             return true;
