@@ -146,10 +146,10 @@
     <Compile Include="VisualNodes\RenderNode.cs" />
     <Compile Include="VisualNodes\VisualNode.cs" />
     <Compile Include="Services\LiveRunnerServices.cs" />
-    <Compile Include="..\..\AssemblyVersionInfo.cs">
+    <Compile Include="..\..\..\AssemblyVersionInfo.cs">
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\SharedAssemblyInfo.cs">
+    <Compile Include="..\..\..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -146,6 +146,12 @@
     <ClCompile Include="StringUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <ClInclude Include="LiveRunnerWrapper.h" />
     <ClInclude Include="DesignScriptRunnerAPI.h" />
     <ClInclude Include="MirrorObjectWrapper.h" />
@@ -154,9 +160,6 @@
     <ClInclude Include="WrapperObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphToDSCompiler\GraphToDSCompiler.csproj">
-      <Project>{593be9fc-7482-4cd6-9f87-77e7ac5cdff2}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\ProtoCore\ProtoCore.csproj">
       <Project>{7a9e0314-966f-4584-baa3-7339cbb849d1}</Project>
     </ProjectReference>

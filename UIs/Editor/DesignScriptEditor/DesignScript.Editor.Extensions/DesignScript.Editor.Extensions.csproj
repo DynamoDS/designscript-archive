@@ -21,13 +21,13 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" >
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'" >
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(SolutionDir)Config\DesignScript.CS.props" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
@@ -42,7 +42,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-	<OutputPath Condition=" '$(OutputPath)' == '' ">..\..\Prototype\bin\$(Platform)\$(Configuration)</OutputPath>
+    <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\Prototype\bin\$(Platform)\$(Configuration)</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -64,10 +64,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\AssemblyVersionInfo.cs">
+    <Compile Include="..\..\..\..\AssemblyVersionInfo.cs">
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\SharedAssemblyInfo.cs">
+    <Compile Include="..\..\..\..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AutoCompleteExtension.cs" />
@@ -129,7 +129,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Prototype\ProtoScript\ProtoCore\ProtoCore.csproj">
+    <ProjectReference Include="..\..\..\..\Core\ProtoCore\ProtoCore.csproj">
       <Project>{7A9E0314-966F-4584-BAA3-7339CBB849D1}</Project>
       <Name>ProtoCore</Name>
     </ProjectReference>
