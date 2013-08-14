@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{97105AA6-8AFC-422C-BEA1-5462A572CFCC}</ProjectGuid>
+    <ProjectGuid>{A79D4CBF-A575-44DC-91C7-D87AA8D2F1E4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>DHLoggingLib</RootNamespace>
     <AssemblyName>DHLoggingLib</AssemblyName>
@@ -62,7 +62,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
+	<Compile Include="..\..\..\AssemblyVersionInfo.cs">
+      <Link>Properties\AssemblyVersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile> 
     <Compile Include="Logger.cs" />
   </ItemGroup>
   <ItemGroup>
