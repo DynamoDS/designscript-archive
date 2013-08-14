@@ -444,322 +444,7 @@ public Node root { get; set; }
         return true;    
     }
 
-    private void InsertDotMethod()
-    {
-        //InsertDotMemVarMethod();
-        InsertDotMemFuncMethod();
-    }
-
-    ProtoCore.AST.AssociativeAST.IdentifierNode BuildAssocIdentifier(string name, ProtoCore.PrimitiveType type = ProtoCore.PrimitiveType.kTypeVar)
-    {
-        var ident = new ProtoCore.AST.AssociativeAST.IdentifierNode();
-        ident.Name = ident.Value = name;
-        ident.datatype = core.TypeSystem.BuildTypeObject(type, false);
-        return ident;
-    }
-
-    ProtoCore.AST.ImperativeAST.IdentifierNode BuildImperativeIdentifier(string name, ProtoCore.PrimitiveType type = ProtoCore.PrimitiveType.kTypeVar)
-    {
-        var ident = new ProtoCore.AST.ImperativeAST.IdentifierNode();
-        ident.Name = ident.Value = name;
-        ident.datatype = core.TypeSystem.BuildTypeObject(type, false);
-        return ident;
-    }
-
-    private void InsertDotMemVarMethod()
-    {
-        ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-        funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kDotArgMethodName;
-        funcDefNode.ReturnType = new ProtoCore.Type() { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeVar), UID = (int)PrimitiveType.kTypeVar };
-        ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kLHS),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeVar), UID = (int)PrimitiveType.kTypeVar }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kRHS), 
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%rhsDimExprList"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt, IsIndexable = true, rank = 1 }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%rhsDim"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt }
-        });
-        funcDefNode.Singnature = args;
-
-        ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
-
-        ProtoCore.AST.AssociativeAST.DotFunctionBodyNode dotNode = new ProtoCore.AST.AssociativeAST.DotFunctionBodyNode(args.Arguments[0].NameNode, args.Arguments[1].NameNode, args.Arguments[2].NameNode, args.Arguments[3].NameNode);
-        body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = ProtoCore.DSASM.Operator.assign, RightNode = dotNode});
-        funcDefNode.FunctionBody = body;
-        (root as ProtoCore.AST.AssociativeAST.CodeBlockNode).Body.Add(funcDefNode); 
-    }
-
-    private void InsertDotMemFuncMethod()
-    {
-        ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-        funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kDotArgMethodName;
-        funcDefNode.IsBuiltIn = true;
-        funcDefNode.ReturnType = new ProtoCore.Type() { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeVar), UID = (int)PrimitiveType.kTypeVar,
-        rank = DSASM.Constants.kArbitraryRank, IsIndexable = true};
-
-        ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kLHS),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeVar), UID = (int)PrimitiveType.kTypeVar }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kRHS),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%rhsDimExprList"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeVar), UID = (int)PrimitiveType.kTypeVar, IsIndexable = true, rank = ProtoCore.DSASM.Constants.kArbitraryRank }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%rhsDim"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%rhsArgList"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeVar), UID = (int)PrimitiveType.kTypeVar, IsIndexable = true, rank = ProtoCore.DSASM.Constants.kArbitraryRank }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%rhsArgNum"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt }
-        });
-        funcDefNode.Singnature = args;
-
-        ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
-
-        ProtoCore.AST.AssociativeAST.DotFunctionBodyNode dotNode = new ProtoCore.AST.AssociativeAST.DotFunctionBodyNode(args.Arguments[0].NameNode, args.Arguments[1].NameNode, args.Arguments[2].NameNode, args.Arguments[3].NameNode, args.Arguments[4].NameNode, args.Arguments[5].NameNode);
-        body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = ProtoCore.DSASM.Operator.assign, RightNode = dotNode});
-        funcDefNode.FunctionBody = body;
-        (root as ProtoCore.AST.AssociativeAST.CodeBlockNode).Body.Add(funcDefNode); 
-    }
- 
-
-    private void InsertBinaryOperationMethod(Operator op, PrimitiveType r, PrimitiveType op1, PrimitiveType op2, int retRank = 0, int op1rank = 0, int op2rank = 0)
-    {
-        ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-        funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
-        funcDefNode.IsAssocOperator = true;
-        funcDefNode.IsBuiltIn = true;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
-        funcDefNode.ReturnType = new ProtoCore.Type() { Name = core.TypeSystem.GetType((int)r), UID = (int)r, rank = retRank, IsIndexable = (retRank > 0)};
-        ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kLHS),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)op1), UID = (int)op1, rank = op1rank, IsIndexable = (op1rank > 0)}
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kRHS),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)op2), UID = (int)op2, rank = op2rank, IsIndexable = (op2rank > 0)}
-        });
-        funcDefNode.Singnature = args;
-
-        ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
-
-        ProtoCore.AST.AssociativeAST.IdentifierNode lhs = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kLHS);
-        ProtoCore.AST.AssociativeAST.IdentifierNode rhs = BuildAssocIdentifier(ProtoCore.DSASM.Constants.kRHS);
-        body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = ProtoCore.DSASM.Operator.assign, RightNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = lhs, RightNode = rhs, Optr = op } });
-        funcDefNode.FunctionBody = body;
-        (root as ProtoCore.AST.AssociativeAST.CodeBlockNode).Body.Add(funcDefNode);
-    }
-
-	// The following methods are used to insert methods to the bottom of the AST and convert operator to these method calls 
-	// to support replication on operators 
-	private void InsertUnaryOperationMethod(UnaryOperator op, PrimitiveType r, PrimitiveType operand)
-    {
-        ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-        funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
-        funcDefNode.IsAssocOperator = true;
-        funcDefNode.IsBuiltIn = true;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
-        funcDefNode.ReturnType = new ProtoCore.Type() { Name = core.TypeSystem.GetType((int)r), UID = (int)r };
-        ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%param"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)operand), UID = (int)operand }
-        });
-        funcDefNode.Singnature = args;
-
-        ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
-        ProtoCore.AST.AssociativeAST.IdentifierNode param = BuildAssocIdentifier("%param");
-        body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = ProtoCore.DSASM.Operator.assign, RightNode = new ProtoCore.AST.AssociativeAST.UnaryExpressionNode() { Expression = param, Operator = op } });
-        funcDefNode.FunctionBody = body;
-        (root as ProtoCore.AST.AssociativeAST.CodeBlockNode).Body.Add(funcDefNode);
-    }
-
-	private void InsertInlineConditionOperationMethod(PrimitiveType condition, PrimitiveType r)
-    {
-        ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-        funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kInlineCondition; 
-        funcDefNode.ReturnType = new ProtoCore.Type() { Name = core.TypeSystem.GetType((int)r), UID = (int)r };
-        ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%condition"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)condition), UID = (int)condition }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%trueExp"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)r), UID = (int)r }
-        });
-        args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
-        {
-            memregion = ProtoCore.DSASM.MemoryRegion.kMemStack,
-            access = ProtoCore.DSASM.AccessSpecifier.kPublic,
-            NameNode = BuildAssocIdentifier("%falseExp"),
-            ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)r), UID = (int)r }
-        });
-        funcDefNode.Singnature = args;
-
-        ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
-        ProtoCore.AST.AssociativeAST.IdentifierNode con = BuildAssocIdentifier("%condition");
-        ProtoCore.AST.AssociativeAST.IdentifierNode t = BuildAssocIdentifier("%trueExp");
-        ProtoCore.AST.AssociativeAST.IdentifierNode f = BuildAssocIdentifier("%falseExp");
-
-        body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = Operator.assign, RightNode = new ProtoCore.AST.AssociativeAST.InlineConditionalNode() { ConditionExpression = con, TrueExpression = t, FalseExpression = f } });
-        funcDefNode.FunctionBody = body;
-        (root as ProtoCore.AST.AssociativeAST.CodeBlockNode).Body.Add(funcDefNode);
-    }
-
-	private void InsertPredefinedMethod()
-	{
-        if (!builtinMethodsLoaded)
-        {
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeString, PrimitiveType.kTypeChar, PrimitiveType.kTypeChar);
-
-            
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeString, PrimitiveType.kTypeString, PrimitiveType.kTypeString);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeVar, PrimitiveType.kTypeString, PrimitiveType.kTypeChar);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeVar, PrimitiveType.kTypeChar, PrimitiveType.kTypeString);
-//			InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeString, PrimitiveType.kTypeString, PrimitiveType.kTypeVar);
-//          InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeString, PrimitiveType.kTypeVar, PrimitiveType.kTypeString);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeString, PrimitiveType.kTypeString, PrimitiveType.kTypeVar, 0, 0, ProtoCore.DSASM.Constants.kArbitraryRank);
-            InsertBinaryOperationMethod(Operator.add, PrimitiveType.kTypeString, PrimitiveType.kTypeVar, PrimitiveType.kTypeString,0,ProtoCore.DSASM.Constants.kArbitraryRank,0);
-
-            InsertBinaryOperationMethod(Operator.sub, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.sub, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.sub, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.sub, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            //InsertBinaryOperationMethod(Operator.div, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            //InsertBinaryOperationMethod(Operator.div, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt);
-            //InsertBinaryOperationMethod(Operator.div, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.div, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.mul, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.mul, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.mul, PrimitiveType.kTypeDouble, PrimitiveType.kTypeInt, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.mul, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.mod, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-
-            InsertBinaryOperationMethod(Operator.bitwiseand, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.bitwiseand, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-            InsertBinaryOperationMethod(Operator.bitwiseor, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.bitwiseor, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-            InsertBinaryOperationMethod(Operator.bitwisexor, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.bitwisexor, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-
-            InsertBinaryOperationMethod(Operator.eq, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.eq, PrimitiveType.kTypeBool, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.eq, PrimitiveType.kTypeBool, PrimitiveType.kTypeString, PrimitiveType.kTypeString);
-			InsertBinaryOperationMethod(Operator.eq, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-			InsertBinaryOperationMethod(Operator.eq, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeVar);
-            InsertBinaryOperationMethod(Operator.eq, PrimitiveType.kTypeBool, PrimitiveType.kTypeVar, PrimitiveType.kTypeBool);
-			
-            InsertBinaryOperationMethod(Operator.nq, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.nq, PrimitiveType.kTypeBool, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.nq, PrimitiveType.kTypeBool, PrimitiveType.kTypeString, PrimitiveType.kTypeString);
-			InsertBinaryOperationMethod(Operator.nq, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-			InsertBinaryOperationMethod(Operator.nq, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeVar);
-            InsertBinaryOperationMethod(Operator.nq, PrimitiveType.kTypeBool, PrimitiveType.kTypeVar, PrimitiveType.kTypeBool);
-
-            InsertBinaryOperationMethod(Operator.ge, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.ge, PrimitiveType.kTypeBool, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.gt, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.gt, PrimitiveType.kTypeBool, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.le, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.le, PrimitiveType.kTypeBool, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.lt, PrimitiveType.kTypeBool, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertBinaryOperationMethod(Operator.lt, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.and, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertBinaryOperationMethod(Operator.or, PrimitiveType.kTypeBool, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-
-            InsertUnaryOperationMethod(UnaryOperator.Neg, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertUnaryOperationMethod(UnaryOperator.Neg, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertUnaryOperationMethod(UnaryOperator.Negate, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertUnaryOperationMethod(UnaryOperator.Negate, PrimitiveType.kTypeDouble, PrimitiveType.kTypeDouble);
-            InsertUnaryOperationMethod(UnaryOperator.Not, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-
-            InsertBinaryOperationMethod(Operator.and, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-            InsertBinaryOperationMethod(Operator.or, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool, PrimitiveType.kTypeBool);
-
-            InsertUnaryOperationMethod(UnaryOperator.Decrement, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-            InsertUnaryOperationMethod(UnaryOperator.Increment, PrimitiveType.kTypeInt, PrimitiveType.kTypeInt);
-        }
-	}
-
-	private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateBinaryOperatorMethodCallNode(Operator op, ProtoCore.AST.AssociativeAST.AssociativeNode op1, ProtoCore.AST.AssociativeAST.AssociativeNode op2)
+    private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateBinaryOperatorMethodCallNode(Operator op, ProtoCore.AST.AssociativeAST.AssociativeNode op1, ProtoCore.AST.AssociativeAST.AssociativeNode op2)
     {
         ProtoCore.AST.AssociativeAST.FunctionCallNode funCallNode = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
         ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString(), Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString() };
@@ -771,7 +456,7 @@ public Node root { get; set; }
         return funCallNode;
     }
 
-	private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateUnaryOperatorMethodCallNode(UnaryOperator op, ProtoCore.AST.AssociativeAST.AssociativeNode operand)
+ 	private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateUnaryOperatorMethodCallNode(UnaryOperator op, ProtoCore.AST.AssociativeAST.AssociativeNode operand)
     {
         ProtoCore.AST.AssociativeAST.FunctionCallNode funCallNode = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
         ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString(), Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString() };
@@ -783,51 +468,14 @@ public Node root { get; set; }
         return funCallNode;
     }
 
-	private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateInlineConditionMethodCallNode(ProtoCore.AST.AssociativeAST.AssociativeNode con, ProtoCore.AST.AssociativeAST.AssociativeNode t, ProtoCore.AST.AssociativeAST.AssociativeNode f)
+
+
+    ProtoCore.AST.ImperativeAST.IdentifierNode BuildImperativeIdentifier(string name, ProtoCore.PrimitiveType type = ProtoCore.PrimitiveType.kTypeVar)
     {
-        ProtoCore.AST.AssociativeAST.FunctionCallNode funCallNode = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Constants.kInlineCondition, Name = ProtoCore.DSASM.Constants.kInlineCondition };
-        funCallNode.Function = funcName;
-        funCallNode.Name = ProtoCore.DSASM.Constants.kInlineCondition;
-        funCallNode.FormalArguments.Add(con);
-        funCallNode.FormalArguments.Add(t);
-        funCallNode.FormalArguments.Add(f);
-
-        NodeUtils.SetNodeLocation(funCallNode, con, f);
-        return funCallNode;
-    }
-
-	private void InsertBuiltInMethods()
-    {
-        if (!builtinMethodsLoaded)
-        {
-            ProtoCore.Lang.BuiltInMethods builtInMethods = new Lang.BuiltInMethods(core);
-            foreach (ProtoCore.Lang.BuiltInMethods.BuiltInMethod method in builtInMethods.Methods)
-			{
-				(root as ProtoCore.AST.AssociativeAST.CodeBlockNode).Body.Add(GenerateBuiltInMethodSignatureNode(method));
-			}
-		}
-    }
-
-    private ProtoCore.AST.AssociativeAST.FunctionDefinitionNode GenerateBuiltInMethodSignatureNode(ProtoCore.Lang.BuiltInMethods.BuiltInMethod method)
-    {
-        ProtoCore.AST.AssociativeAST.FunctionDefinitionNode fDef = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-        fDef.Name = method.Name;
-        fDef.ReturnType = method.ReturnType;
-        fDef.IsExternLib = true;
-        fDef.IsBuiltIn = true;
-        fDef.BuiltInMethodId = method.ID;
-        fDef.Singnature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-
-        foreach (KeyValuePair<string, ProtoCore.Type> param in method.Parameters)
-        {
-            ProtoCore.AST.AssociativeAST.VarDeclNode arg = new ProtoCore.AST.AssociativeAST.VarDeclNode();
-            arg.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode { Name = param.Key, Value = param.Key };
-            arg.ArgumentType = param.Value;
-            fDef.Singnature.AddArgument(arg);
-        }
-
-        return fDef;
+        var ident = new ProtoCore.AST.ImperativeAST.IdentifierNode();
+        ident.Name = ident.Value = name;
+        ident.datatype = core.TypeSystem.BuildTypeObject(type, false);
+        return ident;
     }
 
     private bool IsKeyWord(string identName, bool checkReturn = false, bool checkThis = true)
@@ -1000,34 +648,19 @@ public Node root { get; set; }
 	}
 
 	
-	void InsertPredefinedAndBuiltinMethods(Node node) {
-		root = node; 
-		if (DSASM.InterpreterMode.kNormal == core.ExecMode)
-		{
-		   if (!builtinMethodsLoaded)
-		   {
-		       InsertDotMethod();
-		   }
-		   if (core.Options.AssocOperatorAsMethod)
-		   {
-		       InsertPredefinedMethod();
-		   }
-		   InsertBuiltInMethods();
-		}
-		
-		
-	}
-
 	void DesignScriptParser() {
 		Node node = null; 
 		Hydrogen(out node);
 		if (!core.IsParsingPreloadedAssembly && !core.IsParsingCodeBlockNode)
-		{ 
-		InsertPredefinedAndBuiltinMethods(node);
+		{
+		   ProtoCore.Utils.CoreUtils.InsertPredefinedAndBuiltinMethods(core, node, builtinMethodsLoaded);
+		   root = node;
 		}
 		else
+		{
 		   root = node;
-		   
+		} 
+		
 	}
 
 	void Hydrogen(out Node codeBlockNode) {
@@ -1074,7 +707,7 @@ public Node root { get; set; }
 		
 		if (rootImport && core.IsParsingPreloadedAssembly)
 		{
-		InsertPredefinedAndBuiltinMethods(codeblock);
+		ProtoCore.Utils.CoreUtils.InsertPredefinedAndBuiltinMethods(core, codeblock, builtinMethodsLoaded);
 		core.ImportNodes = codeblock;
 		}
 		
@@ -1807,7 +1440,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 		   errors.SemErr(t.line, t.col, String.Format("\"{0}\" is a keyword, identifier expected", t.val));
 		}
 		NodeUtils.SetNodeLocation(varDeclNode, t);
-		tNode = BuildAssocIdentifier(t.val);
+		tNode = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val);
 		NodeUtils.SetNodeLocation(tNode, t);
 		varDeclNode.NameNode = tNode;
 		
@@ -1984,7 +1617,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 		   SynErr("Return statement is invalid. Do you mean: return = " + la.val + " ?"); 
 		}
 		
-		var = BuildAssocIdentifier(t.val, (ProtoCore.PrimitiveType)ltype);
+		var = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val, (ProtoCore.PrimitiveType)ltype);
 		NodeUtils.SetNodeLocation(var, t);
 		
 		#if ENABLE_INC_DEC_FIX 
@@ -2059,7 +1692,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 		ProtoCore.AST.AssociativeAST.CodeBlockNode functionBody = new ProtoCore.AST.AssociativeAST.CodeBlockNode(); 
 		
 		ProtoCore.AST.AssociativeAST.BinaryExpressionNode binaryExpr = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode();
-		binaryExpr.LeftNode = BuildAssocIdentifier("return", ProtoCore.PrimitiveType.kTypeReturn);
+		binaryExpr.LeftNode = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, "return", ProtoCore.PrimitiveType.kTypeReturn);
 		ProtoCore.AST.AssociativeAST.AssociativeNode expr;
 		
 		Associative_Expression(out expr);
@@ -2156,7 +1789,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 		{
 		   errors.SemErr(t.line, t.col, String.Format("\"{0}\" is a keyword, identifier expected", t.val));
 		}
-		tNode = BuildAssocIdentifier(t.val);
+		tNode = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val);
 		NodeUtils.SetNodeLocation(tNode, t);
 		varDeclNode.NameNode = tNode;
 		NodeUtils.CopyNodeLocation(varDeclNode, tNode);
@@ -2353,156 +1986,119 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 		} else SynErr(94);
 	}
 
-    void Associative_IdentifierList(out ProtoCore.AST.AssociativeAST.AssociativeNode node)
-    {
-        if (core.Options.FullSSA)
-        {
-            node = null;
-            if (isInClass && IsIdentList())
-            {
-                disableKwCheck = true;
-            }
-
-            Associative_NameReference(out node);
-            disableKwCheck = false;
-            ProtoCore.AST.AssociativeAST.AssociativeNode inode = node;
-
-            while (la.kind == 6)
-            {
-                Get();
-                ProtoCore.AST.AssociativeAST.AssociativeNode rnode = null;
-                Associative_NameReference(out rnode);
-                if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
-                   (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
-                   (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
-                {
-                    node = rnode;
-                    return;
-                }
-
-                ProtoCore.AST.AssociativeAST.IdentifierListNode bnode = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
-                bnode.LeftNode = node;
-                bnode.Optr = Operator.dot;
-                bnode.RightNode = rnode;
-                node = bnode;
-                NodeUtils.SetNodeLocation(bnode, bnode.LeftNode, bnode.RightNode);
-            }
-        }
-        else
-        {
-            node = null;
-            if (isInClass && IsIdentList())
-            {
-                disableKwCheck = true;
-            }
-
-            Associative_NameReference(out node);
-            disableKwCheck = false;
-            ProtoCore.AST.AssociativeAST.AssociativeNode inode = node;
-
-            while (la.kind == 6)
-            {
-                Get();
-                ProtoCore.AST.AssociativeAST.AssociativeNode rnode = null;
-                Associative_NameReference(out rnode);
-                if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
-                   (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
-                   (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
-                {
-                    node = rnode;
-                    return;
-                }
-
-                ProtoCore.AST.AssociativeAST.IdentifierListNode bnode = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
-                bnode.LeftNode = node;
-                bnode.Optr = Operator.dot;
-                bnode.RightNode = rnode;
-                inode = bnode;
-                NodeUtils.SetNodeLocation(bnode, bnode.LeftNode, bnode.RightNode);
-
-
-                bool isNeitherIdentOrFunctionCall = !(rnode is ProtoCore.AST.AssociativeAST.IdentifierNode || rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode);
-                if (isLeft || isNeitherIdentOrFunctionCall)
-                {
-                    node = inode;
-                }
-                else
-                {
-                    if (rnode is ProtoCore.AST.AssociativeAST.IdentifierNode)
-                    {
-                        ProtoCore.AST.AssociativeAST.FunctionCallNode rcall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
-                        rcall.Function = rnode;
-                        rcall.Function.Name = ProtoCore.DSASM.Constants.kGetterPrefix + rcall.Function.Name;
-                        bnode.RightNode = rcall;
-
-                        NodeUtils.SetNodeLocation(rcall, rnode, rnode);
-                        node = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(bnode.LeftNode, rcall, core);
-                    }
-                    else
-                    {
-                        string rhsName = null;
-                        ProtoCore.AST.AssociativeAST.ExprListNode dimList = null;
-                        int dim = 0;
-                        if (rnode is ProtoCore.AST.AssociativeAST.IdentifierNode)
-                        {
-                            rhsName = rnode.Name;
-                            ProtoCore.AST.AssociativeAST.IdentifierNode rhsINode = rnode as ProtoCore.AST.AssociativeAST.IdentifierNode;
-                            if (rhsINode.ArrayDimensions != null)
-                            {
-                                dimList = ProtoCore.Utils.CoreUtils.BuildArrayExprList(rhsINode.ArrayDimensions);
-                                dim = dimList.list.Count;
-                            }
-                            else
-                            {
-                                dimList = new ProtoCore.AST.AssociativeAST.ExprListNode();
-                            }
-                        }
-                        else if (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode)
-                        {
-                            ProtoCore.AST.AssociativeAST.FunctionCallNode rhsFNode = rnode as ProtoCore.AST.AssociativeAST.FunctionCallNode;
-                            node = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(node, rhsFNode, core);
-                        }
-                    }
-                }
-            }
-
-            if (!isModifier && withinModifierCheckScope)
-            {
-                if (isLeftVarIdentList)
-                {
-                    if (inode is ProtoCore.AST.AssociativeAST.IdentifierListNode)
-                    {
-                        isModifier = false;
-                        if (node is ProtoCore.AST.AssociativeAST.FunctionDotCallNode)
-                        {
-                            ProtoCore.AST.AssociativeAST.FunctionDotCallNode fdotCall = node as ProtoCore.AST.AssociativeAST.FunctionDotCallNode;
-                            string checkVar = ProtoCore.Utils.CoreUtils.GenerateIdentListNameString(fdotCall.GetIdentList());
-                            isModifier = (leftVar == checkVar);
-                        }
-                    }
-                }
-                else if (inode is ProtoCore.AST.AssociativeAST.IdentifierNode)
-                {
-                    isModifier = (leftVar == inode.Name);
-                }
-
-                // The LHS is an identifier
-                else
-                {
-                    // It is a modifier if the lhs is:
-                    //   1. the same as the current node
-                    //   2. the current node starts with the lhs identifier
-                    isModifier = (leftVar == inode.Name);
-                    if (!isModifier)
-                    {
-                        string rhsString = ProtoCore.Utils.CoreUtils.GenerateIdentListNameString(inode);
-
-                        isModifier = rhsString.StartsWith(leftVar);
-                    }
-                }
-            }
-        }
-    }
+	void Associative_IdentifierList(out ProtoCore.AST.AssociativeAST.AssociativeNode node) {
+		node = null;
+		if (isInClass && IsIdentList())
+		{
+		   disableKwCheck = true;
+		}
+		
+		Associative_NameReference(out node);
+		disableKwCheck = false; 
+		ProtoCore.AST.AssociativeAST.AssociativeNode inode = node; 
+		
+		while (la.kind == 6) {
+			Get();
+			ProtoCore.AST.AssociativeAST.AssociativeNode rnode = null; 
+			Associative_NameReference(out rnode);
+			if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
+			   (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
+			   (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
+			{
+			   node = rnode;
+			   return;
+			}
+			
+			ProtoCore.AST.AssociativeAST.IdentifierListNode bnode = new ProtoCore.AST.AssociativeAST.IdentifierListNode(); 
+			bnode.LeftNode = node; 
+			bnode.Optr = Operator.dot; 
+			bnode.RightNode = rnode; 
+			inode = bnode;
+			NodeUtils.SetNodeLocation(bnode, bnode.LeftNode, bnode.RightNode);
+			
+			
+			bool isNeitherIdentOrFunctionCall = !(rnode is ProtoCore.AST.AssociativeAST.IdentifierNode || rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode);
+			if (isLeft || isNeitherIdentOrFunctionCall)
+			{
+			   node = inode;
+			}
+			else 
+			{
+			   if (rnode is ProtoCore.AST.AssociativeAST.IdentifierNode)
+			   {
+			       ProtoCore.AST.AssociativeAST.FunctionCallNode rcall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+			       rcall.Function = rnode;
+			       rcall.Function.Name = ProtoCore.DSASM.Constants.kGetterPrefix + rcall.Function.Name;
+			       bnode.RightNode = rcall;
+			
+			       NodeUtils.SetNodeLocation(rcall, rnode, rnode);
+			       node = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(bnode.LeftNode, rcall, core);
+			   }
+			   else
+			   {
+			       string rhsName = null;
+			       ProtoCore.AST.AssociativeAST.ExprListNode dimList = null;
+			       int dim = 0;
+			       if (rnode is ProtoCore.AST.AssociativeAST.IdentifierNode)
+			       {
+			           rhsName = rnode.Name;
+			           ProtoCore.AST.AssociativeAST.IdentifierNode rhsINode = rnode as ProtoCore.AST.AssociativeAST.IdentifierNode;
+			           if (rhsINode.ArrayDimensions != null)
+			           {
+			               dimList = ProtoCore.Utils.CoreUtils.BuildArrayExprList(rhsINode.ArrayDimensions);
+			               dim = dimList.list.Count;
+			           }
+			           else
+			           {
+			               dimList = new ProtoCore.AST.AssociativeAST.ExprListNode();
+			           }
+			       }
+			       else if (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode)
+			       {
+			           ProtoCore.AST.AssociativeAST.FunctionCallNode rhsFNode = rnode as ProtoCore.AST.AssociativeAST.FunctionCallNode;
+			           node = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(node, rhsFNode, core);
+			       }
+			   }
+			}
+			
+		}
+		if (!isModifier && withinModifierCheckScope)
+		{
+		   if (isLeftVarIdentList)
+		   {
+		       if (inode is ProtoCore.AST.AssociativeAST.IdentifierListNode)
+		       {
+		           isModifier = false;
+		           if (node is ProtoCore.AST.AssociativeAST.FunctionDotCallNode)
+		           {
+		               ProtoCore.AST.AssociativeAST.FunctionDotCallNode fdotCall = node as ProtoCore.AST.AssociativeAST.FunctionDotCallNode;
+		               string checkVar = ProtoCore.Utils.CoreUtils.GenerateIdentListNameString(fdotCall.GetIdentList());
+		               isModifier = (leftVar == checkVar);
+		           }
+		       }
+		   }
+		   else if (inode is ProtoCore.AST.AssociativeAST.IdentifierNode)
+		   {
+		       isModifier = (leftVar == inode.Name);
+		   }   
+		
+		   // The LHS is an identifier
+		   else
+		   {
+		       // It is a modifier if the lhs is:
+		       //   1. the same as the current node
+		       //   2. the current node starts with the lhs identifier
+		       isModifier = (leftVar == inode.Name);
+		       if (!isModifier)
+		       {
+		           string rhsString = ProtoCore.Utils.CoreUtils.GenerateIdentListNameString(inode);
+		
+		           isModifier = rhsString.StartsWith(leftVar);
+		       }
+		   }
+		}
+		
+	}
 
 	void Associative_LogicalExpression(out ProtoCore.AST.AssociativeAST.AssociativeNode node) {
 		Associative_ComparisonExpression(out node);
@@ -2762,7 +2358,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 		   errors.SemErr(t.line, t.col, String.Format("\"{0}\" is a keyword, identifier expected", t.val));
 		}
 		
-		catchFilterNode.var =  BuildAssocIdentifier(t.val);
+		catchFilterNode.var =  ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val);
 		
 		Expect(48);
 		Expect(1);

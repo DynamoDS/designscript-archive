@@ -504,6 +504,12 @@ namespace ProtoCore.DSASM
             }
         }
 
+        public bool DoesExist(string name)
+        {
+            Validity.Assert(null != name);
+            return ProtoCore.DSASM.Constants.kInvalidIndex != IndexOf(name);
+        }
+
         public string GetTypeName(int UID)
         {
             if (UID == (int)PrimitiveType.kInvalidType ||

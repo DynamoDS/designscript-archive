@@ -233,7 +233,7 @@ namespace ProtoCore.AST.AssociativeAST
                 IsIndexable = false,
                 Name = null
             };
-            Value = identName;
+            Value = Name = identName;
         }
 
         public IdentifierNode(IdentifierNode rhs) : base(rhs)
@@ -517,18 +517,21 @@ namespace ProtoCore.AST.AssociativeAST
         public FunctionCallNode DotCall { get; set; }
         public FunctionCallNode FunctionCall { get; set; }
         public FunctionCallNode NameMangledCall { get; set; }
+        public bool isLastSSAIdentListFactor { get; set; }
         public string lhsName { get; set; }
 
         public FunctionDotCallNode(FunctionCallNode callNode)
         {
             DotCall = new FunctionCallNode();
             FunctionCall = callNode;
+            isLastSSAIdentListFactor = false;
         }
 
         public FunctionDotCallNode(string lhsName, FunctionCallNode callNode)
         {
             this.lhsName = lhsName;
             FunctionCall = callNode;
+            isLastSSAIdentListFactor = false;
         }
 
         public FunctionDotCallNode(FunctionDotCallNode rhs): base(rhs)
@@ -536,6 +539,7 @@ namespace ProtoCore.AST.AssociativeAST
             DotCall = new FunctionCallNode(rhs.DotCall);
             FunctionCall = new FunctionCallNode(rhs.FunctionCall);
             lhsName = rhs.lhsName;
+            isLastSSAIdentListFactor = rhs.isLastSSAIdentListFactor;
         }
 
         public IdentifierListNode GetIdentList()
@@ -1050,6 +1054,7 @@ namespace ProtoCore.AST.AssociativeAST
         public int modBlkUID { get; set; }
         public bool isSSAAssignment { get; set; }
         public bool isSSAPointerAssignment { get; set; }
+        public bool isSSAFirstAssignment { get; set; }
         public bool isMultipleAssign { get; set; }
         public AssociativeNode LeftNode { get; set; }
         public ProtoCore.DSASM.Operator Optr { get; set; }
@@ -1064,6 +1069,7 @@ namespace ProtoCore.AST.AssociativeAST
         {
             isSSAAssignment = false;
             isSSAPointerAssignment = false;
+            isSSAFirstAssignment = false;
             isMultipleAssign = false;
             exprUID = ProtoCore.DSASM.Constants.kInvalidIndex;
             modBlkUID = ProtoCore.DSASM.Constants.kInvalidIndex;
@@ -1076,6 +1082,7 @@ namespace ProtoCore.AST.AssociativeAST
         {
             isSSAAssignment = rhs.isSSAAssignment;
             isSSAPointerAssignment = rhs.isSSAPointerAssignment;
+            isSSAFirstAssignment = rhs.isSSAFirstAssignment;
             isMultipleAssign = rhs.isMultipleAssign;
             exprUID = rhs.exprUID;
             modBlkUID = rhs.modBlkUID;

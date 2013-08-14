@@ -46,7 +46,7 @@ Hydrogen<out Node codeBlockNode>
                             .)
                             (. if (rootImport && core.IsParsingPreloadedAssembly)
         {
-            InsertPredefinedAndBuiltinMethods(codeblock);
+                ProtoCore.Utils.CoreUtils.InsertPredefinedAndBuiltinMethods(core, codeblock, builtinMethodsLoaded);
             core.ImportNodes = codeblock;
         }
 .)
@@ -659,7 +659,7 @@ Associative_vardecl<.out ProtoCore.AST.AssociativeAST.AssociativeNode node, Prot
                                             errors.SemErr(t.line, t.col, String.Format("\"{0}\" is a keyword, identifier expected", t.val));
                                         }
                                         NodeUtils.SetNodeLocation(varDeclNode, t);
-                                        tNode = BuildAssocIdentifier(t.val);
+                                        tNode = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val);
                                         NodeUtils.SetNodeLocation(tNode, t);
                                         varDeclNode.NameNode = tNode;
                                     .)  
@@ -738,7 +738,7 @@ Associative_ArgDecl<out ProtoCore.AST.AssociativeAST.AssociativeNode node, Proto
                                         {
                                             errors.SemErr(t.line, t.col, String.Format("\"{0}\" is a keyword, identifier expected", t.val));
                                         }
-                                        tNode = BuildAssocIdentifier(t.val);
+                                        tNode = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val);
                                         NodeUtils.SetNodeLocation(tNode, t);
                                         varDeclNode.NameNode = tNode;
                                         NodeUtils.CopyNodeLocation(varDeclNode, tNode);
@@ -854,7 +854,7 @@ Associative_FunctionalMethodBodySingleLine<out ProtoCore.AST.AssociativeAST.Asso
                                             ProtoCore.AST.AssociativeAST.CodeBlockNode functionBody = new ProtoCore.AST.AssociativeAST.CodeBlockNode(); 
 
                                             ProtoCore.AST.AssociativeAST.BinaryExpressionNode binaryExpr = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode();
-                                            binaryExpr.LeftNode = BuildAssocIdentifier("return", ProtoCore.PrimitiveType.kTypeReturn);
+                                            binaryExpr.LeftNode = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, "return", ProtoCore.PrimitiveType.kTypeReturn);
                                             ProtoCore.AST.AssociativeAST.AssociativeNode expr;
                                         .)
     Associative_Expression<out expr>
@@ -1477,7 +1477,7 @@ Associative_CatchFilter<out ProtoCore.AST.AssociativeAST.CatchFilterNode catchFi
                                             errors.SemErr(t.line, t.col, String.Format("\"{0}\" is a keyword, identifier expected", t.val));
                                         }
 
-                                        catchFilterNode.var =  BuildAssocIdentifier(t.val);
+                                        catchFilterNode.var =  ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val);
                                     .)  
     ':'
     ident                           (. 
@@ -1827,7 +1827,7 @@ Associative_Ident<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
                     SynErr("Return statement is invalid. Do you mean: return = " + la.val + " ?"); 
                 }
                 
-                var = BuildAssocIdentifier(t.val, (ProtoCore.PrimitiveType)ltype);
+                var = ProtoCore.Utils.CoreUtils.BuildAssocIdentifier(core, t.val, (ProtoCore.PrimitiveType)ltype);
                 NodeUtils.SetNodeLocation(var, t);
             .)
 

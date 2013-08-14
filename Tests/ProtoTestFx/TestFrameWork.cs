@@ -236,6 +236,30 @@ namespace ProtoTestFx.TD
             }
         }
 
+        /// <summary>
+        /// Method to run an AST directly
+        /// </summary>
+        /// <param name="sourceCode">The AST</param>
+        /// <returns></returns>
+        public ExecutionMirror RunASTSource(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList, string errorstring = "", string includePath = "")
+        {
+            var testCore = SetupTestCore();
+            if (!String.IsNullOrEmpty(includePath))
+            {
+                if (System.IO.Directory.Exists(includePath))
+                {
+                    testCore.Options.IncludeDirectories.Add(includePath);
+                }
+                else
+                {
+                    Console.WriteLine(String.Format("Path: {0} does not exist.", includePath));
+                }
+            }
+            testMirror = runner.Execute(astList, testCore);
+            SetErrorMessage(errorstring);
+            return testMirror;
+        }
+
         public ExecutionMirror VerifyRunScriptSource(string sourceCode, string errorstring)
         {
                 Assert.DoesNotThrow(() => testMirror = RunScriptSource(sourceCode, errorstring), errorstring);

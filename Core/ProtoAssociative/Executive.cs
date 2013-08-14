@@ -56,7 +56,7 @@ namespace ProtoAssociative
                     else
                     {
                         //if not null, Compile has been called from DfsTraverse. No parsing is needed. 
-                        if (codeBlockNode == null) 
+                        if (codeBlockNode == null)
                         {
                             System.IO.MemoryStream memstream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(langBlock.body));
                             ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(memstream);
@@ -71,34 +71,15 @@ namespace ProtoAssociative
                             //core.AstNodeList = p.GetParsedASTList(codeBlockNode as ProtoCore.AST.AssociativeAST.CodeBlockNode);
                             List<ProtoCore.AST.Node> astNodes = ProtoCore.Utils.ParserUtils.GetAstNodes(codeBlockNode);
                             core.AstNodeList = astNodes;
-
-                            // TODO: This is a temporary check to filter out function definition and class declaration nodes from CodeBlockNode's 
-                            // in the GraphUI. This should be removed once we start allowing them - pratapa
-                            // Consider moving these checks to CompileExpression()
-                            /*if (core.IsParsingCodeBlockNode)
+                        }
+                        else
+                        {
+                            if (!core.builtInsLoaded)
                             {
-                                if (core.AstNodeList != null)
-                                {
-                                    foreach (ProtoCore.AST.Node node in core.AstNodeList)
-                                    {
-                                        ProtoCore.AST.AssociativeAST.AssociativeNode n = node as ProtoCore.AST.AssociativeAST.AssociativeNode;
-                                        ProtoCore.Utils.Validity.Assert(n != null);
-
-                                        if (n is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode ||
-                                            n is ProtoCore.AST.AssociativeAST.ClassDeclNode)
-                                        {
-                                            core.BuildStatus.LogSemanticError("Class and function definitions are not supported");
-                                            throw new ProtoCore.BuildHaltException("Class and function definitions are not supported");
-                                        }
-                                        else if (n is ProtoCore.AST.AssociativeAST.ImportNode)
-                                        {
-                                            core.BuildStatus.LogSemanticError("Import statements are not supported in CodeBlock Nodes");
-                                            throw new ProtoCore.BuildHaltException(
-                                                "Import statements are not supported in CodeBlock Nodes. To import a file, please use the Library utility");
-                                        }
-                                    }
-                                }
-                            }*/
+                                // Load the built-in methods manually
+                                ProtoCore.Utils.CoreUtils.InsertPredefinedAndBuiltinMethods(core, codeBlockNode, false);
+                                core.builtInsLoaded = true;
+                            }
                         }
 
                         core.assocCodegen.context = callContext;

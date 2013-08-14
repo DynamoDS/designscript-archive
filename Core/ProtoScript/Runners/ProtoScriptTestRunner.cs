@@ -91,6 +91,48 @@ namespace ProtoScript.Runners
             return buildSucceeded;
         }
 
+
+        public bool Compile(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList, ProtoCore.Core core, out int blockId)
+        {
+            bool buildSucceeded = false;
+
+            core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
+
+            blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+            try
+            {
+                //defining the global Assoc block that wraps the entire .ds source file
+                ProtoCore.LanguageCodeBlock globalBlock = new ProtoCore.LanguageCodeBlock();
+                globalBlock.language = ProtoCore.Language.kAssociative;
+                globalBlock.body = string.Empty;
+                //the wrapper block can be given a unique id to identify it as the global scope
+                globalBlock.id = ProtoCore.LanguageCodeBlock.OUTERMOST_BLOCK_ID;
+
+
+                //passing the global Assoc wrapper block to the compiler
+                ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
+                ProtoCore.Language id = globalBlock.language;
+
+                
+		        ProtoCore.AST.AssociativeAST.CodeBlockNode codeblock = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
+                codeblock.Body.AddRange(astList);
+
+                core.Executives[id].Compile(out blockId, null, globalBlock, context, EventSink, codeblock);
+
+                core.BuildStatus.ReportBuildResult();
+
+                int errors = 0;
+                int warnings = 0;
+                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return buildSucceeded;
+        }
+
         public void Execute(ProtoCore.Core core, ProtoCore.Runtime.Context context)
         {
             try
@@ -182,6 +224,35 @@ namespace ProtoScript.Runners
             return null;
         }
 
+        public ExecutionMirror Execute(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList, ProtoCore.Core core, bool isTest = true)
+        {
+            int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+            bool succeeded = Compile(astList, core, out blockId);
+            if (succeeded)
+            {
+                core.GenerateExecutable();
+                core.Rmem.PushGlobFrame(core.GlobOffset);
+                core.RunningBlock = blockId;
+
+                Execute(core, new ProtoCore.Runtime.Context());
+                if (!isTest) 
+                { 
+                    core.Heap.Free(); 
+                }
+            }
+            else
+            {
+                throw new ProtoCore.Exceptions.CompileErrorsOccured();
+            }
+
+            if (isTest && !core.Options.CompileToLib)
+            {
+                return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
+            }
+
+            return null;
+        }
+
         public ExecutionMirror Execute(string code, ProtoCore.Core core, bool isTest = true)
         {
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
@@ -193,9 +264,9 @@ namespace ProtoScript.Runners
                 core.RunningBlock = blockId;
 
                 Execute(core, new ProtoCore.Runtime.Context());
-                if (!isTest) 
-                { 
-                    core.Heap.Free(); 
+                if (!isTest)
+                {
+                    core.Heap.Free();
                 }
             }
             else
