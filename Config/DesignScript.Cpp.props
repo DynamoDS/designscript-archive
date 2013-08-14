@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+	<FINAL_BIN Condition="'$(FINAL_BIN)' == ''">$(SolutionDir)\bin\$(PlatformShortName)\$(Configuration)</FINAL_BIN>
+	<OutDir>$(FINAL_BIN)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <FINAL_BIN Condition="'$(FINAL_BIN)' == ''">$(SolutionDir)\bin\$(Platform)\$(Configuration)</FINAL_BIN>
+	<OutDir>$(FINAL_BIN)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)\bin\$(PlatformShortName)\$(Configuration)</FINAL_BIN>
+	<OutDir>$(FINAL_BIN)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)\bin\$(Platform)\$(Configuration)</FINAL_BIN>
+	<OutDir>$(FINAL_BIN)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ASM)\kern;$(ASM)\fct;$(ASM)\intr;$(ASM)\cstr;$(ASM)\ofst;$(ASM)\covr;$(ASM)\bool;$(ASM)\base;$(ASM)\kern\kernel\spline;$(ASM)\rbi;$(ASM)\datax;$(ASM)\import;$(ASM)\npch;$(ASM)\blnd;$(ASM)\swp;$(ASM)\skin;$(ASM)\eulr;$(ASM)\rem;$(ASM)\lop;$(ASM)\shl;$(ACIS_BITS)\util_lib;$(ASM)\ahl;$(ASM)\ihl;$(ASM)\law;$(ASM)\twk;$(ASM)\ga;$(ASM)\topt;$(ASM)\sbap;$(ASM)\heal;$(ASM);$(ASM)\rbase;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ACIS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition=" '$(NO_SOLID_OPS)' == 'YES'">NO_SOLID_OPS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition=" '$(NO_REGION_OPS)' == 'YES'">NO_REGION_OPS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>$(ASMLibCommon);$(ASMLibRegionOps);$(ASMLibSolidOps);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ASM)\lib\nt_dll100-64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>
