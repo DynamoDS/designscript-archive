@@ -1,0 +1,19 @@
+﻿<Window x:Class="DesignScriptStudio.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DesignScriptStudio.App"
+        xmlns:shell="http://schemas.microsoft.com/winfx/2006/xaml/presentation/shell"
+        WindowStyle="SingleBorderWindow" ResizeMode="CanResize" Background="Transparent"
+        Title="DesignScript Studio" Width="800" Height="600" MinWidth="600" MinHeight="500">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="35"
+                            GlassFrameThickness="0,0,0,1"
+                            CornerRadius="0"
+                            ResizeBorderThickness="5" />
+    </shell:WindowChrome.WindowChrome>
+    <Grid x:Name="WindowGrid">
+        <Canvas Name="canvas" Background="White" Focusable="True"></Canvas>
+        <Grid Name="grid"></Grid>
+    </Grid>
+
+</Window>
