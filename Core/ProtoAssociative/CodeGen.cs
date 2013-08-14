@@ -88,6 +88,7 @@ namespace ProtoAssociative
 
         // This variable is used to keep track of the expression ID being traversed by the code generator
         private int currentExpressionID = ProtoCore.DSASM.Constants.kInvalidIndex;
+
         
         // This constructor is only called for Preloading of assemblies and 
         // precompilation of CodeBlockNode nodes in GraphUI for global language blocks - pratapa
@@ -2184,31 +2185,6 @@ namespace ProtoAssociative
 
         private BinaryExpressionNode BuildSSAIdentListAssignmentNode(IdentifierListNode identList)
         {
-            // Convert the identlist into a function call
-            AssociativeNode functionCallNode = null;
-            AssociativeNode rnode = identList.RightNode;
-            if (identList.RightNode is ProtoCore.AST.AssociativeAST.IdentifierNode)
-            {
-                ProtoCore.AST.AssociativeAST.FunctionCallNode rcall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
-                rcall.Function = rnode;
-                //rcall.Function.Name = ProtoCore.DSASM.Constants.kGetterPrefix + rcall.Function.Name;
-                rcall.Function.Name = rcall.Function.Name;
-                rnode = rcall;
-
-                NodeUtils.SetNodeLocation(rcall, rnode, rnode);
-                functionCallNode = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, rcall, core);
-            }
-            else if (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode)
-            {
-                ProtoCore.AST.AssociativeAST.FunctionCallNode rhsFNode = rnode as ProtoCore.AST.AssociativeAST.FunctionCallNode;
-                functionCallNode = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, rhsFNode, core);
-            }
-            else
-            {
-                Validity.Assert(false);
-            }
-
-
             // Build the final binary expression 
             BinaryExpressionNode bnode = new BinaryExpressionNode();
             bnode.Optr = ProtoCore.DSASM.Operator.assign;
@@ -2325,51 +2301,60 @@ namespace ProtoAssociative
             {
                 IdentifierListNode identList = node as IdentifierListNode;
 
-                bool rhsOfDotIsFunctionCall = !(identList.LeftNode is IdentifierListNode) && (identList.RightNode is FunctionCallNode);
-                if (rhsOfDotIsFunctionCall)
+                // Recursively traversse the left of the ident list
+                SSAIdentList(identList.LeftNode, ref ssaStack, ref astlist);
+
+                // Build the rhs identifier list containing the temp pointer
+                IdentifierListNode rhsIdentList = new IdentifierListNode();
+                rhsIdentList.Optr = Operator.dot;
+
+                AssociativeNode lhsNode = ssaStack.Pop();
+                if (lhsNode is BinaryExpressionNode)
                 {
-                    BinaryExpressionNode bnode = BuildSSAIdentListAssignmentNode(identList);
-                    astlist.Add(bnode);
-                    ssaStack.Push(bnode.LeftNode);
-                } 
+                    rhsIdentList.LeftNode = (lhsNode as BinaryExpressionNode).LeftNode;
+                }
                 else
                 {
-                    // Recursively traversse the left of the ident list
-                    SSAIdentList(identList.LeftNode, ref ssaStack, ref astlist);
+                    rhsIdentList.LeftNode = lhsNode;
+                }
 
-                    // Build the rhs identifier list containing the temp pointer
-                    IdentifierListNode rhsIdentList = new IdentifierListNode();
-                    rhsIdentList.Optr = Operator.dot;
+                ArrayNode arrayDimension = null;
 
-                    AssociativeNode lhsNode = ssaStack.Pop();
-                    if (lhsNode is BinaryExpressionNode)
-                    {
-                        rhsIdentList.LeftNode = (lhsNode as BinaryExpressionNode).LeftNode;
-                    }
-                    else
-                    {
-                        rhsIdentList.LeftNode = lhsNode;
-                    }
+                AssociativeNode rnode = null;
+                if (identList.RightNode is IdentifierNode)
+                {
+                    IdentifierNode identNode = identList.RightNode as IdentifierNode;
+                    arrayDimension = identNode.ArrayDimensions;
+                    rnode = identNode;
+                }
+                else if (identList.RightNode is FunctionCallNode)
+                {
+                    FunctionCallNode fCallNode = identList.RightNode as FunctionCallNode;
+                    arrayDimension = fCallNode.ArrayDimensions;
+                    rnode = fCallNode;
+                }
+                else
+                {
+                    Validity.Assert(false);
+                }
 
+                Validity.Assert(null != rnode);
+                rhsIdentList.RightNode = rnode;
 
-                    IdentifierNode rnode = identList.RightNode as IdentifierNode;
-                    rhsIdentList.RightNode = rnode;
-
-
-                    if (null == rnode.ArrayDimensions)
-                    {
-                        // New SSA expr for the current dot call
-                        string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
-                        var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
-                        BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
-                        bnode.isSSAPointerAssignment = true;
-                        astlist.Add(bnode);
-                        ssaStack.Push(tmpIdent);
-                    }
-                    else
-                    {
-                        EmitSSAArrayIndex(rhsIdentList, ssaStack, ref astlist, true);
-                    }
+                if (null == arrayDimension)
+                {
+                    // New SSA expr for the current dot call
+                    string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+                    var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
+                    BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
+                    bnode.isSSAPointerAssignment = true;
+                    astlist.Add(bnode);
+                    //ssaStack.Push(tmpIdent);
+                    ssaStack.Push(bnode);
+                }
+                else
+                {
+                    EmitSSAArrayIndex(rhsIdentList, ssaStack, ref astlist, true);
                 }
             }
         }
@@ -2407,14 +2392,14 @@ namespace ProtoAssociative
             bnode.LeftNode = tmpName;
             bnode.isSSAAssignment = true;
             bnode.isSSAPointerAssignment = isSSAPointerAssignment;
+            bnode.isSSAFirstAssignment = true;
 
             IdentifierNode identNode = null;
             if (node is IdentifierNode)
             {
-                // Apply the array indexing directly to this identifier
                 identNode = node as IdentifierNode;
 
-                // Right node
+                // Right node - Array indexing will be applied to this new identifier
                 bnode.RightNode = nodeBuilder.BuildIdentfier(identNode.Name);
             }
             else if (node is IdentifierListNode)
@@ -2728,7 +2713,72 @@ namespace ProtoAssociative
                         AssociativeNode arg = fcNode.FormalArguments[idx];
                         DFSEmitSSA_AST(arg, ssaStack, ref astlist);
                         AssociativeNode argNode = ssaStack.Pop();
-                        fcNode.FormalArguments[idx] = argNode is BinaryExpressionNode ? (argNode as BinaryExpressionNode).LeftNode : argNode;
+
+                        if (argNode is BinaryExpressionNode)
+                        {
+                            BinaryExpressionNode argBinaryExpr = argNode as BinaryExpressionNode;
+                            if (argBinaryExpr.RightNode is IdentifierNode)
+                            {
+                                Validity.Assert(argBinaryExpr.LeftNode is IdentifierNode);
+                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = (argBinaryExpr.RightNode as IdentifierNode).ReplicationGuides;
+                            }
+                            else if (argBinaryExpr.RightNode is IdentifierListNode)
+                            {
+                                IdentifierListNode identList = argBinaryExpr.RightNode as IdentifierListNode;
+                                List<AssociativeNode> replicationGuides = null;
+
+                                // Get the replication guide and append it to the last identifier
+                                if (identList.RightNode is IdentifierNode)
+                                {
+                                    replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
+                                }
+                                else if (identList.RightNode is FunctionCallNode)
+                                {
+                                    replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
+                                }
+                                else
+                                {
+                                    Validity.Assert(false);
+                                }
+                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = replicationGuides;
+                            }
+
+                            fcNode.FormalArguments[idx] = argBinaryExpr.LeftNode;
+                        }
+                        else
+                        {
+                            fcNode.FormalArguments[idx] = argNode;
+                        }
+
+                        /*
+                        List<AssociativeNode> replicationGuides = null;
+
+                        // Get the replication guide and append it to the last identifier
+                        if (identList.RightNode is IdentifierNode)
+                        {
+                            replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
+                        }
+                        else if (identList.RightNode is FunctionCallNode)
+                        {
+                            replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
+                        }
+                        else
+                        {
+                            Validity.Assert(false);
+                        }
+
+                        // Set the replicationguide to the last index
+                        Validity.Assert(astlist[lastIndex] is BinaryExpressionNode);
+                        BinaryExpressionNode lastBinaryAssignment = astlist[lastIndex] as BinaryExpressionNode;
+                        if (lastBinaryAssignment.RightNode is IdentifierNode)
+                        {
+                            (lastBinaryAssignment.RightNode as IdentifierNode).ReplicationGuides = replicationGuides;
+                        }
+                        else if (lastBinaryAssignment.RightNode is FunctionCallNode)
+                        {
+                            (lastBinaryAssignment.RightNode as FunctionCallNode).ReplicationGuides = replicationGuides;
+                        }
+                        */
                     }
                 }
 
@@ -2752,6 +2802,7 @@ namespace ProtoAssociative
                 AssociativeNode lastNode = null;
                 Validity.Assert(astlist.Count > 0);
 
+
                 // Get the last identifierlist node and set its flag
                 // This is required to reset the pointerlist for every identifierlist traversed
                 // i.e. 
@@ -2761,7 +2812,8 @@ namespace ProtoAssociative
                 //      b = p.x + g.y    
                 //      reset the flag after traversing p.x and p.y
                 //
-                for (int n = astlist.Count - 1; n >= 0 ; --n)
+                int lastIndex = astlist.Count - 1;
+                for (int n = lastIndex; n >= 0 ; --n)
                 {
                     lastNode = astlist[n];
                     Validity.Assert(lastNode is BinaryExpressionNode);
@@ -2770,10 +2822,66 @@ namespace ProtoAssociative
                     Validity.Assert(bnode.Optr == Operator.assign);
                     if (bnode.RightNode is IdentifierListNode)
                     {
-                        (bnode.RightNode as IdentifierListNode).isLastSSAIdentListFactor = true;
+                        IdentifierListNode identList = bnode.RightNode as IdentifierListNode;
+                        identList.isLastSSAIdentListFactor = true;
                         break;
                     }
                 }
+                
+                //
+                // Backtrack and convert all identlist nodes to dot calls
+                // This can potentially be optimized by performing the dotcall transform in SSAIdentList
+                //
+
+                ///////////////////////////
+
+                int x = 0;
+
+                for (int n = lastIndex; n >= 0; --n)
+                {
+                    lastNode = astlist[n];
+
+                    BinaryExpressionNode bnode = lastNode as BinaryExpressionNode;
+                    Validity.Assert(bnode.Optr == Operator.assign);
+
+                    if (bnode.RightNode is IdentifierListNode)
+                    {
+                        IdentifierListNode identList = bnode.RightNode as IdentifierListNode;
+                        if (identList.RightNode is IdentifierNode)
+                        {
+                            IdentifierNode identNode = identList.RightNode as IdentifierNode;
+
+                            ProtoCore.AST.AssociativeAST.FunctionCallNode rcall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+                            rcall.Function = new IdentifierNode(identNode);
+                            rcall.Function.Name = ProtoCore.DSASM.Constants.kGetterPrefix + rcall.Function.Name;
+
+                            FunctionDotCallNode dotCall = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, rcall, core);
+                            dotCall.isLastSSAIdentListFactor = identList.isLastSSAIdentListFactor;
+                            bnode.RightNode = dotCall;
+
+                        }
+                        else if (identList.RightNode is FunctionCallNode)
+                        {
+                            FunctionCallNode fCallNode = identList.RightNode as FunctionCallNode;
+
+                            FunctionDotCallNode dotCall = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, fCallNode, core);
+                            dotCall.isLastSSAIdentListFactor = identList.isLastSSAIdentListFactor;
+                            bnode.RightNode = dotCall;
+                        }
+                        else
+                        {
+                            Validity.Assert(false);
+                        }
+                    }
+
+                    if (bnode.isSSAFirstAssignment)
+                    {
+                        break;
+                    }
+                }
+
+
+                ///////////////////////////
             }
             else if (node is ExprListNode)
             {
@@ -3640,6 +3748,23 @@ namespace ProtoAssociative
             return isReplicationGuideEmitted;
         }
 
+        /*
+         proc EmitIdentNode(identnode, graphnode)
+	        if ssa
+		        // Check an if this identifier is array indexed
+		        // The array index is a secondary property and is not the original array property of the AST. this is required because this array index is meant only to resolve graphnode dependency with arrays
+		        if node.arrayindex.secondary is valid
+			        dimension = traverse(node.arrayindex.secondary)
+
+			        // Create a new dependent with the array indexing
+			        dependent = new GraphNode(identnode.name, dimension)
+			        graphnode.pushdependent(dependent)
+		        end
+	        end
+        end
+
+         */
+
         private void EmitIdentifierNode(AssociativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone, BinaryExpressionNode parentNode = null)
         {
             IdentifierNode t = node as IdentifierNode;
@@ -3892,6 +4017,16 @@ namespace ProtoAssociative
                         {
                             var curDep = graphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
                             curDep.dimensionNodeList.Add(updateNode);
+
+                            if (core.Options.FullSSA)
+                            {
+                                if (null != firstSSAGraphNode)
+                                {
+                                    curDepIndex = firstSSAGraphNode.dependentList.Count - 1;
+                                    ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
+                                    firstSSAUpdateNode.dimensionNodeList.Add(updateNode);
+                                }
+                            }
                         }
                     }
                 }
@@ -5688,6 +5823,39 @@ namespace ProtoAssociative
             bool arrayIndexing = IsAssociativeArrayIndexing;
             IsAssociativeArrayIndexing = false;
 
+
+            // Handle static calls to reflect the original call
+            if (core.Options.FullSSA)
+            {
+                BuildRealDependencyForIdentList(graphNode);
+
+                if (node is FunctionDotCallNode)
+                {
+                    if ((node as FunctionDotCallNode).isLastSSAIdentListFactor)
+                    {
+                        Validity.Assert(null != ssaPointerList);
+                        ssaPointerList.Clear();
+                    }
+                }
+
+                if (resolveStatic)
+                {
+                    if (node is FunctionDotCallNode)
+                    {
+                        FunctionDotCallNode dotcall = node as FunctionDotCallNode;
+                        Validity.Assert(null != dotcall.DotCall);
+
+                        Validity.Assert(!string.IsNullOrEmpty(staticClass));
+                        dotcall.DotCall.FormalArguments[0] = nodeBuilder.BuildIdentfier(staticClass);
+
+                        staticClass = null;
+                        resolveStatic = false;
+
+                        ssaPointerList.Clear();
+                    }
+                }
+            }
+
             ProtoCore.DSASM.ProcedureNode procNode = TraverseFunctionCall(node, null, ProtoCore.DSASM.Constants.kInvalidIndex, 0, ref inferedType, graphNode, subPass, parentNode);
             emitReplicationGuide = emitReplicationGuideFlag;
             if (graphNode != null)
@@ -6737,7 +6905,6 @@ namespace ProtoAssociative
                             {
                                 if (gNode.procIndex == firstProc.procId && !gNode.updateNodeRefList[0].nodeList[0].symbol.name.ToCharArray()[0].Equals('%'))
                                 {
-
                                     foreach (ProtoCore.AssociativeGraph.GraphNode dNode in gNode.dependentList)
                                     {
                                         if (dNode.procIndex == ProtoCore.DSASM.Constants.kGlobalScope)
@@ -6745,7 +6912,6 @@ namespace ProtoAssociative
                                             if (!dNode.updateNodeRefList[0].nodeList[0].symbol.name.ToCharArray()[0].Equals('%'))
                                             {
                                                 graphNode.PushDependent(dNode);
-
                                             }
                                         }
                                     }
@@ -6769,17 +6935,38 @@ namespace ProtoAssociative
                     }
                     else if (ProtoCore.DSASM.Constants.kInvalidIndex != index && ProtoCore.DSASM.Constants.kGlobalScope != firstProc.classScope)
                     {
-                        // Do this only if first proc is a member function...
-                        ProtoCore.AssociativeGraph.UpdateNodeRef autogenRef = new ProtoCore.AssociativeGraph.UpdateNodeRef(graphNode.dependentList[0].updateNodeRefList[0]);
-                        autogenRef = autogenRef.GetUntilFirstProc();
-
-                        // ... and the first symbol is an instance of a user-defined type
-                        int last = autogenRef.nodeList.Count - 1;
-                        Validity.Assert(autogenRef.nodeList[last].nodeType != ProtoCore.AssociativeGraph.UpdateNodeType.kMethod && null != autogenRef.nodeList[last].symbol);
-                        if (autogenRef.nodeList[last].symbol.datatype.UID >= (int)PrimitiveType.kMaxPrimitives)
+                        if (core.Options.FullSSA)
                         {
-                            autogenRef.PushUpdateNodeRef(updateRef);
-                            graphNode.updateNodeRefList.Add(autogenRef);
+                            foreach (ProtoCore.AssociativeGraph.GraphNode dependent in graphNode.dependentList)
+                            {
+                                // Do this only if first proc is a member function...
+                                ProtoCore.AssociativeGraph.UpdateNodeRef autogenRef = new ProtoCore.AssociativeGraph.UpdateNodeRef(dependent.updateNodeRefList[0]);
+                                autogenRef = autogenRef.GetUntilFirstProc();
+
+                                // ... and the first symbol is an instance of a user-defined type
+                                int last = autogenRef.nodeList.Count - 1;
+                                Validity.Assert(autogenRef.nodeList[last].nodeType != ProtoCore.AssociativeGraph.UpdateNodeType.kMethod && null != autogenRef.nodeList[last].symbol);
+                                if (autogenRef.nodeList[last].symbol.datatype.UID >= (int)PrimitiveType.kMaxPrimitives)
+                                {
+                                    autogenRef.PushUpdateNodeRef(updateRef);
+                                    graphNode.updateNodeRefList.Add(autogenRef);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Do this only if first proc is a member function...
+                            ProtoCore.AssociativeGraph.UpdateNodeRef autogenRef = new ProtoCore.AssociativeGraph.UpdateNodeRef(graphNode.dependentList[0].updateNodeRefList[0]);
+                            autogenRef = autogenRef.GetUntilFirstProc();
+
+                            // ... and the first symbol is an instance of a user-defined type
+                            int last = autogenRef.nodeList.Count - 1;
+                            Validity.Assert(autogenRef.nodeList[last].nodeType != ProtoCore.AssociativeGraph.UpdateNodeType.kMethod && null != autogenRef.nodeList[last].symbol);
+                            if (autogenRef.nodeList[last].symbol.datatype.UID >= (int)PrimitiveType.kMaxPrimitives)
+                            {
+                                autogenRef.PushUpdateNodeRef(updateRef);
+                                graphNode.updateNodeRefList.Add(autogenRef);
+                            }
                         }
                     }
                 }
@@ -6803,23 +6990,6 @@ namespace ProtoAssociative
                         ++n;
                     }
                 }
-
-                //// TODO Jun: Integrate this with the modified argument checks above
-                //// Comment Jun: handle modified arrays
-                //if (graphNode.updatedArguments.Count > 0)
-                //{
-                //    // For every modfied array argument in the procedure
-                //    // Append its dimension list to the argument that was passed in 
-                //    int n = 0;
-                //    foreach (KeyValuePair<string, List<ProtoCore.AssociativeGraph.UpdateNode>> argNameModifiedStatementsPair in firstProc.updatedArgumentArrays)
-                //    {
-                //        graphNode.updatedArguments[n].nodeList[0].dimensionNodeList = argNameModifiedStatementsPair.Value;
-                //        ProtoCore.AssociativeGraph.UpdateNodeRef argNodeRef = new ProtoCore.AssociativeGraph.UpdateNodeRef();
-                //        argNodeRef.PushUpdateNodeRef(graphNode.updatedArguments[n]);
-                //        graphNode.updateNodeRefList.Add(argNodeRef);
-                //        ++n;
-                //    }
-                //}
             }
         }
 
@@ -7162,6 +7332,7 @@ namespace ProtoAssociative
             return false;
         }
 
+
         private void EmitBinaryExpressionNode(AssociativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone, bool isTempExpression = false)
         {
             BinaryExpressionNode bnode = null;
@@ -7272,6 +7443,11 @@ namespace ProtoAssociative
 
                     if (core.Options.FullSSA)
                     {
+                        if (bnode.isSSAFirstAssignment)
+                        {
+                            firstSSAGraphNode = graphNode;
+                        }
+
                         // All associative code is SSA'd and we want to keep track of the original identifier nodes of an identifier list:
                         //      i.e. x.y.z
                         // These identifiers will be used to populate the real graph nodes dependencies
@@ -7279,26 +7455,80 @@ namespace ProtoAssociative
                         {
                             Validity.Assert(null != ssaPointerList);
 
-                            // Determine if the ssa pointerlist needs to be reset for the next SSA expression
-                            //if (currentExpressionID != bnode.exprUID)
-                            //{
-                            //    ssaPointerList.Clear();
-                            //}
-                            //currentExpressionID = bnode.exprUID;
-
                             if (bnode.RightNode is IdentifierNode)
                             {
                                 ssaPointerList.Add(bnode.RightNode);
                             }
                             else if (bnode.RightNode is IdentifierListNode)
                             {
+                                //Validity.Assert(false);
                                 ssaPointerList.Add((bnode.RightNode as IdentifierListNode).RightNode);
+                            }
+                            else if (bnode.RightNode is FunctionDotCallNode)
+                            {
+                                FunctionDotCallNode dotcall = bnode.RightNode as FunctionDotCallNode;
+                                Validity.Assert(dotcall.FunctionCall.Function is IdentifierNode);
+
+                                if (ProtoCore.Utils.CoreUtils.IsGetterSetter(dotcall.FunctionCall.Function.Name))
+                                {
+                                    // This function is an internal getter or setter, store the identifier node
+                                    ssaPointerList.Add(dotcall.FunctionCall.Function);
+                                }
+                                else
+                                {
+                                    // This function is a member function, store the functioncall node
+                                    ssaPointerList.Add(dotcall.FunctionCall);
+                                }
                             }
                             else
                             {
                                 Validity.Assert(false);
                             }
                         }
+
+                        /*
+                           The following functions on codegen will perform the static call backtracking:
+
+                           string staticClass = null
+                           bool resolveStatic = false
+
+                           proc EmitBinaryExpr(node)
+                               if node.right is identifier
+                                   if node.right is a class
+                                       staticClass = node.right.name
+                                       resolveStatic = true
+                                   end
+                               end	
+                           end
+
+                           proc EmitIdentifierList(node, graphnode)
+                               if resolveStatic
+                                   node.left = new IdentifierNode(staticClass)	
+                               end	
+                           end
+                        */
+                        if (bnode.RightNode is IdentifierNode)
+                        {
+                            string identName = (bnode.RightNode as IdentifierNode).Name;
+                            if (core.ClassTable.DoesExist(identName))
+                            {
+                                ssaPointerList.Clear();
+                                staticClass = identName;
+                                resolveStatic = true;
+                                return;
+                            }
+                        }
+
+                        //if (bnode.RightNode is FunctionDotCallNode)
+                        //{
+                        //    string identName = (bnode.RightNode as FunctionDotCallNode).FunctionCall.Function.Name;
+                        //    if (core.ClassTable.DoesExist(identName))
+                        //    {
+                        //        ssaPointerList.Clear();
+                        //        staticClass = identName;
+                        //        resolveStatic = true;
+                        //    }
+                        //}
                     }
                     
 

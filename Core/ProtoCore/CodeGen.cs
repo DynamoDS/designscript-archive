@@ -92,6 +92,13 @@ namespace ProtoCore
         // Contains the list of Nodes in an identifier list
         protected List<ProtoCore.AST.AssociativeAST.AssociativeNode> ssaPointerList;
 
+        // The first graphnode of the SSA'd identifier
+        protected ProtoCore.AssociativeGraph.GraphNode firstSSAGraphNode = null;
+
+        // These variables hold data when backtracking static SSA'd calls
+        protected string staticClass = null;
+        protected bool resolveStatic = false;
+
         public CodeGen(Core coreObj, ProtoCore.DSASM.CodeBlock parentBlock = null)
         {
             Debug.Assert(coreObj != null);
@@ -2206,6 +2213,16 @@ namespace ProtoCore
                         {
                             ProtoCore.AssociativeGraph.UpdateNode currentDependentNode = graphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
                             currentDependentNode.dimensionNodeList.Add(intNode);
+
+                            if (core.Options.FullSSA)
+                            {
+                                if (null != firstSSAGraphNode)
+                                {
+                                    lastDependentIndex = firstSSAGraphNode.dependentList.Count - 1;
+                                    ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
+                                    firstSSAUpdateNode.dimensionNodeList.Add(intNode);
+                                }
+                            }
                         }
                     }
                 }
@@ -2335,6 +2352,16 @@ namespace ProtoCore
                         int lastDependentIndex = graphNode.dependentList.Count - 1;
                         ProtoCore.AssociativeGraph.UpdateNode currentDependentNode = graphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
                         currentDependentNode.dimensionNodeList.Add(intNode);
+
+                        if (core.Options.FullSSA)
+                        {
+                            if (null != firstSSAGraphNode)
+                            {
+                                lastDependentIndex = firstSSAGraphNode.dependentList.Count - 1;
+                                ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
+                                firstSSAUpdateNode.dimensionNodeList.Add(intNode);
+                            }
+                        }
                     }
                 }
             }
@@ -2637,7 +2664,7 @@ namespace ProtoCore
 	            BuildSSADependency(identListNode, graphnode) 
 
                 // Build the dependency based on the non-SSA code
-	            BuildRealDependency(identListNode, graphnode)
+	            BuildRealDependencyForIdentList(identListNode, graphnode)
             end
 
             proc BuildSSADependency(identListNode, graphnode)
@@ -2645,7 +2672,7 @@ namespace ProtoCore
             end
 
 
-            proc BuildRealDependency(identListNode, graphnode)
+            proc BuildRealDependencyForIdentList(identListNode, graphnode)
 	            dependent = new graphnode
 	            dependent.Push(ssaPtrList.GetAll())
                 dependent.Push(identListNode.rhs)
@@ -2702,7 +2729,7 @@ namespace ProtoCore
             return identList;
         }
 
-        private void BuildRealDependency(AssociativeGraph.GraphNode graphNode)
+        protected void BuildRealDependencyForIdentList(AssociativeGraph.GraphNode graphNode)
         {
 	        AssociativeGraph.GraphNode dependent = new AssociativeGraph.GraphNode();
 
@@ -2725,7 +2752,6 @@ namespace ProtoCore
                 }
             }
         }
-
 
         protected void EmitIdentifierListNode(Node node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone, ProtoCore.AST.Node bnode = null)
         {
@@ -2759,11 +2785,24 @@ namespace ProtoCore
             bool isFirstIdent = true;
 
 
+            // Handle static calls to reflect the original call
+            if (resolveStatic)
+            {
+                ProtoCore.AST.AssociativeAST.IdentifierListNode identList = node as ProtoCore.AST.AssociativeAST.IdentifierListNode;
+                Validity.Assert(identList.LeftNode is ProtoCore.AST.AssociativeAST.IdentifierNode);
+                Validity.Assert(!string.IsNullOrEmpty(staticClass));
+                identList.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode(staticClass);
+
+                staticClass = null;
+                resolveStatic = false;
+
+                ssaPointerList.Clear();
+            }
 
             BuildSSADependency(node, graphNode);
             if (core.Options.FullSSA)
             {
-                BuildRealDependency(graphNode);
+                BuildRealDependencyForIdentList(graphNode);
 
                 if (node is ProtoCore.AST.AssociativeAST.IdentifierListNode)
                 {
