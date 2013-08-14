@@ -5,31 +5,24 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-	<FINAL_BIN Condition="'$(FINAL_BIN)' == ''">$(SolutionDir)\bin\$(PlatformShortName)\$(Configuration)</FINAL_BIN>
+	<FINAL_BIN Condition="'$(FINAL_BIN)' == ''">$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)</FINAL_BIN>
 	<OutDir>$(FINAL_BIN)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <FINAL_BIN Condition="'$(FINAL_BIN)' == ''">$(SolutionDir)\bin\$(Platform)\$(Configuration)</FINAL_BIN>
+    <FINAL_BIN Condition="'$(FINAL_BIN)' == ''">$(SolutionDir)bin\$(Platform)\$(Configuration)</FINAL_BIN>
 	<OutDir>$(FINAL_BIN)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)\bin\$(PlatformShortName)\$(Configuration)</FINAL_BIN>
+    <FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)bin\$(PlatformShortName)\$(Configuration)</FINAL_BIN>
 	<OutDir>$(FINAL_BIN)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)\bin\$(Platform)\$(Configuration)</FINAL_BIN>
+    <FINAL_BIN Condition=" '$(FINAL_BIN)' == '' ">$(SolutionDir)bin\$(Platform)\$(Configuration)</FINAL_BIN>
 	<OutDir>$(FINAL_BIN)</OutDir>
   </PropertyGroup>
   <PropertyGroup>
   </PropertyGroup>
-  <ItemDefinitionGroup>
-    <ClCompile>
-      <PreprocessorDefinitions>ACIS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition=" '$(NO_SOLID_OPS)' == 'YES'">NO_SOLID_OPS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition=" '$(NO_REGION_OPS)' == 'YES'">NO_REGION_OPS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-  </ItemDefinitionGroup>
-</Project>
+ </Project>
