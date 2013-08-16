@@ -255,5 +255,49 @@ y = a[1];
             thisTest.Verify("x", new object[] { 2, 3 });
             thisTest.Verify("y", new object[] { 3, 4 });
         }
+
+
+        [Test]
+        public void TestReplicationGuideOnProperty01()
+        {
+
+            String code =
+@"
+class A
+{
+    x : var[];
+    constructor A()
+    {
+        x = {1,2};
+    }
+}
+a = A.A();
+b = A.A();
+c = a.x<1> + b.x<2>;
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            thisTest.Verify("c", new Object[] { new object[] { 2, 3 }, new object[] { 3, 4 } });
+        }
+
+        [Test]
+        public void TestReplicationGuideOnProperty02()
+        {
+
+            String code =
+@"
+class C
+{
+    def f(a : int)
+    {
+        return = 10;
+    }
+}
+p = {C.C(), C.C()};
+x = p<1>.f({1,2}<2>);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new Object[] { new object[] { 10, 10 }, new object[] { 10, 10 } });
+        }
     }
 }

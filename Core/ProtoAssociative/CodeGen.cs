@@ -2283,6 +2283,7 @@ namespace ProtoAssociative
 
                     // Left node
                     var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    (identNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(ident);
                     bnode.LeftNode = identNode;
 
                     // Right node
@@ -2487,6 +2488,49 @@ namespace ProtoAssociative
                 DFSEmitSSA_AST(identNode.ArrayDimensions.Type, ssaStack, ref astlist);
             }
 #endregion
+        }
+
+        /// <summary>
+        /// This helper function extracts the replication guide data from the AST node
+        /// Merge this function with GetReplicationGuides
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        private List<AssociativeNode> GetReplicationGuidesFromASTNode(AssociativeNode node)
+        {
+            List<AssociativeNode> replicationGuides = null;
+            if (node is IdentifierNode)
+            {
+                replicationGuides = (node as IdentifierNode).ReplicationGuides;
+            }
+            else if (node is IdentifierListNode)
+            {
+                IdentifierListNode identList = node as IdentifierListNode;
+
+                // Get the replication guide and append it to the last identifier
+                if (identList.RightNode is IdentifierNode)
+                {
+                    replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
+                }
+                else if (identList.RightNode is FunctionCallNode)
+                {
+                    replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
+                }
+                else
+                {
+                    Validity.Assert(false);
+                }
+            }
+            else if (node is FunctionDotCallNode)
+            {
+                FunctionDotCallNode dotCall = node as FunctionDotCallNode;
+
+                // Get the replication guide from the dotcall
+                IdentifierNode functionCallIdent = dotCall.FunctionCall.Function as IdentifierNode;
+                Validity.Assert(null != functionCallIdent);
+                replicationGuides = functionCallIdent.ReplicationGuides;
+            }
+            return replicationGuides;
         }
 
 
@@ -2717,68 +2761,14 @@ namespace ProtoAssociative
                         if (argNode is BinaryExpressionNode)
                         {
                             BinaryExpressionNode argBinaryExpr = argNode as BinaryExpressionNode;
-                            if (argBinaryExpr.RightNode is IdentifierNode)
-                            {
-                                Validity.Assert(argBinaryExpr.LeftNode is IdentifierNode);
-                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = (argBinaryExpr.RightNode as IdentifierNode).ReplicationGuides;
-                            }
-                            else if (argBinaryExpr.RightNode is IdentifierListNode)
-                            {
-                                IdentifierListNode identList = argBinaryExpr.RightNode as IdentifierListNode;
-                                List<AssociativeNode> replicationGuides = null;
-
-                                // Get the replication guide and append it to the last identifier
-                                if (identList.RightNode is IdentifierNode)
-                                {
-                                    replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
-                                }
-                                else if (identList.RightNode is FunctionCallNode)
-                                {
-                                    replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
-                                }
-                                else
-                                {
-                                    Validity.Assert(false);
-                                }
-                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = replicationGuides;
-                            }
-
+                            (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(argBinaryExpr.RightNode);
+                            
                             fcNode.FormalArguments[idx] = argBinaryExpr.LeftNode;
                         }
                         else
                         {
                             fcNode.FormalArguments[idx] = argNode;
                         }
-
-                        /*
-                        List<AssociativeNode> replicationGuides = null;
-
-                        // Get the replication guide and append it to the last identifier
-                        if (identList.RightNode is IdentifierNode)
-                        {
-                            replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
-                        }
-                        else if (identList.RightNode is FunctionCallNode)
-                        {
-                            replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
-                        }
-                        else
-                        {
-                            Validity.Assert(false);
-                        }
-
-                        // Set the replicationguide to the last index
-                        Validity.Assert(astlist[lastIndex] is BinaryExpressionNode);
-                        BinaryExpressionNode lastBinaryAssignment = astlist[lastIndex] as BinaryExpressionNode;
-                        if (lastBinaryAssignment.RightNode is IdentifierNode)
-                        {
-                            (lastBinaryAssignment.RightNode as IdentifierNode).ReplicationGuides = replicationGuides;
-                        }
-                        else if (lastBinaryAssignment.RightNode is FunctionCallNode)
-                        {
-                            (lastBinaryAssignment.RightNode as FunctionCallNode).ReplicationGuides = replicationGuides;
-                        }
-                        */
                     }
                 }
 
