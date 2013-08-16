@@ -2530,6 +2530,13 @@ namespace ProtoAssociative
                 Validity.Assert(null != functionCallIdent);
                 replicationGuides = functionCallIdent.ReplicationGuides;
             }
+            else if (node is FunctionCallNode)
+            {
+                FunctionCallNode functionCall = node as FunctionCallNode;
+
+                // Get the replication guide from the dotcall
+                replicationGuides = functionCall.ReplicationGuides;
+            }
             return replicationGuides;
         }
 
@@ -2778,6 +2785,9 @@ namespace ProtoAssociative
                 // Left node
                 var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
                 bnode.LeftNode = identNode;
+
+                // Store the replication guide from the function call to the temp
+                (identNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(node);
 
                 //Right node
                 bnode.RightNode = node;

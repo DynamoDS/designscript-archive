@@ -238,6 +238,7 @@ y = c[1];
             thisTest.Verify("y", new object[] { 3, 4 });
         }
 
+
         [Test]
         public void TestReplicationGuide02()
         {
@@ -298,6 +299,29 @@ x = p<1>.f({1,2}<2>);
 ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("x", new Object[] { new object[] { 10, 10 }, new object[] { 10, 10 } });
+        }
+
+        [Test]
+        public void TestReplicationGuideOnFunction01()
+        {
+
+            String code =
+@"
+def f()
+{
+    return = { 1, 2 };
+}
+
+def g()
+{
+    return = { 3, 4 };
+}
+
+x = f()<1> + g()<2>;
+
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new Object[] { new object[] { 4, 5 }, new object[] { 5, 6 } });
         }
     }
 }
