@@ -323,5 +323,32 @@ x = f()<1> + g()<2>;
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("x", new Object[] { new object[] { 4, 5 }, new object[] { 5, 6 } });
         }
+
+        [Test]
+        public void TestArrayIndexingFromFunction01()
+        {
+
+            String code =
+@"
+class A
+{
+    a:int;
+    constructor A(i:int)
+    {
+        a = i;
+    }
+}
+
+def foo()
+{
+    return = {A.A(1)};
+}
+
+x = foo()[0].a;
+
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", 1);
+        }
     }
 }

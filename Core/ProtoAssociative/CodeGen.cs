@@ -2298,6 +2298,34 @@ namespace ProtoAssociative
                 }
 
             }
+            else if (node is FunctionCallNode)
+            {
+                FunctionCallNode fcall = node as FunctionCallNode;
+                if (null == fcall.ArrayDimensions)
+                {
+                    // Build the temp pointer
+                    BinaryExpressionNode bnode = new BinaryExpressionNode();
+                    bnode.Optr = ProtoCore.DSASM.Operator.assign;
+                    bnode.isSSAAssignment = true;
+                    bnode.isSSAPointerAssignment = true;
+
+                    // Left node
+                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    (identNode as IdentifierNode).ReplicationGuides = fcall.ReplicationGuides;
+                    bnode.LeftNode = identNode;
+
+                    // Right node
+                    bnode.RightNode = fcall;
+
+                    astlist.Add(bnode);
+                    ssaStack.Push(bnode);
+                }
+                else
+                {
+                    EmitSSAArrayIndex(fcall, ssaStack, ref astlist, true);
+                }
+
+            }
             else if (node is IdentifierListNode)
             {
                 IdentifierListNode identList = node as IdentifierListNode;
@@ -2402,6 +2430,21 @@ namespace ProtoAssociative
 
                 // Right node - Array indexing will be applied to this new identifier
                 bnode.RightNode = nodeBuilder.BuildIdentfier(identNode.Name);
+            }
+            else if (node is FunctionCallNode)
+            {
+                FunctionCallNode fcall = node as FunctionCallNode;
+                Validity.Assert(fcall.Function is IdentifierNode);
+                identNode = fcall.Function as IdentifierNode;
+
+                // Assign the function array and guide properties to the new ident node
+                identNode.ArrayDimensions = fcall.ArrayDimensions;
+                identNode.ReplicationGuides = fcall.ReplicationGuides;
+
+                // Right node - Remove the function array indexing.
+                // The array indexing to this function will be applied downstream 
+                fcall.ArrayDimensions = null;
+                bnode.RightNode = fcall;
             }
             else if (node is IdentifierListNode)
             {
@@ -4023,8 +4066,11 @@ namespace ProtoAssociative
                                 if (null != firstSSAGraphNode)
                                 {
                                     curDepIndex = firstSSAGraphNode.dependentList.Count - 1;
-                                    ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
-                                    firstSSAUpdateNode.dimensionNodeList.Add(updateNode);
+                                    if (curDepIndex >= 0)
+                                    {
+                                        ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
+                                        firstSSAUpdateNode.dimensionNodeList.Add(updateNode);
+                                    }
                                 }
                             }
                         }
@@ -7462,7 +7508,6 @@ namespace ProtoAssociative
                             }
                             else if (bnode.RightNode is IdentifierListNode)
                             {
-                                //Validity.Assert(false);
                                 ssaPointerList.Add((bnode.RightNode as IdentifierListNode).RightNode);
                             }
                             else if (bnode.RightNode is FunctionDotCallNode)
@@ -7480,6 +7525,12 @@ namespace ProtoAssociative
                                     // This function is a member function, store the functioncall node
                                     ssaPointerList.Add(dotcall.FunctionCall);
                                 }
+                            }
+                            else if (bnode.RightNode is FunctionCallNode)
+                            {
+                                FunctionCallNode fcall = bnode.RightNode as FunctionCallNode;
+                                Validity.Assert(fcall.Function is IdentifierNode);
+                                ssaPointerList.Add(fcall.Function);
                             }
                             else
                             {
