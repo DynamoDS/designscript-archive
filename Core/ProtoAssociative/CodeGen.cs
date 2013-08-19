@@ -3058,7 +3058,7 @@ namespace ProtoAssociative
                             node.IsModifier = true;
                         }
 
-                        if (node.IsModifier)
+                        if (context.applySSATransform && node.IsModifier)
                         {
                             int ssaID = ProtoCore.DSASM.Constants.kInvalidIndex;
                             string name = ProtoCore.Utils.CoreUtils.GenerateIdentListNameString(bnode.LeftNode);
@@ -4367,6 +4367,7 @@ namespace ProtoAssociative
                     throw new BuildHaltException("Invalid language block type (B1C57E37)");
 
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
+                context.applySSATransform = false;
 
                 // Set the current class scope so the next language can refer to it
                 core.ClassIndex = globalClassIndex;
