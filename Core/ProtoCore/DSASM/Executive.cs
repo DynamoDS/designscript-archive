@@ -439,8 +439,8 @@ namespace ProtoCore.DSASM
 
             if (functionIndex != Constants.kGlobalScope && classIndex == Constants.kGlobalScope)
             {
-                Dictionary<string, FunctionGroup> fgps = core.FunctionTable.GlobalFuncTable[classIndex + 1];
-                if (fgps[Constants.kDotArgMethodName].FunctionEndPoints[0].procedureNode.procId == functionIndex)
+                FunctionGroup feps = core.FunctionTable.GetFunctionGroup(classIndex + 1, Constants.kDotArgMethodName);
+                if (feps != null && feps.FunctionEndPoints[0].procedureNode.procId == functionIndex)
                 {
                     int lastFramePointer = (int)rmem.GetAtRelative(StackFrame.kFrameIndexFramePointer).opdata;
                     if (lastFramePointer >= StackFrame.kStackFrameSize)

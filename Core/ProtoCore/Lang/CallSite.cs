@@ -442,7 +442,9 @@ namespace ProtoCore
             while (i < clist.Count)
             {
                 int cidx = clist[i];
-                if (globalFunctionTable.GlobalFuncTable[cidx + 1].TryGetValue(methodName, out funcGroup))
+
+                funcGroup = globalFunctionTable.GetFunctionGroup(cidx + 1, methodName);
+                if (funcGroup != null)
                 {
                     break;
                 }
@@ -1301,12 +1303,8 @@ namespace ProtoCore
 
             //@PERF: Possible optimisation point here, to deal with static dispatches that don't need replication analysis
             //Handle resolution Pass 1: Name -> Method Group
-            FunctionGroup funcGroup;
-            try
-            {
-                funcGroup = globalFunctionTable.GlobalFuncTable[classScope + 1][methodName];
-            }
-            catch (KeyNotFoundException)
+            FunctionGroup funcGroup = globalFunctionTable.GetFunctionGroup(classScope + 1, methodName);
+            if (funcGroup == null)
             {
                 return false;
             }

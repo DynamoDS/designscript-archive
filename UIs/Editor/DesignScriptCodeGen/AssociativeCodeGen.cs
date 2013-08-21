@@ -1665,28 +1665,8 @@ namespace DesignScript.Editor.CodeGen
                 // Determine whether this still needs to be aligned to the actual 'classIndex' variable
                 // The factors that will affect this is whether the 2 function tables (compiler and callsite) need to be merged
                 int classIndexAtCallsite = globalClassIndex + 1;
-                if (!core.FunctionTable.GlobalFuncTable.ContainsKey(classIndexAtCallsite))
-                {
-                    Dictionary<string, FunctionGroup> funcList = new Dictionary<string, FunctionGroup>();
-                    core.FunctionTable.GlobalFuncTable.Add(classIndexAtCallsite, funcList);
-                }
-
-                Dictionary<string, FunctionGroup> fgroup = core.FunctionTable.GlobalFuncTable[classIndexAtCallsite];
-                if (!fgroup.ContainsKey(funcDef.Name))
-                {
-                    // Create a new function group in this class
-                    ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
-                    funcGroup.FunctionEndPoints.Add(fep);
-
-                    // Add this group to the class function tables
-                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
-                }
-                else
-                {
-                    // Add this fep into the exisitng function group
-                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite][funcDef.Name].FunctionEndPoints.Add(fep);
-                }
-
+                core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
+                
                 // Build and append a graphnode for this return statememt
                 ProtoCore.DSASM.SymbolNode returnNode = new ProtoCore.DSASM.SymbolNode();
                 returnNode.name = "return";
@@ -2031,28 +2011,7 @@ namespace DesignScript.Editor.CodeGen
                 // Determine whether this still needs to be aligned to the actual 'classIndex' variable
                 // The factors that will affect this is whether the 2 function tables (compiler and callsite) need to be merged
                 int classIndexAtCallsite = globalClassIndex + 1;
-                if (!core.FunctionTable.GlobalFuncTable.ContainsKey(classIndexAtCallsite))
-                {
-                    Dictionary<string, FunctionGroup> funcList = new Dictionary<string, FunctionGroup>();
-                    core.FunctionTable.GlobalFuncTable.Add(classIndexAtCallsite, funcList);
-                }
-
-                Dictionary<string, FunctionGroup> fgroup = core.FunctionTable.GlobalFuncTable[classIndexAtCallsite];
-                if (!fgroup.ContainsKey(funcDef.Name))
-                {
-                    // Create a new function group in this class
-                    ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
-                    funcGroup.FunctionEndPoints.Add(fep);
-
-                    // Add this group to the class function tables
-                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
-                }
-                else
-                {
-                    // Add this fep into the exisitng function group
-                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite][funcDef.Name].FunctionEndPoints.Add(fep);
-                }
-
+                core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
             }
 
             core.ProcNode = localProcedure = null;
