@@ -1508,28 +1508,8 @@ namespace ProtoImperative
                 // Determine whether this still needs to be aligned to the actual 'classIndex' variable
                 // The factors that will affect this is whether the 2 function tables (compiler and callsite) need to be merged
                 int classIndexAtCallsite = ProtoCore.DSASM.Constants.kInvalidIndex + 1;
-                if (!core.FunctionTable.GlobalFuncTable.ContainsKey(classIndexAtCallsite))
-                {
-                    Dictionary<string, FunctionGroup> funcList = new Dictionary<string, FunctionGroup>();
-                    core.FunctionTable.GlobalFuncTable.Add(classIndexAtCallsite, funcList);
-                }
-
-                Dictionary<string, FunctionGroup> fgroup = core.FunctionTable.GlobalFuncTable[classIndexAtCallsite];
-                if (!fgroup.ContainsKey(funcDef.Name))
-                {
-                    // Create a new function group in this class
-                    ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
-                    funcGroup.FunctionEndPoints.Add(fep);
-
-                    // Add this group to the class function tables
-                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
-                }
-                else
-                {
-                    // Add this fep into the exisitng function group
-                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite][funcDef.Name].FunctionEndPoints.Add(fep);
-                }
-
+                core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
+                
                 if (!hasReturnStatement)
                 {
                     if (!core.Options.SuppressFunctionResolutionWarning)
