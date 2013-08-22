@@ -2580,6 +2580,12 @@ namespace ProtoAssociative
                 // Get the replication guide from the dotcall
                 replicationGuides = functionCall.ReplicationGuides;
             }
+            else
+            {
+                // A parser error has occured if a replication guide gets attached to any AST besides"
+                // Ident, identlist, functioncall and functiondotcall
+                Validity.Assert(false, "This AST node should not have a replication guide.");
+            }
             return replicationGuides;
         }
 
