@@ -122,7 +122,7 @@ namespace ProtoCore.DSASM
         private void BounceExplicit(int exeblock, int entry, Language language, StackFrame frame, List<Instruction> breakpoints)
         {
             fepRun = false;
-            rmem.PushStackFrame(frame, 0);
+            rmem.PushStackFrame(frame, 0, 0);
 
             SetupExecutive(exeblock, entry, language, breakpoints);
 
@@ -137,7 +137,7 @@ namespace ProtoCore.DSASM
         private void BounceExplicit(int exeblock, int entry, Language language, StackFrame frame)
         {
             fepRun = false;
-            rmem.PushStackFrame(frame, 0);
+            rmem.PushStackFrame(frame, 0, 0);
 
             SetupExecutive(exeblock, entry, language);
 
@@ -834,7 +834,39 @@ namespace ProtoCore.DSASM
             // Comment Jun: the caller type is the current type in the stackframe
             StackFrameType callerType = (fepRun) ? StackFrameType.kTypeFunction : StackFrameType.kTypeLanguage;
 
-            ProtoCore.DSASM.StackFrame stackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, blockDepth, framePointer, registers);
+            // Get the execution states of the current stackframe
+            int currentScopeClass = ProtoCore.DSASM.Constants.kInvalidIndex;
+            int currentScopeFunction = ProtoCore.DSASM.Constants.kInvalidIndex;
+            GetCallerInformation(out currentScopeClass, out currentScopeFunction);
+
+            List<bool> execStates = new List<bool>();
+
+            //
+            // Comment Jun:
+            // Storing execution states is relevant only if the current scope is a function,
+            // as this mechanism is used to keep track of maintining execution states of recursive calls
+            // This mechanism should also be ignored if the function call is non-recursive as it does not need to maintains state in that case
+            //
+            if (currentScopeFunction != ProtoCore.DSASM.Constants.kGlobalScope)
+            {
+                // Get the instruction stream where the current function resides in
+                StackValue svCurrentFunctionBlockDecl = rmem.GetAtRelative(rmem.GetStackIndex(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionBlock));
+                Validity.Assert(svCurrentFunctionBlockDecl.optype == AddressType.BlockIndex);
+                AssociativeGraph.DependencyGraph depgraph = exe.instrStreamList[(int)svCurrentFunctionBlockDecl.opdata].dependencyGraph;
+
+                // Allow only if this is a recursive call
+                // It is recursive if the current function scope is equal to the function to call
+                bool isRecursive = fNode.classScope == currentScopeClass && fNode.procId == currentScopeFunction;
+                if (isRecursive)
+                {
+                    // Get the graphnodes of the function from the instruction stream and retrive the execution states
+                    execStates = depgraph.GetExecutionStatesAtScope(currentScopeClass, currentScopeFunction);
+                }
+            }
+            
+
+            // Build the stackfram for the functioncall
+            ProtoCore.DSASM.StackFrame stackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, blockDepth, framePointer, registers, execStates);
 
             FunctionCounter counter = FindCounter(functionIndex, classIndex, fNode.name);
             StackValue sv = new StackValue();
@@ -893,7 +925,7 @@ namespace ProtoCore.DSASM
                     else
                     {
                         core.DebugProps.SetUpCallrForDebug(core, this, fNode, pc, isBaseCall, callsite, core.ContinuationStruct.InitialArguments, replicationGuides, stackFrame,
-                            core.ContinuationStruct.InitialDotCallDimensions, hasDebugInfo);
+                        core.ContinuationStruct.InitialDotCallDimensions, hasDebugInfo);
                     }
                 }
 
@@ -6944,13 +6976,13 @@ namespace ProtoCore.DSASM
 
                 core.DebugProps.SetUpBounce(this, blockCaller, returnAddr);
 
-                StackFrame stackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth + 1, framePointer, registers);
+                StackFrame stackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth + 1, framePointer, registers, null);
                 ProtoCore.Language bounceLangauge = exe.instrStreamList[blockId].language;
                 BounceExplicit(blockId, 0, bounceLangauge, stackFrame, core.Breakpoints);
             }
             else //if (core.Breakpoints == null)
             {
-                StackFrame stackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth + 1, framePointer, registers);
+                StackFrame stackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth + 1, framePointer, registers, null);
 
                 ProtoCore.Language bounceLangauge = exe.instrStreamList[blockId].language;
                 BounceExplicit(blockId, 0, bounceLangauge, stackFrame);
@@ -7090,7 +7122,7 @@ namespace ProtoCore.DSASM
             int depth = 0;
 
             StackFrameType type = StackFrameType.kTypeFunction;
-            rmem.PushStackFrame(svThisPointer, ci, fi, pc + 1, blockDecl, blockCaller, callerType, type, depth, rmem.FramePointer, registers, fNode.localCount);
+            rmem.PushStackFrame(svThisPointer, ci, fi, pc + 1, blockDecl, blockCaller, callerType, type, depth, rmem.FramePointer, registers, fNode.localCount, 0);
 
 
             // Now let's go to the function
@@ -7510,6 +7542,7 @@ namespace ProtoCore.DSASM
             RestoreFromCall();
             core.RunningBlock = executingBlock;
 
+
             // If we're returning from a block to a function, the instruction stream needs to be restored.
             StackValue sv = rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexRegisterTX);
             Validity.Assert(AddressType.CallingConvention == sv.optype);
@@ -7518,14 +7551,34 @@ namespace ProtoCore.DSASM
             isExplicitCall = explicitCall;
 
 
+            List<bool> execStateRestore = new List<bool>();
             if (!core.Options.IDEDebugMode || core.ExecMode == InterpreterMode.kExpressionInterpreter)
             {
+                // Get stack frame size
                 int localCount = 0;
                 int paramCount = 0;
                 GetLocalAndParamCount(blockId, ci, fi, out localCount, out paramCount);
 
+                // Retrieve the execution execution states 
+                int execstates = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexExecutionStates).opdata;
+                if (execstates > 0)
+                {
+                    int offset = ProtoCore.DSASM.StackFrame.kStackFrameSize + localCount + paramCount;
+                    for (int n = 0; n < execstates; ++n)
+                    {
+                        int relativeIndex = -offset - n - 1; 
+                        StackValue svState = rmem.GetAtRelative(relativeIndex);
+                        Validity.Assert(svState.optype == AddressType.Boolean);
+                        execStateRestore.Add(svState.opdata == 0 ? false : true);
+                    }
+                }
+
+                // Pop the stackframe
                 rmem.FramePointer = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFramePointer).opdata;
-                rmem.PopFrame(ProtoCore.DSASM.StackFrame.kStackFrameSize + localCount + paramCount);
+
+                // Get the size of the stackframe and all variable size contents (local, args and exec states)
+                int stackFrameSize = ProtoCore.DSASM.StackFrame.kStackFrameSize + localCount + paramCount + execstates;
+                rmem.PopFrame(stackFrameSize);
 
                 if (core.ExecMode != InterpreterMode.kExpressionInterpreter)
                 {
@@ -7584,6 +7637,31 @@ namespace ProtoCore.DSASM
 
                     RX = svRet;
 
+                }
+            }
+            
+            // Restore the execution states
+            if (execStateRestore.Count > 0)
+            {
+                // Now that the stack frame is popped off, we can retrieve the returned scope
+                // Get graphnodes at the current scope after the return
+                int currentScopeClass = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexClass).opdata;
+                int currentScopeFunction = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunction).opdata;
+
+                // Since there are execution states retrieved from the stack frame,
+                // this means that we must be returning to a function and not the global scope
+                Validity.Assert(currentScopeFunction != ProtoCore.DSASM.Constants.kGlobalScope); 
+
+                // Get the instruction stream where the current function resides in
+                StackValue svCurrentFunctionBlockDecl = rmem.GetAtRelative(rmem.GetStackIndex(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionBlock));
+                Validity.Assert(svCurrentFunctionBlockDecl.optype == AddressType.BlockIndex);
+                AssociativeGraph.DependencyGraph depgraph = exe.instrStreamList[(int)svCurrentFunctionBlockDecl.opdata].dependencyGraph;
+
+                List<AssociativeGraph.GraphNode> graphNodesInScope = depgraph.GetGraphNodesAtScope(currentScopeClass, currentScopeFunction);
+                Validity.Assert(execStateRestore.Count == graphNodesInScope.Count);
+                for (int n = 0; n < execStateRestore.Count; ++n)
+                {
+                    graphNodesInScope[n].isDirty = execStateRestore[n];
                 }
             }
 

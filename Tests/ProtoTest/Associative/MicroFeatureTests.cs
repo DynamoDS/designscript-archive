@@ -4224,6 +4224,115 @@ y = f(x);
         }
 
         [Test]
+        public void TestGlobalFunctionRecursion100_GlobalIncrement()
+        {
+            string code =
+@"
+global = 0;
+def f(i : int)
+{
+    local = [Imperative]
+    {
+        a = 0;
+        if (i > 1)
+        {
+            return = f(i - 1) + i + a;
+        }
+        return = i;
+    }
+    global = global + 1;
+    return = local;
+}
+x = 100;
+y = f(x);
+z = global;
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("y", 5050);
+            thisTest.Verify("z", 100);
+        }
+
+        [Test]
+        public void TestGlobalFunctionRecursion100_GlobalIncrementInFunction01()
+        {
+            string code =
+@"
+global = 0;
+
+def g()
+{
+    global = global + 1;
+    return = 0;
+}
+
+def f(i : int)
+{
+    local = [Imperative]
+    {
+        a = 0;
+        if (i > 1)
+        {
+            return = f(i - 1) + i + a;
+        }
+        return = i;
+    }
+    t = g();
+    return = local;
+}
+x = 100;
+y = f(x);
+z = global;
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("y", 5050);
+            thisTest.Verify("z", 100);
+        }
+
+        [Test]
+        public void TestGlobalFunctionRecursion100_GlobalIncrementInFunction02()
+        {
+            string code =
+@"
+global = 0;
+
+def g()
+{
+    global = global + 1;
+    return = 0;
+}
+
+
+def h()
+{
+    global = global + 1;
+    return = 0;
+}
+
+def f(i : int)
+{
+    local = [Imperative]
+    {
+        a = 0;
+        if (i > 1)
+        {
+            return = f(i - 1) + i + a;
+        }
+        return = i;
+    }
+    s = g();
+    t = h();
+    return = local;
+}
+x = 100;
+y = f(x);
+z = global;
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("y", 5050);
+            thisTest.Verify("z", 200);
+        }
+
+        [Test]
         public void TestGlobalFunctionRecursionReplication()
         {
             string code =

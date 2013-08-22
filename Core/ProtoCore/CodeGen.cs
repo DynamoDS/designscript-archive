@@ -2219,8 +2219,11 @@ namespace ProtoCore
                                 if (null != firstSSAGraphNode)
                                 {
                                     lastDependentIndex = firstSSAGraphNode.dependentList.Count - 1;
-                                    ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
-                                    firstSSAUpdateNode.dimensionNodeList.Add(intNode);
+                                    if (lastDependentIndex >= 0)
+                                    {
+                                        ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
+                                        firstSSAUpdateNode.dimensionNodeList.Add(intNode);
+                                    }
                                 }
                             }
                         }

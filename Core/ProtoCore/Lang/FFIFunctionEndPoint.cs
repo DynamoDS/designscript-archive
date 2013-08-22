@@ -146,7 +146,9 @@ namespace ProtoCore.Lang
                     // This is only incremented for every language block bounce
                     int depth = 0;
                     StackFrameType callerType = (StackFrameType)stackFrame.GetAt(StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
-                    core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, ProtoCore.DSASM.StackFrameType.kTypeFunction, depth, framePointer, registers, locals);
+
+                    // FFI calls do not have execution states
+                    core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, ProtoCore.DSASM.StackFrameType.kTypeFunction, depth, framePointer, registers, locals, 0);
 
                     //is there a way the current stack be passed across and back into the managed runtime by FFI calling back into the language?
                     //e.g. DCEnv* carrying all the stack information? look at how vmkit does this.

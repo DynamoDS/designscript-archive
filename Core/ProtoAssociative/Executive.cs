@@ -51,6 +51,8 @@ namespace ProtoAssociative
                         ProtoCore.AST.AssociativeAST.CodeBlockNode cnode = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
                         cnode.Body.Add(core.AssocNode as ProtoCore.AST.AssociativeAST.AssociativeNode);
 
+                        core.assocCodegen.context = callContext;
+
                         blockId = core.assocCodegen.Emit((cnode as ProtoCore.AST.AssociativeAST.CodeBlockNode), graphNode);
                     }
                     else

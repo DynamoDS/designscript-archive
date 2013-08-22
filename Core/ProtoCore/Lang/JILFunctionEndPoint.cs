@@ -47,7 +47,24 @@ namespace ProtoCore.Lang
             // Assert for the block type
             activation.globs = core.DSExecutable.runtimeSymbols[core.RunningBlock].GetGlobalSize();
 
-            // Params
+            // Push Execution states
+            int execStateSize = 0;
+            if (null != stackFrame.ExecutionStates)
+            {
+                execStateSize = stackFrame.ExecutionStates.Length;
+
+                // ExecutionStates are in lexical order
+                // Push them in reverse order (similar to args) so they can be retrieved in sequence
+                // Retrieveing the executing states occur on function return
+                for (int n = execStateSize - 1; n >= 0 ; --n)
+                {
+                    ProtoCore.DSASM.StackValue svState = stackFrame.ExecutionStates[n];
+                    Validity.Assert(svState.optype == DSASM.AddressType.Boolean);
+                    interpreter.Push(svState);
+                }
+            }
+
+            // Push Params
             formalParameters.Reverse();
             for (int i = 0; i < formalParameters.Count; i++)
             {
@@ -93,9 +110,9 @@ namespace ProtoCore.Lang
             }
             else
             {
-                svCallConvention = ProtoCore.DSASM.StackUtils.BuildNode(ProtoCore.DSASM.AddressType.CallingConvention, (long)ProtoCore.DSASM.CallingConvention.CallType.kImplicit);
-                
+                svCallConvention = ProtoCore.DSASM.StackUtils.BuildNode(ProtoCore.DSASM.AddressType.CallingConvention, (long)ProtoCore.DSASM.CallingConvention.CallType.kImplicit);                
             }
+
             stackFrame.SetAt(DSASM.StackFrame.AbsoluteIndex.kRegisterTX, svCallConvention);
             interpreter.runtime.TX = svCallConvention;
 
@@ -115,7 +132,8 @@ namespace ProtoCore.Lang
             DSASM.StackFrameType type = (DSASM.StackFrameType)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
             Validity.Assert(depth == 0);
             Validity.Assert(type == DSASM.StackFrameType.kTypeFunction);
-            core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers, locals);
+
+            core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers, locals, execStateSize);
 
 
             ProtoCore.DSASM.StackValue svRet;

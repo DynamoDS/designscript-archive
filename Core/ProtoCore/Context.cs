@@ -17,6 +17,13 @@ namespace ProtoCore
             public Dictionary<int, bool> exprExecutionFlags { get; set; }
             public SymbolTable symbolTable { get; set; }
 
+            /// <summary>
+            /// This flag controls whether we want a full codeblock to apply SSA Transform.
+            /// Currently it is used to prevent SSA on inline conditional bodies. 
+            /// This will be resolved when inline replication is fixed
+            /// </summary>
+            public bool applySSATransform { get; set; }
+
             public Context()
             {
                 SourceCode = String.Empty;
@@ -24,6 +31,7 @@ namespace ProtoCore
                 execFlagList = null;
                 symbolTable = null;
                 exprExecutionFlags = new Dictionary<int, bool>();
+                applySSATransform = true;
             }
             
             public void SetData(string source, Dictionary<string, Object> context, Dictionary<string, bool> flagList)
@@ -32,6 +40,7 @@ namespace ProtoCore
                 GlobalVarList = context;
                 execFlagList = flagList;
                 exprExecutionFlags = new Dictionary<int, bool>();
+                applySSATransform = true;
             }
 
             public Context(string source, Dictionary<string, Object> context = null, Dictionary<string, bool> flagList = null)
@@ -44,6 +53,7 @@ namespace ProtoCore
                 execFlagList = flagList;
                 symbolTable = null;
                 exprExecutionFlags = new Dictionary<int, bool>();
+                applySSATransform = true;
             }
         }
     }

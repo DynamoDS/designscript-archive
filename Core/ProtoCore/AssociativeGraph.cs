@@ -794,6 +794,21 @@ namespace ProtoCore.AssociativeGraph
             return nodes;
         }
 
+        public List<bool> GetExecutionStatesAtScope(int classIndex, int procIndex)
+        {
+            List<GraphNode> nodes = GetGraphNodesAtScope(classIndex, procIndex);
+
+            List<bool> execStates = new List<bool>();
+            if (null != nodes && nodes.Count > 0)
+            {
+                for (int n = 0; n < nodes.Count; ++n)
+                {
+                    execStates.Add(nodes[n].isDirty);
+                }
+            }
+            return execStates;
+        }
+
         public void RemoveNodesFromScope(int classIndex, int procIndex)
         {
             ulong removeKey = GetGraphNodeKey(classIndex, procIndex);
