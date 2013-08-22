@@ -126,8 +126,9 @@ namespace ProtoCore
         {
             DumpByteCode = false;
             Verbose = false;
-            DumpIL = false;
+
             FullSSA = false;
+            DumpIL = false;
 
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
@@ -1901,7 +1902,7 @@ namespace ProtoCore
                 int framePointer = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kFramePointer).opdata;
                 List<StackValue> registers = stackFrame.GetRegisters();
 
-                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals);
+                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
             }
 
             ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
@@ -1931,7 +1932,7 @@ namespace ProtoCore
 
                 DebugProps.SetUpBounce(exec, blockCaller, returnAddr);
 
-                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals);
+                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
             }
 
             ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
