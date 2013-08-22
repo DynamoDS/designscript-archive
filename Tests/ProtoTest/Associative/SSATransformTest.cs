@@ -350,5 +350,112 @@ x = foo()[0].a;
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("x", 1);
         }
+
+        [Test]
+        public void TestRecursiveAssociativeImperativeCondition01()
+        {
+            String code =
+@"
+
+global = 0;
+
+def f(x : int)
+{
+    local = [Imperative]
+    {
+        if (x > 1)
+        {
+            return = f(x - 1) + x;
+        }
+        return = x;
+    } 
+    global = global + 1;
+    return = local;
+}
+y = f(10);
+a = global;
+
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("y", 55);
+            thisTest.Verify("a", 10);
+        }
+
+        [Test]
+        public void TestRecursiveAssociativeImperativeCondition02()
+        {
+            String code =
+@"
+
+global = 0;
+
+def g()
+{
+    global = global + 1;
+    return = 0;
+}
+
+def f(x : int)
+{
+    local = [Imperative]
+    {
+        if (x > 1)
+        {
+            return = f(x - 1) + x;
+        }
+        return = x;
+    } 
+
+    t = g();
+    return = local;
+}
+
+y = f(10);
+a = global;
+
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("y", 55);
+            thisTest.Verify("a", 10);
+        }
+
+        [Test]
+        public void TestRecursiveAssociativeImperativeCondition03()
+        {
+            String code =
+@"
+
+global = 0;
+
+def g()
+{
+    global = global + 1;
+    return = 0;
+}
+
+def f(x : int)
+{
+    local = [Imperative]
+    {
+        if (x > 1)
+        {
+            return = f(x - 1) + x;
+        }
+        return = x;
+    } 
+
+    t = g();
+    global = global + 1;
+    return = local;
+}
+
+y = f(10);
+a = global;
+
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("y", 55);
+            thisTest.Verify("a", 20);
+        }
     }
 }
