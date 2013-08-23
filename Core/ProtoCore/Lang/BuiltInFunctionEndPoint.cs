@@ -329,16 +329,16 @@ namespace ProtoCore.Lang
 
                         // Comment Jun: the caller type is the current type in the stackframe
                         StackFrameType callerType = (StackFrameType)stackFrame.GetAt(StackFrame.AbsoluteIndex.kStackFrameType).opdata;
-                        
+
                         if (core.ExecMode != DSASM.InterpreterMode.kExpressionInterpreter && core.Options.IDEDebugMode)
                         {
                             blockCaller = core.DebugProps.CurrentBlockId;
-                            StackFrame bounceStackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers);
+                            StackFrame bounceStackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers, null);
                             ret = core.Bounce(blockId, 0, context, core.Breakpoints, bounceStackFrame, 0, core.CurrentExecutive.CurrentDSASMExec);
                         }
                         else
                         {
-                            StackFrame bounceStackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers);
+                            StackFrame bounceStackFrame = new StackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers, null);
                             ret = core.Bounce(blockId, 0, context, bounceStackFrame);
                         }
 
@@ -400,8 +400,8 @@ namespace ProtoCore.Lang
                         int depth = 0;
                         List<StackValue> registers = new List<StackValue>();
                         interpreter.runtime.SaveRegisters(registers);
-                        ProtoCore.DSASM.StackFrame newStackFrame = new StackFrame(svThisPtr, classScopeCaller, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, 
-                            framePointer, registers);
+                        ProtoCore.DSASM.StackFrame newStackFrame = new StackFrame(svThisPtr, classScopeCaller, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth,
+                            framePointer, registers, null);
 
                         // Build the function arguments
                         List<StackValue> arguments = new List<StackValue>();
@@ -556,9 +556,8 @@ namespace ProtoCore.Lang
 
                         StackFrameType type = StackFrameType.kTypeFunction;
                         int depth = 0;
-
                         ProtoCore.DSASM.StackFrame newStackFrame = new StackFrame(svThisPtr, classScopeCaller, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth,
-                            framePointer, stackFrame.GetRegisters());
+                            framePointer, stackFrame.GetRegisters(), null);
 
                         // Comment Jun: 
                         // Any replication guides pushed in a dotarg->dot call must be retrieved here from the core
