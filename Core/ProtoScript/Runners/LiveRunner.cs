@@ -149,6 +149,12 @@ namespace ProtoScript.Runners
             /// List of search directories to resolve any file reference
             /// </summary>
             public List<string> SearchDirectories;
+
+            /// <summary>
+            /// If the Interpreter mode is true, the LiveRunner takes in code statements as input strings
+            /// and not SyncData
+            /// </summary>
+            public bool InterpreterMode = false;
         }
 
         private abstract class Task
@@ -701,6 +707,53 @@ namespace ProtoScript.Runners
             
         }
 
+        private class UpdateCmdLineInterpreterTask : Task
+        {
+            private string cmdLineString;
+            public UpdateCmdLineInterpreterTask(string code, LiveRunner runner)
+                : base(runner)
+            {
+                this.cmdLineString = code;
+            }
+
+            public override void Execute()
+            {
+                GraphUpdateReadyEventArgs retArgs = null;
+
+                lock (runner.operationsMutex)
+                {
+                    try
+                    {
+                        string code = null;
+                        runner.SynchronizeInternal(code);
+
+                        var modfiedGuidList = runner.GetModifiedGuidList();
+                        runner.ResetModifiedSymbols();
+                        var syncDataReturn = runner.CreateSynchronizeDataForGuidList(modfiedGuidList);
+
+                        retArgs = null;
+
+                        // TODO: Implement ReportErrors override to report errors for command line statements
+                        //ReportErrors(code, syncDataReturn, modfiedGuidList, ref retArgs);
+                        
+                        if (retArgs == null)
+                            retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
+                    }
+                    // Any exceptions that are caught here are most likely from the graph compiler
+                    catch (Exception e)
+                    {
+                        //retArgs = new GraphUpdateReadyEventArgs(syncData, EventStatus.Error, e.Message);
+                    }
+                }
+
+                if (runner.GraphUpdateReady != null)
+                {
+                    runner.GraphUpdateReady(this, retArgs); // Notify all listeners (e.g. UI).
+                }
+            }
+
+        }
+
         private class ConvertNodesToCodeTask : Task
         {
             private List<SnapshotNode> snapshotNodes;
@@ -762,9 +815,10 @@ namespace ProtoScript.Runners
 
         public LiveRunner()
         {
-            InitRunner(new Options());
+            InitRunner( new Options());
         }
 
+        
         public LiveRunner(Options options)
         {
             InitRunner(options);
@@ -788,6 +842,8 @@ namespace ProtoScript.Runners
             taskQueue = new Queue<Task>();
 
             workerThread = new Thread(new ThreadStart(TaskExecMethod));
+            
+
             workerThread.IsBackground = true;
             workerThread.Start();
 
@@ -894,6 +950,19 @@ namespace ProtoScript.Runners
 
             //Todo(Luke) add a Monitor queue to prevent having to have the 
             //work poll
+        }
+
+        /// <summary>
+        /// Async call from command-line interpreter to LiveRunner
+        /// </summary>
+        /// <param name="cmdLineString"></param>
+        public void BeginUpdateCmdLineInterpreter(string cmdLineString)
+        {
+            lock (taskQueue)
+            {
+                taskQueue.Enqueue(
+                    new UpdateCmdLineInterpreterTask(cmdLineString, this));
+            }
         }
 
         /// <summary>
@@ -1020,10 +1089,22 @@ namespace ProtoScript.Runners
             
         }
 
-
-
-
-
+        public void UpdateCmdLineInterpreter(string code)
+        {
+            while (true)
+            {
+                lock (taskQueue)
+                {
+                    //Spin waiting for the queue to be empty
+                    if (taskQueue.Count == 0)
+                    {
+                        SynchronizeInternal(code);
+                        return;
+                    }
+                }
+                Thread.Sleep(0);
+            }
+        }
 
         //Secondary thread
         private void TaskExecMethod()
@@ -1170,6 +1251,39 @@ namespace ProtoScript.Runners
                 GraphToDSCompiler.GraphBuilder g = new GraphBuilder(syncData, graphCompiler);
                 code = g.BuildGraphDAG();
 
+                System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
+
+                //List<string> deletedVars = new List<string>();
+                ResetVMForDeltaExecution();
+
+                //Synchronize the core configuration before compilation and execution.
+                if (syncCoreConfigurations)
+                {
+                    SyncCoreConfigurations(runnerCore, executionOptions);
+                    syncCoreConfigurations = false;
+                }
+
+                bool succeeded = CompileAndExecute(code);
+                if (succeeded)
+                {
+                    graphCompiler.ResetPropertiesForNextExecution();
+                }
+            }
+        }
+
+        private void SynchronizeInternal(string code)
+        {
+            Validity.Assert(null != runner);
+            Validity.Assert(null != graphCompiler);
+
+            if (string.IsNullOrEmpty(code))
+            {
+                code = "";
+                ResetVMForDeltaExecution();
+                return;
+            }
+            else
+            {
                 System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
 
                 //List<string> deletedVars = new List<string>();

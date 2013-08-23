@@ -23,10 +23,20 @@ void LiveRunnerWrapper::updateGraph(const wchar_t* codesegment)
     wrapper()->UpdateGraph(syncData);
 }
 
+void LiveRunnerWrapper::updateCLInterpreter(const wchar_t* codesegment)
+{
+    wrapper()->UpdateCmdLineInterpreter(WcharToString(codesegment));
+}
+
 void LiveRunnerWrapper::updateGraphAsync(const wchar_t* codesegment)
 {
     SynchronizeData^ syncData = createSyncDataFromCode(WcharToString(codesegment));
     wrapper()->BeginUpdateGraph(syncData);
+}
+
+void LiveRunnerWrapper::updateCLInterpreterAsync(const wchar_t* codesegment)
+{
+    wrapper()->BeginUpdateCmdLineInterpreter(WcharToString(codesegment));
 }
 
 DesignScriptObject* LiveRunnerWrapper::queryNodeValue(const wchar_t* nodeName)
