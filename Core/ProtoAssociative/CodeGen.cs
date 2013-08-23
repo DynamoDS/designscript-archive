@@ -2283,6 +2283,7 @@ namespace ProtoAssociative
 
                     // Left node
                     var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    (identNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(ident);
                     bnode.LeftNode = identNode;
 
                     // Right node
@@ -2294,6 +2295,34 @@ namespace ProtoAssociative
                 else
                 {
                     EmitSSAArrayIndex(ident, ssaStack, ref astlist, true);
+                }
+
+            }
+            else if (node is FunctionCallNode)
+            {
+                FunctionCallNode fcall = node as FunctionCallNode;
+                if (null == fcall.ArrayDimensions)
+                {
+                    // Build the temp pointer
+                    BinaryExpressionNode bnode = new BinaryExpressionNode();
+                    bnode.Optr = ProtoCore.DSASM.Operator.assign;
+                    bnode.isSSAAssignment = true;
+                    bnode.isSSAPointerAssignment = true;
+
+                    // Left node
+                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    (identNode as IdentifierNode).ReplicationGuides = fcall.ReplicationGuides;
+                    bnode.LeftNode = identNode;
+
+                    // Right node
+                    bnode.RightNode = fcall;
+
+                    astlist.Add(bnode);
+                    ssaStack.Push(bnode);
+                }
+                else
+                {
+                    EmitSSAArrayIndex(fcall, ssaStack, ref astlist, true);
                 }
 
             }
@@ -2402,6 +2431,21 @@ namespace ProtoAssociative
                 // Right node - Array indexing will be applied to this new identifier
                 bnode.RightNode = nodeBuilder.BuildIdentfier(identNode.Name);
             }
+            else if (node is FunctionCallNode)
+            {
+                FunctionCallNode fcall = node as FunctionCallNode;
+                Validity.Assert(fcall.Function is IdentifierNode);
+                identNode = fcall.Function as IdentifierNode;
+
+                // Assign the function array and guide properties to the new ident node
+                identNode.ArrayDimensions = fcall.ArrayDimensions;
+                identNode.ReplicationGuides = fcall.ReplicationGuides;
+
+                // Right node - Remove the function array indexing.
+                // The array indexing to this function will be applied downstream 
+                fcall.ArrayDimensions = null;
+                bnode.RightNode = fcall;
+            }
             else if (node is IdentifierListNode)
             {
                 // Apply array indexing to the right node of the ident list
@@ -2487,6 +2531,62 @@ namespace ProtoAssociative
                 DFSEmitSSA_AST(identNode.ArrayDimensions.Type, ssaStack, ref astlist);
             }
 #endregion
+        }
+
+        /// <summary>
+        /// This helper function extracts the replication guide data from the AST node
+        /// Merge this function with GetReplicationGuides
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        private List<AssociativeNode> GetReplicationGuidesFromASTNode(AssociativeNode node)
+        {
+            List<AssociativeNode> replicationGuides = null;
+            if (node is IdentifierNode)
+            {
+                replicationGuides = (node as IdentifierNode).ReplicationGuides;
+            }
+            else if (node is IdentifierListNode)
+            {
+                IdentifierListNode identList = node as IdentifierListNode;
+
+                // Get the replication guide and append it to the last identifier
+                if (identList.RightNode is IdentifierNode)
+                {
+                    replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
+                }
+                else if (identList.RightNode is FunctionCallNode)
+                {
+                    replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
+                }
+                else
+                {
+                    Validity.Assert(false);
+                }
+            }
+            else if (node is FunctionDotCallNode)
+            {
+                FunctionDotCallNode dotCall = node as FunctionDotCallNode;
+
+                // Get the replication guide from the dotcall
+                IdentifierNode functionCallIdent = dotCall.FunctionCall.Function as IdentifierNode;
+                Validity.Assert(null != functionCallIdent);
+                replicationGuides = functionCallIdent.ReplicationGuides;
+            }
+            else if (node is FunctionCallNode)
+            {
+                FunctionCallNode functionCall = node as FunctionCallNode;
+
+                // Get the replication guide from the dotcall
+                replicationGuides = functionCall.ReplicationGuides;
+            }
+            else
+            {
+                // A parser error has occured if a replication guide gets attached to any AST besides"
+                // Ident, identlist, functioncall and functiondotcall
+                Validity.Assert(false, "This AST node should not have a replication guide.");
+            }
+            return replicationGuides;
         }
 
 
@@ -2717,68 +2817,14 @@ namespace ProtoAssociative
                         if (argNode is BinaryExpressionNode)
                         {
                             BinaryExpressionNode argBinaryExpr = argNode as BinaryExpressionNode;
-                            if (argBinaryExpr.RightNode is IdentifierNode)
-                            {
-                                Validity.Assert(argBinaryExpr.LeftNode is IdentifierNode);
-                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = (argBinaryExpr.RightNode as IdentifierNode).ReplicationGuides;
-                            }
-                            else if (argBinaryExpr.RightNode is IdentifierListNode)
-                            {
-                                IdentifierListNode identList = argBinaryExpr.RightNode as IdentifierListNode;
-                                List<AssociativeNode> replicationGuides = null;
-
-                                // Get the replication guide and append it to the last identifier
-                                if (identList.RightNode is IdentifierNode)
-                                {
-                                    replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
-                                }
-                                else if (identList.RightNode is FunctionCallNode)
-                                {
-                                    replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
-                                }
-                                else
-                                {
-                                    Validity.Assert(false);
-                                }
-                                (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = replicationGuides;
-                            }
-
+                            (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(argBinaryExpr.RightNode);
+                            
                             fcNode.FormalArguments[idx] = argBinaryExpr.LeftNode;
                         }
                         else
                         {
                             fcNode.FormalArguments[idx] = argNode;
                         }
-
-                        /*
-                        List<AssociativeNode> replicationGuides = null;
-
-                        // Get the replication guide and append it to the last identifier
-                        if (identList.RightNode is IdentifierNode)
-                        {
-                            replicationGuides = (identList.RightNode as IdentifierNode).ReplicationGuides;
-                        }
-                        else if (identList.RightNode is FunctionCallNode)
-                        {
-                            replicationGuides = (identList.RightNode as FunctionCallNode).ReplicationGuides;
-                        }
-                        else
-                        {
-                            Validity.Assert(false);
-                        }
-
-                        // Set the replicationguide to the last index
-                        Validity.Assert(astlist[lastIndex] is BinaryExpressionNode);
-                        BinaryExpressionNode lastBinaryAssignment = astlist[lastIndex] as BinaryExpressionNode;
-                        if (lastBinaryAssignment.RightNode is IdentifierNode)
-                        {
-                            (lastBinaryAssignment.RightNode as IdentifierNode).ReplicationGuides = replicationGuides;
-                        }
-                        else if (lastBinaryAssignment.RightNode is FunctionCallNode)
-                        {
-                            (lastBinaryAssignment.RightNode as FunctionCallNode).ReplicationGuides = replicationGuides;
-                        }
-                        */
                     }
                 }
 
@@ -2788,6 +2834,9 @@ namespace ProtoAssociative
                 // Left node
                 var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
                 bnode.LeftNode = identNode;
+
+                // Store the replication guide from the function call to the temp
+                (identNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(node);
 
                 //Right node
                 bnode.RightNode = node;
@@ -3058,7 +3107,7 @@ namespace ProtoAssociative
                             node.IsModifier = true;
                         }
 
-                        if (node.IsModifier)
+                        if (context.applySSATransform && node.IsModifier)
                         {
                             int ssaID = ProtoCore.DSASM.Constants.kInvalidIndex;
                             string name = ProtoCore.Utils.CoreUtils.GenerateIdentListNameString(bnode.LeftNode);
@@ -4023,8 +4072,11 @@ namespace ProtoAssociative
                                 if (null != firstSSAGraphNode)
                                 {
                                     curDepIndex = firstSSAGraphNode.dependentList.Count - 1;
-                                    ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
-                                    firstSSAUpdateNode.dimensionNodeList.Add(updateNode);
+                                    if (curDepIndex >= 0)
+                                    {
+                                        ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[curDepIndex].updateNodeRefList[0].nodeList[0];
+                                        firstSSAUpdateNode.dimensionNodeList.Add(updateNode);
+                                    }
                                 }
                             }
                         }
@@ -4367,6 +4419,7 @@ namespace ProtoAssociative
                     throw new BuildHaltException("Invalid language block type (B1C57E37)");
 
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
+                context.applySSATransform = false;
 
                 // Set the current class scope so the next language can refer to it
                 core.ClassIndex = globalClassIndex;
@@ -7352,7 +7405,6 @@ namespace ProtoAssociative
                             }
                             else if (bnode.RightNode is IdentifierListNode)
                             {
-                                //Validity.Assert(false);
                                 ssaPointerList.Add((bnode.RightNode as IdentifierListNode).RightNode);
                             }
                             else if (bnode.RightNode is FunctionDotCallNode)
@@ -7370,6 +7422,12 @@ namespace ProtoAssociative
                                     // This function is a member function, store the functioncall node
                                     ssaPointerList.Add(dotcall.FunctionCall);
                                 }
+                            }
+                            else if (bnode.RightNode is FunctionCallNode)
+                            {
+                                FunctionCallNode fcall = bnode.RightNode as FunctionCallNode;
+                                Validity.Assert(fcall.Function is IdentifierNode);
+                                ssaPointerList.Add(fcall.Function);
                             }
                             else
                             {

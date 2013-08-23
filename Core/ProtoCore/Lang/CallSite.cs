@@ -553,7 +553,7 @@ namespace ProtoCore
             int depth = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kStackFrameDepth).opdata;
             DSASM.StackFrameType type = (DSASM.StackFrameType)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
 
-            int locals = 0;
+            int locals = 0; 
             int returnAddr = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
             int framePointer = core.Rmem.FramePointer;
             DSASM.StackFrameType callerType = (DSASM.StackFrameType)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
@@ -568,7 +568,7 @@ namespace ProtoCore
             List<ProtoCore.DSASM.StackValue> registers = new List<DSASM.StackValue>();
             registers.AddRange(stackFrame.GetRegisters());
 
-            core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, (int)svBlockDecl.opdata, blockCaller, callerType, type, depth, framePointer, registers, locals);
+            core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, (int)svBlockDecl.opdata, blockCaller, callerType, type, depth, framePointer, registers, locals, 0);
 
             return StackUtils.BuildNode(AddressType.ExplicitCall, jilFep.procedureNode.pc);
 
