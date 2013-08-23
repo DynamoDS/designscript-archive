@@ -160,10 +160,13 @@
     <ClInclude Include="WrapperObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProtoCore\ProtoCore.csproj">
+    <ProjectReference Include="..\..\Core\GraphToDSCompiler\GraphToDSCompiler.csproj">
+      <Project>{593be9fc-7482-4cd6-9f87-77e7ac5cdff2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\ProtoCore\ProtoCore.csproj">
       <Project>{7a9e0314-966f-4584-baa3-7339cbb849d1}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ProtoScript\ProtoScript.csproj">
+    <ProjectReference Include="..\..\Core\ProtoScript\ProtoScript.csproj">
       <Project>{a4794476-7d0e-41c0-ad83-4ab929c0a46c}</Project>
     </ProjectReference>
   </ItemGroup>
