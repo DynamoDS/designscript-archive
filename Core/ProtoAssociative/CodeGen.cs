@@ -2580,6 +2580,13 @@ namespace ProtoAssociative
                 // Get the replication guide from the dotcall
                 replicationGuides = functionCall.ReplicationGuides;
             }
+            else if (node is ExprListNode)
+            {
+                ExprListNode exprList = node as ExprListNode;
+
+                // Get the replication guide from the dotcall
+                replicationGuides = exprList.ReplicationGuides;
+            }
             else
             {
                 // A parser error has occured if a replication guide gets attached to any AST besides"
