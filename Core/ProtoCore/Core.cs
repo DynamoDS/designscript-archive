@@ -1008,20 +1008,6 @@ namespace ProtoCore
             ContextDataManager.GetInstance(this).AddData(data);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        //public void AddContextData(IEnumerable<IContextData> data)
-        //{
-        //    if (data == null)
-        //        return;
-
-        //    if (null == mCotextManager)
-        //        mCotextManager = new ContextDataManager(this);
-
-        //    mCotextManager.AddData(data);
-        //}
 
         // Cached replication guides for the current call. 
         // TODO Jun: Store this in the dynamic table node
@@ -1275,28 +1261,6 @@ namespace ProtoCore
 
             AssocNode = null;
 
-
-            //
-            //
-            // Comment Jun: Delta execution should not reset the class tables as they are preserved
-            //
-            //      FunctionTable = new Lang.FunctionTable();
-            //      ClassTable = new DSASM.ClassTable();
-            //      TypeSystem = new TypeSystem();
-            //      TypeSystem.SetClassTable(ClassTable);
-            //      ProcNode = null;
-            //      ProcTable = new DSASM.ProcedureTable(ProtoCore.DSASM.Constants.kGlobalScope);
-            //
-            //      CodeBlockList = new List<DSASM.CodeBlock>();
-            //
-            //
-
-            //      CodeBlockIndex = 0;
-            //      RuntimeTableIndex = 0;
-
-            //
-
-
             //Initialize the function pointer table
             FunctionPointerTable = new DSASM.FunctionPointerTable();
 
@@ -1320,6 +1284,8 @@ namespace ProtoCore
             {
                 BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
             }
+
+
             RuntimeStatus = new RuntimeStatus(this);
 
             SSASubscript = 0;
@@ -1388,6 +1354,7 @@ namespace ProtoCore
             {
                 BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError);
             }
+
             
             if (AstNodeList != null) 
                 AstNodeList.Clear();
@@ -1466,6 +1433,8 @@ namespace ProtoCore
             {
                 BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
             }
+
+
             RuntimeStatus = new RuntimeStatus(this);
 
             SSASubscript = 0;
