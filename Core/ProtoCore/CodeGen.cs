@@ -2320,7 +2320,7 @@ namespace ProtoCore
 
             ProtoCore.DSASM.StackValue op = new ProtoCore.DSASM.StackValue();
             op.optype = ProtoCore.DSASM.AddressType.Double;
-            op.opdata = (Int64)System.Convert.ToDouble(dNode.value);
+            op.opdata = (Int64)System.Convert.ToDouble(dNode.value, cultureInfo);
             op.opdata_d = System.Convert.ToDouble(dNode.value, cultureInfo);
 
             if (core.Options.TempReplicationGuideEmptyFlag && emitReplicationGuide)
