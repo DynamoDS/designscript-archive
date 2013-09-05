@@ -21,9 +21,6 @@ namespace ProtoScript.Runners
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
             try
             {
-                // No More HashAngleReplace for unified parser (Fuqiang)
-                //String strSource = ProtoCore.Utils.LexerUtils.HashAngleReplace(code);    
-
                 //defining the global Assoc block that wraps the entire .ds source file
                 ProtoCore.LanguageCodeBlock globalBlock = new ProtoCore.LanguageCodeBlock();
                 globalBlock.language = ProtoCore.Language.kAssociative;
@@ -52,8 +49,11 @@ namespace ProtoScript.Runners
             return buildSucceeded;
         }
 
+
         public bool Compile(string code, ProtoCore.Core core, out int blockId)
         {
+            //ProtoLanguage.CompileStateTracker compileState = new ProtoLanguage.CompileStateTracker(core.Options);
+
             bool buildSucceeded = false;
 
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
