@@ -2580,6 +2580,13 @@ namespace ProtoAssociative
                 // Get the replication guide from the dotcall
                 replicationGuides = functionCall.ReplicationGuides;
             }
+            else if (node is ExprListNode)
+            {
+                ExprListNode exprList = node as ExprListNode;
+
+                // Get the replication guide from the dotcall
+                replicationGuides = exprList.ReplicationGuides;
+            }
             else
             {
                 // A parser error has occured if a replication guide gets attached to any AST besides"
@@ -3096,7 +3103,9 @@ namespace ProtoAssociative
 
                 foreach (AssociativeNode node in astList)
                 {
-                    List<AssociativeNode> newASTList = new List<AssociativeNode>();
+                    //Dictionary<string, int> ssaUIDList = new Dictionary<string, int>();
+
+                    List<AssociativeNode> outASTList = new List<AssociativeNode>();
                     if (node is BinaryExpressionNode)
                     {
                         BinaryExpressionNode bnode = (node as BinaryExpressionNode);
@@ -3131,17 +3140,17 @@ namespace ProtoAssociative
                             }
 
                             Stack<AssociativeNode> ssaStack = new Stack<AssociativeNode>();
-                            DFSEmitSSA_AST(node, ssaStack, ref newASTList);
+                            DFSEmitSSA_AST(node, ssaStack, ref outASTList);
 
                             // Set the unique expression id for this range of SSA nodes
-                            foreach (AssociativeNode aNode in newASTList)
+                            foreach (AssociativeNode aNode in outASTList)
                             {
                                 Debug.Assert(aNode is BinaryExpressionNode);
                                 bnode = aNode as BinaryExpressionNode;
                                 bnode.exprUID = ssaID;
                                 NodeUtils.SetNodeLocation(bnode, node, node);
                             }
-                            newAstList.AddRange(newASTList);
+                            newAstList.AddRange(outASTList);
                         }
                         else
                         {
