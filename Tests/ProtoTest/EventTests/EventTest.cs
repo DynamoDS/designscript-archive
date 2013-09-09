@@ -87,7 +87,7 @@ namespace ProtoTest.EventTests
 
         private Obj GetWatchValue(ProtoCore.Core core, string watchExpression)
         {
-            ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core);
+            ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core, null);
             ExecutionMirror mirror = watchRunner.Execute(watchExpression);
             return mirror.GetWatchValue();
         }

@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using ProtoCore.DSASM.Mirror;
 using System.Diagnostics;
+using ProtoCore.Utils;
 
 
 namespace ProtoScript.Runners
@@ -47,12 +48,18 @@ namespace ProtoScript.Runners
         private ExecutionMirror Execute(string code, ProtoCore.Core core, bool isTest = true)
         {
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            bool succeeded = Compile(code, core, out blockId);
-
-            if (succeeded)
+            ProtoLanguage.CompileStateTracker compileState = Compile(code, out blockId);
+            Validity.Assert(null != compileState);
+            if (compileState.compileSucceeded)
             {
-                core.GenerateExecutable();
-                core.Rmem.PushGlobFrame(core.GlobOffset);
+                // This is the boundary between compilestate and runtime core
+                // Generate the executable
+                compileState.GenerateExecutable();
+
+                // Get the executable from the compileState
+                core.DSExecutable = compileState.DSExecutable;
+
+                core.Rmem.PushGlobFrame(compileState.GlobOffset);
                 core.RunningBlock = blockId;
                 Execute(core);
 
@@ -91,12 +98,11 @@ namespace ProtoScript.Runners
             }
         }
 
-        private bool Compile(string code, ProtoCore.Core core, out int blockId)
+        private ProtoLanguage.CompileStateTracker Compile(string code, out int blockId)
         {
-            bool buildSucceeded = false;
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
 
-
-            core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
+            compileState.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
 
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
             try
@@ -115,20 +121,20 @@ namespace ProtoScript.Runners
                 //passing the global Assoc wrapper block to the compiler
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
                 ProtoCore.Language id = globalBlock.language;
-                core.Executives[id].Compile(out blockId, null, globalBlock, context, EventSink);
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink);
 
-                core.BuildStatus.ReportBuildResult();
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+                compileState.compileSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return buildSucceeded;
+            return compileState;
         }
     }
 }

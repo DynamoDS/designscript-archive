@@ -53,7 +53,11 @@ namespace ProtoFFITests
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             ExecutionMirror mirror = fsr.Execute(code, core, context);
             int nWarnings = core.RuntimeStatus.Warnings.Count;
-            nErrors = core.BuildStatus.ErrorCount;
+
+            // TODO Jun: Fix this be retrieveing the buildstatus from compileState
+            // nErrors = core.BuildStatus.ErrorCount;
+            nErrors = 0;
+
             if (data == null)
             {
                 core.Cleanup();

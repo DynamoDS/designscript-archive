@@ -558,7 +558,7 @@ namespace ProtoTestFx
                 }                            
                 if (lhsName.Equals(symbolName))
                 {
-                    ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core);
+                    ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core, null);
                     ProtoCore.DSASM.Mirror.ExecutionMirror mirror = watchRunner.Execute(exp);
                     Obj obj = mirror.GetWatchValue();
                     

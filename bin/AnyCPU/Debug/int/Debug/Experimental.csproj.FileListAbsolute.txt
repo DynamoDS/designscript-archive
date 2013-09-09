@@ -1,0 +1,1 @@
+C:\jun\AutodeskResearch\git\designscript\bin\AnyCPU\Debug\int\Debug\ResolveAssemblyReference.cache

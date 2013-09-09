@@ -20,7 +20,7 @@ namespace ProtoCore.Utils
         /// current directory.</param>
         /// <returns>Full path for the file if located successfully else the 
         /// file name when failed to loate the given file</returns>
-        public static string GetDSFullPathName(string fileName, Options options = null)
+        public static string GetDSFullPathName(string fileName, ProtoCore.Options options = null)
         {
             //1.  First search at .exe module directory, in case files of the same name exists in the following directories.
             //    The .exe module directory is of highest priority.
@@ -40,6 +40,56 @@ namespace ProtoCore.Utils
             //2. Search relative to the .ds file directory
             string rootModulePath = ".";
             if (null!=options && !string.IsNullOrEmpty(options.RootModulePathName))
+                rootModulePath = options.RootModulePathName;
+
+            if (GetFullPath(fileName, rootModulePath, out fullPathName))
+                return fullPathName;
+
+            if (null != options)
+            {
+                //3. Search at include directories.
+                //   This will include the import path.
+                foreach (string directory in options.IncludeDirectories)
+                {
+                    fullPathName = Path.Combine(directory, fileName);
+                    if (null != fullPathName && File.Exists(fullPathName))
+                        return fullPathName;
+                }
+            }
+
+            //4. Search the absolute path or relative to the current directory
+            if (File.Exists(fileName))
+                return Path.GetFullPath(fileName);
+
+            return fileName;
+        }
+
+        /// <summary>
+        /// TODO Jun : Remove me after the tracker + core swap-out
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static string GetDSFullPathName(string fileName, ProtoLanguage.CompileOptions options = null)
+        {
+            //1.  First search at .exe module directory, in case files of the same name exists in the following directories.
+            //    The .exe module directory is of highest priority.
+            //    CodeBase is used here because Assembly.Location does not work quite well when the module is shallow-copied in nunit test.
+            if (Path.IsPathRooted(fileName))
+            {
+                if (File.Exists(fileName))
+                    return Path.GetFullPath(fileName);
+                fileName = Path.GetFileName(fileName);
+            }
+
+            string fullPathName;
+
+            if (GetFullPath(fileName, GetInstallLocation(), out fullPathName))
+                return fullPathName;
+
+            //2. Search relative to the .ds file directory
+            string rootModulePath = ".";
+            if (null != options && !string.IsNullOrEmpty(options.RootModulePathName))
                 rootModulePath = options.RootModulePathName;
 
             if (GetFullPath(fileName, rootModulePath, out fullPathName))

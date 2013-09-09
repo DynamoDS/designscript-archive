@@ -123,7 +123,7 @@ myNeTwst = myTest.Transform(1);
             fsr.ToggleBreakpoint(cp);
             fsr.Run();  // line containing "this"            
             
-            ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core);
+            ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core, null);
             ExecutionMirror mirror = watchRunner.Execute(@"this");
             Obj objExecVal = mirror.GetWatchValue();
             Assert.AreNotEqual(null, objExecVal);
@@ -132,7 +132,7 @@ myNeTwst = myTest.Transform(1);
 
             vms = fsr.StepOver();
            
-            watchRunner = new ExpressionInterpreterRunner(core);
+            watchRunner = new ExpressionInterpreterRunner(core, null);
             mirror = watchRunner.Execute(@"this");
             objExecVal = mirror.GetWatchValue();
             Assert.AreNotEqual(null, objExecVal);

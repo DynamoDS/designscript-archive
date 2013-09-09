@@ -40,13 +40,13 @@ class C extends B {}
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             ExecutionMirror mirror = fsr.Execute(code, core);
 
-            int idA = core.ClassTable.IndexOf("A");
-            int idB = core.ClassTable.IndexOf("B");
-            int idC = core.ClassTable.IndexOf("C");
+            int idA = core.DSExecutable.classTable.IndexOf("A");
+            int idB = core.DSExecutable.classTable.IndexOf("B");
+            int idC = core.DSExecutable.classTable.IndexOf("C");
 
-            ClassNode cnA = core.ClassTable.ClassNodes[idA];
-            ClassNode cnB = core.ClassTable.ClassNodes[idB];
-            ClassNode cnC = core.ClassTable.ClassNodes[idC];
+            ClassNode cnA = core.DSExecutable.classTable.ClassNodes[idA];
+            ClassNode cnB = core.DSExecutable.classTable.ClassNodes[idB];
+            ClassNode cnC = core.DSExecutable.classTable.ClassNodes[idC];
 
             List<int> idsA = ClassUtils.GetClassUpcastChain(cnA, core);
             List<int> idsB = ClassUtils.GetClassUpcastChain(cnB, core);

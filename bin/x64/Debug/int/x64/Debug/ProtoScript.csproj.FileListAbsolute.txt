@@ -1,0 +1,6 @@
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ResolveAssemblyReference.cache
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoScript.dll.config
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ProtoScript.dll
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ProtoScript.pdb
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoScript.dll
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoScript.pdb

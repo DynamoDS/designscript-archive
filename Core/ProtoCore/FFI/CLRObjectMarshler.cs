@@ -757,7 +757,7 @@ namespace ProtoFFI
             StackValue[] svs = core.Heap.Heaplist[(int)dsObject.opdata].Stack;
             for (int ix = 0; ix < svs.Length; ++ix)
             {
-                SymbolNode symbol = core.ClassTable.ClassNodes[classIndex].symbols.symbolList[ix];
+                SymbolNode symbol = core.DSExecutable.classTable.ClassNodes[classIndex].symbols.symbolList[ix];
                 object prop = null;
                 if(properties.TryGetValue(symbol.name, out prop) && null != prop)
                     svs[ix] = Marshal(prop, context, dsi, GetMarshaledType(prop.GetType()));

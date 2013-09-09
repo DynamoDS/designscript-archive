@@ -1,0 +1,5 @@
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ResolveAssemblyReference.cache
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ProtoTestExe.exe
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ProtoTestExe.pdb
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoTestExe.exe
+C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoTestExe.pdb

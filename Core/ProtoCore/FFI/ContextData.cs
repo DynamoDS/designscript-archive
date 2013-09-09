@@ -50,11 +50,17 @@ namespace ProtoFFI
 
     class CoreDataProvider : IContextDataProvider
     {
-        private static readonly string mName = "ProtoCoreDataProvider"; 
+        private static readonly string mName = "ProtoCoreDataProvider";
         private ProtoCore.Core mCoreObject = null;
+        private ProtoLanguage.CompileStateTracker compileState = null;
         public CoreDataProvider(ProtoCore.Core core)
         {
             mCoreObject = core;
+        }
+
+        public CoreDataProvider(ProtoLanguage.CompileStateTracker compileState)
+        {
+            this.compileState = compileState;
         }
 
         public string Name
@@ -68,11 +74,23 @@ namespace ProtoFFI
             List<IContextData> data = new List<IContextData>();
             foreach (var item in connectionParameters)
             {
-                IContextData d = mCoreObject.ContextDataManager[item.Value as String];
+                IContextData d = compileState.ContextDataManager[item.Value as String];
                 data.Add(d);
             }
             return data.ToArray();
         }
+
+        //public IContextData[] ImportData(Dictionary<string, object> connectionParameters)
+        //{
+        //    //Expects context data name as connection string
+        //    List<IContextData> data = new List<IContextData>();
+        //    foreach (var item in connectionParameters)
+        //    {
+        //        IContextData d = mCoreObject.ContextDataManager[item.Value as String];
+        //        data.Add(d);
+        //    }
+        //    return data.ToArray();
+        //}
 
         Dictionary<string, object> IContextDataProvider.ExportData(IContextData[] data, string filePath)
         {
