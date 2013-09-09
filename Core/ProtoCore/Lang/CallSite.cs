@@ -199,9 +199,9 @@ namespace ProtoCore
 
                 Dictionary<FunctionEndPoint, int> candidatesWithDistances =
                     funcGroup.GetConversionDistances(context, arguments, replicationControl.Instructions,
-                                                     core.ClassTable, core);
+                                                     core.DSExecutable.classTable, core);
                 Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                    funcGroup.GetCastDistances(context, arguments, replicationControl.Instructions, core.ClassTable,
+                    funcGroup.GetCastDistances(context, arguments, replicationControl.Instructions, core.DSExecutable.classTable,
                                                core);
 
                 List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame, candidatesWithDistances);
@@ -245,9 +245,9 @@ namespace ProtoCore
                         //@TODO: THis should use the proper reducer?
 
                         Dictionary<FunctionEndPoint, int> candidatesWithDistances =
-                            funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.ClassTable, core);
+                            funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core);
                         Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                            funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.ClassTable, core);
+                            funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core);
 
                         List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame,
                                                                                           candidatesWithDistances);
@@ -297,10 +297,10 @@ namespace ProtoCore
                     //@TODO: THis should use the proper reducer?
 
                     Dictionary<FunctionEndPoint, int> candidatesWithDistances =
-                        funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.ClassTable, core,
+                        funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core,
                                                          true);
                     Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                        funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.ClassTable, core);
+                        funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core);
 
                     List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame,
                                                                                       candidatesWithDistances);
@@ -412,7 +412,7 @@ namespace ProtoCore
                 int callerci, callerfi;
                 core.CurrentExecutive.CurrentDSASMExec.GetCallerInformation(out callerci, out callerfi);
                 if (callerci == Constants.kGlobalScope ||
-                    (classScope != callerci && !core.ClassTable.ClassNodes[classScope].IsMyBase(callerci)))
+                    (classScope != callerci && !core.DSExecutable.classTable.ClassNodes[classScope].IsMyBase(callerci)))
                 {
                     bool hasFEP = funcGroup.FunctionEndPoints.Count > 0;
                     FunctionGroup visibleFuncGroup = new FunctionGroup();
@@ -450,7 +450,7 @@ namespace ProtoCore
                 }
                 else
                 {
-                    clist.AddRange(core.ClassTable.ClassNodes[cidx].baseList);
+                    clist.AddRange(core.DSExecutable.classTable.ClassNodes[cidx].baseList);
                     ++i;
                 }
             }
@@ -648,12 +648,12 @@ namespace ProtoCore
 
             //Walk the class tree structure to find the method
 
-            while (core.ClassTable.ClassNodes[typeID].baseList.Count > 0)
+            while (core.DSExecutable.classTable.ClassNodes[typeID].baseList.Count > 0)
             {
-                Validity.Assert(core.ClassTable.ClassNodes[typeID].baseList.Count == 1,
+                Validity.Assert(core.DSExecutable.classTable.ClassNodes[typeID].baseList.Count == 1,
                                 "Multiple inheritence not yet supported {B93D8D7F-AB4D-4412-8483-33DE739C0ADA}");
 
-                typeID = core.ClassTable.ClassNodes[typeID].baseList[0];
+                typeID = core.DSExecutable.classTable.ClassNodes[typeID].baseList[0];
 
                 foreach (FunctionEndPoint fep in feps)
                     if (fep.ClassOwnerIndex == typeID)
@@ -1119,7 +1119,7 @@ namespace ProtoCore
                 foreach (FunctionEndPoint fep in functionEndPoint)
                 {
                     //@TODO(Luke): Is this value for allow array promotion correct?
-                    int distance = fep.ComputeTypeDistance(formalParameters, core.ClassTable, core, false);
+                    int distance = fep.ComputeTypeDistance(formalParameters, core.DSExecutable.classTable, core, false);
                     if (distance !=
                         (int) ProcedureDistance.kInvalidDistance)
                         candidatesWithDistances.Add(fep, distance);
@@ -1127,15 +1127,15 @@ namespace ProtoCore
 
                 foreach (FunctionEndPoint fep in functionEndPoint)
                 {
-                    int dist = fep.ComputeCastDistance(formalParameters, core.ClassTable, core);
+                    int dist = fep.ComputeCastDistance(formalParameters, core.DSExecutable.classTable, core);
                     candidatesWithCastDistances.Add(fep, dist);
                 }
 
 
-                //funcGroup.GetConversionDistances(context, formalParams, replicationControl, core.ClassTable, core);
+                //funcGroup.GetConversionDistances(context, formalParams, replicationControl, core.DSExecutable.classTable, core);
 
                 //Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                //    funcGroup.GetCastDistances(context, formalParams, replicationControl, core.ClassTable, core);
+                //    funcGroup.GetCastDistances(context, formalParams, replicationControl, core.DSExecutable.classTable, core);
 
                 List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame, candidatesWithDistances);
 
@@ -1250,7 +1250,7 @@ namespace ProtoCore
                 return coercedRet;
             }
 
-            if (!core.ClassTable.ClassNodes[(int) ret.metaData.type].ConvertibleTo(retType.UID))
+            if (!core.DSExecutable.classTable.ClassNodes[(int) ret.metaData.type].ConvertibleTo(retType.UID))
             {
                 //@TODO(Luke): log no-type coercion possible warning
 
@@ -1370,9 +1370,9 @@ namespace ProtoCore
             {
                 Dictionary<FunctionEndPoint, int> candidatesWithDistances =
                     funcGroup.GetConversionDistances(context, arguments, replicationControl.Instructions,
-                                                     core.ClassTable, core);
+                                                     core.DSExecutable.classTable, core);
                 Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                    funcGroup.GetCastDistances(context, arguments, replicationControl.Instructions, core.ClassTable,
+                    funcGroup.GetCastDistances(context, arguments, replicationControl.Instructions, core.DSExecutable.classTable,
                                                core);
 
                 List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame, candidatesWithDistances);
@@ -1431,7 +1431,7 @@ namespace ProtoCore
                     }
                     else
                     {
-                        clist.AddRange(core.ClassTable.ClassNodes[cidx].baseList);
+                        clist.AddRange(core.DSExecutable.classTable.ClassNodes[cidx].baseList);
                         ++i;
                     }
                 }
@@ -1448,7 +1448,7 @@ namespace ProtoCore
                 {
                     int callerci, callerfi;
                     core.CurrentExecutive.CurrentDSASMExec.GetCallerInformation(out callerci, out callerfi);
-                    if (callerci == Constants.kGlobalScope || (classScope != callerci && !core.ClassTable.ClassNodes[classScope].IsMyBase(callerci)))
+                    if (callerci == Constants.kGlobalScope || (classScope != callerci && !core.DSExecutable.classTable.ClassNodes[classScope].IsMyBase(callerci)))
                     {
                         bool hasFEP = funcGroup.FunctionEndPoints.Count > 0;
                         FunctionGroup visibleFuncGroup = new FunctionGroup();
@@ -1542,9 +1542,9 @@ namespace ProtoCore
                 #region Case 3: Match with type conversion, but no array promotion
                 {
                     Dictionary<FunctionEndPoint, int> candidatesWithDistances =
-                    funcGroup.GetConversionDistances(context, arguments, replicationControl.Instructions, core.ClassTable, core);
+                    funcGroup.GetConversionDistances(context, arguments, replicationControl.Instructions, core.DSExecutable.classTable, core);
                     Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                        funcGroup.GetCastDistances(context, arguments, replicationControl.Instructions, core.ClassTable, core);
+                        funcGroup.GetCastDistances(context, arguments, replicationControl.Instructions, core.DSExecutable.classTable, core);
 
                     List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame, candidatesWithDistances);
                     FunctionEndPoint compliantTarget = GetCompliantTarget(context, arguments, replicationControl.Instructions, stackFrame, core, candidatesWithCastDistances, candidateFunctions, candidatesWithDistances);
@@ -1576,9 +1576,9 @@ namespace ProtoCore
                             //@TODO: THis should use the proper reducer?
 
                             Dictionary<FunctionEndPoint, int> candidatesWithDistances =
-                                funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.ClassTable, core);
+                                funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core);
                             Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                                funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.ClassTable, core);
+                                funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core);
 
                             List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame,
                                                                                               candidatesWithDistances);
@@ -1619,9 +1619,9 @@ namespace ProtoCore
                         //@TODO: THis should use the proper reducer?
 
                         Dictionary<FunctionEndPoint, int> candidatesWithDistances =
-                            funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.ClassTable, core, true);
+                            funcGroup.GetConversionDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core, true);
                         Dictionary<FunctionEndPoint, int> candidatesWithCastDistances =
-                            funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.ClassTable, core);
+                            funcGroup.GetCastDistances(context, arguments, rc.Instructions, core.DSExecutable.classTable, core);
 
                         List<FunctionEndPoint> candidateFunctions = GetCandidateFunctions(stackFrame,
                                                                                             candidatesWithDistances);

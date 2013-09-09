@@ -109,10 +109,10 @@ namespace GraphToDSCompiler
     {
         // TODO Jun: is it better to have GraphUtils as a singleton rather than checking for core? 
         // We only need core to be instantiated once
-        private static ProtoCore.Core core = null;
+        private static ProtoLanguage.CompileStateTracker compileState = null;
         private static string rootModulePath = string.Empty;
 
-        public static ProtoCore.Core GetCore() { return core; }
+        public static ProtoLanguage.CompileStateTracker GetCompilationState() { return compileState; }
 
         private static int numBuiltInMethods = 0;
 
@@ -137,8 +137,8 @@ namespace GraphToDSCompiler
         {
             get
             {
-                if (core != null)
-                    return core.ClassTable;
+                if (compileState != null)
+                    return compileState.ClassTable;
                 else
                     return null;
             }
@@ -149,47 +149,49 @@ namespace GraphToDSCompiler
         {
             get
             {
-                if (core != null)
-                    return core.ImportNodes;
+                if (compileState != null)
+                    return compileState.ImportNodes;
                 else
                     return null;
             }
         }
 
-        public static ProtoCore.BuildStatus BuildStatus { get { return core.BuildStatus; } }
+        public static ProtoCore.BuildStatus BuildStatus { get { return compileState.BuildStatus; } }
 
         public static uint runningUID = Constants.UIDStart;
         public static uint GenerateUID() { return runningUID++; }
 
-        private static void BuildCore(bool isCodeBlockNode = false, bool isPreloadedAssembly = false)
+        private static void BuildCompileState(bool isCodeBlockNode = false, bool isPreloadedAssembly = false)
         {
-
-
-            if (core == null)
+            if (compileState == null)
             {
-                ProtoCore.Options options = new ProtoCore.Options();
+                ProtoLanguage.CompileOptions options = new ProtoLanguage.CompileOptions();
                 options.RootModulePathName = rootModulePath;
-                core = new ProtoCore.Core(options);
-                core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
-                core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
+                compileState = new ProtoLanguage.CompileStateTracker(options);
+
+                // Comment Jun: Compile states trackers do not require an executive
+                //compileState.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(compileState));
+                //compileState.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(compileState));
 
             }
             else
             {
                 //core.ResetDeltaExecution();
-                core.ResetForPrecompilation();
+                compileState.ResetForPrecompilation();
 
             }
-            core.IsParsingPreloadedAssembly = isPreloadedAssembly;
-            core.IsParsingCodeBlockNode = isCodeBlockNode;
-            core.ParsingMode = ProtoCore.ParseMode.AllowNonAssignment;
+            compileState.IsParsingPreloadedAssembly = isPreloadedAssembly;
+            compileState.IsParsingCodeBlockNode = isCodeBlockNode;
+            compileState.ParsingMode = ProtoCore.ParseMode.AllowNonAssignment;
         }
 
         public static void CleanUp()
         {
-            if (core != null)
-                core.Cleanup();
-            core = null;
+            if (compileState != null)
+            {
+                compileState.Cleanup();
+            }
+            compileState = null;
 
             numBuiltInMethods = 0;
             builtInMethods = null;
@@ -201,24 +203,26 @@ namespace GraphToDSCompiler
         {
             if (null == rootModulePath)
                 rootModulePath = string.Empty;
-            if (null == core)
+            if (null == compileState)
                 GraphUtilities.rootModulePath = rootModulePath;
             else
-                core.Options.RootModulePathName = rootModulePath;
+                compileState.Options.RootModulePathName = rootModulePath;
         }
 
         private static bool LocateAssembly(string assembly, out string assemblyPath)
         {
-            ProtoCore.Options options = null;
-            if (null == core)
-                options = new ProtoCore.Options() { RootModulePathName = GraphUtilities.rootModulePath };
+            ProtoLanguage.CompileOptions options = null;
+            if (null == compileState)
+                options = new ProtoLanguage.CompileOptions() { RootModulePathName = GraphUtilities.rootModulePath };
             else
-                options = core.Options;
+                options = compileState.Options;
 
             assemblyPath = FileUtils.GetDSFullPathName(assembly, options);
             string dirName = Path.GetDirectoryName(assemblyPath);
-            if(!string.IsNullOrEmpty(dirName) && !core.Options.IncludeDirectories.Contains(dirName))
-                core.Options.IncludeDirectories.Add(dirName);
+            if (!string.IsNullOrEmpty(dirName) && !compileState.Options.IncludeDirectories.Contains(dirName))
+            {
+                compileState.Options.IncludeDirectories.Add(dirName);
+            }
 
             return File.Exists(assemblyPath);
         }
@@ -234,7 +238,7 @@ namespace GraphToDSCompiler
             string expression = string.Empty;
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
 
-            BuildCore(false, true);
+            BuildCompileState(false, true);
 
             foreach (string assembly in assemblies)
             {
@@ -257,7 +261,7 @@ namespace GraphToDSCompiler
                 ProtoCore.BuildStatus status = null;
                 if (!string.IsNullOrEmpty(expression))
                 {
-                    status = PreCompile(expression, core, out blockId);
+                    status = PreCompile(expression, compileState, out blockId);
                 }
 
                 if (status != null && status.ErrorCount > 0)
@@ -343,7 +347,7 @@ namespace GraphToDSCompiler
         {
             IList<ClassNode> classNodes = GetClassesForAssembly(assembly);
 
-            ProtoCore.Mirror.LibraryMirror libraryMirror = new ProtoCore.Mirror.LibraryMirror(core, assembly, classNodes);
+            ProtoCore.Mirror.LibraryMirror libraryMirror = new ProtoCore.Mirror.LibraryMirror(compileState, assembly, classNodes);
 
             return libraryMirror;
         }
@@ -361,8 +365,8 @@ namespace GraphToDSCompiler
             if (string.IsNullOrEmpty(className))
                 return parentClass;
 
-            Validity.Assert(core != null);
-            ProtoCore.DSASM.ClassTable classTable = core.ClassTable;
+            Validity.Assert(compileState != null);
+            ProtoCore.DSASM.ClassTable classTable = compileState.ClassTable;
             int ci = classTable.IndexOf(className);
 
             if (ci != ProtoCore.DSASM.Constants.kInvalidIndex)
@@ -397,8 +401,8 @@ namespace GraphToDSCompiler
             if (string.IsNullOrEmpty(className))
                 return assembly;
 
-            Validity.Assert(core != null);
-            ProtoCore.DSASM.ClassTable classTable = core.ClassTable;
+            Validity.Assert(compileState != null);
+            ProtoCore.DSASM.ClassTable classTable = compileState.ClassTable;
             int ci = classTable.IndexOf(className);
 
             if (ci != ProtoCore.DSASM.Constants.kInvalidIndex)
@@ -418,8 +422,8 @@ namespace GraphToDSCompiler
         public static List<string> GetConstructors(string className)
         {
             List<string> constructors = new List<string>();
-            Validity.Assert(core != null);
-            ProtoCore.DSASM.ClassTable classTable = core.ClassTable;
+            Validity.Assert(compileState != null);
+            ProtoCore.DSASM.ClassTable classTable = compileState.ClassTable;
             int ci = classTable.IndexOf(className);
 
             if (ci != ProtoCore.DSASM.Constants.kInvalidIndex)
@@ -444,8 +448,8 @@ namespace GraphToDSCompiler
         public static List<string> GetProperties(string className)
         {
             List<string> properties = new List<string>();
-            Validity.Assert(core != null);
-            ProtoCore.DSASM.ClassTable classTable = core.ClassTable;
+            Validity.Assert(compileState != null);
+            ProtoCore.DSASM.ClassTable classTable = compileState.ClassTable;
             int ci = classTable.IndexOf(className);
             string name = string.Empty;
             if (ci != ProtoCore.DSASM.Constants.kInvalidIndex)
@@ -479,8 +483,8 @@ namespace GraphToDSCompiler
         public static List<string> GetMethods(string className)
         {
             List<string> methods = new List<string>();
-            Validity.Assert(core != null);
-            ProtoCore.DSASM.ClassTable classTable = core.ClassTable;
+            Validity.Assert(compileState != null);
+            ProtoCore.DSASM.ClassTable classTable = compileState.ClassTable;
             int ci = classTable.IndexOf(className);
             string name = string.Empty;
             if (ci != ProtoCore.DSASM.Constants.kInvalidIndex)
@@ -506,13 +510,13 @@ namespace GraphToDSCompiler
 
         private static List<ProcedureNode> GetBuiltInMethods()
         {
-            Validity.Assert(core != null);
+            Validity.Assert(compileState != null);
 
-            Validity.Assert(core.CodeBlockList.Count > 0);
+            Validity.Assert(compileState.CodeBlockList.Count > 0);
 
             if (builtInMethods == null)
             {
-                List<ProcedureNode> procNodes = core.CodeBlockList[0].procedureTable.procList;
+                List<ProcedureNode> procNodes = compileState.CodeBlockList[0].procedureTable.procList;
                 numBuiltInMethods = procNodes.Count;
                 List<ProcedureNode> builtIns = new List<ProcedureNode>();
 
@@ -537,11 +541,11 @@ namespace GraphToDSCompiler
         public static List<ProcedureNode> GetGlobalMethods(string dsFile)
         {
             List<ProcedureNode> methods = new List<ProcedureNode>();
-            Validity.Assert(core != null);
+            Validity.Assert(compileState != null);
 
-            Validity.Assert(core.CodeBlockList.Count > 0);
+            Validity.Assert(compileState.CodeBlockList.Count > 0);
 
-            List<ProcedureNode> procNodes = core.CodeBlockList[0].procedureTable.procList;
+            List<ProcedureNode> procNodes = compileState.CodeBlockList[0].procedureTable.procList;
 
             int numNewMethods = procNodes.Count - numBuiltInMethods;
             Validity.Assert(numNewMethods >= 0);
@@ -639,12 +643,12 @@ namespace GraphToDSCompiler
                 if (n is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode ||
                     n is ProtoCore.AST.AssociativeAST.ClassDeclNode)
                 {
-                    core.BuildStatus.LogSemanticError("Class and function definitions are not supported");
+                    compileState.BuildStatus.LogSemanticError("Class and function definitions are not supported");
 
                 }
                 else if (n is ProtoCore.AST.AssociativeAST.ModifierStackNode)
                 {
-                    core.BuildStatus.LogSemanticError("Modifier Blocks are not supported currently");
+                    compileState.BuildStatus.LogSemanticError("Modifier Blocks are not supported currently");
                 }
                 //else if (n is ProtoCore.AST.AssociativeAST.ImportNode)
                 //{
@@ -714,7 +718,7 @@ namespace GraphToDSCompiler
 
                 // For invalid functional associative statement errors like for "a+b;"
                 // Reset core above as we don't wish to propagate these errors - pratapa
-                core.ResetForPrecompilation();
+                compileState.ResetForPrecompilation();
 
                 compiled = GenerateStatements(oldIndex, expression);
                 /*string code = ParseNonAssignment(expression);
@@ -758,7 +762,7 @@ namespace GraphToDSCompiler
 
         public static void RemoveGlobalSymbols(string symbolName)
         {
-            core.CodeBlockList[0].symbolTable.RemoveGlobalSymbols(symbolName);
+            compileState.CodeBlockList[0].symbolTable.RemoveGlobalSymbols(symbolName);
         }
 
         private static List<string> GenerateStatements(int oldIndex, string expression)
@@ -937,9 +941,9 @@ namespace GraphToDSCompiler
 
             try
             {
-                BuildCore(true);
+                BuildCompileState(true);
                 int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-                ProtoCore.BuildStatus status = PreCompile(code, core, out blockId);
+                ProtoCore.BuildStatus status = PreCompile(code, compileState, out blockId);
                 foreach (var err in status.Errors)
                 {
                     errors.Add(err.Message);
@@ -949,7 +953,7 @@ namespace GraphToDSCompiler
                 if (null != inputVariables)
                     GetInputVariables(warnings, inputVariables);
                 if (null != outputLines)
-                    GetOutputLines(code, core, outputLines);
+                    GetOutputLines(code, compileState, outputLines);
 
                 return true;
             }
@@ -986,9 +990,9 @@ namespace GraphToDSCompiler
 
             try
             {
-                BuildCore(true);
+                BuildCompileState(true);
                 int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-                ProtoCore.BuildStatus status = PreCompile(compilableText, core, out blockId);
+                ProtoCore.BuildStatus status = PreCompile(compilableText, compileState, out blockId);
 
                 if( status.Errors.Count > 0)
                    return false;
@@ -998,7 +1002,7 @@ namespace GraphToDSCompiler
                 if (null != inputLines)
                     GetInputLines(compilableText, warnings, inputLines);
                 if (null != outputLines)
-                    GetOutputLines(compilableText, core, outputLines);
+                    GetOutputLines(compilableText, compileState, outputLines);
                 
                 return true;
             }
@@ -1027,9 +1031,9 @@ namespace GraphToDSCompiler
                 unboundIdentifiers.Clear();
             try
             {
-                BuildCore(true);
+                BuildCompileState(true);
                 int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-                ProtoCore.BuildStatus status = PreCompile(compilableText, core, out blockId);
+                ProtoCore.BuildStatus status = PreCompile(compilableText, compileState, out blockId);
 
                 if (status.Errors.Count > 0)
                 {
@@ -1042,7 +1046,7 @@ namespace GraphToDSCompiler
                 if (null != unboundIdentifiers)
                     GetInputLines(compilableText, warnings, unboundIdentifiers);
 
-                astNodes = core.AstNodeList;
+                astNodes = compileState.AstNodeList;
                 return true;
             }
             catch (Exception exception)
@@ -1055,7 +1059,7 @@ namespace GraphToDSCompiler
 
         public static List<SynchronizeData> GetSDList(string filepath)
         {
-            BuildCore(true);
+            BuildCompileState(true);
             List<SynchronizeData> sdList = new List<SynchronizeData>();
             string readContents;
             using (StreamReader streamReader = new StreamReader(filepath, Encoding.UTF8))
@@ -1078,10 +1082,10 @@ namespace GraphToDSCompiler
             List<ProtoCore.AST.Node> n = new List<ProtoCore.AST.Node>();
             try
             {
-                BuildCore(true);
+                BuildCompileState(true);
                 System.IO.MemoryStream memstream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(code));
                 ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(memstream);
-                ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, core);
+                ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, compileState);
 
                 p.Parse();
                 ProtoCore.AST.AssociativeAST.CodeBlockNode codeBlockNode = p.root as ProtoCore.AST.AssociativeAST.CodeBlockNode;
@@ -1126,14 +1130,14 @@ namespace GraphToDSCompiler
         /// Does the first pass of compilation and returns a list of wanrnings in compilation
         /// </summary>
         /// <param name="code"></param>
-        /// <param name="core"></param>
+        /// <param name="compileState"></param>
         /// <param name="blockId"></param>
         /// <returns></returns>
-        private static ProtoCore.BuildStatus PreCompile(string code, ProtoCore.Core core, out int blockId)
+        private static ProtoCore.BuildStatus PreCompile(string code, ProtoLanguage.CompileStateTracker compileState, out int blockId)
         {
             bool buildSucceeded = false;
 
-            core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
+            compileState.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
 
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
             try
@@ -1150,13 +1154,13 @@ namespace GraphToDSCompiler
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
                 ProtoCore.Language id = globalBlock.language;
 
-                core.Executives[id].Compile(out blockId, null, globalBlock, context);
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context);
 
-                core.BuildStatus.ReportBuildResult();
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+                buildSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
             catch (Exception ex)
             {
@@ -1167,7 +1171,7 @@ namespace GraphToDSCompiler
                 }
             }
 
-            return core.BuildStatus;
+            return compileState.BuildStatus;
         }
 
         // TODO: Deprecate as it's used in the deprecated version of GetInputOutputInfo
@@ -1282,7 +1286,7 @@ namespace GraphToDSCompiler
 
             int stmtNumber = 1;
             //List<VariableLine> variableLineList = new List<VariableLine>(warningVLList);
-            foreach (var node in core.AstNodeList)
+            foreach (var node in compileState.AstNodeList)
             {
                 Validity.Assert(node is ProtoCore.AST.AssociativeAST.BinaryExpressionNode);
 
@@ -1324,9 +1328,9 @@ namespace GraphToDSCompiler
         public static ProtoCore.AST.Node Parse(string statement, out ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode)
         {
             commentNode = null;
-            BuildCore(true);
+            BuildCompileState(true);
 
-            Validity.Assert(core != null);
+            Validity.Assert(compileState != null);
             Validity.Assert(statement != null);
 
             if (string.IsNullOrEmpty(statement))
@@ -1334,7 +1338,7 @@ namespace GraphToDSCompiler
 
             System.IO.MemoryStream memstream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(statement));
             ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(memstream);
-            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, core);
+            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, compileState);
 
             p.Parse();
             commentNode = p.commentNode;
@@ -1360,14 +1364,15 @@ namespace GraphToDSCompiler
             }*/
 
 
-            ProtoCore.Options options = new ProtoCore.Options();
-            ProtoCore.Core core = new ProtoCore.Core(options);
-            core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
-            core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
+            ProtoLanguage.CompileOptions options = new ProtoLanguage.CompileOptions();
+            ProtoLanguage.CompileStateTracker compileState = new ProtoLanguage.CompileStateTracker(options);
+            
+            //compileState.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(compileState));
+            //compileState.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(compileState));
 
             System.IO.MemoryStream memstream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(code));
             ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(memstream);
-            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, core);
+            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, compileState);
 
             p.Parse();
             ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = p.root as ProtoCore.AST.AssociativeAST.CodeBlockNode;
@@ -1379,7 +1384,7 @@ namespace GraphToDSCompiler
         // TODO: To Deprecate: Currently used in GetInputOutputInfo() overload used in ProtoTest.GraphCompiler.MicroFeatureTests
         // 
         
-        private static void GetOutputLines(string code, ProtoCore.Core core, Dictionary<int, string> outputLines)
+        private static void GetOutputLines(string code, ProtoLanguage.CompileStateTracker compileState, Dictionary<int, string> outputLines)
         {
             Validity.Assert(code != null);
             if (!String.IsNullOrEmpty(code))
@@ -1387,11 +1392,11 @@ namespace GraphToDSCompiler
 
                 System.IO.MemoryStream memstream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(code));
                 ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(memstream);
-                ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, core);
+                ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, compileState);
 
                 p.Parse();
 
-                foreach (var astNode in core.AstNodeList)
+                foreach (var astNode in compileState.AstNodeList)
                 {
                     var binaryExpr = astNode as ProtoCore.AST.AssociativeAST.BinaryExpressionNode;
                     while (binaryExpr != null)
@@ -1410,10 +1415,10 @@ namespace GraphToDSCompiler
         }
         
 
-        private static void GetOutputLines(string code, ProtoCore.Core core, HashSet<VariableLine> outputLines)
+        private static void GetOutputLines(string code, ProtoLanguage.CompileStateTracker compileState, HashSet<VariableLine> outputLines)
         {
-            
-            foreach (var astNode in core.AstNodeList)
+
+            foreach (var astNode in compileState.AstNodeList)
             {
                 var binaryExpr = astNode as ProtoCore.AST.AssociativeAST.BinaryExpressionNode;
                 while (binaryExpr != null)
@@ -1479,7 +1484,7 @@ namespace GraphToDSCompiler
             List<SnapshotNode> codeBlocks = new List<SnapshotNode>();
             GraphToDSCompiler.GraphCompiler newGC = GraphCompiler.CreateInstance();
 
-            newGC.SetCore(core);
+            newGC.SetCore(compileState);
             GraphToDSCompiler.SynchronizeData newSyncData = new SynchronizeData();
             newSyncData.AddedNodes = inputs;
             newSyncData.ModifiedNodes = new List<SnapshotNode>();

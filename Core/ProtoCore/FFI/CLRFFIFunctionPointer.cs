@@ -464,7 +464,7 @@ namespace ProtoFFI
                     var core = dsi.runtime.Core;
                     int thisptr = (int)thisObject.opdata;
 
-                    int idx = core.ClassTable.ClassNodes[classIndex].symbols.IndexOf(PropertyName);
+                    int idx = core.DSExecutable.classTable.ClassNodes[classIndex].symbols.IndexOf(PropertyName);
                     StackValue oldValue = core.Heap.Heaplist[(int)thisObject.opdata].GetValue(idx, core);
                     if (!StackUtils.Equals(oldValue, propValue))
                     {

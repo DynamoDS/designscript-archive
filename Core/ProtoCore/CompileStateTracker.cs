@@ -15,11 +15,169 @@ using Autodesk.DesignScript.Interfaces;
 
 namespace ProtoLanguage
 {
+    public enum ExecutionMode
+    {
+        Parallel,
+        Serial
+    }
+
+    public class CompileOptions
+    {
+        public CompileOptions()
+        {
+            DumpByteCode = false;
+            Verbose = false;
+
+            FullSSA = false;
+            DumpIL = false;
+
+            DumpFunctionResolverLogic = false;
+            DumpOperatorToMethodByteCode = false;
+            SuppressBuildOutput = false;
+            BuildOptWarningAsError = false;
+            BuildOptErrorAsWarning = false;
+            ExecutionMode = ProtoLanguage.ExecutionMode.Serial;
+            IDEDebugMode = false;
+            WatchTestMode = false;
+            IncludeDirectories = new List<string>();
+
+            // defaults to 6 decimal places
+            //
+            FormatToPrintFloatingPoints = "F6";
+            RootCustomPropertyFilterPathName = @"C:\arxapiharness\Bin\AcDesignScript\CustomPropertyFilter.txt";
+            CompileToLib = false;
+            AssocOperatorAsMethod = true;
+
+            EnableProcNodeSanityCheck = true;
+            EnableReturnTypeCheck = true;
+
+            RootModulePathName = Path.GetFullPath(@".");
+            staticCycleCheck = true;
+            dynamicCycleCheck = true;
+            RecursionChecking = false;
+            EmitBreakpoints = true;
+
+            localDependsOnGlobalSet = false;
+            LHSGraphNodeUpdate = true;
+            TempReplicationGuideEmptyFlag = true;
+            AssociativeToImperativePropagation = true;
+            SuppressFunctionResolutionWarning = true;
+            EnableVariableAccumulator = true;
+            WebRunner = false;
+            DisableDisposeFunctionDebug = true;
+            GenerateExprID = true;
+            IsDeltaExecution = false;
+            ElementBasedArrayUpdate = true;
+
+        }
+
+
+        public bool DumpByteCode { get; set; }
+        public bool DumpIL { get; private set; }
+        public bool FullSSA { get; set; }
+        public bool Verbose { get; set; }
+        public bool DumpOperatorToMethodByteCode { get; set; }
+        public bool SuppressBuildOutput { get; set; }
+        public bool BuildOptWarningAsError { get; set; }
+        public bool BuildOptErrorAsWarning { get; set; }
+        public bool IDEDebugMode { get; set; }      //set to true if two way mapping b/w DesignScript and JIL code is needed
+        public bool WatchTestMode { get; set; }     // set to true when running automation tests for expression interpreter
+        public ExecutionMode ExecutionMode { get; set; }
+        public string FormatToPrintFloatingPoints { get; set; }
+        public bool CompileToLib { get; set; }
+        public bool AssocOperatorAsMethod { get; set; }
+        public string LibPath { get; set; }
+        public bool staticCycleCheck { get; set; }
+        public bool dynamicCycleCheck { get; set; }
+        public bool RecursionChecking { get; set; }
+        public bool DumpFunctionResolverLogic { get; set; }
+        public bool EmitBreakpoints { get; set; }
+        public bool localDependsOnGlobalSet { get; set; }
+        public bool LHSGraphNodeUpdate { get; set; }
+        public bool SuppressFunctionResolutionWarning { get; set; }
+        public bool WebRunner { get; set; }
+
+        public bool TempReplicationGuideEmptyFlag { get; set; }
+        public bool AssociativeToImperativePropagation { get; set; }
+        public bool EnableVariableAccumulator { get; set; }
+        public bool DisableDisposeFunctionDebug { get; set; }
+        public bool GenerateExprID { get; set; }
+        public bool IsDeltaExecution { get; set; }
+        public bool ElementBasedArrayUpdate { get; set; }
+
+
+        // This is being moved to Core.Options as this needs to be overridden for the Watch test framework runner        
+        public int kDynamicCycleThreshold = 2000;
+
+        public double Tolerance
+        {
+            get { return ProtoCore.Utils.MathUtils.Tolerance; }
+            set { ProtoCore.Utils.MathUtils.Tolerance = value; }
+        }
+
+        public List<string> IncludeDirectories { get; set; }
+        public string RootModulePathName { get; set; }
+
+        private string rootCustomPropertyFilterPathName;
+        public string RootCustomPropertyFilterPathName
+        {
+            get
+            {
+                return rootCustomPropertyFilterPathName;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    rootCustomPropertyFilterPathName = null;
+                }
+                else
+                {
+                    var fileName = value;
+                    if (System.IO.File.Exists(fileName))
+                    {
+                        rootCustomPropertyFilterPathName = fileName;
+
+                        System.IO.StreamReader stream = null;
+                        try
+                        {
+                            stream = new System.IO.StreamReader(fileName);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            throw new System.IO.FileLoadException(string.Format("Custom property filter file {0} can't be read. Error Message:{1}", fileName, ex.Message));
+                        }
+                        finally
+                        {
+                            if (stream != null)
+                            {
+                                stream.Dispose();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //throw new System.IO.FileNotFoundException(string.Format("Custom property filter file {0} does not exists", fileName));
+                        rootCustomPropertyFilterPathName = null;
+                    }
+                }
+            }
+        }
+
+        public bool EnableReturnTypeCheck { get; set; }
+
+        public bool EnableProcNodeSanityCheck { get; set; }
+
+    }
+
     public class CompileStateTracker
     {
         public const int FIRST_CORE_ID = 0;
 
         public int ID { get; private set; }
+
+        public bool compileSucceeded { get; set; }
+
         //recurtion
         public List<FunctionCounter> recursivePoint { get; set; }
         public List<FunctionCounter> funcCounterTable { get; set; }
@@ -103,7 +261,7 @@ namespace ProtoLanguage
 
         public List<Instruction> Breakpoints { get; set; }
 
-        public Options Options { get; private set; }
+        public CompileOptions Options { get; private set; }
         public BuildStatus BuildStatus { get; private set; }
 
         public TypeSystem TypeSystem { get; set; }
@@ -125,23 +283,23 @@ namespace ProtoLanguage
         public Dictionary<string, object> Configurations { get; set; }
 
         //Manages injected context data.
-        internal ContextDataManager ContextDataManager { get; set; }
+        public ContextDataManager ContextDataManager { get; set; }
 
         public ParseMode ParsingMode { get; set; }
 
-        //public FFIPropertyChangedMonitor FFIPropertyChangedMonitor { get; private set; }
+        public FFIPropertyChangedMonitor FFIPropertyChangedMonitor { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="data"></param>
-        //public void AddContextData(Dictionary<string, Object> data)
-        //{
-        //    if (data == null)
-        //        return;
+        public void AddContextData(Dictionary<string, Object> data)
+        {
+            if (data == null)
+                return;
 
-        //    ContextDataManager.GetInstance(this).AddData(data);
-        //}
+            ContextDataManager.GetInstance(this).AddData(data);
+        }
 
 
         // Cached replication guides for the current call. 
@@ -172,7 +330,10 @@ namespace ProtoLanguage
         /// </summary>
         public ReasonForExecutionSuspend ReasonForExecutionSuspend { get; internal set; }
 
+        public delegate void DisposeDelegate(ProtoLanguage.CompileStateTracker sender);
+        public event DisposeDelegate Dispose;
         public event EventHandler<ExecutionStateEventArgs> ExecutionEvent;
+
 
         public int ExecutionState { get; set; }
 
@@ -365,6 +526,8 @@ namespace ProtoLanguage
         // All properties require reset except for the runtime memory
         public void ResetForDeltaExecution()
         {
+            compileSucceeded = false;
+
             ClassIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
 
 
@@ -476,6 +639,8 @@ namespace ProtoLanguage
 
         public void ResetForPrecompilation()
         {
+            compileSucceeded = false;
+
             GraphNodeUID = 0;
             CodeBlockIndex = 0;
             RuntimeTableIndex = 0;
@@ -512,8 +677,10 @@ namespace ProtoLanguage
             ExpressionUID = 0;
         }
 
-        private void ResetAll(Options options)
+        private void ResetAll(CompileOptions options)
         {
+            compileSucceeded = false;
+
             ProtoCore.Utils.Validity.AssertExpiry();
             Options = options;
             Executives = new Dictionary<ProtoCore.Language, ProtoCore.Executive>();
@@ -664,6 +831,20 @@ namespace ProtoLanguage
         public int FunctionCallDepth { get; set; }
         public System.IO.TextWriter ExecutionLog { get; set; }
 
+        protected void OnDispose()
+        {
+            if (Dispose != null)
+            {
+                Dispose(this);
+            }
+        }
+
+        public void Cleanup()
+        {
+            OnDispose();
+            ProtoFFI.CLRModuleType.ClearTypes();
+        }
+
 
         public void InitializeContextGlobals(Dictionary<string, object> context)
         {
@@ -681,7 +862,7 @@ namespace ProtoLanguage
             }
         }
 
-        public CompileStateTracker(Options options)
+        public CompileStateTracker(CompileOptions options)
         {
             ResetAll(options);
         }
@@ -919,63 +1100,63 @@ namespace ProtoLanguage
             return codeblock;
         }
 
-        public StackValue Bounce(int exeblock, int entry, ProtoCore.Runtime.Context context, ProtoCore.DSASM.StackFrame stackFrame, int locals = 0, ProtoCore.DebugServices.EventSink sink = null)
-        {
-            if (stackFrame != null)
-            {
-                ProtoCore.DSASM.StackValue svThisPtr = stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kThisPtr);
-                int ci = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kClass).opdata;
-                int fi = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunction).opdata;
-                int returnAddr = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
-                int blockDecl = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionBlock).opdata;
-                int blockCaller = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionCallerBlock).opdata;
-                ProtoCore.DSASM.StackFrameType callerFrameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
-                ProtoCore.DSASM.StackFrameType frameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
-                Validity.Assert(frameType == StackFrameType.kTypeLanguage);
+        //public StackValue Bounce(int exeblock, int entry, ProtoCore.Runtime.Context context, ProtoCore.DSASM.StackFrame stackFrame, int locals = 0, ProtoCore.DebugServices.EventSink sink = null)
+        //{
+        //    if (stackFrame != null)
+        //    {
+        //        ProtoCore.DSASM.StackValue svThisPtr = stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kThisPtr);
+        //        int ci = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kClass).opdata;
+        //        int fi = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunction).opdata;
+        //        int returnAddr = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
+        //        int blockDecl = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionBlock).opdata;
+        //        int blockCaller = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionCallerBlock).opdata;
+        //        ProtoCore.DSASM.StackFrameType callerFrameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
+        //        ProtoCore.DSASM.StackFrameType frameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
+        //        Validity.Assert(frameType == StackFrameType.kTypeLanguage);
 
-                int depth = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameDepth).opdata;
-                int framePointer = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFramePointer).opdata;
-                List<StackValue> registers = stackFrame.GetRegisters();
+        //        int depth = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameDepth).opdata;
+        //        int framePointer = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFramePointer).opdata;
+        //        List<StackValue> registers = stackFrame.GetRegisters();
 
-                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
-            }
+        //        Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
+        //    }
 
-            ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
-            CurrentExecutive = Executives[id];
-            ProtoCore.DSASM.StackValue sv = Executives[id].Execute(exeblock, entry, context, sink);
-            return sv;
-        }
+        //    ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
+        //    CurrentExecutive = Executives[id];
+        //    ProtoCore.DSASM.StackValue sv = Executives[id].Execute(exeblock, entry, context, sink);
+        //    return sv;
+        //}
 
-        public StackValue Bounce(int exeblock, int entry, ProtoCore.Runtime.Context context, List<Instruction> breakpoints, ProtoCore.DSASM.StackFrame stackFrame, int locals = 0,
-            ProtoCore.DSASM.Executive exec = null, ProtoCore.DebugServices.EventSink sink = null, bool fepRun = false)
-        {
-            if (stackFrame != null)
-            {
-                ProtoCore.DSASM.StackValue svThisPtr = stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kThisPtr);
-                int ci = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kClass).opdata;
-                int fi = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunction).opdata;
-                int returnAddr = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
-                int blockDecl = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionBlock).opdata;
-                int blockCaller = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionCallerBlock).opdata;
-                ProtoCore.DSASM.StackFrameType callerFrameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
-                ProtoCore.DSASM.StackFrameType frameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
-                Validity.Assert(frameType == StackFrameType.kTypeLanguage);
+        //public StackValue Bounce(int exeblock, int entry, ProtoCore.Runtime.Context context, List<Instruction> breakpoints, ProtoCore.DSASM.StackFrame stackFrame, int locals = 0,
+        //    ProtoCore.DSASM.Executive exec = null, ProtoCore.DebugServices.EventSink sink = null, bool fepRun = false)
+        //{
+        //    if (stackFrame != null)
+        //    {
+        //        ProtoCore.DSASM.StackValue svThisPtr = stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kThisPtr);
+        //        int ci = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kClass).opdata;
+        //        int fi = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunction).opdata;
+        //        int returnAddr = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
+        //        int blockDecl = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionBlock).opdata;
+        //        int blockCaller = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFunctionCallerBlock).opdata;
+        //        ProtoCore.DSASM.StackFrameType callerFrameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
+        //        ProtoCore.DSASM.StackFrameType frameType = (ProtoCore.DSASM.StackFrameType)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
+        //        Validity.Assert(frameType == StackFrameType.kTypeLanguage);
 
-                int depth = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameDepth).opdata;
-                int framePointer = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFramePointer).opdata;
-                List<StackValue> registers = stackFrame.GetRegisters();
+        //        int depth = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kStackFrameDepth).opdata;
+        //        int framePointer = (int)stackFrame.GetAt(ProtoCore.DSASM.StackFrame.AbsoluteIndex.kFramePointer).opdata;
+        //        List<StackValue> registers = stackFrame.GetRegisters();
 
-                DebugProps.SetUpBounce(exec, blockCaller, returnAddr);
+        //        DebugProps.SetUpBounce(exec, blockCaller, returnAddr);
 
-                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
-            }
+        //        Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
+        //    }
 
-            ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
-            CurrentExecutive = Executives[id];
+        //    ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
+        //    CurrentExecutive = Executives[id];
 
-            ProtoCore.DSASM.StackValue sv = Executives[id].Execute(exeblock, entry, context, breakpoints, sink, fepRun);
-            return sv;
-        }
+        //    ProtoCore.DSASM.StackValue sv = Executives[id].Execute(exeblock, entry, context, breakpoints, sink, fepRun);
+        //    return sv;
+        //}
 
         private void BfsBuildSequenceTable(CodeBlock codeBlock, SymbolTable[] runtimeSymbols)
         {
@@ -1044,10 +1225,7 @@ namespace ProtoLanguage
             {
                 if (null != DSExecutable.instrStreamList[i])
                 {
-
-                    // Jun: Fixme before submission
-                    //ExprInterpreterExe.instrStreamList[i] = new InstructionStream(DSExecutable.instrStreamList[i].language, this);
-                    
+                    ExprInterpreterExe.instrStreamList[i] = new InstructionStream(DSExecutable.instrStreamList[i].language, this);
                     for (int j = 0; j < DSExecutable.instrStreamList[i].instrList.Count; ++j)
                     {
                         ExprInterpreterExe.instrStreamList[i].instrList.Add(DSExecutable.instrStreamList[i].instrList[j]);
@@ -1101,6 +1279,15 @@ namespace ProtoLanguage
             {
                 DSExecutable.isSingleAssocBlock = (ProtoCore.DSASM.OpCode.BOUNCE == CodeBlockList[0].instrStream.instrList[0].opCode) ? true : false;
             }
+
+            // Properties directly accessed by the runtime from core, should now be accessed from the executable
+            DSExecutable.CodeBlockList = new List<CodeBlock>(CodeBlockList);
+            DSExecutable.FunctionTable = FunctionTable;
+            DSExecutable.CompleteCodeBlockList = CompleteCodeBlockList;
+            DSExecutable.DynamicVariableTable = DynamicVariableTable;
+            DSExecutable.DynamicFunctionTable = DynamicFunctionTable;
+            DSExecutable.FunctionPointerTable = FunctionPointerTable;
+
             GenerateExprExe();
         }
 

@@ -315,7 +315,7 @@ namespace ProtoCore
                     return true;
                 }
 
-                return core.ClassTable.ClassNodes[fromType].ConvertibleTo(toType);
+                return core.DSExecutable.classTable.ClassNodes[fromType].ConvertibleTo(toType);
             }
             return false;
         }
@@ -355,7 +355,7 @@ namespace ProtoCore
 
             if ( !(
                 (int)sv.metaData.type == targetType.UID || 
-                (core.ClassTable.ClassNodes[(int)sv.metaData.type].ConvertibleTo(targetType.UID))
+                (core.DSExecutable.classTable.ClassNodes[(int)sv.metaData.type].ConvertibleTo(targetType.UID))
                 || sv.optype == AddressType.ArrayPointer))
             {
                 core.RuntimeStatus.LogWarning(RuntimeData.WarningID.kConversionNotPossible, ProtoCore.RuntimeData.WarningMessage.kConvertNonConvertibleTypes);

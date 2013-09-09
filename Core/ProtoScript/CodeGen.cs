@@ -7,11 +7,11 @@ namespace ProtoScript
     public class GenerateScript
     {
         private Script script;
-        private Core core;
-        public GenerateScript(Core core)
+        private ProtoLanguage.CompileStateTracker compileState;
+        public GenerateScript(ProtoLanguage.CompileStateTracker compileState)
         {
             script = new Script();
-            this.core = core;
+            this.compileState = compileState;
         }
 
         public ProtoCore.Script preParseFromFile(string pathFilename)
