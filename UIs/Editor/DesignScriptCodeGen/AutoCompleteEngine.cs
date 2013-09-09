@@ -377,10 +377,10 @@ namespace DesignScript.Editor.AutoComplete
                 // should be done.
                 e.Result = false;
 
-                ProtoCore.Core core = CompileCodeSnapshot(workData);
-                if (null != core)
+                ProtoLanguage.CompileStateTracker compileState = CompileCodeSnapshot(workData);
+                if (null != compileState)
                 {
-                    stagingDatabase = new SymbolDatabaseProxy(core, scopeIdentifiers);
+                    stagingDatabase = new SymbolDatabaseProxy(compileState, scopeIdentifiers);
                     e.Result = true;
                 }
             }
@@ -435,7 +435,7 @@ namespace DesignScript.Editor.AutoComplete
             }
         }
 
-        private ProtoCore.Core CompileCodeSnapshot(AutoCompleteWorkData workData)
+        private ProtoLanguage.CompileStateTracker CompileCodeSnapshot(AutoCompleteWorkData workData)
         {
             if (null != this.scopeIdentifiers)
             {
@@ -443,26 +443,26 @@ namespace DesignScript.Editor.AutoComplete
                 this.scopeIdentifiers = null;
             }
 
-            ProtoCore.Options options = new ProtoCore.Options();
+            ProtoLanguage.CompileOptions options = new ProtoLanguage.CompileOptions();
             options.RootModulePathName = workData.ScriptPath;
-            ProtoCore.Core core = new ProtoCore.Core(options);
+            ProtoLanguage.CompileStateTracker compileState = new ProtoLanguage.CompileStateTracker(options);
 
-            core.CurrentDSFileName = workData.ScriptPath;
+            compileState.CurrentDSFileName = workData.ScriptPath;
             ProtoFFI.DLLFFIHandler.Register(ProtoFFI.FFILanguage.CSharp, new ProtoFFI.CSModuleHelper());
 
             // Register a message stream if we do have one.
             if (null != this.MessageHandler)
-                core.BuildStatus.MessageHandler = this.MessageHandler;
+                compileState.BuildStatus.MessageHandler = this.MessageHandler;
 
             MemoryStream stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(workData.CodeSnapshot));
             ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(stream);
-            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, core);
+            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, compileState);
 
             try
             {
                 p.Parse();
                 CoreCodeGen.arrayTypeTable = new ArrayTypeTable();
-                AssociativeCodeGen codegen = new AssociativeCodeGen(core);
+                AssociativeCodeGen codegen = new AssociativeCodeGen(compileState);
 
                 codegen.Emit(p.root as ProtoCore.AST.AssociativeAST.CodeBlockNode);
             }
@@ -470,14 +470,14 @@ namespace DesignScript.Editor.AutoComplete
             {
                 System.Diagnostics.Debug.WriteLine("Exception Caught in CodeGen");
                 System.Diagnostics.Debug.WriteLine(ex.Message);
-                core = null;
+                compileState = null;
             }
             finally
             {
                 // Do necessary clean-up here.
             }
 
-            return core;
+            return compileState;
         }
 
         private void PromoteStagingDatabase()
