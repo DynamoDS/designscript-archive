@@ -7,15 +7,12 @@ namespace ProtoCore.AST.AssociativeAST
 {
     public abstract class AssociativeNode : Node
     {
-        public bool IsModifier;
-
         public AssociativeNode()
         {
         }
 
         public AssociativeNode(AssociativeNode rhs) : base(rhs)
         {
-            IsModifier = rhs.IsModifier;
         }
 
         public override bool Compare(Node other)
