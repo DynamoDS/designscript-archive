@@ -1873,18 +1873,7 @@ namespace ProtoCore.DSASM
                 // Comment Jun: 
                 //      This is clarifying the intention that if the graphnode is within the same SSA expression, we still allow update
                 //
-                bool allowUpdateWithinSSA = false;
-                if (core.Options.FullSSA)
-                {
-                    allowUpdateWithinSSA = true;
-                }
-                else
-                {
-                    // TODO Jun: Remove this code immediatley after enabling SSA
-                    bool withinSSAStatement = graphNode.UID == executingGraphNode.UID;
-                    allowUpdateWithinSSA = !withinSSAStatement;
-                }
-
+                bool allowUpdateWithinSSA = true;
                 if (!allowUpdateWithinSSA || (propertyChanged && graphNode == Properties.executingGraphNode))
                 {
                     continue;
@@ -1933,11 +1922,8 @@ namespace ProtoCore.DSASM
                     // isSSAAssign means this is the graphnode of the final SSA assignment
                     // Overrride this if allowing within SSA update
                     // TODO Jun: Remove this code when SSA is completely enabled
-                    bool allowSSADownstream = false;
-                    if (core.Options.FullSSA)
-                    {
-                        allowSSADownstream = graphNode.UID > executingGraphNode.UID;
-                    }
+                    bool allowSSADownstream = graphNode.UID > executingGraphNode.UID;
+                    
 
                     // Comment Jun: 
                     //      If the triggered dependent graphnode is LHS 
@@ -1975,33 +1961,6 @@ namespace ProtoCore.DSASM
                         }
                         else if (!graphNode.isDirty)
                         {
-                            // If the graphnode is not cyclic, then it can be safely marked as dirty, in preparation of its execution
-                            if (core.Options.EnableVariableAccumulator
-                                && !isSSAAssign
-                                && graphNode.IsSSANode())
-                            {
-                                //
-                                // Comment Jun: Backtrack and firt the first graphnode of this SSA transform and mark it dirty. 
-                                //              We want to execute the entire statement, not just the partial SSA nodes
-                                //
-
-                                // TODO Jun: Optimization - Statically determine the index of the starting graphnode of this SSA expression
-
-                                // Looks we should partially execuate graph
-                                // nodes otherwise we will get accumulative
-                                // update. - Yu Ke 
-
-                                /*
-                                int graphNodeIndex = 0;
-                                for (; graphNodeIndex < graph.GraphList.Count; graphNodeIndex++)
-                                {
-                                    if (graph.GraphList[graphNodeIndex].UID == graphNode.UID)
-                                        break;
-                                }
-                                var firstGraphNode = GetFirstSSAGraphnode(graphNodeIndex - 1, graphNode.exprUID);
-                                firstGraphNode.isDirty = true;
-                                */
-                            }
 
                             if (core.Options.ElementBasedArrayUpdate)
                             {

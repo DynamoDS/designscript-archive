@@ -2214,18 +2214,16 @@ namespace ProtoCore
                             ProtoCore.AssociativeGraph.UpdateNode currentDependentNode = graphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
                             currentDependentNode.dimensionNodeList.Add(intNode);
 
-                            if (compileStateTracker.Options.FullSSA)
+                            if (null != firstSSAGraphNode)
                             {
-                                if (null != firstSSAGraphNode)
+                                lastDependentIndex = firstSSAGraphNode.dependentList.Count - 1;
+                                if (lastDependentIndex >= 0)
                                 {
-                                    lastDependentIndex = firstSSAGraphNode.dependentList.Count - 1;
-                                    if (lastDependentIndex >= 0)
-                                    {
-                                        ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
-                                        firstSSAUpdateNode.dimensionNodeList.Add(intNode);
-                                    }
+                                    ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
+                                    firstSSAUpdateNode.dimensionNodeList.Add(intNode);
                                 }
                             }
+                            
                         }
                     }
                 }
@@ -2356,14 +2354,11 @@ namespace ProtoCore
                         ProtoCore.AssociativeGraph.UpdateNode currentDependentNode = graphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
                         currentDependentNode.dimensionNodeList.Add(intNode);
 
-                        if (compileStateTracker.Options.FullSSA)
+                        if (null != firstSSAGraphNode)
                         {
-                            if (null != firstSSAGraphNode)
-                            {
-                                lastDependentIndex = firstSSAGraphNode.dependentList.Count - 1;
-                                ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
-                                firstSSAUpdateNode.dimensionNodeList.Add(intNode);
-                            }
+                            lastDependentIndex = firstSSAGraphNode.dependentList.Count - 1;
+                            ProtoCore.AssociativeGraph.UpdateNode firstSSAUpdateNode = firstSSAGraphNode.dependentList[lastDependentIndex].updateNodeRefList[0].nodeList[0];
+                            firstSSAUpdateNode.dimensionNodeList.Add(intNode);
                         }
                     }
                 }
@@ -2803,19 +2798,17 @@ namespace ProtoCore
             }
 
             BuildSSADependency(node, graphNode);
-            if (compileStateTracker.Options.FullSSA)
-            {
-                BuildRealDependencyForIdentList(graphNode);
+            BuildRealDependencyForIdentList(graphNode);
 
-                if (node is ProtoCore.AST.AssociativeAST.IdentifierListNode)
+            if (node is ProtoCore.AST.AssociativeAST.IdentifierListNode)
+            {
+                if ((node as ProtoCore.AST.AssociativeAST.IdentifierListNode).isLastSSAIdentListFactor)
                 {
-                    if ((node as ProtoCore.AST.AssociativeAST.IdentifierListNode).isLastSSAIdentListFactor)
-                    {
-                        Validity.Assert(null != ssaPointerList);
-                        ssaPointerList.Clear();
-                    }
+                    Validity.Assert(null != ssaPointerList);
+                    ssaPointerList.Clear();
                 }
             }
+            
 
             bool isCollapsed;
             EmitGetterSetterForIdentList(node, ref inferedType, graphNode, subPass, out isCollapsed);

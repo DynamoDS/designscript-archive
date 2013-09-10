@@ -1166,7 +1166,6 @@ Associative_FunctionalStatement<out ProtoCore.AST.AssociativeAST.AssociativeNode
                                        // Create function call node from binary expression node 
                                        expressionNode.RightNode = GenerateBinaryOperatorMethodCallNode(op, previousElementNode.LeftNode, rightNode);
                                        NodeUtils.SetNodeStartLocation(expressionNode.RightNode, opLine, opCol);
-                                       expressionNode.IsModifier = true;
                                     }
 
                                     if (null == identifier)
@@ -1235,16 +1234,6 @@ Associative_FunctionalStatement<out ProtoCore.AST.AssociativeAST.AssociativeNode
                                     if (isLeftMostNode) 
                                     {
                                         leftVar = null;
-                                        if (node is ProtoCore.AST.AssociativeAST.BinaryExpressionNode)
-                                        {
-                                            node.IsModifier = isModifier;   
-                                            /*
-                                            if ((node as ProtoCore.AST.AssociativeAST.BinaryExpressionNode).RightNode is ProtoCore.AST.AssociativeAST.InlineConditionalNode)
-                                            {
-                                               node.IsModifier = false;
-                                            }                                                             
-                                            */
-                                        }
                                         isModifier = false;
                                         withinModifierCheckScope = false;
                                         isLeftVarIdentList = false;                                  
