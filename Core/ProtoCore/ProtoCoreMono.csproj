@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
+    <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\bin\$(Platform)\$(Configuration)</OutputPath>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -69,6 +70,7 @@
     <Compile Include="CodeGenDS.cs" />
     <Compile Include="CodePoint.cs" />
     <Compile Include="CompilerOptions.cs" />
+    <Compile Include="CompileStateTracker.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="ClassTable.cs" />
     <Compile Include="DSASM\FunctionCounter.cs" />
