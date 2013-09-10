@@ -14,7 +14,7 @@ namespace ProtoScript.Runners
         private ProtoLanguage.CompileStateTracker compileState; 
         private readonly ProtoCore.DebugServices.EventSink EventSink = new ProtoCore.DebugServices.ConsoleEventSink();
 
-        public ExpressionInterpreterRunner(ProtoCore.Core core, ProtoLanguage.CompileStateTracker compileState)
+        public ExpressionInterpreterRunner(ProtoCore.Core core, ProtoLanguage.CompileStateTracker compileState = null)
         {
             Core = core;
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter;
