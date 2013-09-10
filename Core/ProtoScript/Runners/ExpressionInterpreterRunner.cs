@@ -11,25 +11,32 @@ namespace ProtoScript.Runners
     public class ExpressionInterpreterRunner
     {
         private ProtoCore.Core Core;
+        private ProtoLanguage.CompileStateTracker compileState; 
         private readonly ProtoCore.DebugServices.EventSink EventSink = new ProtoCore.DebugServices.ConsoleEventSink();
 
-        public ExpressionInterpreterRunner(ProtoCore.Core core)
+        public ExpressionInterpreterRunner(ProtoCore.Core core, ProtoLanguage.CompileStateTracker compileState = null)
         {
             Core = core;
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter;
+
+            this.compileState = compileState;
+            compileState.ExecMode = ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter; ;
         }
 
         public bool Compile(string code, out int blockId)
         {
             bool buildSucceeded = false;
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+
+            //compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+
             try
             {
                 //defining the global Assoc block that wraps the entire .ds source file
                 ProtoCore.LanguageCodeBlock globalBlock = new ProtoCore.LanguageCodeBlock();
                 globalBlock.language = ProtoCore.Language.kAssociative;
-                //globalBlock.language = ProtoCore.Language.kImperative;
                 globalBlock.body = code;
+
                 //the wrapper block can be given a unique id to identify it as the global scope
                 globalBlock.id = ProtoCore.LanguageCodeBlock.OUTERMOST_BLOCK_ID;
 
@@ -38,22 +45,22 @@ namespace ProtoScript.Runners
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
                 ProtoCore.Language id = globalBlock.language;
 
-                Core.ExprInterpreterExe.iStreamCanvas = new InstructionStream(globalBlock.language, Core);
+                compileState.ExprInterpreterExe.iStreamCanvas = new InstructionStream(globalBlock.language, compileState);
 
                 // Save the global offset and restore after compilation
-                int offsetRestore = Core.GlobOffset;
-                Core.GlobOffset = Core.Rmem.Stack.Count;
-                
-                Core.Executives[id].Compile(out blockId, null, globalBlock, context, EventSink);
+                int offsetRestore = compileState.GlobOffset;
+                compileState.GlobOffset = Core.Rmem.Stack.Count;
+
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink);
 
                 // Restore the global offset
-                Core.GlobOffset = offsetRestore;
+                compileState.GlobOffset = offsetRestore;
 
-                Core.BuildStatus.ReportBuildResult();
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = Core.BuildStatus.GetBuildResult(out errors, out warnings);
+                buildSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
             catch (Exception ex)
             {
@@ -77,16 +84,47 @@ namespace ProtoScript.Runners
             //The watchBaseOffset is used to indexing the watch variables and related temporary variables
             Core.watchBaseOffset = 0;
             Core.watchStack.Clear();
+            compileState.watchBaseOffset = 0;
+            compileState.watchStack.Clear();
+
+            compileState.ProcTable = Core.ProcTable;
+            compileState.ClassTable= Core.ClassTable;
+
+
+            compileState.CodeBlockList = Core.DSExecutable.CodeBlockList;
+            compileState.FunctionTable = Core.DSExecutable.FunctionTable;
+            compileState.CompleteCodeBlockList = Core.DSExecutable.CompleteCodeBlockList;
+
+            compileState.Rmem = Core.Rmem;
+
+            compileState.DebugProps = Core.DebugProps;
+
+            //compileState.assocCodegen = Core.assocCodegen;
+
+            compileState.ExecMode = InterpreterMode.kExpressionInterpreter;
 
             bool succeeded = Compile(code, out blockId);
 
             //Clear the warnings and errors so they will not continue impact the next compilation.
             //Fix IDE-662
-            Core.BuildStatus.Errors.Clear();
-            Core.BuildStatus.Warnings.Clear();
+            compileState.BuildStatus.Errors.Clear();
+            compileState.BuildStatus.Warnings.Clear();
 
-            for (int i = 0; i < Core.watchBaseOffset; ++i )
+            for (int i = 0; i < compileState.watchBaseOffset; ++i)
+            {
                 Core.watchStack.Add(StackUtils.BuildNull());
+            }
+
+
+            // Jun: PArt of the compile tracker and core swap
+            // This code that copies watch data from compilestate to core needs cleanup
+            Core.watchBaseOffset = compileState.watchBaseOffset;
+            //Core.watchClassScope = compileState.watchClassScope;
+            //Core.watchFramePointer = compileState.watchFramePointer;
+            //Core.watchFunctionScope = compileState.watchFunctionScope;
+            Core.watchSymbolList = compileState.watchSymbolList;
+
+
 
             //Record the old function call depth
             //Fix IDE-523: part of error for watching non-existing member
@@ -98,8 +136,10 @@ namespace ProtoScript.Runners
             {
 
                 //a2. Record the old start PC for restore instructions
-                Core.startPC = Core.ExprInterpreterExe.instrStreamList[blockId].instrList.Count;
-                Core.GenerateExprExeInstructions(blockId);
+                Core.startPC = compileState.ExprInterpreterExe.instrStreamList[blockId].instrList.Count;
+
+                compileState.GenerateExprExeInstructions(blockId);
+                Core.ExprInterpreterExe = compileState.ExprInterpreterExe; 
                 
                 //a3. Record the old running block
                 int restoreBlock = Core.RunningBlock;
@@ -162,7 +202,7 @@ namespace ProtoScript.Runners
                     if (ProtoCore.DSASM.Constants.kInvalidIndex == node.classScope)
                         Core.DSExecutable.runtimeSymbols[node.runtimeTableIndex].Remove(node);
                     else
-                        Core.ClassTable.ClassNodes[node.classScope].symbols.Remove(node);
+                        Core.DSExecutable.classTable.ClassNodes[node.classScope].symbols.Remove(node);
                 }
             }
             else
@@ -180,7 +220,7 @@ namespace ProtoScript.Runners
                     if (ProtoCore.DSASM.Constants.kInvalidIndex == node.classScope)
                         Core.DSExecutable.runtimeSymbols[node.runtimeTableIndex].Remove(node);
                     else
-                        Core.ClassTable.ClassNodes[node.classScope].symbols.Remove(node);
+                        Core.DSExecutable.classTable.ClassNodes[node.classScope].symbols.Remove(node);
                 }
 
                 // TODO: investigate why additional elements are added to the stack.

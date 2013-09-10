@@ -171,7 +171,7 @@ namespace ProtoCore
             {
                 if (classScope != Constants.kGlobalScope)
                 {
-                    string classname = core.ClassTable.ClassNodes[classScope].name;
+                    string classname = core.DSExecutable.classTable.ClassNodes[classScope].name;
                     message = string.Format(RuntimeData.WarningMessage.kPropertyOfClassNotFound, classname, propertyName);
                 }
                 else

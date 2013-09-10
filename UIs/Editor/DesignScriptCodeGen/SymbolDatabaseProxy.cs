@@ -37,16 +37,16 @@ namespace DesignScript.Editor.AutoComplete
 
     class SymbolDatabaseProxy
     {
-        ProtoCore.Core core = null;
+        ProtoLanguage.CompileStateTracker compileState = null;
         SQLiteConnection connection = null;
         List<ParentChildPair> hierarchy = null;
         Dictionary<string, int> scriptIdentifiers = null;
 
         #region Public Class Operational Methods
 
-        internal SymbolDatabaseProxy(ProtoCore.Core core, Dictionary<ScopeInfo, CodeRange> scopeIdentifiers)
+        internal SymbolDatabaseProxy(ProtoLanguage.CompileStateTracker compileState, Dictionary<ScopeInfo, CodeRange> scopeIdentifiers)
         {
-            this.core = core;
+            this.compileState = compileState;
 
             try
             {
@@ -184,7 +184,7 @@ namespace DesignScript.Editor.AutoComplete
 
         internal bool IsValid
         {
-            get { return (null != core && (null != connection)); }
+            get { return (null != compileState && (null != connection)); }
         }
 
         #endregion
@@ -197,9 +197,9 @@ namespace DesignScript.Editor.AutoComplete
             {
                 ProcessScopeIdentifiers(scopeIdentifiers);
 
-                List<CodeBlock> codeBlockList = core.CompleteCodeBlockList;
+                List<CodeBlock> codeBlockList = compileState.CompleteCodeBlockList;
                 if (null == codeBlockList || (codeBlockList.Count <= 0))
-                    codeBlockList = core.CodeBlockList;
+                    codeBlockList = compileState.CodeBlockList;
 
                 if (null != codeBlockList)
                 {
@@ -207,7 +207,7 @@ namespace DesignScript.Editor.AutoComplete
                         ProcessCodeBlock(codeBlock);
                 }
 
-                foreach (ClassNode classNode in core.ClassTable.ClassNodes)
+                foreach (ClassNode classNode in compileState.ClassTable.ClassNodes)
                     ProcessClassNode(classNode);
             }
         }

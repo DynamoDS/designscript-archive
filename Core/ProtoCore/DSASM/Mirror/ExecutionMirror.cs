@@ -480,7 +480,7 @@ namespace ProtoCore.DSASM.Mirror
             }
             else
             {
-                CodeBlock searchBlock = core.CompleteCodeBlockList[block];
+                CodeBlock searchBlock = exe.CompleteCodeBlockList[block];
 
                 // To detal with the case that a language block defined in a function
                 //
@@ -629,7 +629,7 @@ namespace ProtoCore.DSASM.Mirror
         {
             if (obj.DsasmValue.optype == AddressType.Pointer)
             {
-                return core.ClassTable.ClassNodes[(int)obj.DsasmValue.metaData.type].name;
+                return core.DSExecutable.classTable.ClassNodes[(int)obj.DsasmValue.metaData.type].name;
             }
             else
             {
@@ -905,7 +905,7 @@ namespace ProtoCore.DSASM.Mirror
 
             Dictionary<string, Obj> ret = new Dictionary<string, Obj>();
             int classIndex = (int)obj.DsasmValue.metaData.type;
-            Dictionary<int,SymbolNode> symbolList = core.ClassTable.ClassNodes[classIndex].symbols.symbolList;
+            Dictionary<int,SymbolNode> symbolList = core.DSExecutable.classTable.ClassNodes[classIndex].symbols.symbolList;
             StackValue[] svs = core.Heap.Heaplist[(int)obj.DsasmValue.opdata].Stack;
             int index = 0;
             for (int ix = 0; ix < svs.Length; ++ix)
@@ -940,7 +940,7 @@ namespace ProtoCore.DSASM.Mirror
             StackValue[] svs = core.Heap.Heaplist[(int)obj.DsasmValue.opdata].Stack;
             for (int ix = 0; ix < svs.Length; ++ix)
             {
-                string propertyName = core.ClassTable.ClassNodes[classIndex].symbols.symbolList[ix].name;
+                string propertyName = core.DSExecutable.classTable.ClassNodes[classIndex].symbols.symbolList[ix].name;
                 ret.Add(propertyName);
             }
 

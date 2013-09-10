@@ -13,7 +13,7 @@ namespace GraphToDSCompiler
     public class GraphCompiler
     {
         AST graph = new AST();
-        private ProtoCore.Core core = null;
+        private ProtoLanguage.CompileStateTracker compileState = null;
         public GraphCompilationStatus gcs = new GraphCompilationStatus();
         static uint tguid = 20000;
 
@@ -356,8 +356,8 @@ namespace GraphToDSCompiler
 
             // TODO Jun: Optimization
             // IsStaticMemberVariable is an expensive call, consider optimizing that function or cache property name
-            int classindex = core.ClassTable.IndexOf(classname);
-            ProtoCore.DSASM.ClassNode cnode = core.ClassTable.ClassNodes[classindex];
+            int classindex = compileState.ClassTable.IndexOf(classname);
+            ProtoCore.DSASM.ClassNode cnode = compileState.ClassTable.ClassNodes[classindex];
 
             // Check if the proeprty is a member variable
             return cnode.IsStaticMemberVariable(propertyname);
@@ -377,7 +377,7 @@ namespace GraphToDSCompiler
 
             // Handle static calls
             // TODO Jun: Determine if this check needs to be done at the UI level
-            Validity.Assert(null != core);
+            Validity.Assert(null != compileState);
             if (IsStaticCall(propertyName))
             {
                 CreateCodeblockNode(guid, tempName + "=" + propertyName);
@@ -2481,10 +2481,10 @@ namespace GraphToDSCompiler
             mapModifiedName = new Dictionary<string, uint>();
         }
 
-        public void SetCore(ProtoCore.Core core)
+        public void SetCore(ProtoLanguage.CompileStateTracker compileState)
         {
-            Validity.Assert(null == this.core);
-            this.core = core;
+            Validity.Assert(null == this.compileState);
+            this.compileState = compileState;
         }
 
         /// <summary>

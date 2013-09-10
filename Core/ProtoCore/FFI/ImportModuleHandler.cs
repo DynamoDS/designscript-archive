@@ -10,18 +10,18 @@ namespace ProtoFFI
     {
         readonly Dictionary<string, ImportNode> mModuleTable = new Dictionary<string, ImportNode>(StringComparer.CurrentCultureIgnoreCase);
         readonly ImportNode mRootImportNode = new ImportNode { CodeNode = new CodeBlockNode() };
-        readonly ProtoCore.Core _coreObj;
+        readonly ProtoLanguage.CompileStateTracker compileState;
 
         // line and column info used to log error message 
         int curLine = -1; int curCol = -1;
 
         // public static readonly string kInstanceVarName = "__instance";
 
-        public ImportModuleHandler(ProtoCore.Core coreObj)
+        public ImportModuleHandler(ProtoLanguage.CompileStateTracker compileState)
         {
-            _coreObj = coreObj;
-            if (_coreObj.Options.RootModulePathName != null)
-                mModuleTable[_coreObj.Options.RootModulePathName] = null;
+            this.compileState = compileState;
+            if (compileState.Options.RootModulePathName != null)
+                mModuleTable[compileState.Options.RootModulePathName] = null;
         }
 
         public ImportNode RootImportNode { get { return mRootImportNode; } }
@@ -35,14 +35,14 @@ namespace ProtoFFI
             ProtoCore.AST.AssociativeAST.ImportNode node = new ProtoCore.AST.AssociativeAST.ImportNode();
             node.ModuleName = moduleName;
 
-            string modulePathFileName = FileUtils.GetDSFullPathName(moduleName, _coreObj.Options);
+            string modulePathFileName = FileUtils.GetDSFullPathName(moduleName, compileState.Options);
 
             // Tracking directory paths for all imported DS files during preload assembly stage so that they can be accessed by Graph compiler before execution - pratapa
-            if (_coreObj.IsParsingPreloadedAssembly)
+            if (compileState.IsParsingPreloadedAssembly)
             {
                 string dirName = Path.GetDirectoryName(modulePathFileName);
-                if (!string.IsNullOrEmpty(dirName) && !_coreObj.Options.IncludeDirectories.Contains(dirName))
-                    _coreObj.Options.IncludeDirectories.Add(dirName);
+                if (!string.IsNullOrEmpty(dirName) && !compileState.Options.IncludeDirectories.Contains(dirName))
+                    compileState.Options.IncludeDirectories.Add(dirName);
             }
 
             if (string.IsNullOrEmpty(typeName))
@@ -61,7 +61,7 @@ namespace ProtoFFI
                 if (!FFIExecutionManager.Instance.IsInternalGacAssembly(moduleName))
                 {
                     System.Diagnostics.Debug.Write(@"Cannot import file: '" + modulePathFileName);
-                    _coreObj.LogWarning(ProtoCore.BuildData.WarningID.kFileNotFound, string.Format(ProtoCore.BuildData.WarningMessage.kFileNotFound, modulePathFileName));
+                    compileState.BuildStatus.LogWarning(ProtoCore.BuildData.WarningID.kFileNotFound, string.Format(ProtoCore.BuildData.WarningMessage.kFileNotFound, modulePathFileName));
                     return null;
                 }
             }
@@ -91,8 +91,8 @@ namespace ProtoFFI
             catch (System.Exception ex)
             {
                 if (ex.InnerException != null)
-                    _coreObj.BuildStatus.LogSemanticError(ex.InnerException.Message);
-                _coreObj.BuildStatus.LogSemanticError(ex.Message);
+                    compileState.BuildStatus.LogSemanticError(ex.InnerException.Message);
+                compileState.BuildStatus.LogSemanticError(ex.Message);
             }
 
             //Cache the codeblock of root import node.
@@ -237,7 +237,7 @@ namespace ProtoFFI
                 }
                 catch
                 {
-                    _coreObj.LogSemanticError(string.Format("Failed to import {0}", importModuleName), _coreObj.CurrentDSFileName, curLine, curCol);
+                    compileState.BuildStatus.LogSemanticError(string.Format("Failed to import {0}", importModuleName), compileState.CurrentDSFileName, curLine, curCol);
                 }
             }
             
@@ -248,14 +248,14 @@ namespace ProtoFFI
                 codeBlockNode = dllModule.ImportCodeBlock(typeName, alias, refNode);
                 Type type = dllModule.GetExtensionAppType();
                 if (type != null)
-                    FFIExecutionManager.Instance.RegisterExtensionApplicationType(_coreObj, type);
+                    FFIExecutionManager.Instance.RegisterExtensionApplicationType(compileState, type);
             }
             else if (extension == ".ds")
             {
-                string origDSFile = _coreObj.CurrentDSFileName;
-                _coreObj.CurrentDSFileName = System.IO.Path.GetFullPath(importModuleName);
+                string origDSFile = compileState.CurrentDSFileName;
+                compileState.CurrentDSFileName = System.IO.Path.GetFullPath(importModuleName);
                 codeBlockNode = ImportDesignScriptFile(importModuleName, typeName, alias);
-                _coreObj.CurrentDSFileName = origDSFile;
+                compileState.CurrentDSFileName = origDSFile;
             }
             
 
@@ -271,7 +271,7 @@ namespace ProtoFFI
             try
             {
                 ProtoCore.DesignScriptParser.Scanner scanner = new ProtoCore.DesignScriptParser.Scanner(designScriptFile);
-                ProtoCore.DesignScriptParser.Parser parser = new ProtoCore.DesignScriptParser.Parser(scanner, _coreObj, true);
+                ProtoCore.DesignScriptParser.Parser parser = new ProtoCore.DesignScriptParser.Parser(scanner, compileState, true);
                 parser.ImportModuleHandler = this;
 
                 //System.IO.StringWriter parseErrors = new System.IO.StringWriter();

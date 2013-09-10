@@ -25,9 +25,9 @@
             //    return new ClassMirror(className, core);
             //}
 
-            public static LibraryMirror Reflect(string assemblyName, ProtoCore.Core core)
+            public static LibraryMirror Reflect(string assemblyName, ProtoLanguage.CompileStateTracker compileState)
             {
-                return new LibraryMirror(assemblyName, core);
+                return new LibraryMirror(assemblyName, compileState);
             }
         }
     }

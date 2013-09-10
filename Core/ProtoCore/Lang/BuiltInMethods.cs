@@ -75,7 +75,7 @@ namespace ProtoCore.Lang
 
         public List<BuiltInMethod> Methods { get; set; }
 
-        public BuiltInMethods(Core core)
+        public BuiltInMethods(ProtoLanguage.CompileStateTracker compileState)
         {
             Validity.Assert(null == Methods);
             Methods = new List<BuiltInMethod>();

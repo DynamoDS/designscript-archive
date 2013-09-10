@@ -80,14 +80,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <SpecificVersion>False</SpecificVersion>
-      <NunitPath Condition=" '$(NunitPath)' == '' ">..\..\..\nunit\framework\nunit.framework.dll</NunitPath>
-      <Hintpath>$(NunitPath)</Hintpath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="..\..\AssemblyVersionInfo.cs">
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
@@ -95,6 +87,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="CodeGen.cs" />
+    <Compile Include="CompilerUtils.cs" />
     <Compile Include="Config\RunConfiguration.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Messages\Error.cs" />
@@ -127,6 +120,10 @@
     <ProjectReference Include="..\ProtoImperative\ProtoImperative.csproj">
       <Project>{0D3D43DC-BD7E-46F0-93F7-1C6A6CC79948}</Project>
       <Name>ProtoImperative</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProtoLanguage\ProtoLanguage.csproj">
+      <Project>{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}</Project>
+      <Name>ProtoLanguage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

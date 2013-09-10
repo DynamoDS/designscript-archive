@@ -241,37 +241,37 @@ namespace DesignScript.Editor.CodeGen
         public static void Reset()
         {
             CoreCodeGen.ResetInternalStates();
-            AutoCompletionHelper.core = null;
+            AutoCompletionHelper.compileState = null;
         }
 
         public static bool Compile(string src, string entryFile)
         {
-            ProtoCore.Options ops = new ProtoCore.Options();
+            ProtoLanguage.CompileOptions ops = new ProtoLanguage.CompileOptions();
             ops.RootModulePathName = entryFile;
             if (null != AutoCompletionHelper.searchPaths)
                 ops.IncludeDirectories.AddRange(AutoCompletionHelper.searchPaths);
 
-            core = new ProtoCore.Core(ops);
+            compileState = new ProtoLanguage.CompileStateTracker(ops);
 
-            core.CurrentDSFileName = entryFile;
+            compileState.CurrentDSFileName = entryFile;
 
             CoreCodeGen.ResetInternalStates();
             ProtoFFI.DLLFFIHandler.Register(ProtoFFI.FFILanguage.CSharp, new ProtoFFI.CSModuleHelper());
 
             // Register a message stream if we do have one.
             if (null != AutoCompletionHelper.MessageHandler)
-                core.BuildStatus.MessageHandler = MessageHandler;
+                compileState.BuildStatus.MessageHandler = MessageHandler;
 
             MemoryStream ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(src));
             ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(ms);
-            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, core);
+            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, compileState);
 
             try
             {
                 p.Parse();
 
                 CoreCodeGen.arrayTypeTable = new ArrayTypeTable();
-                AssociativeCodeGen codegen = new AssociativeCodeGen(core);
+                AssociativeCodeGen codegen = new AssociativeCodeGen(compileState);
                 codegen.Emit(p.root as ProtoCore.AST.AssociativeAST.CodeBlockNode);
             }
             catch (Exception ex)
@@ -359,8 +359,8 @@ namespace DesignScript.Editor.CodeGen
                 return new List<MethodSignature>();
 
             // We need to compile the input source code first.
-            System.Diagnostics.Debug.Assert(null != AutoCompletionHelper.core);
-            if (string.IsNullOrEmpty(identList) || (null == AutoCompletionHelper.core))
+            System.Diagnostics.Debug.Assert(null != AutoCompletionHelper.compileState);
+            if (string.IsNullOrEmpty(identList) || (null == AutoCompletionHelper.compileState))
                 return new List<MethodSignature>();
 
             if (null == CoreCodeGen.CodeRangeTable)
@@ -429,7 +429,7 @@ namespace DesignScript.Editor.CodeGen
             // Note, the .NET Distinct method will keep the earlier element and delete the later one, 
             // this ensures that if both the derived class and the base class have exactly the same function signature, 
             // the base class one will be removed and the derived one will be kept, which is expected 
-            return methodList.Distinct(new DeplicateMethodSignatureRemover()).Select(x => new MethodSignature(x.Value, x.Key == ProtoCore.DSASM.Constants.kInvalidIndex ? null : core.ClassTable.ClassNodes[x.Key].name)).ToList();
+            return methodList.Distinct(new DeplicateMethodSignatureRemover()).Select(x => new MethodSignature(x.Value, x.Key == ProtoCore.DSASM.Constants.kInvalidIndex ? null : compileState.ClassTable.ClassNodes[x.Key].name)).ToList();
 
         }
 
@@ -437,9 +437,9 @@ namespace DesignScript.Editor.CodeGen
 
         #region Compiler Related Code
 
-        public static bool IsHelperReset { get { return (null == AutoCompletionHelper.core); } }
+        public static bool IsHelperReset { get { return (null == AutoCompletionHelper.compileState); } }
 
-        static private ProtoCore.Core core;
+        static private ProtoLanguage.CompileStateTracker compileState;
 
         static private CodeRangeTable codeRangeTable
         {
@@ -505,7 +505,7 @@ namespace DesignScript.Editor.CodeGen
                 return ProtoCore.DSASM.AccessSpecifier.kPublic;
             else if (fromClassIndex == targetClassIndex)                    // inside the same class, access level is private
                 return ProtoCore.DSASM.AccessSpecifier.kPrivate;
-            else if (core.ClassTable.ClassNodes[fromClassIndex].baseList.Contains(targetClassIndex))  // inside the derived class, access level is protected
+            else if (compileState.ClassTable.ClassNodes[fromClassIndex].baseList.Contains(targetClassIndex))  // inside the derived class, access level is protected
                 return ProtoCore.DSASM.AccessSpecifier.kProtected;
             return ProtoCore.DSASM.AccessSpecifier.kPublic;
         }
@@ -611,7 +611,7 @@ namespace DesignScript.Editor.CodeGen
                 // if there is return its class index as final type
                 // and set isStatic to true
                 // we are only interested in its static members and constructors now
-                finalType = core.ClassTable.IndexOf(idents[0]);
+                finalType = compileState.ClassTable.IndexOf(idents[0]);
                 isStatic = true;
             }
             if (finalType == ProtoCore.DSASM.Constants.kInvalidIndex)
@@ -659,7 +659,7 @@ namespace DesignScript.Editor.CodeGen
             {
                 // Not inside any class
                 ProtoCore.DSASM.CodeBlock cb = null;
-                List<ProtoCore.DSASM.CodeBlock> codeBlocks = core.CodeBlockList;
+                List<ProtoCore.DSASM.CodeBlock> codeBlocks = compileState.CodeBlockList;
                 if (null != codeBlocks && (si.BlockId >= 0) && (si.BlockId < codeBlocks.Count))
                     cb = codeBlocks[si.BlockId];
 
@@ -712,7 +712,7 @@ namespace DesignScript.Editor.CodeGen
                 }
 
                 // inside a class scope
-                ProtoCore.DSASM.CodeBlock cb = core.CodeBlockList[si.BlockId];
+                ProtoCore.DSASM.CodeBlock cb = compileState.CodeBlockList[si.BlockId];
                 ProtoCore.DSASM.SymbolNode sn = null;
                 while (cb.parent != null)
                 {
@@ -733,7 +733,7 @@ namespace DesignScript.Editor.CodeGen
                 if (sn == null)
                 {
                     // search local variables in the funtion
-                    IEnumerable<ProtoCore.DSASM.SymbolNode> sns = core.ClassTable.ClassNodes[si.ClassScope].symbols.symbolList.Values.Where(x => x.name == ident && x.functionIndex == si.FunctionIndex);
+                    IEnumerable<ProtoCore.DSASM.SymbolNode> sns = compileState.ClassTable.ClassNodes[si.ClassScope].symbols.symbolList.Values.Where(x => x.name == ident && x.functionIndex == si.FunctionIndex);
                     if (sns.Count() > 0)
                     {
                         sn = sns.ElementAt(0);
@@ -871,7 +871,7 @@ namespace DesignScript.Editor.CodeGen
             if (si.BlockId == ProtoCore.DSASM.Constants.kInvalidIndex)
                 return functionList;
 
-            ProtoCore.DSASM.CodeBlock cb = core.CodeBlockList[si.BlockId];
+            ProtoCore.DSASM.CodeBlock cb = compileState.CodeBlockList[si.BlockId];
             while (cb != null)
             {
                 if (null == cb.procedureTable)
@@ -907,7 +907,7 @@ namespace DesignScript.Editor.CodeGen
 
             // one search is enough, because the code gen will copy all the accessible base 
             // class member variabs to the current class table, life easier
-            ProtoCore.DSASM.ClassNode cn = core.ClassTable.ClassNodes[classIndex];
+            ProtoCore.DSASM.ClassNode cn = compileState.ClassTable.ClassNodes[classIndex];
             if (cn.symbols == null)
                 return null;
             for (int ix = cn.symbols.symbolList.Values.Count - 1; ix >= 0; --ix)
@@ -942,7 +942,7 @@ namespace DesignScript.Editor.CodeGen
         /// </returns>
         private static List<KeyValuePair<int, ProtoCore.DSASM.ProcedureNode>> GetMemberFunctions(int classIndex, string function, ScopeInfo si, bool isStatic)
         {
-            ProtoCore.DSASM.ClassNode cn = core.ClassTable.ClassNodes[classIndex];
+            ProtoCore.DSASM.ClassNode cn = compileState.ClassTable.ClassNodes[classIndex];
             List<KeyValuePair<int, ProtoCore.DSASM.ProcedureNode>> functionList = new List<KeyValuePair<int, ProtoCore.DSASM.ProcedureNode>>();
             // first search its own functions
             if (cn.vtable == null)
@@ -972,7 +972,7 @@ namespace DesignScript.Editor.CodeGen
 
         private static List<KeyValuePair<int, ProtoCore.DSASM.ProcedureNode>> GetConstructors(int classIndex, string function, ScopeInfo si)
         {
-            ProtoCore.DSASM.ClassNode cn = core.ClassTable.ClassNodes[classIndex];
+            ProtoCore.DSASM.ClassNode cn = compileState.ClassTable.ClassNodes[classIndex];
             ProtoCore.DSASM.AccessSpecifier access = GetAccessLevel(si.ClassScope, classIndex);
             List<KeyValuePair<int, ProtoCore.DSASM.ProcedureNode>> functionList = new List<KeyValuePair<int, ProtoCore.DSASM.ProcedureNode>>();
             if (cn.vtable == null)
@@ -1013,7 +1013,7 @@ namespace DesignScript.Editor.CodeGen
         private static List<KeyValuePair<MemberType, string>> GetClassMembers(int classIndex, ScopeInfo si, bool searchingBase, bool isStatic, bool includeConstructor)
         {
             List<KeyValuePair<MemberType, string>> members = new List<KeyValuePair<MemberType, string>>();
-            ProtoCore.DSASM.ClassNode cn = core.ClassTable.ClassNodes[classIndex];
+            ProtoCore.DSASM.ClassNode cn = compileState.ClassTable.ClassNodes[classIndex];
 
             // 1. search the member variable
             if (cn.symbols != null && !searchingBase) // when searching base, no need to populate the member variable, it has already been added in code gen
