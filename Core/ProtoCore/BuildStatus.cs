@@ -387,37 +387,7 @@ namespace ProtoCore
             get { return Warnings.Count; }
         }
 
-        //  logs all errors and warnings by default
-        //
-        //public BuildStatus(Core core, bool warningAsError, System.IO.TextWriter writer = null, bool errorAsWarning = false)
-        //{
-        //    this.core = core;
-        //    warnings = new List<BuildData.WarningEntry>();
-
-        //    errors = new List<BuildData.ErrorEntry>();
-        //    this.warningAsError = warningAsError;
-        //    this.errorAsWarning = errorAsWarning;
-
-        //    if (writer != null)
-        //    {
-        //        consoleOut = System.Console.Out;
-        //        System.Console.SetOut(writer);
-        //    }
-
-        //    // Create a default console output stream, and this can 
-        //    // be overwritten in IDE by assigning it a different value.
-        //    this.MessageHandler = new ConsoleOutputStream();
-
-        //    //if (compileState.Options.WebRunner)
-        //    //{
-        //    //    this.WebMsgHandler = new WebOutputStream(compileState);
-        //    //}
-        //}
-
-
-
-        //  logs all errors and warnings by default
-        //
+      
         public BuildStatus(ProtoLanguage.CompileStateTracker compilestate, bool warningAsError, System.IO.TextWriter writer = null, bool errorAsWarning = false)
         {
             this.compileState = compilestate;
@@ -442,30 +412,7 @@ namespace ProtoCore
             }
         }
 
-        //public BuildStatus(Core core, bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
-        //{
-        //    this.core = core;
-        //    this.LogWarnings = LogWarnings;
-        //    this.logErrors = logErrors;
-        //    this.displayBuildResult = displayBuildResult;
-
-        //    //this.errorCount = 0;
-        //    //this.warningCount = 0;
-        //    warnings = new List<BuildData.WarningEntry>();
-
-        //    errors = new List<BuildData.ErrorEntry>();
-
-        //    if (writer != null)
-        //    {
-        //        consoleOut = System.Console.Out;
-        //        System.Console.SetOut(writer);
-        //    }
-
-        //    // Create a default console output stream, and this can 
-        //    // be overwritten in IDE by assigning it a different value.
-        //    this.MessageHandler = new ConsoleOutputStream();
-        //}      
-
+      
         public BuildStatus(ProtoLanguage.CompileStateTracker compilestate, bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
         {
             this.compileState = compilestate;

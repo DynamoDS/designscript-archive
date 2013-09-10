@@ -860,7 +860,6 @@ namespace ProtoScript.Runners
             coreOptions = new ProtoCore.Options();
             coreOptions.GenerateExprID = true;
             coreOptions.IsDeltaExecution = true;
-            coreOptions.BuildOptErrorAsWarning = true;
             
             coreOptions.WebRunner = false;
             coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;

@@ -70,7 +70,6 @@ namespace ProtoTest.EventTests
             var options = new ProtoCore.Options();
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
-            options.DumpByteCode = true;
             options.Verbose = true;
 
             core_ = new ProtoCore.Core(options);

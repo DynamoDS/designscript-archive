@@ -124,17 +124,10 @@ namespace ProtoCore
     {
         public Options()
         {
-            DumpByteCode = false;
             Verbose = false;
-
-            FullSSA = false;
-            DumpIL = false;
-
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
             SuppressBuildOutput = false;
-            BuildOptWarningAsError = false;
-            BuildOptErrorAsWarning = false;
             ExecutionMode = ProtoCore.ExecutionMode.Serial;
             IDEDebugMode = false;
             WatchTestMode = false;
@@ -147,11 +140,7 @@ namespace ProtoCore
             CompileToLib = false;
             AssocOperatorAsMethod = true;
 
-            EnableProcNodeSanityCheck = true;
-            EnableReturnTypeCheck = true;
-
             RootModulePathName = Path.GetFullPath(@".");
-            staticCycleCheck = true;
             dynamicCycleCheck = true;
             RecursionChecking = false;
             EmitBreakpoints = true;
@@ -161,7 +150,6 @@ namespace ProtoCore
             TempReplicationGuideEmptyFlag = true;
             AssociativeToImperativePropagation = true;
             SuppressFunctionResolutionWarning = true;
-            EnableVariableAccumulator = true;
             WebRunner = false;
             DisableDisposeFunctionDebug = true;
             GenerateExprID = true;
@@ -170,14 +158,9 @@ namespace ProtoCore
 
         }
 
-        public bool DumpByteCode { get; set; }
-        public bool DumpIL { get; private set; }
-        public bool FullSSA { get; set; }
         public bool Verbose { get; set; }
         public bool DumpOperatorToMethodByteCode { get; set; }
         public bool SuppressBuildOutput { get; set; }
-        public bool BuildOptWarningAsError { get; set; }
-        public bool BuildOptErrorAsWarning { get; set; }
         public bool IDEDebugMode { get; set; }      //set to true if two way mapping b/w DesignScript and JIL code is needed
         public bool WatchTestMode { get; set; }     // set to true when running automation tests for expression interpreter
         public ExecutionMode ExecutionMode { get; set; }
@@ -185,7 +168,6 @@ namespace ProtoCore
         public bool CompileToLib { get; set; }
         public bool AssocOperatorAsMethod { get; set; }
         public string LibPath { get; set; }
-        public bool staticCycleCheck { get; set; }
         public bool dynamicCycleCheck { get; set; }
         public bool RecursionChecking { get; set; }
         public bool DumpFunctionResolverLogic { get; set; }
@@ -197,7 +179,6 @@ namespace ProtoCore
 
         public bool TempReplicationGuideEmptyFlag { get; set; }
         public bool AssociativeToImperativePropagation { get; set; }
-        public bool EnableVariableAccumulator { get; set; }
         public bool DisableDisposeFunctionDebug { get; set; }
         public bool GenerateExprID { get; set; }
         public bool IsDeltaExecution { get; set; }
@@ -261,11 +242,6 @@ namespace ProtoCore
                 }
             }
         }
-
-        public bool EnableReturnTypeCheck { get; set; }
-
-        public bool EnableProcNodeSanityCheck { get; set; }
-
     }
 
     public struct InlineConditional
@@ -916,11 +892,6 @@ namespace ProtoCore
             public RuntimeData.WarningID RuntimeId;
             public int Line;
             public int Col;
-
-            //public ErrorEntry()
-            //{
-
-            //}
         }
 
         public Dictionary<ulong, ulong> codeToLocation = new Dictionary<ulong, ulong>();
@@ -1272,20 +1243,6 @@ namespace ProtoCore
             ExceptionHandlingManager = new ExceptionHandlingManager();
             startPC = ProtoCore.DSASM.Constants.kInvalidIndex;
 
-            if (Options.SuppressBuildOutput)
-            {
-                //  don't log any of the build related messages
-                //  just accumulate them in relevant containers with
-                //  BuildStatus object
-                //
-                //BuildStatus = new BuildStatus(this, false, false, false);
-            }
-            else
-            {
-                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
-            }
-
-
             RuntimeStatus = new RuntimeStatus(this);
 
             SSASubscript = 0;
@@ -1333,29 +1290,6 @@ namespace ProtoCore
             DynamicVariableTable = new DSASM.DynamicVariableTable();
             DynamicFunctionTable = new DSASM.DynamicFunctionTable();
 
-            // If the previous compilation for import resulted in a build error, 
-            // ignore it and continue compiling other import statements
-            /*if (BuildStatus.ErrorCount > 0)
-            {
-                ImportHandler = null;
-                CodeBlockList.Clear();
-                CompleteCodeBlockList.Clear();
-            }*/
-
-            if (Options.SuppressBuildOutput)
-            {
-                //  don't log any of the build related messages
-                //  just accumulate them in relevant containers with
-                //  BuildStatus object
-                //
-                //BuildStatus = new BuildStatus(this, false, false, false);
-            }
-            else
-            {
-                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError);
-            }
-
-            
             if (AstNodeList != null) 
                 AstNodeList.Clear();
 
@@ -1420,19 +1354,6 @@ namespace ProtoCore
             startPC = ProtoCore.DSASM.Constants.kInvalidIndex;
 
             deltaCompileStartPC = ProtoCore.DSASM.Constants.kInvalidIndex;
-
-            if (options.SuppressBuildOutput)
-            {
-                //  don't log any of the build related messages
-                //  just accumulate them in relevant containers with
-                //  BuildStatus object
-                //
-                //BuildStatus = new BuildStatus(this, false, false, false);
-            }
-            else
-            {
-                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
-            }
 
 
             RuntimeStatus = new RuntimeStatus(this);

@@ -19,7 +19,6 @@ namespace ProtoFFITests
             DLLFFIHandler.Register(FFILanguage.CSharp, new CSModuleHelper());
             CLRModuleType.ClearTypes();
             core.Options.Verbose = true;
-            core.Options.DumpByteCode = true;
             return core;
         }
 

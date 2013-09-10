@@ -488,11 +488,9 @@ namespace DesignScript.Editor.Core
             runnerConfig.IsParrallel = false;
 
 #if DEBUG
-            var dumpBytecCodeFlag = this.core.Options.DumpByteCode;
             var verboseFlag = this.core.Options.Verbose;
             var prevAsmOutput = this.core.AsmOutput;
 
-            this.core.Options.DumpByteCode = true;
             this.core.Options.Verbose = true;
 
             this.ByteCodeStream = new MemoryStream();
@@ -503,7 +501,6 @@ namespace DesignScript.Editor.Core
             bool startSucceeded = debugRunner.LoadAndPreStart(scriptPath, runnerConfig);
 
 #if DEBUG
-            this.core.Options.DumpByteCode = dumpBytecCodeFlag;
             this.core.Options.Verbose = verboseFlag;
             this.core.AsmOutput.Close();
             this.core.AsmOutput = prevAsmOutput == null ? Console.Out : prevAsmOutput;
