@@ -14,7 +14,7 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
@@ -51,7 +51,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-	<NunitPath Condition=" '$(NunitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin\Debug\framework\nunit.framework.dll</NunitPath>
+      <NunitPath Condition=" '$(NunitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin\Debug\framework\nunit.framework.dll</NunitPath>
       <Hintpath>$(NunitPath)</Hintpath>
     </Reference>
   </ItemGroup>
@@ -99,7 +99,7 @@
       <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
       <Name>ProtoInterface</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Core\ProtoScript\ProtoScriptMono.csproj">
+	<ProjectReference Include="..\..\Core\ProtoScript\ProtoScriptMono.csproj">
       <Project>{A4794476-7D0E-41C0-AD83-4AB929C0A46C}</Project>
       <Name>ProtoScript</Name>
     </ProjectReference>
