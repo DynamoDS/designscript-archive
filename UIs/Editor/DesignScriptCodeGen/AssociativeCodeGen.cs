@@ -21,8 +21,8 @@ namespace DesignScript.Editor.CodeGen
         // This is because constructors auto insert an allocc instruction before any cosntructo body is traversed
         private bool setConstructorStartPC;
 
-        public AssociativeCodeGen(Core coreObj, ProtoCore.DSASM.CodeBlock parentBlock = null)
-            : base(coreObj, parentBlock)
+        public AssociativeCodeGen(ProtoLanguage.CompileStateTracker compileState, ProtoCore.DSASM.CodeBlock parentBlock = null)
+            : base(compileState, parentBlock)
         {
             classOffset = 0;
 
@@ -40,16 +40,16 @@ namespace DesignScript.Editor.CodeGen
             codeBlock = new ProtoCore.DSASM.CodeBlock(
                 ProtoCore.DSASM.CodeBlockType.kLanguage,
                 ProtoCore.Language.kAssociative,
-                core.CodeBlockIndex,
-                new ProtoCore.DSASM.SymbolTable("associative lang block", core.RuntimeTableIndex),
-                new ProtoCore.DSASM.ProcedureTable(core.RuntimeTableIndex),
+                compileState.CodeBlockIndex,
+                new ProtoCore.DSASM.SymbolTable("associative lang block", compileState.RuntimeTableIndex),
+                new ProtoCore.DSASM.ProcedureTable(compileState.RuntimeTableIndex),
                 false,
-                core);
+                compileState);
 
-            ++core.CodeBlockIndex;
-            ++core.RuntimeTableIndex;
+            ++compileState.CodeBlockIndex;
+            ++compileState.RuntimeTableIndex;
 
-            core.CodeBlockList.Add(codeBlock);
+            compileState.CodeBlockList.Add(codeBlock);
             if (null != parentBlock)
             {
                 // This is a nested block
@@ -67,10 +67,10 @@ namespace DesignScript.Editor.CodeGen
 
             if ((int)ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex)
             {
-                symbolindex = core.ClassTable.ClassNodes[globalClassIndex].symbols.IndexOf(ident, globalClassIndex, funcIndex);
+                symbolindex = compileState.ClassTable.ClassNodes[globalClassIndex].symbols.IndexOf(ident, globalClassIndex, funcIndex);
                 if ((int)ProtoCore.DSASM.Constants.kInvalidIndex != symbolindex)
                 {
-                    node = core.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList[symbolindex];
+                    node = compileState.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList[symbolindex];
                 }
             }
             else
@@ -112,7 +112,7 @@ namespace DesignScript.Editor.CodeGen
             symbolnode.size = datasize;
             symbolnode.functionIndex = funcIndex;
             symbolnode.datatype = datatype;
-            symbolnode.staticType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, -2);
+            symbolnode.staticType = compileState.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, -2);
             symbolnode.isArgument = false;
             symbolnode.memregion = region;
             symbolnode.classScope = classScope;
@@ -134,16 +134,16 @@ namespace DesignScript.Editor.CodeGen
                 //if (core.classTable.list[classIndex].symbols.IndexOf(ident, classIndex, funcIndex) != (int)ProtoCore.DSASM.Constants.kInvalidIndex)
                 //    return null;
 
-                symbolindex = core.ClassTable.ClassNodes[classIndex].symbols.IndexOf(ident);
+                symbolindex = compileState.ClassTable.ClassNodes[classIndex].symbols.IndexOf(ident);
                 if (symbolindex != (int)ProtoCore.DSASM.Constants.kInvalidIndex)
                 {
-                    ProtoCore.DSASM.SymbolNode node = core.ClassTable.ClassNodes[classIndex].symbols.symbolList[symbolindex];
+                    ProtoCore.DSASM.SymbolNode node = compileState.ClassTable.ClassNodes[classIndex].symbols.symbolList[symbolindex];
                     if (node.functionIndex == ProtoCore.DSASM.Constants.kGlobalScope &&
                         funcIndex == ProtoCore.DSASM.Constants.kGlobalScope)
                         return null;
                 }
 
-                symbolindex = core.ClassTable.ClassNodes[classIndex].symbols.Append(symbolnode);
+                symbolindex = compileState.ClassTable.ClassNodes[classIndex].symbols.Append(symbolnode);
                 if (symbolindex == ProtoCore.DSASM.Constants.kInvalidIndex)
                 {
                     return null;
@@ -157,7 +157,7 @@ namespace DesignScript.Editor.CodeGen
                     staticSymbolnode.size = datasize;
                     staticSymbolnode.functionIndex = funcIndex;
                     staticSymbolnode.datatype = datatype;
-                    staticSymbolnode.staticType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, -2);
+                    staticSymbolnode.staticType = compileState.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, -2);
                     staticSymbolnode.isArgument = false;
                     staticSymbolnode.memregion = region;
                     staticSymbolnode.classScope = classScope;
@@ -226,7 +226,7 @@ namespace DesignScript.Editor.CodeGen
                 ProtoCore.DSASM.Constants.kInvalidIndex,
                 funcIndex,
                 datatype,
-                core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, -2),
+                compileState.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, -2),
                 size,
                 datasize,
                 true,
@@ -254,7 +254,7 @@ namespace DesignScript.Editor.CodeGen
             int symbolindex = ProtoCore.DSASM.Constants.kInvalidIndex;
             if ((int)ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex)
             {
-                symbolindex = core.ClassTable.ClassNodes[globalClassIndex].symbols.Append(node);
+                symbolindex = compileState.ClassTable.ClassNodes[globalClassIndex].symbols.Append(node);
             }
             else
             {
@@ -291,7 +291,7 @@ namespace DesignScript.Editor.CodeGen
             if (node is IdentifierNode)
             {
                 IdentifierNode t = node as IdentifierNode;
-                if (core.TypeSystem.IsHigherRank(t.datatype.UID, inferedType.UID))
+                if (compileState.TypeSystem.IsHigherRank(t.datatype.UID, inferedType.UID))
                 {
                     ProtoCore.Type type = new ProtoCore.Type();
                     type.UID = t.datatype.UID;
@@ -323,7 +323,7 @@ namespace DesignScript.Editor.CodeGen
             {
                 if (funcCall.FormalArguments[0] is IdentifierNode)
                 {
-                    int ci = core.ClassTable.IndexOf((funcCall.FormalArguments[0] as IdentifierNode).Name);
+                    int ci = compileState.ClassTable.IndexOf((funcCall.FormalArguments[0] as IdentifierNode).Name);
                     if (ci != ProtoCore.DSASM.Constants.kInvalidIndex)
                     {
                         funcCall.FormalArguments[0] = new IntNode() { value = ci.ToString() };
@@ -333,7 +333,7 @@ namespace DesignScript.Editor.CodeGen
                     if (funcCall.FormalArguments.Count > 4)
                     {
                         int dynamicRhsIndex = int.Parse((funcCall.FormalArguments[1] as IntNode).value);
-                        core.DynamicFunctionTable.functionTable[dynamicRhsIndex].classIndex = globalClassIndex;
+                        compileState.DynamicFunctionTable.functionTable[dynamicRhsIndex].classIndex = globalClassIndex;
                     }
                     else if (subPass != ProtoCore.DSASM.AssociativeSubCompilePass.kUnboundIdentifier)
                     {
@@ -343,7 +343,7 @@ namespace DesignScript.Editor.CodeGen
                         if (isAllocated && symbolnode.datatype.UID != (int)PrimitiveType.kTypeVar)
                         {
                             int rhsIndex = int.Parse((funcCall.FormalArguments[1] as IntNode).value);
-                            string rhsName = core.DynamicVariableTable.variableTable[rhsIndex].variableName;
+                            string rhsName = compileState.DynamicVariableTable.variableTable[rhsIndex].variableName;
                             isAllocated = VerifyAllocation(rhsName, symbolnode.datatype.UID, out symbolnode, out isAccessible);
                             if (null == symbolnode)    //unbound identifier
                             {
@@ -403,7 +403,7 @@ namespace DesignScript.Editor.CodeGen
                 ProtoCore.AST.Node leftnode = (parentNode as ProtoCore.AST.AssociativeAST.IdentifierListNode).LeftNode;
                 if (leftnode != null && leftnode is ProtoCore.AST.AssociativeAST.IdentifierNode)
                 {
-                    refClassIndex = core.ClassTable.IndexOf(leftnode.Name);
+                    refClassIndex = compileState.ClassTable.IndexOf(leftnode.Name);
                 }
             }
 
@@ -424,7 +424,7 @@ namespace DesignScript.Editor.CodeGen
                 }
                 if (procName != ProtoCore.DSASM.Constants.kFunctionPointerCall)
                 {
-                    procNode = core.ClassTable.ClassNodes[inferedType.UID].GetMemberFunction(procName, arglist, globalClassIndex, out isAccessible, out realType);
+                    procNode = compileState.ClassTable.ClassNodes[inferedType.UID].GetMemberFunction(procName, arglist, globalClassIndex, out isAccessible, out realType);
 
                     if (procNode != null)
                     {
@@ -461,13 +461,13 @@ namespace DesignScript.Editor.CodeGen
                 }
                 else
                 {
-                    procNode = core.GetFirstVisibleProcedure(procName, arglist, codeBlock);
+                    procNode = compileState.GetFirstVisibleProcedure(procName, arglist, codeBlock);
                     if (null != procNode)
                     {
                         if ((int)ProtoCore.DSASM.Constants.kInvalidIndex != procNode.procId)
                         {
                             // A global function
-                            if (core.TypeSystem.IsHigherRank((int)procNode.returntype.UID, inferedType.UID))
+                            if (compileState.TypeSystem.IsHigherRank((int)procNode.returntype.UID, inferedType.UID))
                             {
                                 inferedType = procNode.returntype;
                             }
@@ -484,7 +484,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             int realType;
                             bool isAccessible;
-                            ProtoCore.DSASM.ProcedureNode memProcNode = core.ClassTable.ClassNodes[type].GetMemberFunction(procName, arglist, globalClassIndex, out isAccessible, out realType);
+                            ProtoCore.DSASM.ProcedureNode memProcNode = compileState.ClassTable.ClassNodes[type].GetMemberFunction(procName, arglist, globalClassIndex, out isAccessible, out realType);
 
                             if (memProcNode != null)
                             {
@@ -544,19 +544,19 @@ namespace DesignScript.Editor.CodeGen
                     if (procName == ProtoCore.DSASM.Constants.kFunctionPointerCall && depth == 0)
                     {
                         ProtoCore.DSASM.DynamicFunctionNode dynamicFunctionNode = new ProtoCore.DSASM.DynamicFunctionNode(procName, arglist, lefttype);
-                        core.DynamicFunctionTable.functionTable.Add(dynamicFunctionNode);
+                        compileState.DynamicFunctionTable.functionTable.Add(dynamicFunctionNode);
                         IdentifierNode iNode = new IdentifierNode()
                         {
                             Value = funcCall.Function.Name,
                             Name = funcCall.Function.Name,
-                            datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         EmitIdentifierNode(iNode, ref inferedType);
                     }
                     else
                     {
                         ProtoCore.DSASM.DynamicFunctionNode dynamicFunctionNode = new ProtoCore.DSASM.DynamicFunctionNode(funcCall.Function.Name, arglist, lefttype);
-                        core.DynamicFunctionTable.functionTable.Add(dynamicFunctionNode);
+                        compileState.DynamicFunctionTable.functionTable.Add(dynamicFunctionNode);
                     }
                     inferedType.UID = (int)PrimitiveType.kTypeVar;
                 }
@@ -584,10 +584,10 @@ namespace DesignScript.Editor.CodeGen
                     codeblocknode.col,
                     codeblocknode.endLine,
                     codeblocknode.endCol,
-                    core.CurrentDSFileName);
+                    compileState.CurrentDSFileName);
             else
                 CodeRangeTable.AddCodeBlockRangeEntry(codeBlock.codeBlockId,
-                    0, 0, int.MaxValue, int.MaxValue, core.CurrentDSFileName);
+                    0, 0, int.MaxValue, int.MaxValue, compileState.CurrentDSFileName);
 
             ProtoCore.Type inferedType = new ProtoCore.Type();
             while (ProtoCore.DSASM.AssociativeCompilePass.kDone != compilePass)
@@ -609,7 +609,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempLangBlock,
                             Name = ProtoCore.DSASM.Constants.kTempLangBlock,
-                            datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         BinaryExpressionNode langBlockNode = new BinaryExpressionNode();
                         langBlockNode.LeftNode = iNode;
@@ -632,7 +632,7 @@ namespace DesignScript.Editor.CodeGen
                     EmitFunctionCallToInitStaticProperty(codeblocknode.Body);
                 }
             }
-            core.InferedType = inferedType;
+            compileState.InferedType = inferedType;
 
             return codeBlock.codeBlockId;
         }
@@ -640,9 +640,9 @@ namespace DesignScript.Editor.CodeGen
         private void EmitFunctionCallToInitStaticProperty(List<AssociativeNode> codeblock)
         {
             List<AssociativeNode> functionCalls = new List<AssociativeNode>();
-            for (int i = 0; i < core.ClassTable.ClassNodes.Count; ++i)
+            for (int i = 0; i < compileState.ClassTable.ClassNodes.Count; ++i)
             {
-                var classNode = core.ClassTable.ClassNodes[i];
+                var classNode = compileState.ClassTable.ClassNodes[i];
                 if (classNode.vtable != null &&
                     classNode.vtable.procList.Exists(procNode => procNode.name == ProtoCore.DSASM.Constants.kStaticPropertiesInitializer && procNode.isStatic))
                 {
@@ -652,7 +652,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempFunctionReturnVar,
                             Name = ProtoCore.DSASM.Constants.kTempFunctionReturnVar,
-                            datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                         },
 
                         Optr = ProtoCore.DSASM.Operator.assign,
@@ -723,7 +723,7 @@ namespace DesignScript.Editor.CodeGen
             {
                 //check if it is a function instance
                 ProtoCore.DSASM.ProcedureNode procNode = null;
-                procNode = core.GetFirstVisibleProcedure(t.Name, null, codeBlock);
+                procNode = compileState.GetFirstVisibleProcedure(t.Name, null, codeBlock);
                 if (null != procNode)
                 {
                     if ((int)ProtoCore.DSASM.Constants.kInvalidIndex != procNode.procId)
@@ -733,10 +733,10 @@ namespace DesignScript.Editor.CodeGen
                         inferedType.UID = (int)PrimitiveType.kTypeFunctionPointer;
                         if (ProtoCore.DSASM.AssociativeSubCompilePass.kUnboundIdentifier != subPass)
                         {
-                            int fptr = core.FunctionPointerTable.functionPointerDictionary.Count;
+                            int fptr = compileState.FunctionPointerTable.functionPointerDictionary.Count;
                             ProtoCore.DSASM.FunctionPointerNode fptrNode = new ProtoCore.DSASM.FunctionPointerNode(procNode.procId, procNode.runtimeIndex);
-                            core.FunctionPointerTable.functionPointerDictionary.TryAdd(fptr, fptrNode);
-                            core.FunctionPointerTable.functionPointerDictionary.TryGetBySecond(fptrNode, out fptr);
+                            compileState.FunctionPointerTable.functionPointerDictionary.TryAdd(fptr, fptrNode);
+                            compileState.FunctionPointerTable.functionPointerDictionary.TryGetBySecond(fptrNode, out fptr);
                         }
                         return;
                     }
@@ -757,11 +757,11 @@ namespace DesignScript.Editor.CodeGen
                     // TODO Jun: Refactor Allocate() to just return the symbol node itself
                     ProtoCore.DSASM.SymbolNode symnode = Allocate(globalClassIndex, globalClassIndex, globalProcIndex, t.Value, nullType);
                     Debug.Assert(symnode != null);
-                    IdentLocation.AddEntry(symnode, t.line, t.col, core.CurrentDSFileName);
+                    IdentLocation.AddEntry(symnode, t.line, t.col, compileState.CurrentDSFileName);
                     int symbolindex = symnode.symbolTableIndex;
                     if ((int)ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex)
                     {
-                        symbolnode = core.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList[symbolindex];
+                        symbolnode = compileState.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList[symbolindex];
                     }
                     else
                     {
@@ -800,7 +800,7 @@ namespace DesignScript.Editor.CodeGen
                     type.IsIndexable = false;
                 }
 
-                if (ignoreRankCheck || core.TypeSystem.IsHigherRank(type.UID, inferedType.UID))
+                if (ignoreRankCheck || compileState.TypeSystem.IsHigherRank(type.UID, inferedType.UID))
                 {
                     inferedType = type;
                 }
@@ -1016,33 +1016,33 @@ namespace DesignScript.Editor.CodeGen
 
 
                 // Set the current class scope so the next language can refer to it
-                core.ClassIndex = globalClassIndex;
+                compileState.ClassIndex = globalClassIndex;
 
-                if (globalProcIndex != ProtoCore.DSASM.Constants.kInvalidIndex && core.ProcNode == null)
+                if (globalProcIndex != ProtoCore.DSASM.Constants.kInvalidIndex && compileState.ProcNode == null)
                 {
                     if (globalClassIndex != ProtoCore.DSASM.Constants.kInvalidIndex)
-                        core.ProcNode = core.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
+                        compileState.ProcNode = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
                     else
-                        core.ProcNode = codeBlock.procedureTable.procList[globalProcIndex];
+                        compileState.ProcNode = codeBlock.procedureTable.procList[globalProcIndex];
                 }
 
                 if (langblock.codeblock.language == Language.kAssociative)
                 {
-                    AssociativeCodeGen codegen = new AssociativeCodeGen(core, codeBlock);
+                    AssociativeCodeGen codegen = new AssociativeCodeGen(compileState, codeBlock);
                     blockId = codegen.Emit(langblock.CodeBlockNode as ProtoCore.AST.AssociativeAST.CodeBlockNode);
                 }
                 else if (langblock.codeblock.language == Language.kImperative)
                 {
-                    ImperativeCodeGen codegen = new ImperativeCodeGen(core, codeBlock);
+                    ImperativeCodeGen codegen = new ImperativeCodeGen(compileState, codeBlock);
                     blockId = codegen.Emit(langblock.CodeBlockNode as ProtoCore.AST.ImperativeAST.CodeBlockNode);
                 }
                 //core.Executives[langblock.codeblock.language].Compile(out blockId, codeBlock, langblock.codeblock, context, codeBlock.EventSink, langblock.CodeBlockNode);
-                inferedType = core.InferedType;
+                inferedType = compileState.InferedType;
 
-                ExceptionRegistration registration = core.ExceptionHandlingManager.ExceptionTable.GetExceptionRegistration(blockId, globalProcIndex, globalClassIndex);
+                ExceptionRegistration registration = compileState.ExceptionHandlingManager.ExceptionTable.GetExceptionRegistration(blockId, globalProcIndex, globalClassIndex);
                 if (registration == null)
                 {
-                    registration = core.ExceptionHandlingManager.ExceptionTable.Register(blockId, globalProcIndex, globalClassIndex);
+                    registration = compileState.ExceptionHandlingManager.ExceptionTable.Register(blockId, globalProcIndex, globalClassIndex);
                     Debug.Assert(registration != null);
                 }
             }
@@ -1055,7 +1055,7 @@ namespace DesignScript.Editor.CodeGen
                 Name = ProtoCore.DSASM.Constants.kGetterPrefix + memVar.name,
                 Singnature = new ArgumentSignatureNode(),
                 Pattern = null,
-                ReturnType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false),
+                ReturnType = compileState.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false),
                 FunctionBody = new CodeBlockNode(),
                 IsExternLib = false,
                 IsDNI = false,
@@ -1071,14 +1071,14 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = ProtoCore.DSDefinitions.Kw.kw_return,
                     Name = ProtoCore.DSDefinitions.Kw.kw_return,
-                    datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
+                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
                 },
                 Optr = ProtoCore.DSASM.Operator.assign,
                 RightNode = new IdentifierNode()
                 {
                     Value = memVar.name,
                     Name = memVar.name,
-                    datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                 }
             });
 
@@ -1095,11 +1095,11 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = ProtoCore.DSASM.Constants.kTempArg,
                     Name = ProtoCore.DSASM.Constants.kTempArg,
-                    datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                 },
                 ArgumentType = new ProtoCore.Type
                 {
-                    Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeVar),
+                    Name = compileState.TypeSystem.GetType((int)PrimitiveType.kTypeVar),
                     UID = (int)PrimitiveType.kTypeVar
                 }
             };
@@ -1112,7 +1112,7 @@ namespace DesignScript.Editor.CodeGen
                 Name = ProtoCore.DSASM.Constants.kSetterPrefix + memVar.name,
                 Singnature = argumentSingature,
                 Pattern = null,
-                ReturnType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeNull, false),
+                ReturnType = compileState.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeNull, false),
                 FunctionBody = new CodeBlockNode(),
                 IsExternLib = false,
                 IsDNI = false,
@@ -1129,14 +1129,14 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = memVar.name,
                     Name = memVar.name,
-                    datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                 },
                 Optr = ProtoCore.DSASM.Operator.assign,
                 RightNode = new IdentifierNode()
                 {
                     Value = ProtoCore.DSASM.Constants.kTempArg,
                     Name = ProtoCore.DSASM.Constants.kTempArg,
-                    datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                 }
             });
 
@@ -1147,7 +1147,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = ProtoCore.DSDefinitions.Kw.kw_return,
                     Name = ProtoCore.DSDefinitions.Kw.kw_return,
-                    datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
+                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
                 },
                 Optr = ProtoCore.DSASM.Operator.assign,
                 RightNode = new NullNode()
@@ -1167,28 +1167,28 @@ namespace DesignScript.Editor.CodeGen
                 cnode.name = classDecl.className;
                 cnode.size = classDecl.varlist.Count;
                 cnode.IsImportedClass = classDecl.IsImportedClass;
-                cnode.typeSystem = core.TypeSystem;
-                globalClassIndex = core.ClassTable.Append(cnode);
+                cnode.typeSystem = compileState.TypeSystem;
+                globalClassIndex = compileState.ClassTable.Append(cnode);
                 CodeRangeTable.AddClassBlockRangeEntry(globalClassIndex,
                     classDecl.line,
                     classDecl.col,
                     classDecl.endLine,
                     classDecl.endCol,
-                    core.CurrentDSFileName);
+                    compileState.CurrentDSFileName);
             }
             else if (ProtoCore.DSASM.AssociativeCompilePass.kClassHeirarchy == compilePass)
             {
                 // Class heirarchy pass
                 // Populating each class entry with their respective base classes
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
+                globalClassIndex = compileState.ClassTable.IndexOf(classDecl.className);
 
-                ProtoCore.DSASM.ClassNode cnode = core.ClassTable.ClassNodes[globalClassIndex];
+                ProtoCore.DSASM.ClassNode cnode = compileState.ClassTable.ClassNodes[globalClassIndex];
 
                 if (null != classDecl.superClass)
                 {
                     for (int n = 0; n < classDecl.superClass.Count; ++n)
                     {
-                        int baseClass = core.ClassTable.IndexOf(classDecl.superClass[n]);
+                        int baseClass = compileState.ClassTable.IndexOf(classDecl.superClass[n]);
                         if (ProtoCore.DSASM.Constants.kInvalidIndex != baseClass)
                         {
                             cnode.baseList.Add(baseClass);
@@ -1203,19 +1203,19 @@ namespace DesignScript.Editor.CodeGen
                 // Class member variable pass
                 // Populating each class entry symbols with their respective member variables
 
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
-                ProtoCore.DSASM.ClassNode cnode = core.ClassTable.ClassNodes[globalClassIndex];
+                globalClassIndex = compileState.ClassTable.IndexOf(classDecl.className);
+                ProtoCore.DSASM.ClassNode cnode = compileState.ClassTable.ClassNodes[globalClassIndex];
 
                 // Handle member vars from base class
                 if (null != classDecl.superClass)
                 {
                     for (int n = 0; n < classDecl.superClass.Count; ++n)
                     {
-                        int baseClass = core.ClassTable.IndexOf(classDecl.superClass[n]);
+                        int baseClass = compileState.ClassTable.IndexOf(classDecl.superClass[n]);
                         if (ProtoCore.DSASM.Constants.kInvalidIndex != baseClass)
                         {
                             // Append the members variables of every class that this class inherits from
-                            foreach (ProtoCore.DSASM.SymbolNode symnode in core.ClassTable.ClassNodes[baseClass].symbols.symbolList.Values)
+                            foreach (ProtoCore.DSASM.SymbolNode symnode in compileState.ClassTable.ClassNodes[baseClass].symbols.symbolList.Values)
                             {
                                 // It is a member variables
                                 if (ProtoCore.DSASM.Constants.kGlobalScope == symnode.functionIndex)
@@ -1268,11 +1268,11 @@ namespace DesignScript.Editor.CodeGen
                         datatype.UID = (int)PrimitiveType.kTypeVar;
                     else
                     {
-                        datatype.UID = core.TypeSystem.GetType(vardecl.ArgumentType.Name);
+                        datatype.UID = compileState.TypeSystem.GetType(vardecl.ArgumentType.Name);
                         if (datatype.UID == ProtoCore.DSASM.Constants.kInvalidIndex)
                             datatype.UID = (int)PrimitiveType.kTypeVar;
                     }
-                    datatype.Name = core.TypeSystem.GetType(datatype.UID);
+                    datatype.Name = compileState.TypeSystem.GetType(datatype.UID);
                     int symbolIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
 
                     if (varIdent is ProtoCore.AST.AssociativeAST.TypedIdentifierNode)
@@ -1285,8 +1285,8 @@ namespace DesignScript.Editor.CodeGen
                     {
                         ProtoCore.DSASM.SymbolNode memVar =
                             vardecl.IsStatic
-                            ? core.CodeBlockList[0].symbolTable.symbolList[symbolIndex]
-                            : core.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList[symbolIndex];
+                            ? compileState.CodeBlockList[0].symbolTable.symbolList[symbolIndex]
+                            : compileState.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList[symbolIndex];
 
                         EmitGetterForMemVar(classDecl, memVar);
                         EmitSetterForMemVar(classDecl, memVar);
@@ -1304,7 +1304,7 @@ namespace DesignScript.Editor.CodeGen
                         Name = ProtoCore.DSASM.Constants.kStaticPropertiesInitializer,
                         Singnature = new ArgumentSignatureNode(),
                         Pattern = null,
-                        ReturnType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeNull), UID = (int)PrimitiveType.kTypeNull },
+                        ReturnType = new ProtoCore.Type { Name = compileState.TypeSystem.GetType((int)PrimitiveType.kTypeNull), UID = (int)PrimitiveType.kTypeNull },
                         FunctionBody = new CodeBlockNode(),
                         IsExternLib = false,
                         IsDNI = false,
@@ -1321,7 +1321,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSDefinitions.Kw.kw_return,
                             Name = ProtoCore.DSDefinitions.Kw.kw_return,
-                            datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
+                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
                         },
                         Optr = ProtoCore.DSASM.Operator.assign,
                         RightNode = new NullNode()
@@ -1333,7 +1333,7 @@ namespace DesignScript.Editor.CodeGen
                 // Class member variable pass
                 // Populating each class entry vtables with their respective member variables signatures
 
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
+                globalClassIndex = compileState.ClassTable.IndexOf(classDecl.className);
                 foreach (AssociativeNode funcdecl in classDecl.funclist)
                 {
                     DfsTraverse(funcdecl, ref inferedType);
@@ -1341,7 +1341,7 @@ namespace DesignScript.Editor.CodeGen
 
                 if (!classDecl.IsExternLib)
                 {
-                    ProtoCore.DSASM.ProcedureTable vtable = core.ClassTable.ClassNodes[globalClassIndex].vtable;
+                    ProtoCore.DSASM.ProcedureTable vtable = compileState.ClassTable.ClassNodes[globalClassIndex].vtable;
                     if (vtable.IndexOfExact(classDecl.className, new List<ProtoCore.Type>()) == ProtoCore.DSASM.Constants.kInvalidIndex)
                     {
                         ConstructorDefinitionNode defaultConstructor = new ConstructorDefinitionNode();
@@ -1365,7 +1365,7 @@ namespace DesignScript.Editor.CodeGen
                 // Class member variable pass
                 // Populating the function body of each member function defined in the class vtables
 
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
+                globalClassIndex = compileState.ClassTable.IndexOf(classDecl.className);
 
                 foreach (AssociativeNode funcdecl in classDecl.funclist)
                 {
@@ -1376,7 +1376,7 @@ namespace DesignScript.Editor.CodeGen
             }
 
             // Reset the class index
-            core.ClassIndex = globalClassIndex = ProtoCore.DSASM.Constants.kGlobalScope;
+            compileState.ClassIndex = globalClassIndex = ProtoCore.DSASM.Constants.kGlobalScope;
         }
 
         private void EmitCallingForBaseConstructor(int thisClassIndex, ProtoCore.AST.AssociativeAST.FunctionCallNode baseConstructor)
@@ -1390,8 +1390,8 @@ namespace DesignScript.Editor.CodeGen
             {
                 if (baseConstructor.Function == null)
                 {
-                    int baseClassIndex = core.ClassTable.ClassNodes[thisClassIndex].baseList[0];
-                    baseConstructorName = core.ClassTable.ClassNodes[baseClassIndex].name; 
+                    int baseClassIndex = compileState.ClassTable.ClassNodes[thisClassIndex].baseList[0];
+                    baseConstructorName = compileState.ClassTable.ClassNodes[baseClassIndex].name; 
                 }
                 else
                 {
@@ -1410,12 +1410,12 @@ namespace DesignScript.Editor.CodeGen
                     argTypeList.Add(paramType);
                 }
 
-                List<int> myBases = core.ClassTable.ClassNodes[globalClassIndex].baseList;
+                List<int> myBases = compileState.ClassTable.ClassNodes[globalClassIndex].baseList;
                 foreach (int bidx in myBases)
                 {
-                    int cidx = core.ClassTable.ClassNodes[bidx].vtable.IndexOf(baseConstructorName, argTypeList, core.ClassTable);
+                    int cidx = compileState.ClassTable.ClassNodes[bidx].vtable.IndexOf(baseConstructorName, argTypeList, compileState.ClassTable);
                     if ((cidx != ProtoCore.DSASM.Constants.kInvalidIndex) &&
-                        core.ClassTable.ClassNodes[bidx].vtable.procList[cidx].isConstructor)
+                        compileState.ClassTable.ClassNodes[bidx].vtable.procList[cidx].isConstructor)
                     {
                         ctorIndex = cidx;
                         baseIndex = bidx;
@@ -1427,11 +1427,11 @@ namespace DesignScript.Editor.CodeGen
             {
                 // call base class's default constructor
                 // TODO keyu: to support multiple inheritance
-                List<int> myBases = core.ClassTable.ClassNodes[globalClassIndex].baseList;
+                List<int> myBases = compileState.ClassTable.ClassNodes[globalClassIndex].baseList;
                 foreach (int bidx in myBases)
                 {
-                    baseConstructorName = core.ClassTable.ClassNodes[bidx].name;
-                    int cidx = core.ClassTable.ClassNodes[bidx].vtable.IndexOf(baseConstructorName, argTypeList, core.ClassTable);
+                    baseConstructorName = compileState.ClassTable.ClassNodes[bidx].name;
+                    int cidx = compileState.ClassTable.ClassNodes[bidx].vtable.IndexOf(baseConstructorName, argTypeList, compileState.ClassTable);
                     Debug.Assert(cidx != ProtoCore.DSASM.Constants.kInvalidIndex);
                     ctorIndex = cidx;
                     baseIndex = bidx;
@@ -1453,10 +1453,10 @@ namespace DesignScript.Editor.CodeGen
                 localProcedure.name = funcDef.Name;
                 localProcedure.pc = ProtoCore.DSASM.Constants.kInvalidIndex;
                 localProcedure.localCount = 0;// Defer till all locals are allocated
-                localProcedure.returntype.UID = core.TypeSystem.GetType(funcDef.ReturnType.Name);
+                localProcedure.returntype.UID = compileState.TypeSystem.GetType(funcDef.ReturnType.Name);
                 if (localProcedure.returntype.UID == ProtoCore.DSASM.Constants.kInvalidIndex)
                     localProcedure.returntype.UID = (int)PrimitiveType.kTypeVar;
-                localProcedure.returntype.Name = core.TypeSystem.GetType(localProcedure.returntype.UID);
+                localProcedure.returntype.Name = compileState.TypeSystem.GetType(localProcedure.returntype.UID);
                 localProcedure.returntype.IsIndexable = false;
                 localProcedure.isConstructor = true;
                 localProcedure.runtimeIndex = 0;
@@ -1464,7 +1464,7 @@ namespace DesignScript.Editor.CodeGen
                 Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex, "A constructor node must be associated with class");
                 localProcedure.localCount = 0;
 
-                int peekFunctionindex = core.ClassTable.ClassNodes[globalClassIndex].vtable.procList.Count;
+                int peekFunctionindex = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.procList.Count;
 
                 if (!funcDef.IsExternLib)
                     CodeRangeTable.AddClassBlockFunctionEntry(globalClassIndex,
@@ -1473,7 +1473,7 @@ namespace DesignScript.Editor.CodeGen
                         funcDef.FunctionBody.col,
                         funcDef.FunctionBody.endLine,
                         funcDef.FunctionBody.endCol,
-                        core.CurrentDSFileName);
+                        compileState.CurrentDSFileName);
 
                 // Append arg symbols
                 List<KeyValuePair<string, ProtoCore.Type>> argsToBeAllocated = new List<KeyValuePair<string, ProtoCore.Type>>();
@@ -1506,10 +1506,10 @@ namespace DesignScript.Editor.CodeGen
                         }
 
                         ProtoCore.Type argType = new ProtoCore.Type();
-                        argType.UID = core.TypeSystem.GetType(argNode.ArgumentType.Name);
+                        argType.UID = compileState.TypeSystem.GetType(argNode.ArgumentType.Name);
                         if (argType.UID == ProtoCore.DSASM.Constants.kInvalidIndex)
                             argType.UID = (int)PrimitiveType.kTypeVar;
-                        argType.Name = core.TypeSystem.GetType(argType.UID);
+                        argType.Name = compileState.TypeSystem.GetType(argType.UID);
                         argType.IsIndexable = argNode.ArgumentType.IsIndexable;
                         argType.rank = argNode.ArgumentType.rank;
 
@@ -1520,7 +1520,7 @@ namespace DesignScript.Editor.CodeGen
                     }
                 }
 
-                int findex = core.ClassTable.ClassNodes[globalClassIndex].vtable.Append(localProcedure);
+                int findex = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.Append(localProcedure);
 
                 // Comment Jun: Catch this assert given the condition as this type of mismatch should never occur
                 if (ProtoCore.DSASM.Constants.kInvalidIndex != findex)
@@ -1544,17 +1544,17 @@ namespace DesignScript.Editor.CodeGen
                 {
                     foreach (VarDeclNode argNode in funcDef.Signature.Arguments)
                     {
-                        int argType = core.TypeSystem.GetType(argNode.ArgumentType.Name);
+                        int argType = compileState.TypeSystem.GetType(argNode.ArgumentType.Name);
                         bool isArray = argNode.ArgumentType.IsIndexable;
                         int rank = argNode.ArgumentType.rank;
-                        argList.Add(core.TypeSystem.BuildTypeObject(argType, isArray, rank));
+                        argList.Add(compileState.TypeSystem.BuildTypeObject(argType, isArray, rank));
                     }
                 }
 
-                globalProcIndex = core.ClassTable.ClassNodes[globalClassIndex].vtable.IndexOfExact(funcDef.Name, argList);
+                globalProcIndex = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.IndexOfExact(funcDef.Name, argList);
 
                 Debug.Assert(null == localProcedure);
-                localProcedure = core.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
+                localProcedure = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
 
                 Debug.Assert(null != localProcedure);
                 if (null == localProcedure)
@@ -1567,7 +1567,7 @@ namespace DesignScript.Editor.CodeGen
                 if (!funcDef.IsExternLib)
                 {
                     // Traverse default assignment for the class
-                    foreach (BinaryExpressionNode bNode in core.ClassTable.ClassNodes[globalClassIndex].defaultArgExprList)
+                    foreach (BinaryExpressionNode bNode in compileState.ClassTable.ClassNodes[globalClassIndex].defaultArgExprList)
                     {
                         EmitBinaryExpressionNode(bNode, ref inferedType, false, null, subPass);
                         UpdateType(bNode.LeftNode.Name, ProtoCore.DSASM.Constants.kInvalidIndex, inferedType);
@@ -1586,7 +1586,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempDefaultArg,
                             Name = ProtoCore.DSASM.Constants.kTempDefaultArg,
-                            datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         BinaryExpressionNode bNodeTemp = new BinaryExpressionNode();
                         bNodeTemp.LeftNode = iNodeTemp;
@@ -1616,11 +1616,11 @@ namespace DesignScript.Editor.CodeGen
                     }
 
                     // All locals have been stack allocated, update the local count of this function
-                    localProcedure.localCount = core.BaseOffset;
-                    core.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex].localCount = core.BaseOffset;
+                    localProcedure.localCount = compileState.BaseOffset;
+                    compileState.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex].localCount = compileState.BaseOffset;
 
                     // Update the param stack indices of this function
-                    foreach (ProtoCore.DSASM.SymbolNode symnode in core.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList.Values)
+                    foreach (ProtoCore.DSASM.SymbolNode symnode in compileState.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList.Values)
                     {
                         if (symnode.functionIndex == globalProcIndex && symnode.isArgument)
                         {
@@ -1665,7 +1665,7 @@ namespace DesignScript.Editor.CodeGen
                 // Determine whether this still needs to be aligned to the actual 'classIndex' variable
                 // The factors that will affect this is whether the 2 function tables (compiler and callsite) need to be merged
                 int classIndexAtCallsite = globalClassIndex + 1;
-                core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
+                compileState.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
                 
                 // Build and append a graphnode for this return statememt
                 ProtoCore.DSASM.SymbolNode returnNode = new ProtoCore.DSASM.SymbolNode();
@@ -1673,9 +1673,9 @@ namespace DesignScript.Editor.CodeGen
             }
 
             // Constructors have no return statemetns, reset variables here
-            core.ProcNode = localProcedure = null;
+            compileState.ProcNode = localProcedure = null;
             globalProcIndex = ProtoCore.DSASM.Constants.kGlobalScope;
-            core.BaseOffset = 0;
+            compileState.BaseOffset = 0;
             argOffset = 0;
             classOffset = 0;
             codeBlock.blockType = originalBlockType;
@@ -1699,10 +1699,10 @@ namespace DesignScript.Editor.CodeGen
                 localProcedure.pc = ProtoCore.DSASM.Constants.kInvalidIndex;
                 localProcedure.localCount = 0; // Defer till all locals are allocated
                 localProcedure.returntype.Name = funcDef.ReturnType.Name;
-                localProcedure.returntype.UID = core.TypeSystem.GetType(funcDef.ReturnType.Name);
+                localProcedure.returntype.UID = compileState.TypeSystem.GetType(funcDef.ReturnType.Name);
                 if (localProcedure.returntype.UID == ProtoCore.DSASM.Constants.kInvalidIndex)
                     localProcedure.returntype.UID = (int)PrimitiveType.kTypeVar;
-                localProcedure.returntype.Name = core.TypeSystem.GetType(localProcedure.returntype.UID);
+                localProcedure.returntype.Name = compileState.TypeSystem.GetType(localProcedure.returntype.UID);
                 localProcedure.returntype.IsIndexable = funcDef.ReturnType.IsIndexable;
                 localProcedure.returntype.rank = funcDef.ReturnType.rank;
                 localProcedure.isConstructor = false;
@@ -1721,7 +1721,7 @@ namespace DesignScript.Editor.CodeGen
                 }
                 else
                 {
-                    peekFunctionindex = core.ClassTable.ClassNodes[globalClassIndex].vtable.procList.Count;
+                    peekFunctionindex = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.procList.Count;
                 }
 
                 if (IsParsingMemberFunctionSig() && !funcDef.IsExternLib)
@@ -1731,7 +1731,7 @@ namespace DesignScript.Editor.CodeGen
                         funcDef.FunctionBody.col,
                         funcDef.FunctionBody.endLine,
                         funcDef.FunctionBody.endCol,
-                        core.CurrentDSFileName);
+                        compileState.CurrentDSFileName);
                 else if (!funcDef.IsExternLib)
                     CodeRangeTable.AddCodeBlockFunctionEntry(codeBlock.codeBlockId,
                         peekFunctionindex,
@@ -1739,7 +1739,7 @@ namespace DesignScript.Editor.CodeGen
                         funcDef.FunctionBody.col,
                         funcDef.FunctionBody.endLine,
                         funcDef.FunctionBody.endCol,
-                        core.CurrentDSFileName);
+                        compileState.CurrentDSFileName);
 
                 // Append arg symbols
                 List<KeyValuePair<string, ProtoCore.Type>> argsToBeAllocated = new List<KeyValuePair<string, ProtoCore.Type>>();
@@ -1772,10 +1772,10 @@ namespace DesignScript.Editor.CodeGen
                         }
 
                         ProtoCore.Type argType = new ProtoCore.Type();
-                        argType.UID = core.TypeSystem.GetType(argNode.ArgumentType.Name);
+                        argType.UID = compileState.TypeSystem.GetType(argNode.ArgumentType.Name);
                         if (argType.UID == ProtoCore.DSASM.Constants.kInvalidIndex)
                             argType.UID = (int)PrimitiveType.kTypeVar;
-                        argType.Name = core.TypeSystem.GetType(argType.UID);
+                        argType.Name = compileState.TypeSystem.GetType(argType.UID);
                         argType.IsIndexable = argNode.ArgumentType.IsIndexable;
                         argType.rank = argNode.ArgumentType.rank;
                         // We dont directly allocate arguments now
@@ -1793,7 +1793,7 @@ namespace DesignScript.Editor.CodeGen
                 }
                 else
                 {
-                    globalProcIndex = core.ClassTable.ClassNodes[globalClassIndex].vtable.Append(localProcedure);
+                    globalProcIndex = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.Append(localProcedure);
                 }
 
                 // Comment Jun: Catch this assert given the condition as this type of mismatch should never occur
@@ -1811,10 +1811,10 @@ namespace DesignScript.Editor.CodeGen
                     });
 
 
-                    ExceptionRegistration registration = core.ExceptionHandlingManager.ExceptionTable.GetExceptionRegistration(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
+                    ExceptionRegistration registration = compileState.ExceptionHandlingManager.ExceptionTable.GetExceptionRegistration(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
                     if (registration == null)
                     {
-                        registration = core.ExceptionHandlingManager.ExceptionTable.Register(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
+                        registration = compileState.ExceptionHandlingManager.ExceptionTable.Register(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
                         Debug.Assert(registration != null);
                     }
                 }
@@ -1827,10 +1827,10 @@ namespace DesignScript.Editor.CodeGen
                 {
                     foreach (VarDeclNode argNode in funcDef.Singnature.Arguments)
                     {
-                        int argType = core.TypeSystem.GetType(argNode.ArgumentType.Name);
+                        int argType = compileState.TypeSystem.GetType(argNode.ArgumentType.Name);
                         bool isArray = argNode.ArgumentType.IsIndexable;
                         int rank = argNode.ArgumentType.rank;
-                        argList.Add(core.TypeSystem.BuildTypeObject(argType, isArray, rank));
+                        argList.Add(compileState.TypeSystem.BuildTypeObject(argType, isArray, rank));
                     }
                 }
 
@@ -1842,8 +1842,8 @@ namespace DesignScript.Editor.CodeGen
                 }
                 else
                 {
-                    globalProcIndex = core.ClassTable.ClassNodes[globalClassIndex].vtable.IndexOfExact(funcDef.Name, argList);
-                    localProcedure = core.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
+                    globalProcIndex = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.IndexOfExact(funcDef.Name, argList);
+                    localProcedure = compileState.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
                 }
 
                 Debug.Assert(null != localProcedure);
@@ -1852,7 +1852,7 @@ namespace DesignScript.Editor.CodeGen
                 //Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == localProcedure.pc);
 
                 // Copy the active function to the core so nested language blocks can refer to it
-                core.ProcNode = localProcedure;
+                compileState.ProcNode = localProcedure;
 
                 ProtoCore.FunctionEndPoint fep = null;
                 if (!funcDef.IsExternLib)
@@ -1869,7 +1869,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempDefaultArg,
                             Name = ProtoCore.DSASM.Constants.kTempDefaultArg,
-                            datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         BinaryExpressionNode bNodeTemp = new BinaryExpressionNode();
                         bNodeTemp.LeftNode = iNodeTemp;
@@ -1909,7 +1909,7 @@ namespace DesignScript.Editor.CodeGen
                             {
                                 Value = ProtoCore.DSASM.Constants.kTempLangBlock,
                                 Name = ProtoCore.DSASM.Constants.kTempLangBlock,
-                                datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                                datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
                             };
                             BinaryExpressionNode langBlockNode = new BinaryExpressionNode();
                             langBlockNode.LeftNode = iNode;
@@ -1929,11 +1929,11 @@ namespace DesignScript.Editor.CodeGen
                     }
 
                     // All locals have been stack allocated, update the local count of this function
-                    localProcedure.localCount = core.BaseOffset;
+                    localProcedure.localCount = compileState.BaseOffset;
 
                     if (ProtoCore.DSASM.Constants.kInvalidIndex == globalClassIndex)
                     {
-                        localProcedure.localCount = core.BaseOffset;
+                        localProcedure.localCount = compileState.BaseOffset;
 
                         // Update the param stack indices of this function
                         foreach (ProtoCore.DSASM.SymbolNode symnode in codeBlock.symbolTable.symbolList.Values)
@@ -1946,10 +1946,10 @@ namespace DesignScript.Editor.CodeGen
                     }
                     else
                     {
-                        core.ClassTable.ClassNodes[globalClassIndex].vtable.procList[localProcedure.procId].localCount = core.BaseOffset;
+                        compileState.ClassTable.ClassNodes[globalClassIndex].vtable.procList[localProcedure.procId].localCount = compileState.BaseOffset;
 
                         // Update the param stack indices of this function
-                        foreach (ProtoCore.DSASM.SymbolNode symnode in core.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList.Values)
+                        foreach (ProtoCore.DSASM.SymbolNode symnode in compileState.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList.Values)
                         {
                             if (symnode.functionIndex == localProcedure.procId && symnode.isArgument)
                             {
@@ -2011,12 +2011,12 @@ namespace DesignScript.Editor.CodeGen
                 // Determine whether this still needs to be aligned to the actual 'classIndex' variable
                 // The factors that will affect this is whether the 2 function tables (compiler and callsite) need to be merged
                 int classIndexAtCallsite = globalClassIndex + 1;
-                core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
+                compileState.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
             }
 
-            core.ProcNode = localProcedure = null;
+            compileState.ProcNode = localProcedure = null;
             globalProcIndex = ProtoCore.DSASM.Constants.kGlobalScope;
-            core.BaseOffset = 0;
+            compileState.BaseOffset = 0;
             argOffset = 0;
         }
 
@@ -2049,8 +2049,8 @@ namespace DesignScript.Editor.CodeGen
             ProtoCore.DSASM.CodeBlock localCodeBlock = new ProtoCore.DSASM.CodeBlock(
                 ProtoCore.DSASM.CodeBlockType.kConstruct,
                 Language.kInvalid,
-                core.CodeBlockIndex++,
-                new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("if"), core.RuntimeTableIndex++),
+                compileState.CodeBlockIndex++,
+                new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("if"), compileState.RuntimeTableIndex++),
                 null);
 
 
@@ -2058,7 +2058,7 @@ namespace DesignScript.Editor.CodeGen
             localCodeBlock.parent = codeBlock;
             codeBlock.children.Add(localCodeBlock);
             codeBlock = localCodeBlock;
-            core.CodeBlockList.Add(codeBlock);
+            compileState.CodeBlockList.Add(codeBlock);
             // If-body
             foreach (AssociativeNode ifBody in ifnode.IfBody)
             {
@@ -2084,15 +2084,15 @@ namespace DesignScript.Editor.CodeGen
                 localCodeBlock = new ProtoCore.DSASM.CodeBlock(
                     ProtoCore.DSASM.CodeBlockType.kConstruct,
                     Language.kInvalid,
-                    core.CodeBlockIndex++,
-                    new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("else"), core.RuntimeTableIndex++),
+                    compileState.CodeBlockIndex++,
+                    new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("else"), compileState.RuntimeTableIndex++),
                     null);
 
                 localCodeBlock.instrStream = codeBlock.instrStream;
                 localCodeBlock.parent = codeBlock;
                 codeBlock.children.Add(localCodeBlock);
                 codeBlock = localCodeBlock;
-                core.CodeBlockList.Add(codeBlock);
+                compileState.CodeBlockList.Add(codeBlock);
                 foreach (AssociativeNode elseBody in ifnode.ElseBody)
                 {
                     inferedType = new ProtoCore.Type();
@@ -2268,11 +2268,11 @@ namespace DesignScript.Editor.CodeGen
                         ProtoCore.DSASM.ProcedureNode procNode = null;
                         if (globalClassIndex != ProtoCore.DSASM.Constants.kGlobalScope)
                         {
-                            procNode = core.ClassTable.ClassNodes[globalClassIndex].GetMemberFunction(t.Name, null, globalClassIndex, out isAccessibleFp, out realType);
+                            procNode = compileState.ClassTable.ClassNodes[globalClassIndex].GetMemberFunction(t.Name, null, globalClassIndex, out isAccessibleFp, out realType);
                         }
                         if (procNode == null)
                         {
-                            procNode = core.GetFirstVisibleProcedure(t.Name, null, codeBlock);
+                            procNode = compileState.GetFirstVisibleProcedure(t.Name, null, codeBlock);
                         }
                     }
 
@@ -2287,26 +2287,26 @@ namespace DesignScript.Editor.CodeGen
                         dimensions = DfsEmitArrayIndexHeap(t.ArrayDimensions);
                     }
 
-                    ProtoCore.Type castType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false);
+                    ProtoCore.Type castType = compileState.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false);
                     var tident = bnode.LeftNode as TypedIdentifierNode;
                     if (tident != null)
                     {
                         int castUID = tident.datatype.UID;
                         if ((int)PrimitiveType.kInvalidType == castUID)
                         {
-                            castUID = core.ClassTable.IndexOf(tident.datatype.Name);
+                            castUID = compileState.ClassTable.IndexOf(tident.datatype.Name);
                         }
 
                         if ((int)PrimitiveType.kInvalidType == castUID)
                         {
-                            castType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kInvalidType, false);
+                            castType = compileState.TypeSystem.BuildTypeObject((int)PrimitiveType.kInvalidType, false);
                             castType.Name = tident.datatype.Name;
                             castType.rank = tident.datatype.rank;
                             castType.IsIndexable = (castType.rank != 0);
                         }
                         else
                         {
-                            castType = core.TypeSystem.BuildTypeObject(castUID, tident.datatype.IsIndexable, tident.datatype.rank);
+                            castType = compileState.TypeSystem.BuildTypeObject(castUID, tident.datatype.IsIndexable, tident.datatype.rank);
                         }
                     }
 
@@ -2335,7 +2335,7 @@ namespace DesignScript.Editor.CodeGen
                             {
                                 symbolnode = Allocate(globalClassIndex, globalClassIndex, globalProcIndex, t.Name, inferedType);
                                 Debug.Assert(symbolnode != null);
-                                IdentLocation.AddEntry(symbolnode, t.line, t.col, core.CurrentDSFileName);
+                                IdentLocation.AddEntry(symbolnode, t.line, t.col, compileState.CurrentDSFileName);
                             }
 
                             symbol = symbolnode.symbolTableIndex;
@@ -2362,7 +2362,7 @@ namespace DesignScript.Editor.CodeGen
                             {
                                 symbolnode = Allocate(globalClassIndex, globalClassIndex, globalProcIndex, t.Name, inferedType);
                                 Debug.Assert(symbolnode != null);
-                                IdentLocation.AddEntry(symbolnode, t.line, t.col, core.CurrentDSFileName);
+                                IdentLocation.AddEntry(symbolnode, t.line, t.col, compileState.CurrentDSFileName);
                             }
                         }
 
@@ -2392,7 +2392,7 @@ namespace DesignScript.Editor.CodeGen
                 int leftClassIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
                 if (listNode.LeftNode is IdentifierNode)
                 {
-                    leftClassIndex = core.ClassTable.IndexOf(listNode.LeftNode.Name);
+                    leftClassIndex = compileState.ClassTable.IndexOf(listNode.LeftNode.Name);
                 }
                 AssociativeNode iNode = (listNode.LeftNode.Name == ProtoCore.DSDefinitions.Kw.kw_this ||
                                          leftClassIndex != ProtoCore.DSASM.Constants.kInvalidIndex) ? listNode.RightNode : listNode.LeftNode;
@@ -2435,14 +2435,14 @@ namespace DesignScript.Editor.CodeGen
         {
             ImportNode importNode = node as ImportNode;
             CodeBlockNode codeBlockNode = importNode.CodeNode;
-            string origSourceLocation = core.CurrentDSFileName;
-            core.CurrentDSFileName = importNode.ModuleName;
+            string origSourceLocation = compileState.CurrentDSFileName;
+            compileState.CurrentDSFileName = importNode.ModuleName;
 
             if (compilePass == ProtoCore.DSASM.AssociativeCompilePass.kClassName)
             {
                 CodeRangeTable.AddCodeBlockRangeEntry(codeBlock.codeBlockId,
-                    0, 0, int.MaxValue, int.MaxValue, core.CurrentDSFileName);
-                ImportTable.AddEntry(origSourceLocation, core.CurrentDSFileName);
+                    0, 0, int.MaxValue, int.MaxValue, compileState.CurrentDSFileName);
+                ImportTable.AddEntry(origSourceLocation, compileState.CurrentDSFileName);
             }
             if (codeBlockNode != null)
             {
@@ -2451,7 +2451,7 @@ namespace DesignScript.Editor.CodeGen
                     DfsTraverse(assocNode, ref inferedType, false, null, subPass);
                 }
             }
-            core.CurrentDSFileName = origSourceLocation;
+            compileState.CurrentDSFileName = origSourceLocation;
         }
 
         protected void EmitExceptionHandlingNode(AssociativeNode node, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone)
@@ -2468,10 +2468,10 @@ namespace DesignScript.Editor.CodeGen
             ExceptionHandler exceptionHandler = new ExceptionHandler();
             exceptionHandler.TryLevel = tryLevel;
 
-            ExceptionRegistration registration = core.ExceptionHandlingManager.ExceptionTable.GetExceptionRegistration(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
+            ExceptionRegistration registration = compileState.ExceptionHandlingManager.ExceptionTable.GetExceptionRegistration(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
             if (registration == null)
             {
-                registration = core.ExceptionHandlingManager.ExceptionTable.Register(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
+                registration = compileState.ExceptionHandlingManager.ExceptionTable.Register(codeBlock.codeBlockId, globalProcIndex, globalClassIndex);
                 Debug.Assert(registration != null);
             }
             registration.Add(exceptionHandler);
@@ -2493,7 +2493,7 @@ namespace DesignScript.Editor.CodeGen
 
                 CatchFilterNode filterNode = catchBlock.catchFilter;
                 Debug.Assert(filterNode != null);
-                catchHandler.FilterTypeUID = core.TypeSystem.GetType(filterNode.type.Name);
+                catchHandler.FilterTypeUID = compileState.TypeSystem.GetType(filterNode.type.Name);
 
                 ProtoCore.Type inferedType = new ProtoCore.Type();
                 inferedType.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
@@ -2522,7 +2522,7 @@ namespace DesignScript.Editor.CodeGen
 
                 IdentifierNode tmpArg = new IdentifierNode();
                 tmpArg.Name = tmpArg.Value = ProtoCore.DSASM.Constants.kTempArg;
-                tmpArg.datatype = core.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false);
+                tmpArg.datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false);
                 setter.FormalArguments.Add(tmpArg);
 
                 return setter;

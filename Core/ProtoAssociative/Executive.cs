@@ -9,49 +9,56 @@ namespace ProtoAssociative
 	public class Executive : ProtoCore.Executive
 	{
 
-		public Executive (Core core) : base(core)
+        public Executive()
 		{
 		}
 
-        public override bool Compile(out int blockId, ProtoCore.DSASM.CodeBlock parentBlock, ProtoCore.LanguageCodeBlock langBlock, ProtoCore.CompileTime.Context callContext, ProtoCore.DebugServices.EventSink sink, ProtoCore.AST.Node codeBlockNode, ProtoCore.AssociativeGraph.GraphNode graphNode = null)
+        public Executive(ProtoCore.Core core)
+            : base(core)
+        {
+        }
+
+        public override bool Compile(ProtoLanguage.CompileStateTracker compileState, out int blockId, ProtoCore.DSASM.CodeBlock parentBlock, ProtoCore.LanguageCodeBlock langBlock, ProtoCore.CompileTime.Context callContext, ProtoCore.DebugServices.EventSink sink, ProtoCore.AST.Node codeBlockNode, ProtoCore.AssociativeGraph.GraphNode graphNode = null)
         {
             Debug.Assert(langBlock != null);
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
 
             bool buildSucceeded = false;
-            bool isLangSignValid = core.Langverify.Verify(langBlock);
+            bool isLangSignValid = compileState.Langverify.Verify(langBlock);
 
             if (isLangSignValid)
             {
                 try
                 {
-                    ProtoCore.CodeGen oldCodegen = core.assocCodegen;
+                    ProtoCore.CodeGen oldCodegen = compileState.assocCodegen;
 
-                    if (ProtoCore.DSASM.InterpreterMode.kNormal == core.ExecMode)
+                    if (ProtoCore.DSASM.InterpreterMode.kNormal == compileState.ExecMode)
                     {
-                        if ((core.IsParsingPreloadedAssembly || core.IsParsingCodeBlockNode) && parentBlock == null)
+                        if ((compileState.IsParsingPreloadedAssembly || compileState.IsParsingCodeBlockNode) && parentBlock == null)
                         {
-                            if (core.CodeBlockList.Count == 0)
+                            if (compileState.CodeBlockList.Count == 0)
                             {
-                                core.assocCodegen = new ProtoAssociative.CodeGen(core, parentBlock);
+                                compileState.assocCodegen = new ProtoAssociative.CodeGen(compileState, parentBlock);
                             }
                             else 
                             {
                                 // We reuse the existing toplevel CodeBlockList's for the procedureTable's 
                                 // by calling this overloaded constructor - pratapa
-                                core.assocCodegen = new ProtoAssociative.CodeGen(core);
+                                compileState.assocCodegen = new ProtoAssociative.CodeGen(compileState);
                             }
                         }
                         else
-                            core.assocCodegen = new ProtoAssociative.CodeGen(core, parentBlock);
+                            compileState.assocCodegen = new ProtoAssociative.CodeGen(compileState, parentBlock);
                     }
 
-                    if (null != core.AssocNode)
+                    if (null != compileState.AssocNode)
                     {
                         ProtoCore.AST.AssociativeAST.CodeBlockNode cnode = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-                        cnode.Body.Add(core.AssocNode as ProtoCore.AST.AssociativeAST.AssociativeNode);
+                        cnode.Body.Add(compileState.AssocNode as ProtoCore.AST.AssociativeAST.AssociativeNode);
 
-                        blockId = core.assocCodegen.Emit((cnode as ProtoCore.AST.AssociativeAST.CodeBlockNode), graphNode);
+                        compileState.assocCodegen.context = callContext;
+
+                        blockId = compileState.assocCodegen.Emit((cnode as ProtoCore.AST.AssociativeAST.CodeBlockNode), graphNode);
                     }
                     else
                     {
@@ -60,54 +67,54 @@ namespace ProtoAssociative
                         {
                             System.IO.MemoryStream memstream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(langBlock.body));
                             ProtoCore.DesignScriptParser.Scanner s = new ProtoCore.DesignScriptParser.Scanner(memstream);
-                            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, core, core.builtInsLoaded);
+                            ProtoCore.DesignScriptParser.Parser p = new ProtoCore.DesignScriptParser.Parser(s, compileState, compileState.builtInsLoaded);
                             p.Parse();
 
                             // TODO Jun: Set this flag inside a persistent object
-                            core.builtInsLoaded = true;
+                            compileState.builtInsLoaded = true;
 
                             codeBlockNode = p.root;
 
-                            //core.AstNodeList = p.GetParsedASTList(codeBlockNode as ProtoCore.AST.AssociativeAST.CodeBlockNode);
+                            //compileState.AstNodeList = p.GetParsedASTList(codeBlockNode as ProtoCore.AST.AssociativeAST.CodeBlockNode);
                             List<ProtoCore.AST.Node> astNodes = ProtoCore.Utils.ParserUtils.GetAstNodes(codeBlockNode);
-                            core.AstNodeList = astNodes;
+                            compileState.AstNodeList = astNodes;
                         }
                         else
                         {
-                            if (!core.builtInsLoaded)
+                            if (!compileState.builtInsLoaded)
                             {
                                 // Load the built-in methods manually
-                                ProtoCore.Utils.CoreUtils.InsertPredefinedAndBuiltinMethods(core, codeBlockNode, false);
-                                core.builtInsLoaded = true;
+                                ProtoCore.Utils.CoreUtils.InsertPredefinedAndBuiltinMethods(compileState, codeBlockNode, false);
+                                compileState.builtInsLoaded = true;
                             }
                         }
 
-                        core.assocCodegen.context = callContext;
+                        compileState.assocCodegen.context = callContext;
 
                         //Temporarily change the code block for code gen to the current block, in the case it is an imperative block
                         //CodeGen for ProtoImperative is modified to passing in the core object.
-                        ProtoCore.DSASM.CodeBlock oldCodeBlock = core.assocCodegen.codeBlock;
-                        if (core.ExecMode == ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter)
+                        ProtoCore.DSASM.CodeBlock oldCodeBlock = compileState.assocCodegen.codeBlock;
+                        if (compileState.ExecMode == ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter)
                         {
-                            int tempBlockId = core.GetCurrentBlockId();
+                            int tempBlockId = compileState.GetCurrentBlockId();
 
-                            ProtoCore.DSASM.CodeBlock tempCodeBlock = core.GetCodeBlock(core.CodeBlockList, tempBlockId);
+                            ProtoCore.DSASM.CodeBlock tempCodeBlock = compileState.GetCodeBlock(compileState.CodeBlockList, tempBlockId);
                             while (null != tempCodeBlock && tempCodeBlock.blockType != ProtoCore.DSASM.CodeBlockType.kLanguage)
                             {
                                 tempCodeBlock = tempCodeBlock.parent;
                             }
-                            core.assocCodegen.codeBlock = tempCodeBlock;
+                            compileState.assocCodegen.codeBlock = tempCodeBlock;
                         }
-                        core.assocCodegen.codeBlock.EventSink = sink;
-                        if (core.BuildStatus.Errors.Count == 0) //if there is syntax error, no build needed
+                        compileState.assocCodegen.codeBlock.EventSink = sink;
+                        if (compileState.BuildStatus.Errors.Count == 0) //if there is syntax error, no build needed
                         {
-                             blockId = core.assocCodegen.Emit((codeBlockNode as ProtoCore.AST.AssociativeAST.CodeBlockNode), graphNode);
+                             blockId = compileState.assocCodegen.Emit((codeBlockNode as ProtoCore.AST.AssociativeAST.CodeBlockNode), graphNode);
                         }
-                        if (core.ExecMode == ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter)
+                        if (compileState.ExecMode == ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter)
                         {
-                            blockId = core.assocCodegen.codeBlock.codeBlockId;
+                            blockId = compileState.assocCodegen.codeBlock.codeBlockId;
                             //Restore the code block.
-                            core.assocCodegen.codeBlock = oldCodeBlock;
+                            compileState.assocCodegen.codeBlock = oldCodeBlock;
                         }
                     }
 
@@ -122,21 +129,21 @@ namespace ProtoAssociative
                     // replace some other useful information? Need to revisit it.
                     //
                     // Also refer to defect IDE-2120.
-                    if (oldCodegen != null && core.assocCodegen != oldCodegen)
+                    if (oldCodegen != null && compileState.assocCodegen != oldCodegen)
                     {
-                        core.assocCodegen = oldCodegen;
+                        compileState.assocCodegen = oldCodegen;
                     }
                 }
                 catch (ProtoCore.BuildHaltException e)
                 {
 #if DEBUG
-                    //core.BuildStatus.LogSemanticError(e.errorMsg);
+                    //compileState.BuildStatus.LogSemanticError(e.errorMsg);
 #endif
                 }
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+                buildSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
 
             return buildSucceeded;

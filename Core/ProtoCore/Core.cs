@@ -126,8 +126,9 @@ namespace ProtoCore
         {
             DumpByteCode = false;
             Verbose = false;
-            DumpIL = false;
+
             FullSSA = false;
+            DumpIL = false;
 
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
@@ -989,7 +990,7 @@ namespace ProtoCore
         public Dictionary<string, object> Configurations { get; set; }
 
         //Manages injected context data.
-        internal ContextDataManager ContextDataManager { get; set; }
+        public ContextDataManager ContextDataManager { get; set; }
 
         public ParseMode ParsingMode { get; set; }
 
@@ -1007,20 +1008,6 @@ namespace ProtoCore
             ContextDataManager.GetInstance(this).AddData(data);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        //public void AddContextData(IEnumerable<IContextData> data)
-        //{
-        //    if (data == null)
-        //        return;
-
-        //    if (null == mCotextManager)
-        //        mCotextManager = new ContextDataManager(this);
-
-        //    mCotextManager.AddData(data);
-        //}
 
         // Cached replication guides for the current call. 
         // TODO Jun: Store this in the dynamic table node
@@ -1274,28 +1261,6 @@ namespace ProtoCore
 
             AssocNode = null;
 
-
-            //
-            //
-            // Comment Jun: Delta execution should not reset the class tables as they are preserved
-            //
-            //      FunctionTable = new Lang.FunctionTable();
-            //      ClassTable = new DSASM.ClassTable();
-            //      TypeSystem = new TypeSystem();
-            //      TypeSystem.SetClassTable(ClassTable);
-            //      ProcNode = null;
-            //      ProcTable = new DSASM.ProcedureTable(ProtoCore.DSASM.Constants.kGlobalScope);
-            //
-            //      CodeBlockList = new List<DSASM.CodeBlock>();
-            //
-            //
-
-            //      CodeBlockIndex = 0;
-            //      RuntimeTableIndex = 0;
-
-            //
-
-
             //Initialize the function pointer table
             FunctionPointerTable = new DSASM.FunctionPointerTable();
 
@@ -1313,12 +1278,14 @@ namespace ProtoCore
                 //  just accumulate them in relevant containers with
                 //  BuildStatus object
                 //
-                BuildStatus = new BuildStatus(this, false, false, false);
+                //BuildStatus = new BuildStatus(this, false, false, false);
             }
             else
             {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
+                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
             }
+
+
             RuntimeStatus = new RuntimeStatus(this);
 
             SSASubscript = 0;
@@ -1381,12 +1348,13 @@ namespace ProtoCore
                 //  just accumulate them in relevant containers with
                 //  BuildStatus object
                 //
-                BuildStatus = new BuildStatus(this, false, false, false);
+                //BuildStatus = new BuildStatus(this, false, false, false);
             }
             else
             {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError);
+                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError);
             }
+
             
             if (AstNodeList != null) 
                 AstNodeList.Clear();
@@ -1459,12 +1427,14 @@ namespace ProtoCore
                 //  just accumulate them in relevant containers with
                 //  BuildStatus object
                 //
-                BuildStatus = new BuildStatus(this, false, false, false);
+                //BuildStatus = new BuildStatus(this, false, false, false);
             }
             else
             {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
+                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
             }
+
+
             RuntimeStatus = new RuntimeStatus(this);
 
             SSASubscript = 0;
@@ -1901,7 +1871,7 @@ namespace ProtoCore
                 int framePointer = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kFramePointer).opdata;
                 List<StackValue> registers = stackFrame.GetRegisters();
 
-                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals);
+                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
             }
 
             ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
@@ -1931,7 +1901,7 @@ namespace ProtoCore
 
                 DebugProps.SetUpBounce(exec, blockCaller, returnAddr);
 
-                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals);
+                Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerFrameType, frameType, depth + 1, framePointer, registers, locals, 0);
             }
 
             ProtoCore.Language id = DSExecutable.instrStreamList[exeblock].language;
@@ -1988,7 +1958,9 @@ namespace ProtoCore
             }
         }
 
-
+        //
+        // Comment Jun: The compile state will now handle executable generation
+        /*
         public void GenerateExprExe()
         {
             // TODO Jun: Determine if we really need another executable for the expression interpreter
@@ -2017,6 +1989,7 @@ namespace ProtoCore
                 }
             }
         }
+        
 
 
         public void GenerateExprExeInstructions(int blockScope)
@@ -2065,7 +2038,7 @@ namespace ProtoCore
             }
             GenerateExprExe();
         }
-
+        */
 
 
         public string GenerateTempVar()

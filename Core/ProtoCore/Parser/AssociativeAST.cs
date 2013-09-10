@@ -1170,14 +1170,14 @@ namespace ProtoCore.AST.AssociativeAST
             return identNode;
         }
 
-        public IdentifierNode CreateIdentifierNode(AssociativeNode leftNode, ProtoCore.Core core)
+        public IdentifierNode CreateIdentifierNode(AssociativeNode leftNode, ProtoLanguage.CompileStateTracker compileState)
         {
             IdentifierNode leftIdentifier = leftNode as IdentifierNode;
             if (null == leftIdentifier)
                 return null;
 
             string modifierName = leftIdentifier.Name;
-            string stackName = core.GetModifierBlockTemp(modifierName);
+            string stackName = compileState.GetModifierBlockTemp(modifierName);
             IdentifierNode identNode = new IdentifierNode
             {
                 Value = stackName,

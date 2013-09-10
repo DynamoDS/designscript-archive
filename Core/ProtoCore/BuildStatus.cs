@@ -273,12 +273,18 @@ namespace ProtoCore
 
     public class WebOutputStream : IOutputStream
     {
-        public Core core;
+        public ProtoCore.Core core;
+        public ProtoLanguage.CompileStateTracker compileState;
         public string filename;
-        public WebOutputStream(Core core)
+        public WebOutputStream(ProtoCore.Core core)
         {
             this.core = core;
-            this.filename = core.CurrentDSFileName;
+            this.filename = this.core.CurrentDSFileName;
+        }
+        public WebOutputStream(ProtoLanguage.CompileStateTracker state)
+        {
+            this.compileState = state;
+            this.filename = state.CurrentDSFileName;
         }
         public string GetCurrentFileName()
         {
@@ -296,9 +302,9 @@ namespace ProtoCore
                 string formatWithoutFile = "{0}: {1}";
 
                 //System.IO.StreamWriter logFile = new System.IO.StreamWriter("c:\\test.txt");
-                if (null != core.ExecutionLog)
+                if (null != compileState.ExecutionLog)
                 {
-                    core.ExecutionLog.WriteLine(string.Format(formatWithoutFile,
+                    compileState.ExecutionLog.WriteLine(string.Format(formatWithoutFile,
                         message.Type.ToString(), message.Message));
                 }
 
@@ -310,10 +316,10 @@ namespace ProtoCore
             else
             {
                 // Type: Message (File - Line, Column)
-                if (null != core.ExecutionLog)
+                if (null != compileState.ExecutionLog)
                 {
                     string formatWithFile = "{0}: {1} ({2} - line: {3}, col: {4})";
-                    core.ExecutionLog.WriteLine(string.Format(formatWithFile,
+                    compileState.ExecutionLog.WriteLine(string.Format(formatWithFile,
                         message.Type.ToString(), message.Message,
                         message.FilePath, message.Line, message.Column));
                 }
@@ -329,8 +335,8 @@ namespace ProtoCore
 
         public void Close()
         {
-            if (null != core.ExecutionLog)
-                core.ExecutionLog.Close();
+            if (null != compileState.ExecutionLog)
+                compileState.ExecutionLog.Close();
         }
 
         public List<ProtoCore.OutputMessage> GetMessages()
@@ -341,7 +347,8 @@ namespace ProtoCore
 
     public class BuildStatus
     {
-        private ProtoCore.Core core;
+        //private Core core;
+        private ProtoLanguage.CompileStateTracker compileState;
         private System.IO.TextWriter consoleOut = System.Console.Out;
         private readonly bool LogWarnings = true;
         private readonly bool logErrors = true;
@@ -380,15 +387,40 @@ namespace ProtoCore
             get { return Warnings.Count; }
         }
 
+        //  logs all errors and warnings by default
+        //
+        //public BuildStatus(Core core, bool warningAsError, System.IO.TextWriter writer = null, bool errorAsWarning = false)
+        //{
+        //    this.core = core;
+        //    warnings = new List<BuildData.WarningEntry>();
+
+        //    errors = new List<BuildData.ErrorEntry>();
+        //    this.warningAsError = warningAsError;
+        //    this.errorAsWarning = errorAsWarning;
+
+        //    if (writer != null)
+        //    {
+        //        consoleOut = System.Console.Out;
+        //        System.Console.SetOut(writer);
+        //    }
+
+        //    // Create a default console output stream, and this can 
+        //    // be overwritten in IDE by assigning it a different value.
+        //    this.MessageHandler = new ConsoleOutputStream();
+
+        //    //if (compileState.Options.WebRunner)
+        //    //{
+        //    //    this.WebMsgHandler = new WebOutputStream(compileState);
+        //    //}
+        //}
+
 
 
         //  logs all errors and warnings by default
         //
-        public BuildStatus(Core core,bool warningAsError, System.IO.TextWriter writer = null, bool errorAsWarning = false)
+        public BuildStatus(ProtoLanguage.CompileStateTracker compilestate, bool warningAsError, System.IO.TextWriter writer = null, bool errorAsWarning = false)
         {
-            this.core = core;
-            //this.errorCount = 0;
-            //this.warningCount = 0;
+            this.compileState = compilestate;
             warnings = new List<BuildData.WarningEntry>();
             
             errors = new List<BuildData.ErrorEntry>();
@@ -404,15 +436,39 @@ namespace ProtoCore
             // Create a default console output stream, and this can 
             // be overwritten in IDE by assigning it a different value.
             this.MessageHandler = new ConsoleOutputStream();
-            if (core.Options.WebRunner)
+            if (compilestate.Options.WebRunner)
             {
-                this.WebMsgHandler = new WebOutputStream(core);
+                this.WebMsgHandler = new WebOutputStream(compilestate);
             }
         }
 
-        public BuildStatus(Core core,bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
+        //public BuildStatus(Core core, bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
+        //{
+        //    this.core = core;
+        //    this.LogWarnings = LogWarnings;
+        //    this.logErrors = logErrors;
+        //    this.displayBuildResult = displayBuildResult;
+
+        //    //this.errorCount = 0;
+        //    //this.warningCount = 0;
+        //    warnings = new List<BuildData.WarningEntry>();
+
+        //    errors = new List<BuildData.ErrorEntry>();
+
+        //    if (writer != null)
+        //    {
+        //        consoleOut = System.Console.Out;
+        //        System.Console.SetOut(writer);
+        //    }
+
+        //    // Create a default console output stream, and this can 
+        //    // be overwritten in IDE by assigning it a different value.
+        //    this.MessageHandler = new ConsoleOutputStream();
+        //}      
+
+        public BuildStatus(ProtoLanguage.CompileStateTracker compilestate, bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
         {
-            this.core = core;
+            this.compileState = compilestate;
             this.LogWarnings = LogWarnings;
             this.logErrors = logErrors;
             this.displayBuildResult = displayBuildResult;
@@ -474,9 +530,9 @@ namespace ProtoCore
                 Col = col            
             };
 
-            if(core.Options.IsDeltaExecution)
+            if (compileState.Options.IsDeltaExecution)
             {
-                core.LogErrorInGlobalMap(Core.ErrorType.Error, msg, fileName, line, col);
+                compileState.LogErrorInGlobalMap(ProtoLanguage.CompileStateTracker.ErrorType.Error, msg, fileName, line, col);
             }
 
             errors.Add(errorEntry);
@@ -507,9 +563,9 @@ namespace ProtoCore
                 System.Console.WriteLine("{0}({1},{2}) Error:{3}", fileName, line, col, msg);
             }
 
-            if (core.Options.IsDeltaExecution)
+            if (compileState.Options.IsDeltaExecution)
             {
-                core.LogErrorInGlobalMap(Core.ErrorType.Error, msg, fileName, line, col);
+                compileState.LogErrorInGlobalMap(ProtoLanguage.CompileStateTracker.ErrorType.Error, msg, fileName, line, col);
             }
 
             BuildData.ErrorEntry errorEntry = new BuildData.ErrorEntry
@@ -561,9 +617,9 @@ namespace ProtoCore
             BuildData.WarningEntry warningEntry = new BuildData.WarningEntry { id = warnId, msg = msg, line = line, col = col, FileName = fileName };
             warnings.Add(warningEntry);
 
-            if (core.Options.IsDeltaExecution)
+            if (compileState.Options.IsDeltaExecution)
             {
-                core.LogErrorInGlobalMap(Core.ErrorType.Warning, msg, fileName, line, col, warnId);
+                compileState.LogErrorInGlobalMap(ProtoLanguage.CompileStateTracker.ErrorType.Warning, msg, fileName, line, col, warnId);
             }
 
             OutputMessage outputmessage = new OutputMessage(OutputMessage.MessageType.Warning, msg.Trim(), fileName, line, col);

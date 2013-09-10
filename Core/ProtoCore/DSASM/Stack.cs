@@ -23,8 +23,10 @@ namespace ProtoCore.DSASM
         public const int kFrameIndexCallerStackFrameType    = -7;
         public const int kFrameIndexStackFrameType          = -8;
         public const int kFrameIndexStackFrameDepth         = -9;
+        public const int kFrameIndexLocalVariables          = -10;
+        public const int kFrameIndexExecutionStates         = -11;
 
-        public const int kLastFrameIndex = kFrameIndexStackFrameDepth;
+        public const int kLastFrameIndex = kFrameIndexExecutionStates;
 
         // Relative idnex of each register
         public const int kFrameIndexRegisterAX = kLastFrameIndex - 1;
@@ -41,10 +43,6 @@ namespace ProtoCore.DSASM
         // Relative index of the frame pointer
         public const int kFrameIndexFramePointer = -(kPointersSize + kRegistrySize);
 
-        public const int kRegistrySize = 10;
-        public const int kPointersSize = 10;
-        public const int kStackFrameSize = kPointersSize + kRegistrySize;
-        
 
         public enum AbsoluteIndex
         {
@@ -57,6 +55,8 @@ namespace ProtoCore.DSASM
             kCallerStackFrameType,
             kStackFrameType,
             kStackFrameDepth,
+            kLocalVariables,
+            kExecutionStates,
             kRegisterAX,
             kRegisterBX,
             kRegisterCX,
@@ -71,10 +71,16 @@ namespace ProtoCore.DSASM
             kSize
         }
 
+
+        public const int kRegistrySize = 10;
+        public const int kPointersSize = 12;
+        public const int kStackFrameSize = kPointersSize + kRegistrySize;
+
         public StackValue[] Frame { get; set; }
+        public StackValue[] ExecutionStates { get; set; }
 
         private void Init(StackValue svThisPtr, int classIndex, int funcIndex, int pc, int functionBlockDecl, int functionBlockCaller, StackFrameType callerType, StackFrameType type, int depth,
-           int framePointer, List<StackValue> stack)
+           int framePointer, List<StackValue> stack, List<bool> execStates)
         {
             Validity.Assert((int)StackFrame.AbsoluteIndex.kSize == kStackFrameSize);
 
@@ -102,12 +108,26 @@ namespace ProtoCore.DSASM
             Frame[(int)AbsoluteIndex.kRegisterSX] = stack[8];
             Frame[(int)AbsoluteIndex.kRegisterTX] = stack[9];
 
+            int execStateSize = 0;
+            if (null != execStates)
+            {
+                execStateSize = execStates.Count;
+                ExecutionStates = new StackValue[execStateSize];
+                for (int n = 0; n < execStateSize; ++n)
+                {
+                    ExecutionStates[n] = StackUtils.BuildBoolean(execStates[n]);
+                }
+            }
+
+            Frame[(int)AbsoluteIndex.kExecutionStates] = StackUtils.BuildInt(execStateSize);
+            Frame[(int)AbsoluteIndex.kLocalVariables] = StackUtils.BuildInt(0);
+            
             Validity.Assert(kStackFrameSize == Frame.Length);
         }
 
-        public StackFrame(StackValue svThisPtr, int classIndex, int funcIndex, int pc, int functionBlockDecl, int functionBlockCaller, StackFrameType callerType, StackFrameType type, int depth, int framePointer, List<StackValue> stack)
+        public StackFrame(StackValue svThisPtr, int classIndex, int funcIndex, int pc, int functionBlockDecl, int functionBlockCaller, StackFrameType callerType, StackFrameType type, int depth, int framePointer, List<StackValue> stack, List<bool> execStates) 
         {
-            Init(svThisPtr, classIndex, funcIndex, pc, functionBlockDecl, functionBlockCaller, callerType, type, depth, framePointer, stack);
+            Init(svThisPtr, classIndex, funcIndex, pc, functionBlockDecl, functionBlockCaller, callerType, type, depth, framePointer, stack, execStates);
         }
 
         public StackFrame(int globalOffset)
@@ -124,7 +144,7 @@ namespace ProtoCore.DSASM
             int depth = -1;
             int framePointer = globalOffset;
 
-            Init(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, ProtoCore.DSASM.StackUtils.BuildInvalidRegisters());
+            Init(svThisPtr, ci, fi, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, ProtoCore.DSASM.StackUtils.BuildInvalidRegisters(), new List<bool>());
         }
 
         public StackValue GetAt(AbsoluteIndex index)

@@ -759,7 +759,7 @@ namespace ProtoCore.AssociativeGraph
 
     public class DependencyGraph
     {
-        private readonly ProtoCore.Core core;
+        private readonly ProtoLanguage.CompileStateTracker compileState;
         private List<GraphNode> graphList;
 
         // For quickly get a list of graph nodes at some scope. 
@@ -780,9 +780,9 @@ namespace ProtoCore.AssociativeGraph
             return (((ulong)ci) << 32) | pi;
         }
 
-        public DependencyGraph(ProtoCore.Core core)
+        public DependencyGraph(ProtoLanguage.CompileStateTracker compileState)
         {
-            this.core = core;
+            this.compileState = compileState;
             graphList = new List<GraphNode>();
             graphNodeMap = new Dictionary<ulong, List<GraphNode>>();
         }
@@ -794,6 +794,21 @@ namespace ProtoCore.AssociativeGraph
             return nodes;
         }
 
+        public List<bool> GetExecutionStatesAtScope(int classIndex, int procIndex)
+        {
+            List<GraphNode> nodes = GetGraphNodesAtScope(classIndex, procIndex);
+
+            List<bool> execStates = new List<bool>();
+            if (null != nodes && nodes.Count > 0)
+            {
+                for (int n = 0; n < nodes.Count; ++n)
+                {
+                    execStates.Add(nodes[n].isDirty);
+                }
+            }
+            return execStates;
+        }
+
         public void RemoveNodesFromScope(int classIndex, int procIndex)
         {
             ulong removeKey = GetGraphNodeKey(classIndex, procIndex);
@@ -802,9 +817,9 @@ namespace ProtoCore.AssociativeGraph
 
         public void Push(GraphNode node)
         {
-            Validity.Assert(null != core);
-            Validity.Assert(core.GraphNodeUID >= 0);
-            node.UID = core.GraphNodeUID++;
+            Validity.Assert(null != compileState);
+            Validity.Assert(compileState.GraphNodeUID >= 0);
+            node.UID = compileState.GraphNodeUID++;
             node.dependencyGraphListID = graphList.Count;
             graphList.Add(node);
 

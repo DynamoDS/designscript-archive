@@ -113,6 +113,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignScriptStudio.App", "U
 		{9EC0521F-84DA-4196-B0BC-34E4049E50BD} = {9EC0521F-84DA-4196-B0BC-34E4049E50BD}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoLanguage", "Core\ProtoLanguage\ProtoLanguage.csproj", "{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -403,6 +405,14 @@ Global
 		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Release|x64.Build.0 = Release|x64
 		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Release|x86.ActiveCfg = Release|x86
 		{6D9134B2-DD88-44EF-8B4E-7B2C45E6A22F}.Release|x86.Build.0 = Release|x86
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Debug|Win32.ActiveCfg = Debug|x64
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Debug|x64.ActiveCfg = Debug|x64
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Debug|x64.Build.0 = Debug|x64
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Debug|x86.ActiveCfg = Debug|x64
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Release|Win32.ActiveCfg = Release|x64
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Release|x64.ActiveCfg = Release|x64
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Release|x64.Build.0 = Release|x64
+		{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

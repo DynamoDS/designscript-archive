@@ -1,5 +1,7 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
+using ProtoCore.Utils;
 
 namespace ProtoScript.Runners
 {
@@ -17,39 +19,38 @@ namespace ProtoScript.Runners
             return inString;
         }
 
-        public bool Compile(string code, ProtoCore.Core core, out int blockId)
+        public ProtoLanguage.CompileStateTracker Compile(string code, out int blockId)
         {
-            bool buildSucceeded = false;
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
             try
             {
-                // No More HashAngleReplace for unified parser (Fuqiang)
-                //String strSource = ProtoCore.Utils.LexerUtils.HashAngleReplace(code);
                 System.IO.MemoryStream sourceMemStream = new System.IO.MemoryStream(System.Text.Encoding.Default.GetBytes(code));
-                ProtoScript.GenerateScript gs = new ProtoScript.GenerateScript(core);
+                ProtoScript.GenerateScript gs = new ProtoScript.GenerateScript(compileState);
 
-                core.Script = gs.preParseFromStream(sourceMemStream);
+                compileState.Script = gs.preParseFromStream(sourceMemStream);
 
-                foreach (ProtoCore.LanguageCodeBlock codeblock in core.Script.codeblockList)
+                foreach (ProtoCore.LanguageCodeBlock codeblock in compileState.Script.codeblockList)
                 {
                     ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
                     ProtoCore.Language id = codeblock.language;
 
-                    core.Executives[id].Compile(out blockId, null, codeblock, context, EventSink);
+                    compileState.Executives[id].Compile(compileState, out blockId, null, codeblock, context, EventSink);
                 }
 
-                core.BuildStatus.ReportBuildResult();
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+                compileState.compileSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return buildSucceeded;
+            return compileState;
         }
 
         public void Execute(ProtoCore.Core core)
@@ -74,17 +75,35 @@ namespace ProtoScript.Runners
         public void Execute(string code, ProtoCore.Core core)
         {
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            bool succeeded = Compile(code, core, out blockId);
-            if (succeeded)
+            ProtoLanguage.CompileStateTracker compileState = Compile(code, out blockId);
+            Validity.Assert(null != compileState);
+            if (compileState.compileSucceeded)
             {
-                core.GenerateExecutable();
-                core.Rmem.PushGlobFrame(core.GlobOffset);
+                // This is the boundary between compilestate and runtime core
+                // Generate the executable
+                compileState.GenerateExecutable();
+
+                // Get the executable from the compileState
+                core.DSExecutable = compileState.DSExecutable;
+
+                // Setup the initial size of the global stack
+                core.Rmem.PushGlobFrame(compileState.GlobOffset);
                 core.RunningBlock = blockId;
+
                 Execute(core);
                 core.Heap.Free();
+
+
+                //core.GenerateExecutable();
+                //core.Rmem.PushGlobFrame(core.GlobOffset);
+                //core.RunningBlock = blockId;
+                //Execute(core);
+                //core.Heap.Free();
             }
             else
+            {
                 throw new ProtoCore.Exceptions.CompileErrorsOccured();
+            }
         }
 
         public void LoadAndExecute(string pathFilename, ProtoCore.Core core)

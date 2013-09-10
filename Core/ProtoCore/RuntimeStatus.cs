@@ -90,10 +90,13 @@ namespace ProtoCore
             warnings = new List<RuntimeData.WarningEntry>();
             this.warningAsError = warningAsError;
             this.core = core;
+
             if (core.Options.WebRunner)
             {
-                this.WebMsgHandler = new WebOutputStream(core);
+                //this.WebMsgHandler = new WebOutputStream(core);
             }
+
+
             if (writer != null)
             {
                 output = System.Console.Out;
@@ -168,7 +171,7 @@ namespace ProtoCore
             {
                 if (classScope != Constants.kGlobalScope)
                 {
-                    string classname = core.ClassTable.ClassNodes[classScope].name;
+                    string classname = core.DSExecutable.classTable.ClassNodes[classScope].name;
                     message = string.Format(RuntimeData.WarningMessage.kPropertyOfClassNotFound, classname, propertyName);
                 }
                 else

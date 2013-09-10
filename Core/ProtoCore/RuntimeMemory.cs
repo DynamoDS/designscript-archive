@@ -110,13 +110,23 @@ namespace ProtoCore
                 }
             }
 
-            public void PushStackFrame(int ptr, int classIndex, int funcIndex, int pc, int functionBlockDecl, int functionBlockCaller, StackFrameType callerType, StackFrameType type, int depth, int fp, List<StackValue> registers, int locsize)
+            private void PushFrame(List<StackValue> stackData)
+            {
+                if (null != stackData && stackData.Count > 0)
+                {
+                    Stack.AddRange(stackData);
+                }
+            }
+
+            public void PushStackFrame(int ptr, int classIndex, int funcIndex, int pc, int functionBlockDecl, int functionBlockCaller, StackFrameType callerType, StackFrameType type, int depth, int fp, List<StackValue> registers, int locsize, int executionStates)
             {
                 // TODO Jun: Performance
                 // Push frame should only require adjusting the frame index instead of pushing dummy elements
                 PushFrame(locsize);
                 Push(StackUtils.BuildInt(fp));
                 PushRegisters(registers);
+                Push(StackUtils.BuildNode(AddressType.Int, executionStates));
+                Push(StackUtils.BuildNode(AddressType.Int, 0));
                 Push(StackUtils.BuildNode(AddressType.Int, depth));
                 Push(StackUtils.BuildNode(AddressType.FrameType, (int)type));
                 Push(StackUtils.BuildNode(AddressType.FrameType, (int)callerType));
@@ -129,13 +139,15 @@ namespace ProtoCore
                 FramePointer = Stack.Count;
             }
 
-            public void PushStackFrame(StackValue svThisPtr, int classIndex, int funcIndex, int pc, int functionBlockDecl, int functionBlockCaller, StackFrameType callerType, StackFrameType type, int depth, int fp, List<StackValue> registers, int locsize)
+            public void PushStackFrame(StackValue svThisPtr, int classIndex, int funcIndex, int pc, int functionBlockDecl, int functionBlockCaller, StackFrameType callerType, StackFrameType type, int depth, int fp, List<StackValue> registers, int locsize, int executionStates)
             {
                 // TODO Jun: Performance
                 // Push frame should only require adjusting the frame index instead of pushing dummy elements
                 PushFrame(locsize);
                 Push(StackUtils.BuildInt(fp));
                 PushRegisters(registers);
+                Push(StackUtils.BuildNode(AddressType.Int, executionStates));
+                Push(StackUtils.BuildNode(AddressType.Int, 0));
                 Push(StackUtils.BuildNode(AddressType.Int, depth));
                 Push(StackUtils.BuildNode(AddressType.FrameType, (int)type));
                 Push(StackUtils.BuildNode(AddressType.FrameType, (int)callerType));
@@ -149,7 +161,7 @@ namespace ProtoCore
             }
 
 
-            public void PushStackFrame(StackFrame stackFrame, int localSize)
+            public void PushStackFrame(StackFrame stackFrame, int localSize, int executionStates)
             {
                 // TODO Jun: Performance
                 // Push frame should only require adjusting the frame index instead of pushing dummy elements
@@ -169,6 +181,8 @@ namespace ProtoCore
                 Push(stackFrame.Frame[(int)StackFrame.AbsoluteIndex.kRegisterBX]);
                 Push(stackFrame.Frame[(int)StackFrame.AbsoluteIndex.kRegisterAX]);
 
+                Push(stackFrame.Frame[(int)StackFrame.AbsoluteIndex.kExecutionStates]);
+                Push(stackFrame.Frame[(int)StackFrame.AbsoluteIndex.kLocalVariables]);
                 Push(stackFrame.Frame[(int)StackFrame.AbsoluteIndex.kStackFrameDepth]);
                 Push(stackFrame.Frame[(int)StackFrame.AbsoluteIndex.kStackFrameType]);
                 Push(stackFrame.Frame[(int)StackFrame.AbsoluteIndex.kCallerStackFrameType]);
@@ -198,6 +212,8 @@ namespace ProtoCore
                     && AddressType.BlockIndex == Stack[GetRelative(StackFrame.kFrameIndexFunctionCallerBlock)].optype
                     && AddressType.FrameType == Stack[GetRelative(StackFrame.kFrameIndexCallerStackFrameType)].optype
                     && AddressType.FrameType == Stack[GetRelative(StackFrame.kFrameIndexStackFrameType)].optype
+                    && AddressType.Int == Stack[GetRelative(StackFrame.kFrameIndexLocalVariables)].optype
+                    && AddressType.Int == Stack[GetRelative(StackFrame.kFrameIndexExecutionStates)].optype
                     && AddressType.Int == Stack[GetRelative(StackFrame.kFrameIndexStackFrameDepth)].optype
                     && AddressType.Int == Stack[GetRelative(StackFrame.kFrameIndexFramePointer)].optype;
 

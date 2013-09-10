@@ -22,14 +22,14 @@ namespace ProtoCore.Lang
 
             int fptr = (int)pointer.opdata;
             ProtoCore.DSASM.FunctionPointerNode fptrNode;
-            if (core.FunctionPointerTable.functionPointerDictionary.TryGetByFirst(fptr, out fptrNode))
+            if (core.DSExecutable.FunctionPointerTable.functionPointerDictionary.TryGetByFirst(fptr, out fptrNode))
             {
                 int blockId = fptrNode.blockId;
                 int procId = fptrNode.procId;
                 mProcNode = dsi.runtime.exe.procedureTable[blockId].procList[procId];
             }
 
-            mCallSite = new ProtoCore.CallSite(ProtoCore.DSASM.Constants.kGlobalScope, Name, core.FunctionTable, core.Options.ExecutionMode);
+            mCallSite = new ProtoCore.CallSite(ProtoCore.DSASM.Constants.kGlobalScope, Name, core.DSExecutable.FunctionTable, core.Options.ExecutionMode);
         }
 
         public StackValue Evaluate(List<StackValue> args, StackFrame stackFrame)
@@ -59,7 +59,7 @@ namespace ProtoCore.Lang
             mRunTime.runtime.SX = svBlockDecl;
 
             mRunTime.runtime.SaveRegisters(registers);
-            ProtoCore.DSASM.StackFrame newStackFrame = new StackFrame(thisPtr, classScopeCaller, 1, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers);
+            ProtoCore.DSASM.StackFrame newStackFrame = new StackFrame(thisPtr, classScopeCaller, 1, returnAddr, blockDecl, blockCaller, callerType, type, depth, framePointer, registers, null);
 
             List<List<int>> replicationGuides = new List<List<int>>();
             if (mRunTime.runtime.Core.Options.IDEDebugMode && mRunTime.runtime.Core.ExecMode != ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter)
