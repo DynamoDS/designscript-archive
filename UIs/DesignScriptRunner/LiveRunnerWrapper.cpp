@@ -72,6 +72,12 @@ DesignScriptObject* LiveRunnerWrapper::getCoreDump()
     return new SimpleDSObject(dump);
 }
 
+const wchar_t* LiveRunnerWrapper::getCoreDumpCmdLineREPL()
+{
+    return StringToWchar(wrapper()->GetCoreDump());
+}
+
+
 SynchronizeData^ LiveRunnerWrapper::createSyncDataFromCode(System::String^ codesegment)
 {
     SnapshotNode^ node = gcnew SnapshotNode(mNodeId++, SnapshotNodeType::CodeBlock, codesegment);
