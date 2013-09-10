@@ -14,12 +14,12 @@ namespace ProtoCore.DSASM
         public ProtoCore.AssociativeGraph.DependencyGraph dependencyGraph { get; set; }
         public List<ProtoCore.AssociativeGraph.UpdateNodeRef> xUpdateList { get; set; }
 
-        public InstructionStream(ProtoCore.Language langId, ProtoCore.Core core)
+        public InstructionStream(ProtoCore.Language langId, ProtoLanguage.CompileStateTracker compileState)
         {
             language = langId;
             entrypoint = Constants.kInvalidIndex;
             instrList = new List<Instruction>();
-            dependencyGraph = new ProtoCore.AssociativeGraph.DependencyGraph(core);
+            dependencyGraph = new ProtoCore.AssociativeGraph.DependencyGraph(compileState);
             xUpdateList = new List<AssociativeGraph.UpdateNodeRef>();
         }
     }
@@ -32,14 +32,32 @@ namespace ProtoCore.DSASM
     public class Executable
     {
         public bool isSingleAssocBlock { get; set; }
+
+
         public ProtoCore.DSASM.ClassTable classTable { get; set; }
         public ProtoCore.DSASM.ProcedureTable[] procedureTable { get; set; }
         public ProtoCore.DSASM.SymbolTable[] runtimeSymbols { get; set; }
 
+        
         public InstructionStream[] instrStreamList { get; set; } 
         public InstructionStream iStreamCanvas { get; set; }
 
         public DebugServices.EventSink EventSink = new DebugServices.ConsoleEventSink();
+
+        //
+        // Comment Jun: Refactor core
+        //  These following properties are from core. 
+        //  They were previously accessed directly from core by the runtime.
+        //  They will now be part of the executable,
+        //  and all runtime shall only read from executable.
+        //
+        public List<CodeBlock> CodeBlockList { get; set; }
+        public ProtoCore.Lang.FunctionTable FunctionTable { get; set; }
+        public List<CodeBlock> CompleteCodeBlockList { get; set; }
+        public DynamicVariableTable DynamicVariableTable { get; set; }
+        public DynamicFunctionTable DynamicFunctionTable { get; set; }
+        public FunctionPointerTable FunctionPointerTable { get; set; }
+
 
         public Executable()
         {
@@ -54,6 +72,7 @@ namespace ProtoCore.DSASM
             classTable = null;
             instrStreamList = null;
             iStreamCanvas = null;
+            CodeBlockList = new List<CodeBlock>();
         }
     }
 
@@ -85,7 +104,7 @@ namespace ProtoCore.DSASM
 
         public bool isBreakable { get; set; }
 
-        public CodeBlock(CodeBlockType type, ProtoCore.Language langId, int codeBlockId, SymbolTable symbols, ProcedureTable procTable, bool isBreakableBlock = false, ProtoCore.Core core = null)
+        public CodeBlock(CodeBlockType type, ProtoCore.Language langId, int codeBlockId, SymbolTable symbols, ProcedureTable procTable, bool isBreakableBlock = false, ProtoLanguage.CompileStateTracker compileState = null)
         {
             blockType = type;
 
@@ -94,7 +113,7 @@ namespace ProtoCore.DSASM
 
             language = langId;
             this.codeBlockId = codeBlockId;
-            instrStream = new InstructionStream(langId, core);
+            instrStream = new InstructionStream(langId, compileState);
 
             symbolTable = symbols;
             procedureTable = procTable;

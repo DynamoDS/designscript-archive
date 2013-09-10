@@ -20,7 +20,7 @@ namespace ProtoFFI
 
         private AssemblyName mExecutingAssemblyName = Assembly.GetExecutingAssembly().GetName();
 
-        Dictionary<Core, FFIExecutionSession> mSessions = new Dictionary<Core, FFIExecutionSession>();
+        Dictionary<ProtoLanguage.CompileStateTracker, FFIExecutionSession> mSessions = new Dictionary<ProtoLanguage.CompileStateTracker, FFIExecutionSession>();
         ExtensionAppLoader mApploader = new ExtensionAppLoader();
 
         static FFIExecutionManager mSelf = null;
@@ -73,34 +73,34 @@ namespace ProtoFFI
             return GACGeometryKeyTokens.ContainsKey(assemblyName);
         }
 
-        public IExecutionSession GetSession(Core core)
+        public IExecutionSession GetSession(ProtoLanguage.CompileStateTracker compileState)
         {
-            return GetSession(core, false);
+            return GetSession(compileState, false);
         }
 
-        public bool RegisterExtensionApplicationType(Core core, SysType type)
+        public bool RegisterExtensionApplicationType(ProtoLanguage.CompileStateTracker compileState, SysType type)
         {
             if (!typeof(IExtensionApplication).IsAssignableFrom(type))
                 return false;
 
-            FFIExecutionSession session = GetSession(core, true);
+            FFIExecutionSession session = GetSession(compileState, true);
             session.AddExtensionAppType(type);
             return true;
         }
 
-        private FFIExecutionSession GetSession(Core core, bool createIfNone)
+        private FFIExecutionSession GetSession(ProtoLanguage.CompileStateTracker compileState, bool createIfNone)
         {
             FFIExecutionSession session = null;
-            if(!mSessions.TryGetValue(core, out session) && createIfNone)
+            if(!mSessions.TryGetValue(compileState, out session) && createIfNone)
             {
                 lock (mSessions)
                 {
-                    if (!mSessions.TryGetValue(core, out session))
+                    if (!mSessions.TryGetValue(compileState, out session))
                     {
-                        session = new FFIExecutionSession(core);
-                        core.ExecutionEvent += OnExecutionEvent;
-                        core.Dispose += OnDispose;
-                        mSessions.Add(core, session);
+                        session = new FFIExecutionSession(compileState);
+                        compileState.ExecutionEvent += OnExecutionEvent;
+                        compileState.Dispose += OnDispose;
+                        mSessions.Add(compileState, session);
                     }
                 }
             }
@@ -108,7 +108,7 @@ namespace ProtoFFI
             return session;
         }
 
-        private void OnDispose(Core sender)
+        private void OnDispose(ProtoLanguage.CompileStateTracker sender)
         {
             if (null == mSessions)
                 return;
@@ -128,8 +128,8 @@ namespace ProtoFFI
 
         private void OnExecutionEvent(object sender, ExecutionStateEventArgs e)
         {
-            Core core = sender as Core;
-            FFIExecutionSession session = GetSession(core, false);
+            ProtoLanguage.CompileStateTracker compileState = sender as ProtoLanguage.CompileStateTracker;
+            FFIExecutionSession session = GetSession(compileState, false);
             //If there wasn't any session created, there was no extension app 
             //registered for the session
             if (null == session)
@@ -158,12 +158,12 @@ namespace ProtoFFI
 
     class FFIExecutionSession : IExecutionSession, IConfiguration, IDisposable
     {
-        private Core core;
+        private ProtoLanguage.CompileStateTracker compileState;
         private Dictionary<string, object> configValues;
         private List<SysType> extensionapps;
-        public FFIExecutionSession(Core core)
+        public FFIExecutionSession(ProtoLanguage.CompileStateTracker compileState)
         {
-            this.core = core;
+            this.compileState = compileState;
             this.configValues = new Dictionary<string, object>();
             this.extensionapps = new List<SysType>();
         }
@@ -175,22 +175,22 @@ namespace ProtoFFI
 
         public string SearchFile(string fileName)
         {
-            return FileUtils.GetDSFullPathName(fileName, this.core.Options);
+            return FileUtils.GetDSFullPathName(fileName, this.compileState.Options);
         }
 
         public string RootModulePath
         {
-            get { return core.Options.RootModulePathName; }
+            get { return compileState.Options.RootModulePathName; }
         }
 
         public string[] IncludeDirectories
         {
-            get { return core.Options.IncludeDirectories.ToArray(); }
+            get { return compileState.Options.IncludeDirectories.ToArray(); }
         }
 
         public bool IsDebugMode
         {
-            get { return core.Options.IDEDebugMode; }
+            get { return compileState.Options.IDEDebugMode; }
         }
 
         public object GetConfigValue(string config)
@@ -198,7 +198,7 @@ namespace ProtoFFI
             object value = null;
             if (!this.configValues.TryGetValue(config, out value))
             {
-                core.Configurations.TryGetValue(config, out value);
+                compileState.Configurations.TryGetValue(config, out value);
             }
             return value;
         }

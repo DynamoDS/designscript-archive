@@ -222,7 +222,7 @@ namespace ProtoCore
                 {
                     //This was an empty array
                     Validity.Assert(cn == null, "If it was an empty array, there shouldn't be a type node");
-                    cn = core.ClassTable.ClassNodes[(int)PrimitiveType.kTypeNull];
+                    cn = core.DSExecutable.classTable.ClassNodes[(int)PrimitiveType.kTypeNull];
                 }
                 else if (arrayTypes.Count == 1)
                 {
@@ -250,8 +250,8 @@ namespace ProtoCore
 
 
                 bool isNotExactTypeMatch = cn != argTypeNode;
-                bool argumentsNotNull = cn != core.ClassTable.ClassNodes[(int) PrimitiveType.kTypeNull];
-                bool recievingTypeNotAVar = argTypeNode != core.ClassTable.ClassNodes[(int) PrimitiveType.kTypeVar];
+                bool argumentsNotNull = cn != core.DSExecutable.classTable.ClassNodes[(int) PrimitiveType.kTypeNull];
+                bool recievingTypeNotAVar = argTypeNode != core.DSExecutable.classTable.ClassNodes[(int) PrimitiveType.kTypeVar];
                 bool isNotConvertible = !cn.ConvertibleTo(typ.UID);
                 
                 //bool isCalleeVar = cn == core.classTable.list[(int) PrimitiveType.kTypeVar];

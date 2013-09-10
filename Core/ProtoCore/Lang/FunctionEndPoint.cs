@@ -85,7 +85,7 @@ namespace ProtoCore
                     {
                         //This was an empty array
                         Validity.Assert(cn == null, "If it was an empty array, there shouldn't be a type node");
-                        cn = core.ClassTable.ClassNodes[(int)PrimitiveType.kTypeNull];
+                        cn = core.DSExecutable.classTable.ClassNodes[(int)PrimitiveType.kTypeNull];
                     }
                     else if (arrayTypes.Count == 1)
                     {
@@ -104,17 +104,17 @@ namespace ProtoCore
                     }
 
 
-                    ClassNode argTypeNode = core.ClassTable.ClassNodes[typ.UID];
+                    ClassNode argTypeNode = core.DSExecutable.classTable.ClassNodes[typ.UID];
 
                     //cn now represents the class node of the argument
                     //argTypeNode represents the class node of the argument
 
-                    int coersionScore = cn.GetCoercionScore(core.ClassTable.ClassNodes.IndexOf(argTypeNode));
+                    int coersionScore = cn.GetCoercionScore(core.DSExecutable.classTable.ClassNodes.IndexOf(argTypeNode));
 
                     //TODO(Jun)This is worrying test
 
                     //Disable var as exact match, otherwise resolution between double and var will fail
-                    if (cn != argTypeNode && cn != core.ClassTable.ClassNodes[(int)PrimitiveType.kTypeNull]  && argTypeNode != core.ClassTable.ClassNodes[(int)PrimitiveType.kTypeVar] )
+                    if (cn != argTypeNode && cn != core.DSExecutable.classTable.ClassNodes[(int)PrimitiveType.kTypeNull]  && argTypeNode != core.DSExecutable.classTable.ClassNodes[(int)PrimitiveType.kTypeVar] )
                         return false;
 
                     //if (coersionScore != (int)ProcedureDistance.kExactMatchScore)

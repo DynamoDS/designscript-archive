@@ -91,7 +91,7 @@ namespace ProtoCore.Utils
                 return null;
 
             if (commonTypeIDs.Count == 1)
-                return core.ClassTable.ClassNodes[commonTypeIDs.First()];
+                return core.DSExecutable.classTable.ClassNodes[commonTypeIDs.First()];
 
 
             List<int> lookupChain = chains[0];
@@ -120,7 +120,7 @@ namespace ProtoCore.Utils
                     orderedTypes.Add(typeToInsert);
             }
 
-            return core.ClassTable.ClassNodes[orderedTypes.First()];
+            return core.DSExecutable.classTable.ClassNodes[orderedTypes.First()];
         }
 
         /// <summary>
@@ -132,20 +132,6 @@ namespace ProtoCore.Utils
         public static List<int> GetConversionChain(ClassNode cn, Core core)
         {
             List<int> ret = new List<int>();
-            /*
-            //@TODO: Replace this with an ID
-            ret.Add(core.classTable.list.IndexOf(cn));
-
-            ClassNode target = cn;
-            while (target.baseList.Count > 0)
-            {
-                Validity.Assert(target.baseList.Count == 1, "Multiple Inheritence not yet supported, {F5DDC58D-F721-4319-854A-622175AC43F8}");
-                ret.Add(cn.baseList[0]);
-
-                target = core.classTable.list[cn.baseList[0]];
-            }
-            */
-
             List<int> coercableTypes = new List<int>();
 
             foreach (int typeID in cn.coerceTypes.Keys)
@@ -164,7 +150,7 @@ namespace ProtoCore.Utils
                 if (!inserted)
                     coercableTypes.Add(typeID);
             }
-            coercableTypes.Add(core.ClassTable.ClassNodes.IndexOf(cn));
+            coercableTypes.Add(core.DSExecutable.classTable.ClassNodes.IndexOf(cn));
 
 
 
@@ -209,7 +195,7 @@ namespace ProtoCore.Utils
             if (!IsArray(array))
             {
                 Dictionary<ClassNode, int> ret = new Dictionary<ClassNode, int>();
-                ret.Add(core.ClassTable.ClassNodes[(int)array.metaData.type], 1);
+                ret.Add(core.DSExecutable.classTable.ClassNodes[(int)array.metaData.type], 1);
                 return ret;
             }
 
@@ -221,7 +207,7 @@ namespace ProtoCore.Utils
             for (int i = 0; i < heapElement.VisibleSize; ++i)
             {
                 StackValue sv = heapElement.Stack[i];
-                ClassNode cn = core.ClassTable.ClassNodes[(int)sv.metaData.type];
+                ClassNode cn = core.DSExecutable.classTable.ClassNodes[(int)sv.metaData.type];
                 if (!usageFreq.ContainsKey(cn))
                     usageFreq.Add(cn, 0);
 
@@ -243,7 +229,7 @@ namespace ProtoCore.Utils
             if (!IsArray(array))
             {
                 Dictionary<ClassNode, int> ret = new Dictionary<ClassNode, int>();
-                ret.Add(core.ClassTable.ClassNodes[(int) array.metaData.type], 1);
+                ret.Add(core.DSExecutable.classTable.ClassNodes[(int) array.metaData.type], 1);
                 return ret;
             }
 
@@ -272,7 +258,7 @@ namespace ProtoCore.Utils
                 else
                 {
 
-                    ClassNode cn = core.ClassTable.ClassNodes[(int)sv.metaData.type];
+                    ClassNode cn = core.DSExecutable.classTable.ClassNodes[(int)sv.metaData.type];
                     if (!usageFreq.ContainsKey(cn))
                         usageFreq.Add(cn, 0);
 

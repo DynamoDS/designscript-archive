@@ -347,7 +347,7 @@ namespace ProtoCore
 
     public class BuildStatus
     {
-        private Core core;
+        //private Core core;
         private ProtoLanguage.CompileStateTracker compileState;
         private System.IO.TextWriter consoleOut = System.Console.Out;
         private readonly bool LogWarnings = true;
@@ -389,30 +389,30 @@ namespace ProtoCore
 
         //  logs all errors and warnings by default
         //
-        public BuildStatus(Core core, bool warningAsError, System.IO.TextWriter writer = null, bool errorAsWarning = false)
-        {
-            this.core = core;
-            warnings = new List<BuildData.WarningEntry>();
+        //public BuildStatus(Core core, bool warningAsError, System.IO.TextWriter writer = null, bool errorAsWarning = false)
+        //{
+        //    this.core = core;
+        //    warnings = new List<BuildData.WarningEntry>();
 
-            errors = new List<BuildData.ErrorEntry>();
-            this.warningAsError = warningAsError;
-            this.errorAsWarning = errorAsWarning;
+        //    errors = new List<BuildData.ErrorEntry>();
+        //    this.warningAsError = warningAsError;
+        //    this.errorAsWarning = errorAsWarning;
 
-            if (writer != null)
-            {
-                consoleOut = System.Console.Out;
-                System.Console.SetOut(writer);
-            }
+        //    if (writer != null)
+        //    {
+        //        consoleOut = System.Console.Out;
+        //        System.Console.SetOut(writer);
+        //    }
 
-            // Create a default console output stream, and this can 
-            // be overwritten in IDE by assigning it a different value.
-            this.MessageHandler = new ConsoleOutputStream();
+        //    // Create a default console output stream, and this can 
+        //    // be overwritten in IDE by assigning it a different value.
+        //    this.MessageHandler = new ConsoleOutputStream();
 
-            //if (compileState.Options.WebRunner)
-            //{
-            //    this.WebMsgHandler = new WebOutputStream(compileState);
-            //}
-        }
+        //    //if (compileState.Options.WebRunner)
+        //    //{
+        //    //    this.WebMsgHandler = new WebOutputStream(compileState);
+        //    //}
+        //}
 
 
 
@@ -436,35 +436,35 @@ namespace ProtoCore
             // Create a default console output stream, and this can 
             // be overwritten in IDE by assigning it a different value.
             this.MessageHandler = new ConsoleOutputStream();
-            if (core.Options.WebRunner)
+            if (compilestate.Options.WebRunner)
             {
-                this.WebMsgHandler = new WebOutputStream(core);
+                this.WebMsgHandler = new WebOutputStream(compilestate);
             }
         }
 
-        public BuildStatus(Core core, bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
-        {
-            this.core = core;
-            this.LogWarnings = LogWarnings;
-            this.logErrors = logErrors;
-            this.displayBuildResult = displayBuildResult;
+        //public BuildStatus(Core core, bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
+        //{
+        //    this.core = core;
+        //    this.LogWarnings = LogWarnings;
+        //    this.logErrors = logErrors;
+        //    this.displayBuildResult = displayBuildResult;
 
-            //this.errorCount = 0;
-            //this.warningCount = 0;
-            warnings = new List<BuildData.WarningEntry>();
+        //    //this.errorCount = 0;
+        //    //this.warningCount = 0;
+        //    warnings = new List<BuildData.WarningEntry>();
 
-            errors = new List<BuildData.ErrorEntry>();
+        //    errors = new List<BuildData.ErrorEntry>();
 
-            if (writer != null)
-            {
-                consoleOut = System.Console.Out;
-                System.Console.SetOut(writer);
-            }
+        //    if (writer != null)
+        //    {
+        //        consoleOut = System.Console.Out;
+        //        System.Console.SetOut(writer);
+        //    }
 
-            // Create a default console output stream, and this can 
-            // be overwritten in IDE by assigning it a different value.
-            this.MessageHandler = new ConsoleOutputStream();
-        }      
+        //    // Create a default console output stream, and this can 
+        //    // be overwritten in IDE by assigning it a different value.
+        //    this.MessageHandler = new ConsoleOutputStream();
+        //}      
 
         public BuildStatus(ProtoLanguage.CompileStateTracker compilestate, bool LogWarnings, bool logErrors, bool displayBuildResult, System.IO.TextWriter writer = null)
         {
@@ -530,9 +530,9 @@ namespace ProtoCore
                 Col = col            
             };
 
-            if (core.Options.IsDeltaExecution)
+            if (compileState.Options.IsDeltaExecution)
             {
-                core.LogErrorInGlobalMap(ProtoCore.Core.ErrorType.Error, msg, fileName, line, col);
+                compileState.LogErrorInGlobalMap(ProtoLanguage.CompileStateTracker.ErrorType.Error, msg, fileName, line, col);
             }
 
             errors.Add(errorEntry);
@@ -563,9 +563,9 @@ namespace ProtoCore
                 System.Console.WriteLine("{0}({1},{2}) Error:{3}", fileName, line, col, msg);
             }
 
-            if (core.Options.IsDeltaExecution)
+            if (compileState.Options.IsDeltaExecution)
             {
-                core.LogErrorInGlobalMap(ProtoCore.Core.ErrorType.Error, msg, fileName, line, col);
+                compileState.LogErrorInGlobalMap(ProtoLanguage.CompileStateTracker.ErrorType.Error, msg, fileName, line, col);
             }
 
             BuildData.ErrorEntry errorEntry = new BuildData.ErrorEntry
@@ -617,9 +617,9 @@ namespace ProtoCore
             BuildData.WarningEntry warningEntry = new BuildData.WarningEntry { id = warnId, msg = msg, line = line, col = col, FileName = fileName };
             warnings.Add(warningEntry);
 
-            if (core.Options.IsDeltaExecution)
+            if (compileState.Options.IsDeltaExecution)
             {
-                core.LogErrorInGlobalMap(ProtoCore.Core.ErrorType.Warning, msg, fileName, line, col, warnId);
+                compileState.LogErrorInGlobalMap(ProtoLanguage.CompileStateTracker.ErrorType.Warning, msg, fileName, line, col, warnId);
             }
 
             OutputMessage outputmessage = new OutputMessage(OutputMessage.MessageType.Warning, msg.Trim(), fileName, line, col);

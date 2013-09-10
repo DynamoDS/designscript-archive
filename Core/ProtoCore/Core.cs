@@ -990,7 +990,7 @@ namespace ProtoCore
         public Dictionary<string, object> Configurations { get; set; }
 
         //Manages injected context data.
-        internal ContextDataManager ContextDataManager { get; set; }
+        public ContextDataManager ContextDataManager { get; set; }
 
         public ParseMode ParsingMode { get; set; }
 
@@ -1278,11 +1278,11 @@ namespace ProtoCore
                 //  just accumulate them in relevant containers with
                 //  BuildStatus object
                 //
-                BuildStatus = new BuildStatus(this, false, false, false);
+                //BuildStatus = new BuildStatus(this, false, false, false);
             }
             else
             {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
+                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
             }
 
 
@@ -1348,11 +1348,11 @@ namespace ProtoCore
                 //  just accumulate them in relevant containers with
                 //  BuildStatus object
                 //
-                BuildStatus = new BuildStatus(this, false, false, false);
+                //BuildStatus = new BuildStatus(this, false, false, false);
             }
             else
             {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError);
+                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError);
             }
 
             
@@ -1427,11 +1427,11 @@ namespace ProtoCore
                 //  just accumulate them in relevant containers with
                 //  BuildStatus object
                 //
-                BuildStatus = new BuildStatus(this, false, false, false);
+                //BuildStatus = new BuildStatus(this, false, false, false);
             }
             else
             {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
+                //BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
             }
 
 
@@ -1958,7 +1958,9 @@ namespace ProtoCore
             }
         }
 
-
+        //
+        // Comment Jun: The compile state will now handle executable generation
+        /*
         public void GenerateExprExe()
         {
             // TODO Jun: Determine if we really need another executable for the expression interpreter
@@ -1987,6 +1989,7 @@ namespace ProtoCore
                 }
             }
         }
+        
 
 
         public void GenerateExprExeInstructions(int blockScope)
@@ -2035,7 +2038,7 @@ namespace ProtoCore
             }
             GenerateExprExe();
         }
-
+        */
 
 
         public string GenerateTempVar()

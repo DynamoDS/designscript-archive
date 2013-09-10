@@ -91,7 +91,9 @@ namespace ProtoFFI
                     return mAssemblies[shortname] as Assembly;
 
                 //load from search path, if file exists
-                string filepath = ProtoCore.Utils.FileUtils.GetDSFullPathName(shortname + ".dll");
+
+                // TODO Jun: Refactor GetDSFullPathName by getting rid of the options parameter
+                string filepath = ProtoCore.Utils.FileUtils.GetDSFullPathName(shortname + ".dll", new ProtoCore.Options());
                 if (File.Exists(filepath))
                     return Assembly.LoadFrom(filepath);
             }
