@@ -169,16 +169,13 @@ namespace GraphToDSCompiler
                 options.RootModulePathName = rootModulePath;
                 compileState = new ProtoLanguage.CompileStateTracker(options);
 
-                // Comment Jun: Compile states trackers do not require an executive
-                //compileState.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(compileState));
-                //compileState.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(compileState));
+                compileState.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive());
+                compileState.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive());
 
             }
             else
             {
-                //core.ResetDeltaExecution();
                 compileState.ResetForPrecompilation();
-
             }
             compileState.IsParsingPreloadedAssembly = isPreloadedAssembly;
             compileState.IsParsingCodeBlockNode = isCodeBlockNode;
