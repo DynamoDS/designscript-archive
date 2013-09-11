@@ -277,6 +277,26 @@ namespace ProtoCore.DSASM
             return floatingOpTable[op];
         }
 
+        /// <summary>
+        /// Return the internal function name for operator.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetOpFunction(Operator op)
+        {
+            return Constants.kInternalNamePrefix + op.ToString();
+        }
+
+        /// <summary>
+        /// Return the internal function name for unary operator
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetUnaryOpFunction(UnaryOperator op)
+        {
+            return Constants.kInternalNamePrefix + op.ToString();
+        }
+
         private static Dictionary<Operator, ProtoCore.DSASM.OpCode> opCodeTable;
         private static Dictionary<UnaryOperator, ProtoCore.DSASM.OpCode> unaryOpCodeTable;
         private static Dictionary<Operator, string> opNameTable;
