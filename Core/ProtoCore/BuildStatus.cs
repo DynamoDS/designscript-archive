@@ -500,11 +500,6 @@ namespace ProtoCore
 
         public void LogSemanticError(string msg, string fileName = null, int line = -1, int col = -1, AssociativeGraph.GraphNode graphNode = null)
         {
-            /*if (fileName == null)
-            {
-                fileName = "N.A.";
-            }*/
-
             if (logErrors)
             {
                 System.Console.WriteLine("{0}({1},{2}) Error:{3}", fileName, line, col, msg);
@@ -523,16 +518,6 @@ namespace ProtoCore
                 Col = col
             };
             errors.Add(errorEntry);
-
-            // Comment: This is true for example in Graph Execution mode
-            /*if (errorAsWarning)
-            {
-                if (graphNode != null)
-                {
-                    graphNode.isDirty = false;
-                    return;
-                }
-            }*/
 
             OutputMessage outputmessage = new OutputMessage(OutputMessage.MessageType.Error, msg.Trim(), fileName, line, col);
             if (MessageHandler != null)

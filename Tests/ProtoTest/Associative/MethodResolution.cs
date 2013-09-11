@@ -9,6 +9,7 @@ namespace ProtoTest.Associative
     class MethodResolution
     {
         public ProtoCore.Core core;
+        private ProtoLanguage.CompileStateTracker compileState = null;
         public TestFrameWork thisTest = new TestFrameWork();
 
         [SetUp]
@@ -43,7 +44,7 @@ namespace ProtoTest.Associative
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("x").Payload == 123);
             Assert.IsTrue((Int64)mirror.GetValue("y").Payload == 345);
@@ -84,7 +85,7 @@ namespace ProtoTest.Associative
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("x").Payload == 123);
             Assert.IsTrue((Int64)mirror.GetValue("y").Payload == 345);
@@ -142,7 +143,7 @@ namespace ProtoTest.Associative
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("x").Payload == 200);
             Assert.IsTrue((Int64)mirror.GetValue("y").Payload == 800);
@@ -189,7 +190,7 @@ d = s3.mx;
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((double)mirror.GetValue("d").Payload == 1);
 
@@ -221,10 +222,10 @@ d = s3.mx;
                 val = b.execute(a);
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 1);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -257,10 +258,10 @@ d = s3.mx;
                 val = b.execute(c);
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 1);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -292,10 +293,10 @@ d = s3.mx;
                 val = c.execute(c);
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 1);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -327,10 +328,10 @@ d = s3.mx;
                 val = c.execute(c);
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 2);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -358,10 +359,10 @@ d = s3.mx;
                 val = c.execute(c);
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 1);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -390,10 +391,10 @@ d = s3.mx;
                 val = b.execute(arr);
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 2);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -500,12 +501,12 @@ d = s3.mx;
                 val3 = val[2];
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val1").Payload == -1);
             Assert.IsTrue((Int64)mirror.GetValue("val2").Payload == -1);
             Assert.IsTrue((Int64)mirror.GetValue("val3").Payload == -1);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
 
@@ -538,11 +539,11 @@ d = s3.mx;
                 val2 = val[1];
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val1").Payload == -1);
             Assert.IsTrue((Int64)mirror.GetValue("val2").Payload == -1);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -566,10 +567,10 @@ v = A.execute(arr);
 val = v[0];
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 100);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -591,10 +592,10 @@ v = A.execute(arr);
 val = v[0];
                 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             //Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 100);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -688,10 +689,10 @@ val = v[0];
                             val = Test(a);
                             ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 123);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -715,10 +716,10 @@ val = v[0];
                             val = Test(a);
                             ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 123);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -742,10 +743,10 @@ val = v[0];
                             val = A.A().foo(arr);
                             ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 2);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -769,10 +770,10 @@ val = v[0];
                             val = A.A().foo(arr);
                             ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val").Payload == 2);
-            Assert.IsTrue(core.BuildStatus.WarningCount == 0);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == 0);
         }
 
         [Test]
@@ -802,7 +803,7 @@ val = v[0];
 
                             ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("val1").Payload == 1);
             //Assert.IsTrue((Int64)mirror.GetValue("val2").Payload == 2);
@@ -834,7 +835,7 @@ val = v[0];
 
                             ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             //Assert.IsTrue((Int64)mirror.GetValue("val1").Payload == 1);
             Assert.IsTrue((Int64)mirror.GetValue("val2").Payload == 2);
