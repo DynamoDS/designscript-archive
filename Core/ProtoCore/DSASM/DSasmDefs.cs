@@ -185,51 +185,126 @@ namespace ProtoCore.DSASM
         public const string Null = "null";
     }
 
-    // @TODO(Jun) Consider this class to be either static or visible in declared in core
-    public class OpKeywordData
+    /// <summary>
+    /// Translate an operator to other representations.
+    /// </summary>
+    public class Op
     {
-        public Dictionary<Operator, string> opStringTable;
-        public Dictionary<Operator, ProtoCore.DSASM.OpCode> opCodeTable;
-        public Dictionary<Operator, Operator> opDoubleTable;
-        public static Dictionary<Operator, string> OpSymbolTable { get; set; }
-
-        public Dictionary<UnaryOperator, string> unaryOpStringTable;
-        public Dictionary<UnaryOperator, ProtoCore.DSASM.OpCode> unaryOpCodeTable;
-
-        public HashSet<Operator> arithmeticOpTable;
-        //public Dictionary<UnaryOperator, UnaryOperator> unaryOpDoubleTable;
-
-        public Dictionary<int, AddressType> UIDOpTypeTable = new Dictionary<int, AddressType>();
-
-        static OpKeywordData()
+        /// <summary>
+        /// Return the corresponding opcode of an operator.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static ProtoCore.DSASM.OpCode GetOpCode(Operator op)
         {
-            initOpSymbolTable();
+            if (null == opCodeTable)
+            {
+                initOpCodeTable();
+            }
+            return opCodeTable[op];
         }
 
-        public OpKeywordData()
+        /// <summary>
+        /// Return the corresponding opcode of an unary operator.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static ProtoCore.DSASM.OpCode GetUnaryOpCode(UnaryOperator op)
         {
-            initOpCodeTable();
-            initOpDoubleTable();
-            initOpStringTable();
-            initOpSymbolTable();
-
-            initUnaryOpCodeTable();            
-            initUnaryOpStringTable();
-
-            initArithmeticOpTable();
-
-            initUIDOpTypeTable();
+            if (null == unaryOpCodeTable)
+            {
+                initUnaryOpCodeTable();
+            }
+            return unaryOpCodeTable[op];
         }
 
-        private void initUIDOpTypeTable()
+        /// <summary>
+        /// Return the symbol representation of an operator. E.g., return "+"
+        /// for Operator.add.
+        /// </summary>
+        /// <param name="op">Operator</param>
+        /// <returns></returns>
+        public static string GetOpSymbol(Operator op)
         {
-            UIDOpTypeTable = new Dictionary<int, AddressType>();
-            UIDOpTypeTable.Add(2, AddressType.Double);
-            UIDOpTypeTable.Add(3, AddressType.Int);
-            UIDOpTypeTable.Add(4, AddressType.Boolean);
+            if (null == opSymbolTable)
+            {
+                initOpSymbolTable();
+            }
+            return opSymbolTable[op];
         }
 
-        private void initUnaryOpCodeTable()
+        /// <summary>
+        /// Return the string representation of an operator. E.g., return "add"
+        /// for Operator.add.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetOpName(Operator op)
+        {
+            if (null == opNameTable)
+            {
+                initOpNameTable();
+            }
+            return opNameTable[op];
+        }
+
+        /// <summary>
+        /// Return the string representation of an unary operator. E.g., return 
+        /// "not" for UnaryOperator.not.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetUnaryOpName(UnaryOperator op)
+        {
+            if (null == unaryOpNameTable)
+            {
+                initUnaryOpNameTable();
+            }
+            return unaryOpNameTable[op];
+        }
+
+        /// <summary>
+        /// Return the corresponding operator for handling floating point number.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static Operator GetFloatingOp(Operator op)
+        {
+            if (null == floatingOpTable)
+            {
+                initFloatingOpTable();
+            }
+            return floatingOpTable[op];
+        }
+
+        /// <summary>
+        /// Return the internal function name for operator.
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetOpFunction(Operator op)
+        {
+            return Constants.kInternalNamePrefix + op.ToString();
+        }
+
+        /// <summary>
+        /// Return the internal function name for unary operator
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetUnaryOpFunction(UnaryOperator op)
+        {
+            return Constants.kInternalNamePrefix + op.ToString();
+        }
+
+        private static Dictionary<Operator, ProtoCore.DSASM.OpCode> opCodeTable;
+        private static Dictionary<UnaryOperator, ProtoCore.DSASM.OpCode> unaryOpCodeTable;
+        private static Dictionary<Operator, string> opNameTable;
+        private static Dictionary<UnaryOperator, string> unaryOpNameTable;
+        private static Dictionary<Operator, string> opSymbolTable;
+        private static Dictionary<Operator, Operator> floatingOpTable;
+
+        private static void initUnaryOpCodeTable()
         {
             unaryOpCodeTable = new Dictionary<UnaryOperator, OpCode>();
             unaryOpCodeTable.Add(UnaryOperator.None, ProtoCore.DSASM.OpCode.NONE);
@@ -238,53 +313,53 @@ namespace ProtoCore.DSASM
             unaryOpCodeTable.Add(UnaryOperator.Neg, ProtoCore.DSASM.OpCode.NEG);
         }
 
-        private void initUnaryOpStringTable()
+        private static void initUnaryOpNameTable()
         {
-            unaryOpStringTable = new Dictionary<UnaryOperator, string>();
-            unaryOpStringTable.Add(UnaryOperator.None, "none");
-            unaryOpStringTable.Add(UnaryOperator.Not, "not");
-            unaryOpStringTable.Add(UnaryOperator.Negate, "negate");
-            unaryOpStringTable.Add(UnaryOperator.Neg, "neg");
+            unaryOpNameTable = new Dictionary<UnaryOperator, string>();
+            unaryOpNameTable.Add(UnaryOperator.None, "none");
+            unaryOpNameTable.Add(UnaryOperator.Not, "not");
+            unaryOpNameTable.Add(UnaryOperator.Negate, "negate");
+            unaryOpNameTable.Add(UnaryOperator.Neg, "neg");
         }
  
-        private void initOpStringTable()
+        private static void initOpNameTable()
         {
-            opStringTable = new Dictionary<Operator, string>();
+            opNameTable = new Dictionary<Operator, string>();
 
-            opStringTable.Add(Operator.none, "none");
-            opStringTable.Add(Operator.assign, "assign");
-            opStringTable.Add(Operator.and, "and");
-            opStringTable.Add(Operator.or, "or");
-            opStringTable.Add(Operator.dot, "dot");
-            opStringTable.Add(Operator.bitwiseand, "bitand");
-            opStringTable.Add(Operator.bitwiseor, "biteor");
-            opStringTable.Add(Operator.bitwisexor, "bitxor");
+            opNameTable.Add(Operator.none, "none");
+            opNameTable.Add(Operator.assign, "assign");
+            opNameTable.Add(Operator.and, "and");
+            opNameTable.Add(Operator.or, "or");
+            opNameTable.Add(Operator.dot, "dot");
+            opNameTable.Add(Operator.bitwiseand, "bitand");
+            opNameTable.Add(Operator.bitwiseor, "biteor");
+            opNameTable.Add(Operator.bitwisexor, "bitxor");
 
-            opStringTable.Add(Operator.lt, ProtoCore.DSASM.kw.lt);
-            opStringTable.Add(Operator.gt, ProtoCore.DSASM.kw.gt);
-            opStringTable.Add(Operator.le, ProtoCore.DSASM.kw.le);
-            opStringTable.Add(Operator.ge, ProtoCore.DSASM.kw.ge);
-            opStringTable.Add(Operator.eq, ProtoCore.DSASM.kw.eq);
-            opStringTable.Add(Operator.nq, ProtoCore.DSASM.kw.nq);
-            opStringTable.Add(Operator.add, ProtoCore.DSASM.kw.add);
-            opStringTable.Add(Operator.sub, ProtoCore.DSASM.kw.sub);
-            opStringTable.Add(Operator.mul, ProtoCore.DSASM.kw.mul);
-            opStringTable.Add(Operator.div, ProtoCore.DSASM.kw.div);
-            opStringTable.Add(Operator.mod, ProtoCore.DSASM.kw.mod);
+            opNameTable.Add(Operator.lt, ProtoCore.DSASM.kw.lt);
+            opNameTable.Add(Operator.gt, ProtoCore.DSASM.kw.gt);
+            opNameTable.Add(Operator.le, ProtoCore.DSASM.kw.le);
+            opNameTable.Add(Operator.ge, ProtoCore.DSASM.kw.ge);
+            opNameTable.Add(Operator.eq, ProtoCore.DSASM.kw.eq);
+            opNameTable.Add(Operator.nq, ProtoCore.DSASM.kw.nq);
+            opNameTable.Add(Operator.add, ProtoCore.DSASM.kw.add);
+            opNameTable.Add(Operator.sub, ProtoCore.DSASM.kw.sub);
+            opNameTable.Add(Operator.mul, ProtoCore.DSASM.kw.mul);
+            opNameTable.Add(Operator.div, ProtoCore.DSASM.kw.div);
+            opNameTable.Add(Operator.mod, ProtoCore.DSASM.kw.mod);
 
-            opStringTable.Add(Operator.ltd, ProtoCore.DSASM.kw.ltd);
-            opStringTable.Add(Operator.gtd, ProtoCore.DSASM.kw.gtd);
-            opStringTable.Add(Operator.led, ProtoCore.DSASM.kw.led);
-            opStringTable.Add(Operator.ged, ProtoCore.DSASM.kw.ged);
-            opStringTable.Add(Operator.eqd, ProtoCore.DSASM.kw.eqd);
-            opStringTable.Add(Operator.nqd, ProtoCore.DSASM.kw.nqd);
-            opStringTable.Add(Operator.addd, ProtoCore.DSASM.kw.addd);
-            opStringTable.Add(Operator.subd, ProtoCore.DSASM.kw.subd);
-            opStringTable.Add(Operator.muld, ProtoCore.DSASM.kw.muld);
-            opStringTable.Add(Operator.divd, ProtoCore.DSASM.kw.divd);
+            opNameTable.Add(Operator.ltd, ProtoCore.DSASM.kw.ltd);
+            opNameTable.Add(Operator.gtd, ProtoCore.DSASM.kw.gtd);
+            opNameTable.Add(Operator.led, ProtoCore.DSASM.kw.led);
+            opNameTable.Add(Operator.ged, ProtoCore.DSASM.kw.ged);
+            opNameTable.Add(Operator.eqd, ProtoCore.DSASM.kw.eqd);
+            opNameTable.Add(Operator.nqd, ProtoCore.DSASM.kw.nqd);
+            opNameTable.Add(Operator.addd, ProtoCore.DSASM.kw.addd);
+            opNameTable.Add(Operator.subd, ProtoCore.DSASM.kw.subd);
+            opNameTable.Add(Operator.muld, ProtoCore.DSASM.kw.muld);
+            opNameTable.Add(Operator.divd, ProtoCore.DSASM.kw.divd);
         }
 
-        private void initOpCodeTable()
+        private static void initOpCodeTable()
         {
             opCodeTable = new Dictionary<Operator, ProtoCore.DSASM.OpCode>();
 
@@ -318,54 +393,41 @@ namespace ProtoCore.DSASM
             opCodeTable.Add(Operator.divd, ProtoCore.DSASM.OpCode.DIVD);
         }
 
-        private void initOpDoubleTable()
+        private static void initFloatingOpTable()
         {
-            opDoubleTable = new Dictionary<Operator, Operator>();
-            opDoubleTable.Add(Operator.lt, Operator.ltd);
-            opDoubleTable.Add(Operator.gt, Operator.gtd);
-            opDoubleTable.Add(Operator.le, Operator.led);
-            opDoubleTable.Add(Operator.ge, Operator.ged);
-            opDoubleTable.Add(Operator.eq, Operator.eqd);
-            opDoubleTable.Add(Operator.nq, Operator.nqd);
-            opDoubleTable.Add(Operator.add, Operator.addd);
-            opDoubleTable.Add(Operator.sub, Operator.subd);
-            opDoubleTable.Add(Operator.mul, Operator.muld);
-            opDoubleTable.Add(Operator.div, Operator.divd);
-        }
-
-        private void initArithmeticOpTable()
-        {
-            arithmeticOpTable = new HashSet<Operator>();
-            arithmeticOpTable.Add(Operator.add); 
-            arithmeticOpTable.Add(Operator.addd); 
-            arithmeticOpTable.Add(Operator.sub); 
-            arithmeticOpTable.Add(Operator.subd); 
-            arithmeticOpTable.Add(Operator.mul); 
-            arithmeticOpTable.Add(Operator.muld); 
-            arithmeticOpTable.Add(Operator.div); 
-            arithmeticOpTable.Add(Operator.divd); 
+            floatingOpTable = new Dictionary<Operator, Operator>();
+            floatingOpTable.Add(Operator.lt, Operator.ltd);
+            floatingOpTable.Add(Operator.gt, Operator.gtd);
+            floatingOpTable.Add(Operator.le, Operator.led);
+            floatingOpTable.Add(Operator.ge, Operator.ged);
+            floatingOpTable.Add(Operator.eq, Operator.eqd);
+            floatingOpTable.Add(Operator.nq, Operator.nqd);
+            floatingOpTable.Add(Operator.add, Operator.addd);
+            floatingOpTable.Add(Operator.sub, Operator.subd);
+            floatingOpTable.Add(Operator.mul, Operator.muld);
+            floatingOpTable.Add(Operator.div, Operator.divd);
         }
 
         private static void initOpSymbolTable()
         {
-            OpSymbolTable = new Dictionary<Operator, string>();
-            OpSymbolTable.Add(Operator.add, "+");
-            OpSymbolTable.Add(Operator.sub, "-");
-            OpSymbolTable.Add(Operator.mul, "*");
-            OpSymbolTable.Add(Operator.div, "/");
-            OpSymbolTable.Add(Operator.mod, "%");
-            OpSymbolTable.Add(Operator.bitwiseand, "&");
-            OpSymbolTable.Add(Operator.bitwiseor, "|");
-            OpSymbolTable.Add(Operator.bitwisexor, "^");
-            OpSymbolTable.Add(Operator.eq, "==");
-            OpSymbolTable.Add(Operator.nq, "!=");
-            OpSymbolTable.Add(Operator.ge, ">=");
-            OpSymbolTable.Add(Operator.gt, ">");
-            OpSymbolTable.Add(Operator.le, "<=");
-            OpSymbolTable.Add(Operator.lt, "<");
-            OpSymbolTable.Add(Operator.and, "&&");
-            OpSymbolTable.Add(Operator.or, "||");
-            OpSymbolTable.Add(Operator.assign, "=");
+            opSymbolTable = new Dictionary<Operator, string>();
+            opSymbolTable.Add(Operator.add, "+");
+            opSymbolTable.Add(Operator.sub, "-");
+            opSymbolTable.Add(Operator.mul, "*");
+            opSymbolTable.Add(Operator.div, "/");
+            opSymbolTable.Add(Operator.mod, "%");
+            opSymbolTable.Add(Operator.bitwiseand, "&");
+            opSymbolTable.Add(Operator.bitwiseor, "|");
+            opSymbolTable.Add(Operator.bitwisexor, "^");
+            opSymbolTable.Add(Operator.eq, "==");
+            opSymbolTable.Add(Operator.nq, "!=");
+            opSymbolTable.Add(Operator.ge, ">=");
+            opSymbolTable.Add(Operator.gt, ">");
+            opSymbolTable.Add(Operator.le, "<=");
+            opSymbolTable.Add(Operator.lt, "<");
+            opSymbolTable.Add(Operator.and, "&&");
+            opSymbolTable.Add(Operator.or, "||");
+            opSymbolTable.Add(Operator.assign, "=");
         }
     }
 

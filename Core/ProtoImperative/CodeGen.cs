@@ -186,9 +186,9 @@ namespace ProtoImperative
                     opAX.opdata = (int)ProtoCore.DSASM.Registers.AX;
                     EmitPop(opAX, Constants.kGlobalScope);
 
-                    string op = opKwData.opStringTable[ProtoCore.DSASM.Operator.add];
+                    string op = Op.GetOpName(ProtoCore.DSASM.Operator.add);
                     EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX, ProtoCore.DSASM.kw.regBX);
-                    EmitBinary(opKwData.opCodeTable[ProtoCore.DSASM.Operator.add], opAX, opBX);
+                    EmitBinary(Op.GetOpCode(ProtoCore.DSASM.Operator.add), opAX, opBX);
 
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                     EmitPush(opAX);
@@ -248,9 +248,9 @@ namespace ProtoImperative
                 EmitInstrConsole(ProtoCore.DSASM.kw.pop, ProtoCore.DSASM.kw.regAX);
                 EmitPop(opAX, Constants.kGlobalScope);
 
-                op = opKwData.opStringTable[ProtoCore.DSASM.Operator.mul];
+                op = Op.GetOpName(ProtoCore.DSASM.Operator.mul);
                 EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX, ProtoCore.DSASM.kw.regBX);
-                EmitBinary(opKwData.opCodeTable[ProtoCore.DSASM.Operator.mul], opAX, opBX);
+                EmitBinary(Op.GetOpCode(ProtoCore.DSASM.Operator.mul), opAX, opBX);
 
                 EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                 EmitPush(opRes);
@@ -266,9 +266,9 @@ namespace ProtoImperative
                     EmitInstrConsole(ProtoCore.DSASM.kw.pop, ProtoCore.DSASM.kw.regAX);
                     EmitPop(opAX, Constants.kGlobalScope);
 
-                    op = opKwData.opStringTable[ProtoCore.DSASM.Operator.add];
+                    op = Op.GetOpName(ProtoCore.DSASM.Operator.add);
                     EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX, ProtoCore.DSASM.kw.regBX);
-                    EmitBinary(opKwData.opCodeTable[ProtoCore.DSASM.Operator.add], opAX, opBX);
+                    EmitBinary(Op.GetOpCode(ProtoCore.DSASM.Operator.add), opAX, opBX);
 
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                     EmitPush(opRes);
@@ -2504,9 +2504,9 @@ namespace ProtoImperative
                     opAX.opdata = (int)ProtoCore.DSASM.Registers.AX;
                     EmitPop(opAX, Constants.kGlobalScope);
 
-                    string op = opKwData.unaryOpStringTable[u.Operator];
+                    string op = Op.GetUnaryOpName(u.Operator);
                     EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX);
-                    EmitUnary(opKwData.unaryOpCodeTable[u.Operator], opAX);
+                    EmitUnary(Op.GetUnaryOpCode(u.Operator), opAX);
 
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                     ProtoCore.DSASM.StackValue opRes = new ProtoCore.DSASM.StackValue();

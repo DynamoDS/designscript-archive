@@ -6271,9 +6271,9 @@ namespace ProtoAssociative
                 opAX.opdata = (int)ProtoCore.DSASM.Registers.AX;
                 EmitPop(opAX, Constants.kGlobalScope);
 
-                string op = opKwData.unaryOpStringTable[u.Operator];
+                string op = Op.GetUnaryOpName(u.Operator);
                 EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX);
-                EmitUnary(opKwData.unaryOpCodeTable[u.Operator], opAX);
+                EmitUnary(Op.GetUnaryOpCode(u.Operator), opAX);
 
                 EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                 ProtoCore.DSASM.StackValue opRes = new ProtoCore.DSASM.StackValue();
