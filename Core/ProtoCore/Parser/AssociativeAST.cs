@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ProtoCore.DesignScriptParser;
+using ProtoCore.DSASM;
 using ProtoCore.Utils;
 
 namespace ProtoCore.AST.AssociativeAST
@@ -1671,6 +1672,115 @@ namespace ProtoCore.AST.AssociativeAST
             }
             else
                 return false;
+        }
+    }
+
+    public class AstFactory
+    {
+        public static NullNode BuildNullNode()
+        {
+            return new NullNode();
+        }
+
+        public static IntNode BuildIntNode(int value)
+        {
+            return new IntNode(value.ToString());
+        }
+
+        public static DoubleNode BuildDoubleNode(double value)
+        {
+            return new DoubleNode(value.ToString());
+        }
+
+        public static StringNode BuildStringNode(string str)
+        {
+            return new StringNode { value = str };
+        }
+
+        public static BooleanNode BuildBooleanNode(bool value)
+        {
+            string strValue = value ? Literal.True : Literal.False;
+            return new BooleanNode { value = strValue };
+        }
+
+        public static InlineConditionalNode BuildConditionalNode(AssociativeNode condition,
+                                                                 AssociativeNode trueExpr,
+                                                                 AssociativeNode falseExpr)
+        {
+            InlineConditionalNode cond = new InlineConditionalNode();
+            cond.ConditionExpression = condition;
+            cond.TrueExpression = trueExpr;
+            cond.FalseExpression = falseExpr;
+            return cond;
+        }
+
+        public static AssociativeNode BuildFunctionCall(string function,
+                                                        List<AssociativeNode> arguments)
+        {
+            string[] dotcalls = function.Split('.');
+            string functionName = dotcalls[dotcalls.Length - 1];
+
+            FunctionCallNode funcCall = new FunctionCallNode();
+            funcCall.Function = BuildIdentifier(functionName);
+            funcCall.FormalArguments = arguments;
+
+            if (dotcalls.Length == 1)
+            {
+                return funcCall;
+            }
+            else
+            {
+                IdentifierNode lhs = BuildIdentifier(dotcalls[0]);
+                return CoreUtils.GenerateCallDotNode(lhs, funcCall);
+            }
+        }
+
+        public static IdentifierNode BuildIdentifier(string name)
+        {
+            return new IdentifierNode(name);
+        }
+
+        public static ExprListNode BuildExprList(List<AssociativeNode> nodes)
+        {
+            ExprListNode exprList = new ExprListNode();
+            exprList.list = nodes;
+            return exprList;
+        }
+
+        public static ExprListNode BuildExprList(List<string> exprs)
+        {
+            List<AssociativeNode> nodes = new List<AssociativeNode>();
+            foreach (var item in exprs)
+            {
+                nodes.Add(BuildIdentifier(item));
+            }
+            return BuildExprList(nodes);
+        }
+
+        public static BinaryExpressionNode BuildBinaryExpression(AssociativeNode lhs,
+                                                                 AssociativeNode rhs,
+                                                                 Operator op)
+        {
+            return new BinaryExpressionNode(lhs, rhs, op);
+        }
+
+        public static BinaryExpressionNode BuildAssignment(AssociativeNode lhs,
+                                                           AssociativeNode rhs)
+        {
+            return new BinaryExpressionNode(lhs, rhs, Operator.assign);
+        }
+
+        public static VarDeclNode BuildParamNode(string paramName)
+        {
+            VarDeclNode param = new VarDeclNode();
+            param.NameNode = BuildIdentifier(paramName);
+
+            ProtoCore.Type type = new ProtoCore.Type();
+            type.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
+            type.Name = "var";
+            param.ArgumentType = type;
+
+            return param;
         }
     }
 }
