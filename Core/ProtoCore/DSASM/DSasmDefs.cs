@@ -185,6 +185,9 @@ namespace ProtoCore.DSASM
         public const string Null = "null";
     }
 
+    /// <summary>
+    /// Translate an operator to other representations.
+    /// </summary>
     public class Op
     {
         /// <summary>
