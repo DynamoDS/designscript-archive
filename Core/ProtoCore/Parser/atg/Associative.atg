@@ -2111,7 +2111,7 @@ Associative_NameReference<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
             ProtoCore.AST.AssociativeAST.AssociativeNode rnode = null;
             Associative_NameReference(out rnode);
             if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
-               (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
+               (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Keyword.This &&
                (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
             {
                 node = rnode;
@@ -2151,7 +2151,7 @@ Associative_IdentifierList<out ProtoCore.AST.AssociativeAST.AssociativeNode node
         Associative_NameReference<out rnode>
                                     (.
                                         if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
-                                            (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
+                                            (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Keyword.This &&
                                             (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
                                         {
                                             node = rnode;
