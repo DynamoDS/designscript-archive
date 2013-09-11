@@ -1774,12 +1774,7 @@ namespace ProtoCore.AST.AssociativeAST
         {
             VarDeclNode param = new VarDeclNode();
             param.NameNode = BuildIdentifier(paramName);
-
-            ProtoCore.Type type = new ProtoCore.Type();
-            type.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
-            type.Name = "var";
-            param.ArgumentType = type;
-
+            param.ArgumentType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false);
             return param;
         }
     }
