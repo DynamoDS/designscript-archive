@@ -487,12 +487,7 @@ namespace ProtoCore.Utils
 
         public static string GetOperatorString(DSASM.Operator optr)
         {
-            Validity.Assert(null != OpKeywordData.OpSymbolTable && OpKeywordData.OpSymbolTable.Count > 0);
-            if (OpKeywordData.OpSymbolTable.ContainsKey(optr))
-            {
-                return OpKeywordData.OpSymbolTable[optr];
-            }
-            return string.Empty;
+            return Op.GetOpSymbol(optr);
         }
 
         public static bool TryGetPropertyName(string methodName, out string propertyName)
