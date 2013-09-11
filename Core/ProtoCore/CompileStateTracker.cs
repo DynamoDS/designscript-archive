@@ -25,18 +25,13 @@ namespace ProtoLanguage
     {
         public CompileOptions()
         {
-            DumpByteCode = false;
-            Verbose = false;
-
-            FullSSA = false;
             DumpIL = false;
-
+            DumpByteCode = false;
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
             SuppressBuildOutput = false;
             BuildOptWarningAsError = false;
             BuildOptErrorAsWarning = false;
-            ExecutionMode = ProtoLanguage.ExecutionMode.Serial;
             IDEDebugMode = false;
             WatchTestMode = false;
             IncludeDirectories = new List<string>();
@@ -47,9 +42,6 @@ namespace ProtoLanguage
             RootCustomPropertyFilterPathName = @"C:\arxapiharness\Bin\AcDesignScript\CustomPropertyFilter.txt";
             CompileToLib = false;
             AssocOperatorAsMethod = true;
-
-            EnableProcNodeSanityCheck = true;
-            EnableReturnTypeCheck = true;
 
             RootModulePathName = Path.GetFullPath(@".");
             staticCycleCheck = true;
@@ -62,7 +54,6 @@ namespace ProtoLanguage
             TempReplicationGuideEmptyFlag = true;
             AssociativeToImperativePropagation = true;
             SuppressFunctionResolutionWarning = true;
-            EnableVariableAccumulator = true;
             WebRunner = false;
             DisableDisposeFunctionDebug = true;
             GenerateExprID = true;
@@ -74,15 +65,12 @@ namespace ProtoLanguage
 
         public bool DumpByteCode { get; set; }
         public bool DumpIL { get; private set; }
-        public bool FullSSA { get; set; }
-        public bool Verbose { get; set; }
         public bool DumpOperatorToMethodByteCode { get; set; }
         public bool SuppressBuildOutput { get; set; }
         public bool BuildOptWarningAsError { get; set; }
         public bool BuildOptErrorAsWarning { get; set; }
         public bool IDEDebugMode { get; set; }      //set to true if two way mapping b/w DesignScript and JIL code is needed
         public bool WatchTestMode { get; set; }     // set to true when running automation tests for expression interpreter
-        public ExecutionMode ExecutionMode { get; set; }
         public string FormatToPrintFloatingPoints { get; set; }
         public bool CompileToLib { get; set; }
         public bool AssocOperatorAsMethod { get; set; }
@@ -99,7 +87,6 @@ namespace ProtoLanguage
 
         public bool TempReplicationGuideEmptyFlag { get; set; }
         public bool AssociativeToImperativePropagation { get; set; }
-        public bool EnableVariableAccumulator { get; set; }
         public bool DisableDisposeFunctionDebug { get; set; }
         public bool GenerateExprID { get; set; }
         public bool IsDeltaExecution { get; set; }
@@ -163,11 +150,6 @@ namespace ProtoLanguage
                 }
             }
         }
-
-        public bool EnableReturnTypeCheck { get; set; }
-
-        public bool EnableProcNodeSanityCheck { get; set; }
-
     }
 
     public class CompileStateTracker
