@@ -168,8 +168,6 @@ namespace GraphToDSCompiler
                 ProtoLanguage.CompileOptions options = new ProtoLanguage.CompileOptions();
                 options.RootModulePathName = rootModulePath;
                 compileState = new ProtoLanguage.CompileStateTracker(options);
-
-                // Comment Jun: Compile states trackers do not require an executive
                 compileState.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive());
                 compileState.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive());
 
