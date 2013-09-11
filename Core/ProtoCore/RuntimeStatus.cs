@@ -181,7 +181,7 @@ namespace ProtoCore
             }
             else if (CoreUtils.TryGetOperator(methodName, out op))
             {
-                string strOp = OpKeywordData.OpSymbolTable[op];
+                string strOp = Op.GetOpSymbol(op);
                 message = String.Format(RuntimeData.WarningMessage.kMethodResolutionFailureForOperator,
                                         strOp,
                                         core.TypeSystem.GetType((int)arguments[0].metaData.type),
