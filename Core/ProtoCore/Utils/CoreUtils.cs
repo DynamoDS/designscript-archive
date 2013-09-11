@@ -184,7 +184,7 @@ namespace ProtoCore.Utils
         funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
         funcDefNode.IsAssocOperator = true;
         funcDefNode.IsBuiltIn = true;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funcDefNode.Name = Op.GetOpFunction(op);
         funcDefNode.ReturnType = new ProtoCore.Type() { Name = compileState.TypeSystem.GetType((int)r), UID = (int)r, rank = retRank, IsIndexable = (retRank > 0)};
         ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
         args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
@@ -221,7 +221,7 @@ namespace ProtoCore.Utils
         funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
         funcDefNode.IsAssocOperator = true;
         funcDefNode.IsBuiltIn = true;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funcDefNode.Name = Op.GetUnaryOpFunction(op);
         funcDefNode.ReturnType = new ProtoCore.Type() { Name = compileState.TypeSystem.GetType((int)r), UID = (int)r };
         ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
         args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
