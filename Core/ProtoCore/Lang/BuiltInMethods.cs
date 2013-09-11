@@ -1123,7 +1123,7 @@ namespace ProtoCore.Lang
 
             Methods.Add(new BuiltInMethod
             {
-                Name = "StringLen",
+                Name = "StringLength",
                 ReturnType = new Type
                 {
                     UID = (int)PrimitiveType.kTypeInt,
