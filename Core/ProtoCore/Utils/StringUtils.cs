@@ -63,5 +63,17 @@ namespace ProtoCore.Utils
             StackValue tmp = rmem.BuildArray(v1.Concat(v2).ToArray());
             return StackUtils.BuildString(tmp.opdata);
         }
+
+
+        public static int StringLength(StackValue sv, Core core)
+        {
+            if (!StackUtils.IsString(sv))
+            {
+                return ProtoCore.DSASM.Constants.kInvalidIndex;
+            }
+            HeapElement he1 = core.Heap.Heaplist[(int)sv.opdata];
+            int len = he1.VisibleSize;
+            return len;
+        }
     }
 }
