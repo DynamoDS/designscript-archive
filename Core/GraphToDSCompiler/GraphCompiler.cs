@@ -2260,7 +2260,7 @@ namespace GraphToDSCompiler
             }
 
             //for_taking_care_of_nulls
-            const string tempNullAssign = Constants.kwTempNull + "=" + ProtoCore.DSDefinitions.Kw.kw_null + ";\n";
+            const string tempNullAssign = Constants.kwTempNull + "=" + ProtoCore.DSDefinitions.Keyword.Null + ";\n";
             builder.Append(tempNullAssign);
             foreach (string island in listIslands) // Loop through all strings
             {

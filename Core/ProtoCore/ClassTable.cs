@@ -507,7 +507,7 @@ namespace ProtoCore.DSASM
                 {
                     foreach (ProcedureNode procNode in vtable.procList)
                     {
-                        if (procNode.name == ProtoCore.DSDefinitions.Kw.kw_Dispose && procNode.argInfoList.Count == 0)
+                        if (procNode.name == ProtoCore.DSDefinitions.Keyword.Dispose && procNode.argInfoList.Count == 0)
                         {
                             disposeMethod = procNode;
                             break;
@@ -541,14 +541,14 @@ namespace ProtoCore.DSASM
 
         public ClassTable()
         {
-            classIndexMap[ProtoCore.DSDefinitions.Kw.kw_invalid] = ProtoCore.DSASM.Constants.kInvalidIndex;
+            classIndexMap[ProtoCore.DSDefinitions.Keyword.Invalid] = ProtoCore.DSASM.Constants.kInvalidIndex;
         }
 
         public void Reserve(int size)
         {
             for (int n = 0; n < size; ++n)
             {
-                ProtoCore.DSASM.ClassNode cnode = new ProtoCore.DSASM.ClassNode { name = ProtoCore.DSDefinitions.Kw.kw_invalid, size = 0, rank = 0, symbols = null, vtable = null };
+                ProtoCore.DSASM.ClassNode cnode = new ProtoCore.DSASM.ClassNode { name = ProtoCore.DSDefinitions.Keyword.Invalid, size = 0, rank = 0, symbols = null, vtable = null };
                 classNodes.Add(cnode);
             }
         }

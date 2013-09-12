@@ -549,7 +549,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = funcCall.Function.Name,
                             Name = funcCall.Function.Name,
-                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         EmitIdentifierNode(iNode, ref inferedType);
                     }
@@ -609,7 +609,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempLangBlock,
                             Name = ProtoCore.DSASM.Constants.kTempLangBlock,
-                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         BinaryExpressionNode langBlockNode = new BinaryExpressionNode();
                         langBlockNode.LeftNode = iNode;
@@ -652,7 +652,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempFunctionReturnVar,
                             Name = ProtoCore.DSASM.Constants.kTempFunctionReturnVar,
-                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                         },
 
                         Optr = ProtoCore.DSASM.Operator.assign,
@@ -1069,16 +1069,16 @@ namespace DesignScript.Editor.CodeGen
                 // return = property;
                 LeftNode = new IdentifierNode()
                 {
-                    Value = ProtoCore.DSDefinitions.Kw.kw_return,
-                    Name = ProtoCore.DSDefinitions.Kw.kw_return,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
+                    Value = ProtoCore.DSDefinitions.Keyword.Return,
+                    Name = ProtoCore.DSDefinitions.Keyword.Return,
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeReturn, false)
                 },
                 Optr = ProtoCore.DSASM.Operator.assign,
                 RightNode = new IdentifierNode()
                 {
                     Value = memVar.name,
                     Name = memVar.name,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                 }
             });
 
@@ -1095,7 +1095,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = ProtoCore.DSASM.Constants.kTempArg,
                     Name = ProtoCore.DSASM.Constants.kTempArg,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                 },
                 ArgumentType = new ProtoCore.Type
                 {
@@ -1129,14 +1129,14 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = memVar.name,
                     Name = memVar.name,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                 },
                 Optr = ProtoCore.DSASM.Operator.assign,
                 RightNode = new IdentifierNode()
                 {
                     Value = ProtoCore.DSASM.Constants.kTempArg,
                     Name = ProtoCore.DSASM.Constants.kTempArg,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                 }
             });
 
@@ -1145,9 +1145,9 @@ namespace DesignScript.Editor.CodeGen
             {
                 LeftNode = new IdentifierNode()
                 {
-                    Value = ProtoCore.DSDefinitions.Kw.kw_return,
-                    Name = ProtoCore.DSDefinitions.Kw.kw_return,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
+                    Value = ProtoCore.DSDefinitions.Keyword.Return,
+                    Name = ProtoCore.DSDefinitions.Keyword.Return,
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeReturn, false)
                 },
                 Optr = ProtoCore.DSASM.Operator.assign,
                 RightNode = new NullNode()
@@ -1319,9 +1319,9 @@ namespace DesignScript.Editor.CodeGen
                     {
                         LeftNode = new IdentifierNode()
                         {
-                            Value = ProtoCore.DSDefinitions.Kw.kw_return,
-                            Name = ProtoCore.DSDefinitions.Kw.kw_return,
-                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeReturn, false)
+                            Value = ProtoCore.DSDefinitions.Keyword.Return,
+                            Name = ProtoCore.DSDefinitions.Keyword.Return,
+                            datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeReturn, false)
                         },
                         Optr = ProtoCore.DSASM.Operator.assign,
                         RightNode = new NullNode()
@@ -1586,7 +1586,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempDefaultArg,
                             Name = ProtoCore.DSASM.Constants.kTempDefaultArg,
-                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         BinaryExpressionNode bNodeTemp = new BinaryExpressionNode();
                         bNodeTemp.LeftNode = iNodeTemp;
@@ -1869,7 +1869,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = ProtoCore.DSASM.Constants.kTempDefaultArg,
                             Name = ProtoCore.DSASM.Constants.kTempDefaultArg,
-                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         BinaryExpressionNode bNodeTemp = new BinaryExpressionNode();
                         bNodeTemp.LeftNode = iNodeTemp;
@@ -1909,7 +1909,7 @@ namespace DesignScript.Editor.CodeGen
                             {
                                 Value = ProtoCore.DSASM.Constants.kTempLangBlock,
                                 Name = ProtoCore.DSASM.Constants.kTempLangBlock,
-                                datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                                datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                             };
                             BinaryExpressionNode langBlockNode = new BinaryExpressionNode();
                             langBlockNode.LeftNode = iNode;
@@ -1925,7 +1925,7 @@ namespace DesignScript.Editor.CodeGen
                         }
 
                         BinaryExpressionNode binaryNode = bnode as BinaryExpressionNode;
-                        hasReturnStatement = hasReturnStatement || ((binaryNode != null) && (binaryNode.LeftNode.Name == ProtoCore.DSDefinitions.Kw.kw_return));
+                        hasReturnStatement = hasReturnStatement || ((binaryNode != null) && (binaryNode.LeftNode.Name == ProtoCore.DSDefinitions.Keyword.Return));
                     }
 
                     // All locals have been stack allocated, update the local count of this function
@@ -2249,7 +2249,7 @@ namespace DesignScript.Editor.CodeGen
                 ProtoCore.DSASM.SymbolNode symbolnode = null;
 
                 string s = t.Value;
-                if (s == ProtoCore.DSDefinitions.Kw.kw_return)
+                if (s == ProtoCore.DSDefinitions.Keyword.Return)
                 {
                     Debug.Assert(null == symbolnode);
                     symbolnode = new ProtoCore.DSASM.SymbolNode();
@@ -2394,11 +2394,11 @@ namespace DesignScript.Editor.CodeGen
                 {
                     leftClassIndex = compileState.ClassTable.IndexOf(listNode.LeftNode.Name);
                 }
-                AssociativeNode iNode = (listNode.LeftNode.Name == ProtoCore.DSDefinitions.Kw.kw_this ||
+                AssociativeNode iNode = (listNode.LeftNode.Name == ProtoCore.DSDefinitions.Keyword.This ||
                                          leftClassIndex != ProtoCore.DSASM.Constants.kInvalidIndex) ? listNode.RightNode : listNode.LeftNode;
                 while (iNode is IdentifierListNode)
                 {
-                    if ((iNode as IdentifierListNode).LeftNode.Name != ProtoCore.DSDefinitions.Kw.kw_this)
+                    if ((iNode as IdentifierListNode).LeftNode.Name != ProtoCore.DSDefinitions.Keyword.This)
                     {
                         iNode = (iNode as IdentifierListNode).LeftNode;
                     }
@@ -2522,7 +2522,7 @@ namespace DesignScript.Editor.CodeGen
 
                 IdentifierNode tmpArg = new IdentifierNode();
                 tmpArg.Name = tmpArg.Value = ProtoCore.DSASM.Constants.kTempArg;
-                tmpArg.datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false);
+                tmpArg.datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false);
                 setter.FormalArguments.Add(tmpArg);
 
                 return setter;

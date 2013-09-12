@@ -558,7 +558,7 @@ namespace ProtoCore
             {
                 debugFrame.IsDotArgCall = true;
             }
-            else if (fNode.name.Equals(ProtoCore.DSDefinitions.Kw.kw_Dispose))
+            else if (fNode.name.Equals(ProtoCore.DSDefinitions.Keyword.Dispose))
             {
                 debugFrame.IsDisposeCall = true;
                 ReturnPCFromDispose = DebugEntryPC;

@@ -302,7 +302,7 @@ namespace ProtoCore.Utils
             if (null == binaryNode)
                 return false;
 
-            return (binaryNode.LeftNode.Name == ProtoCore.DSDefinitions.Kw.kw_return);
+            return (binaryNode.LeftNode.Name == ProtoCore.DSDefinitions.Keyword.Return);
         }
 
         public static bool IsReturnExpressionNode(ProtoCore.AST.AssociativeAST.AssociativeNode node)
@@ -321,7 +321,7 @@ namespace ProtoCore.Utils
                 return false;
             }
 
-            return (retNode.Value == ProtoCore.DSDefinitions.Kw.kw_return);
+            return (retNode.Value == ProtoCore.DSDefinitions.Keyword.Return);
         }
 
         public static bool IsAssignmentNode(ProtoCore.AST.ImperativeAST.ImperativeNode node)

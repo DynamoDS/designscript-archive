@@ -523,7 +523,7 @@ namespace DesignScript.Editor.CodeGen
                         {
                             Value = funcCall.Function.Name,
                             Name = funcCall.Function.Name,
-                            datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                            datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                         };
                         EmitIdentifierNode(iNode, ref inferedType);
                     }
@@ -869,7 +869,7 @@ namespace DesignScript.Editor.CodeGen
                     {
                         Value = ProtoCore.DSASM.Constants.kTempDefaultArg,
                         Name = ProtoCore.DSASM.Constants.kTempDefaultArg,
-                        datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                        datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                     };
                     BinaryExpressionNode bNodeTemp = new BinaryExpressionNode();
                     bNodeTemp.LeftNode = iNodeTemp;
@@ -896,7 +896,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     DfsTraverse(bnode, ref inferedType);
                     BinaryExpressionNode binaryNode = bnode as BinaryExpressionNode;
-                    hasReturnStatement = hasReturnStatement || ((binaryNode != null) && (binaryNode.LeftNode.Name == ProtoCore.DSDefinitions.Kw.kw_return));
+                    hasReturnStatement = hasReturnStatement || ((binaryNode != null) && (binaryNode.LeftNode.Name == ProtoCore.DSDefinitions.Keyword.Return));
                 }
 
                 // All locals have been stack allocated, update the local count of this function
@@ -1248,7 +1248,7 @@ namespace DesignScript.Editor.CodeGen
 
                             IdentifierNode t = new IdentifierNode();
                             t.Value = n.ToString();
-                            t.datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeInt, false);
+                            t.datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeInt, false);
 
                             ArrayNode array = new ArrayNode();
                             array.Expr = t;
@@ -1353,7 +1353,7 @@ namespace DesignScript.Editor.CodeGen
                 ProtoCore.DSASM.SymbolNode symbolnode = null;
 
                 string s = t.Value;
-                bool isReturn = (s == ProtoCore.DSDefinitions.Kw.kw_return);
+                bool isReturn = (s == ProtoCore.DSDefinitions.Keyword.Return);
                 if (isReturn)
                 {
                     EmitReturnStatement(node, inferedType);
@@ -1600,7 +1600,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = forNode.loopVar.Name,
                     Name = forNode.loopVar.Name,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false),
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false),
                     line = forNode.loopVar.line,
                     col = forNode.loopVar.col,
                     endLine = forNode.loopVar.line,
@@ -1628,7 +1628,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = forCountIdent,
                     Name = forCountIdent,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                 };
 
                 BinaryExpressionNode forcounterExpr = new BinaryExpressionNode();
@@ -1647,7 +1647,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = forIterCountVar,
                     Name = forIterCountVar,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                 };
 
                 BinaryExpressionNode forIterations = new BinaryExpressionNode();
@@ -1698,7 +1698,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Value = identName,
                     Name = identName,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false)
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false)
                 };
 
                 BinaryExpressionNode arrayexprAssignment = new BinaryExpressionNode();
@@ -2061,7 +2061,7 @@ namespace DesignScript.Editor.CodeGen
                     {
                         Name = ProtoCore.DSASM.Constants.kTempExceptionVar,
                         Value = ProtoCore.DSASM.Constants.kTempExceptionVar,
-                        datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false),
+                        datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false),
                     }
                 };
                 ProtoCore.Type inferedType = new ProtoCore.Type();
@@ -2101,7 +2101,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     Name = ProtoCore.DSASM.Constants.kTempExceptionVar,
                     Value = ProtoCore.DSASM.Constants.kTempExceptionVar,
-                    datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false),
+                    datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false),
                 },
                 Optr = ProtoCore.DSASM.Operator.assign,
                 RightNode = throwNode.expression
@@ -2122,7 +2122,7 @@ namespace DesignScript.Editor.CodeGen
 
                 IdentifierNode tmpArg = new IdentifierNode();
                 tmpArg.Name = tmpArg.Value = ProtoCore.DSASM.Constants.kTempArg;
-                tmpArg.datatype = compileState.TypeSystem.BuildTypeObject(PrimitiveType.kTypeVar, false);
+                tmpArg.datatype = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false);
                 setter.FormalArguments.Add(tmpArg);
 
                 return setter;

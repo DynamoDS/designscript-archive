@@ -445,9 +445,9 @@ public Node root { get; set; }
     private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateBinaryOperatorMethodCallNode(Operator op, ProtoCore.AST.AssociativeAST.AssociativeNode op1, ProtoCore.AST.AssociativeAST.AssociativeNode op2)
     {
         ProtoCore.AST.AssociativeAST.FunctionCallNode funCallNode = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString(), Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString() };
+        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Op.GetOpFunction(op), Name = ProtoCore.DSASM.Op.GetOpFunction(op) };
         funCallNode.Function = funcName;
-        funCallNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funCallNode.Name = ProtoCore.DSASM.Op.GetOpFunction(op);
         funCallNode.FormalArguments.Add(op1); funCallNode.FormalArguments.Add(op2);
 
         NodeUtils.SetNodeLocation(funCallNode, op1, op2);
@@ -457,9 +457,9 @@ public Node root { get; set; }
  	private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateUnaryOperatorMethodCallNode(UnaryOperator op, ProtoCore.AST.AssociativeAST.AssociativeNode operand)
     {
         ProtoCore.AST.AssociativeAST.FunctionCallNode funCallNode = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString(), Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString() };
+        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Op.GetUnaryOpFunction(op), Name = ProtoCore.DSASM.Op.GetUnaryOpFunction(op) };
         funCallNode.Function = funcName;
-        funCallNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funCallNode.Name = ProtoCore.DSASM.Op.GetUnaryOpFunction(op);
         funCallNode.FormalArguments.Add(operand);
 
         NodeUtils.CopyNodeLocation(funCallNode, operand);
@@ -472,23 +472,23 @@ public Node root { get; set; }
     {
         var ident = new ProtoCore.AST.ImperativeAST.IdentifierNode();
         ident.Name = ident.Value = name;
-        ident.datatype = compileState.TypeSystem.BuildTypeObject(type, false);
+        ident.datatype = TypeSystem.BuildPrimitiveTypeObject(type, false);
         return ident;
     }
 
     private bool IsKeyWord(string identName, bool checkReturn = false, bool checkThis = true)
     {
-        if (identName == ProtoCore.DSDefinitions.Kw.kw_return && !checkReturn)
+        if (identName == ProtoCore.DSDefinitions.Keyword.Return && !checkReturn)
         {
             return false;
         }
 
-        if (checkThis && identName == ProtoCore.DSDefinitions.Kw.kw_this)
+        if (checkThis && identName == ProtoCore.DSDefinitions.Keyword.This)
         {
             return true;
         }
 
-        foreach (string kw in ProtoCore.DSDefinitions.Kw.kwList)
+        foreach (string kw in ProtoCore.DSDefinitions.Keyword.KeywordList)
         {
             if (kw == identName)
                 return true;
@@ -1990,7 +1990,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
             ProtoCore.AST.AssociativeAST.AssociativeNode rnode = null;
             Associative_NameReference(out rnode);
             if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
-                (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
+                (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Keyword.This &&
                 (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
             {
                 node = rnode;

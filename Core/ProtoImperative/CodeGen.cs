@@ -375,7 +375,7 @@ namespace ProtoImperative
                 ProtoCore.DSASM.Constants.kInvalidIndex, 
                 funcIndex, 
                 datatype,
-                compileStateTracker.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false),
+                TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false),
                 size, 
                 datasize,
                 false,
@@ -1024,7 +1024,7 @@ namespace ProtoImperative
         private void EmitIdentifierNode(ImperativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null)
         {
             IdentifierNode t = node as IdentifierNode;
-            if (t.Name.Equals(ProtoCore.DSDefinitions.Kw.kw_this))
+            if (t.Name.Equals(ProtoCore.DSDefinitions.Keyword.This))
             {
                 if (localProcedure != null)
                 {
@@ -1130,7 +1130,7 @@ namespace ProtoImperative
 
                 EmitPushVarData(runtimeIndex, dimensions);
 
-                ProtoCore.Type varType = compileStateTracker.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, 0);
+                ProtoCore.Type varType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false, 0);
                 symbolnode = Allocate(t.Value, globalProcIndex, varType);
 
                 EmitInstrConsole(ProtoCore.DSASM.kw.pop, t.Value);
@@ -2173,7 +2173,7 @@ namespace ProtoImperative
                 ProtoCore.DSASM.SymbolNode symbolnode = null;
 
                 string s = t.Value;
-                bool isReturn = (s == ProtoCore.DSDefinitions.Kw.kw_return);
+                bool isReturn = (s == ProtoCore.DSDefinitions.Keyword.Return);
                 if (isReturn)
                 {
                     EmitReturnStatement(node, inferedType);
@@ -2269,7 +2269,7 @@ namespace ProtoImperative
                         dimensions = DfsEmitArrayIndexHeap(t.ArrayDimensions);
                     }
 
-                    ProtoCore.Type castType = compileStateTracker.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false);
+                    ProtoCore.Type castType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false);
                     var tident = b.LeftNode as TypedIdentifierNode;
                     if (tident != null)
                     {
@@ -2283,7 +2283,7 @@ namespace ProtoImperative
                         {
                             string message = String.Format(ProtoCore.BuildData.WarningMessage.kTypeUndefined, tident.datatype.Name);
                             buildStatus.LogWarning(ProtoCore.BuildData.WarningID.kTypeUndefined, message, compileStateTracker.CurrentDSFileName, b.line, b.col);
-                            castType = compileStateTracker.TypeSystem.BuildTypeObject((int)PrimitiveType.kInvalidType, false);
+                            castType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kInvalidType, false);
                             castType.Name = tident.datatype.Name;
                             castType.rank = tident.datatype.rank;
                             castType.IsIndexable = (castType.rank != 0);
@@ -3184,10 +3184,10 @@ namespace ProtoImperative
             if (leftMostIdentList.LeftNode is IdentifierNode)
             {
                 IdentifierNode leftMostIdent = leftMostIdentList.LeftNode as IdentifierNode;
-                if (!string.Equals(ProtoCore.DSDefinitions.Kw.kw_this, leftMostIdent.Name) &&
+                if (!string.Equals(ProtoCore.DSDefinitions.Keyword.This, leftMostIdent.Name) &&
                     IsProperty(leftMostIdent.Name))
                 {
-                    var thisIdent = nodeBuilder.BuildIdentfier(ProtoCore.DSDefinitions.Kw.kw_this);
+                    var thisIdent = nodeBuilder.BuildIdentfier(ProtoCore.DSDefinitions.Keyword.This);
                     var thisIdentList = nodeBuilder.BuildIdentList(thisIdent, leftMostIdent);
                     leftMostIdentList.LeftNode = thisIdentList;
                 }
@@ -3624,7 +3624,7 @@ namespace ProtoImperative
         {
             var ident = new IdentifierNode();
             ident.Name = ident.Value = name;
-            ident.datatype = compileState.TypeSystem.BuildTypeObject(type, false);
+            ident.datatype = TypeSystem.BuildPrimitiveTypeObject(type, false);
 
             return ident;
         }
@@ -3636,7 +3636,7 @@ namespace ProtoImperative
 
         public ImperativeNode BuildReturn()
         {
-            return BuildIdentfier(ProtoCore.DSDefinitions.Kw.kw_return, PrimitiveType.kTypeReturn);
+            return BuildIdentfier(ProtoCore.DSDefinitions.Keyword.Return, PrimitiveType.kTypeReturn);
         }
 
         public ImperativeNode BuildIdentList(ImperativeNode leftNode, ImperativeNode rightNode)
