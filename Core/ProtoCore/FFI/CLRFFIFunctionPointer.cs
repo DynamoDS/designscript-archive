@@ -326,9 +326,9 @@ namespace ProtoFFI
             {
                 if (ex.InnerException != null)
                 {
-                    dsi.LogSemanticError(ex.InnerException.Message);
+                    dsi.LogError(ex.InnerException.Message);
                 }
-                dsi.LogSemanticError(ex.Message);
+                dsi.LogError(ex.Message);
             }
             catch (System.Reflection.TargetException ex)
             {
@@ -398,9 +398,9 @@ namespace ProtoFFI
             {
                 if (ex.InnerException != null)
                 {
-                    dsi.LogSemanticError(ErrorString(ex.InnerException));
+                    dsi.LogError(ErrorString(ex.InnerException));
                 }
-                dsi.LogSemanticError(ErrorString(ex));
+                dsi.LogError(ErrorString(ex));
             }
 
             return dsRetValue;

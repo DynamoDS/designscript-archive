@@ -2576,6 +2576,19 @@ namespace ProtoAssociative
                 // Get the replication guide from the dotcall
                 replicationGuides = exprList.ReplicationGuides;
             }
+            else if (node is RangeExprNode)
+            {
+                RangeExprNode rangeExpr = node as RangeExprNode;
+
+                // Get the replication guide from the dotcall
+                replicationGuides = rangeExpr.ReplicationGuides;
+            }
+            else if (node is InlineConditionalNode)
+            {
+                // TODO Jun: Parser should support replication guides on an entire inline conditional
+                InlineConditionalNode inlineCondition = node as InlineConditionalNode;
+                replicationGuides = null;
+            }
             else
             {
                 // A parser error has occured if a replication guide gets attached to any AST besides"

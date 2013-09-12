@@ -73,6 +73,7 @@ namespace DesignScript.Editor.Core
         DebugRunner debugRunner = null;
 
         // For script execution without debugger attached.
+        ProtoLanguage.CompileStateTracker compileState = null;
         ProtoCore.Core core = null;
         ProtoScriptTestRunner scriptRunner = null;
 
@@ -535,7 +536,6 @@ namespace DesignScript.Editor.Core
             }
 
             IOutputStream messageList = Solution.Current.GetMessage(false);
-            this.core.BuildStatus.MessageHandler = messageList;
             this.core.RuntimeStatus.MessageHandler = messageList;
 
             workerParams.RegularRunMirror = null;
@@ -587,7 +587,7 @@ namespace DesignScript.Editor.Core
 
             try
             {
-                workerParams.RegularRunMirror = scriptRunner.Execute(scriptCode, core);
+                workerParams.RegularRunMirror = scriptRunner.Execute(scriptCode, core, out compileState);
             }
             catch (System.Exception exception)
             {
@@ -770,11 +770,9 @@ namespace DesignScript.Editor.Core
             currentWatchedStackValue = null;
             ExpressionInterpreterRunner exprInterpreter = null;
 
-            IOutputStream buildStream = core.BuildStatus.MessageHandler;
             IOutputStream runtimeStream = core.RuntimeStatus.MessageHandler;
 
             // Disable output before interpret expression.
-            core.BuildStatus.MessageHandler = null;
             core.RuntimeStatus.MessageHandler = null;
             exprInterpreter = new ExpressionInterpreterRunner(this.core);
 
@@ -798,7 +796,6 @@ namespace DesignScript.Editor.Core
             }
 
             // Re-enable output after execution is done.
-            core.BuildStatus.MessageHandler = buildStream;
             core.RuntimeStatus.MessageHandler = runtimeStream;
             return (null != currentWatchedStackValue);
         }

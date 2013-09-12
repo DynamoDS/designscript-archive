@@ -8,6 +8,8 @@ namespace ProtoTest
     class MultiLanugageBasic
     {
 
+        private ProtoLanguage.CompileStateTracker compileState = null;
+
         [SetUp]
         public void TestSetup()
         {
@@ -30,7 +32,7 @@ namespace ProtoTest
     a = 3;
     b = 4;
 }
-", core);
+", core, out compileState);
        }
 
         [Test]
@@ -49,7 +51,7 @@ namespace ProtoTest
     a = 3;
     b = 4;
 }
-", core);
+", core, out compileState);
         }
 
         [Test]
@@ -71,7 +73,7 @@ namespace ProtoTest
         }
     b = 4;
 }
-", core);
+", core, out compileState);
         }
 
 
@@ -95,7 +97,7 @@ namespace ProtoTest
     }
     b = 4;
 }
-", core);
+", core, out compileState);
         }
 
         [Test]
@@ -126,7 +128,7 @@ namespace ProtoTest
     }
     c = a;
 }
-", core);
+", core, out compileState);
         }
 
         [Test]
@@ -158,7 +160,7 @@ x;y;
     y = p.m;
 }
 "
-    , core);
+    , core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("x", 0).Payload == 16);
             Assert.IsTrue((Int64)mirror.GetValue("y", 0).Payload == 32);

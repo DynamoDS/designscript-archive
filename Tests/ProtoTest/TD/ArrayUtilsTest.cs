@@ -12,6 +12,7 @@ namespace ProtoTest.UtilsTests
     public class ArrayUtilsTest
     {
         public ProtoCore.Core core;
+        private ProtoLanguage.CompileStateTracker compileState = null;
 
         [SetUp]
         public void Setup()
@@ -37,7 +38,7 @@ namespace ProtoTest.UtilsTests
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("b");
@@ -69,7 +70,7 @@ class A
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("b");
@@ -101,7 +102,7 @@ class A
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("b");
@@ -135,7 +136,7 @@ class A
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("b");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("c");
@@ -161,7 +162,7 @@ a;b;c;
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
 
@@ -202,7 +203,7 @@ a;b;c;
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("b");
@@ -248,7 +249,7 @@ a;b;c;d;e;
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("b");
@@ -328,7 +329,7 @@ tCCC = {C.C(), C.C(), C.C()};
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             StackValue svAAA = mirror.GetRawFirstValue("tAAA");
             ClassNode superAAA = ArrayUtils.GetGreatestCommonSubclassForArray(svAAA, core);
@@ -483,7 +484,7 @@ tCD = { c, d };
 
 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             StackValue svABC = mirror.GetRawFirstValue("tABC");
             ClassNode superABC = ArrayUtils.GetGreatestCommonSubclassForArray(svABC, core);
@@ -547,7 +548,7 @@ tE = {};//empty array
 
 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             StackValue svABC = mirror.GetRawFirstValue("tABC");
             ClassNode superABC = ArrayUtils.GetGreatestCommonSubclassForArray(svABC, core);
@@ -608,7 +609,7 @@ rBH = {b,h};
 
 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             StackValue svABCDEF = mirror.GetRawFirstValue("rABCDEF");
             ClassNode superABCDEF = ArrayUtils.GetGreatestCommonSubclassForArray(svABCDEF, core);
@@ -639,7 +640,7 @@ rBH = {b,h};
 ";
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("b");
@@ -663,7 +664,7 @@ b = {1,2,{3}};
 x = {{1},{3.1415}};
 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             StackValue a = mirror.GetRawFirstValue("a");
             StackValue b = mirror.GetRawFirstValue("b");
@@ -694,7 +695,7 @@ r2 = Contains(a, 3.0);
 //t = Contains(a, null);
 ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             StackValue a = mirror.GetRawFirstValue("a");
 

@@ -479,12 +479,11 @@ namespace ProtoScript.Runners
             private void ReportBuildErrorsAndWarnings(string code, SynchronizeData syncDataReturn, Dictionary<uint, string> modifiedGuidList, ref GraphUpdateReadyEventArgs retArgs)
             {
                 //GraphUpdateReadyEventArgs retArgs = null;
-
-                if (runner.runnerCore.BuildStatus.ErrorCount > 0)
+                if (runner.compileState.BuildStatus.ErrorCount > 0)
                 {
                     retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
 
-                    foreach (var err in runner.runnerCore.BuildStatus.Errors)
+                    foreach (var err in runner.compileState.BuildStatus.Errors)
                     {
                         string msg = err.Message;
                         int lineNo = err.Line;
@@ -523,12 +522,12 @@ namespace ProtoScript.Runners
                         }
                     }
                 }
-                if (runner.runnerCore.BuildStatus.WarningCount > 0)
+                if (runner.compileState.BuildStatus.WarningCount > 0)
                 {
                     if (retArgs == null)
                         retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
 
-                    foreach (var warning in runner.runnerCore.BuildStatus.Warnings)
+                    foreach (var warning in runner.compileState.BuildStatus.Warnings)
                     {
                         string msg = warning.msg;
                         int lineNo = warning.line;

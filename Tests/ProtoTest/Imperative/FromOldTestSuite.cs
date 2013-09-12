@@ -178,7 +178,8 @@ f0;f1;f2;f3;t0;t1;t2;t3;t4;t5;t6;t7;
 
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ProtoLanguage.CompileStateTracker compileState = null;
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("y").Payload == 57);
         }

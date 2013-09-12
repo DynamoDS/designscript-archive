@@ -18,6 +18,7 @@ namespace ProtoTestFx.TD
     public class TestFrameWork
     {
         private static ProtoCore.Core testCore;
+        private static ProtoLanguage.CompileStateTracker compileState = null;
         private ExecutionMirror testMirror;
         private readonly ProtoScriptTestRunner runner;
         private static string mErrorMessage = "";
@@ -44,7 +45,6 @@ namespace ProtoTestFx.TD
             // this setting is to fix the random failure of replication test case
             testCore.Options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             testCore.Options.Verbose = true;
-//            testCore.Options.kDynamicCycleThreshold = 5;
             
             //FFI registration and cleanup
             DLLFFIHandler.Register(FFILanguage.CPlusPlus, new ProtoFFI.PInvokeModuleHelper());
@@ -230,7 +230,7 @@ namespace ProtoTestFx.TD
                         Console.WriteLine(String.Format("Path: {0} does not exist.", includePath));
                     }
                 }
-                testMirror = runner.Execute(sourceCode, testCore);
+                testMirror = runner.Execute(sourceCode, testCore, out compileState);
                 SetErrorMessage(errorstring);
                 return testMirror;
             }
@@ -540,12 +540,12 @@ namespace ProtoTestFx.TD
 
         public static void VerifyBuildWarning(ProtoCore.BuildData.WarningID id)
         {
-            Assert.IsTrue(testCore.BuildStatus.ContainsWarning(id), mErrorMessage);
+            Assert.IsTrue(compileState.BuildStatus.ContainsWarning(id), mErrorMessage);
         }
 
         public void VerifyBuildWarningCount(int count)
         {
-            Assert.IsTrue(testCore.BuildStatus.WarningCount == count, mErrorMessage);
+            Assert.IsTrue(compileState.BuildStatus.WarningCount == count, mErrorMessage);
         }
 
         public static void VerifyRuntimeWarning(ProtoCore.RuntimeData.WarningID id)

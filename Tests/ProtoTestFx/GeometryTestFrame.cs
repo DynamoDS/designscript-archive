@@ -62,7 +62,7 @@ namespace ProtoTestFx
 
         internal static ProtoCore.Core TestRunnerRunOnly(string includePath, string code,
             Dictionary<int, List<string>> map, string geometryFactory,
-            string persistentManager, out ExecutionMirror mirror)
+            string persistentManager, out ExecutionMirror mirror, out ProtoLanguage.CompileStateTracker compileState)
         {
             ProtoCore.Core core;
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScriptTestRunner();
@@ -98,7 +98,7 @@ namespace ProtoTestFx
             // by overriding the POP_handler instruction - pratapa
             core.ExecutiveProvider = new InjectionExecutiveProvider();
 
-            core.BuildStatus.MessageHandler = fs;
+            //core.BuildStatus.MessageHandler = fs;
             core.RuntimeStatus.MessageHandler = fs;
 
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
@@ -110,8 +110,7 @@ namespace ProtoTestFx
             DLLFFIHandler.Register(FFILanguage.CSharp, new CSModuleHelper());
 
             //Run
-
-            mirror = fsr.Execute(code, core);
+            mirror = fsr.Execute(code, core, out compileState);
 
             //sw.Close();
 
@@ -129,7 +128,9 @@ namespace ProtoTestFx
             file.Close();
             InjectionExecutive.ExpressionMap.Clear();
             ExecutionMirror mirror;
-            Core core = TestRunnerRunOnly(includePath, code, map, "ManagedAsmGeometry.dll", "ManagedAsmPersistentManager.dll", out mirror);
+
+            ProtoLanguage.CompileStateTracker compileState = null;
+            Core core = TestRunnerRunOnly(includePath, code, map, "ManagedAsmGeometry.dll", "ManagedAsmPersistentManager.dll", out mirror, out compileState);
 
             try
             {
@@ -144,7 +145,7 @@ namespace ProtoTestFx
                 string logFile = Path.GetFileName(Path.ChangeExtension(scriptFile, ".log"));
                 string baseLogFile = Path.Combine(BaseDir, logFile);
                 string outputLogFile = Path.Combine(ScriptDir, logFile);
-                TextOutputStream tStream = core.BuildStatus.MessageHandler as TextOutputStream;
+                TextOutputStream tStream = compileState.BuildStatus.MessageHandler as TextOutputStream;
                 StreamWriter osw = new StreamWriter(outputLogFile);
                 osw.Write(tStream.ToString());
                 if (null != mirror)
@@ -194,7 +195,8 @@ namespace ProtoTestFx
             file.Close();
             InjectionExecutive.ExpressionMap.Clear();
             ExecutionMirror mirror;
-            Core core = TestRunnerRunOnly(includePath, code, map, "ManagedAsmGeometry.dll", "ManagedAsmPersistentManager.dll", out mirror);
+            ProtoLanguage.CompileStateTracker compileState = null;
+            Core core = TestRunnerRunOnly(includePath, code, map, "ManagedAsmGeometry.dll", "ManagedAsmPersistentManager.dll", out mirror, out compileState);
 
             //XML Result
             Dictionary<Expression, List<string>> expressionValues = InjectionExecutive.ExpressionMap;
@@ -207,7 +209,7 @@ namespace ProtoTestFx
             string logFile = Path.GetFileName(Path.ChangeExtension(scriptFile, ".log"));
             string baseLogFile = Path.Combine(BaseDir, logFile);
             string outputLogFile = Path.Combine(ScriptDir, logFile);
-            TextOutputStream tStream = core.BuildStatus.MessageHandler as TextOutputStream;
+            TextOutputStream tStream = compileState.BuildStatus.MessageHandler as TextOutputStream;
             StreamWriter osw = new StreamWriter(outputLogFile);
             osw.Write(tStream.ToString());
             if (null != mirror)
@@ -243,7 +245,8 @@ namespace ProtoTestFx
             file.Close();
             InjectionExecutive.ExpressionMap.Clear();
             ExecutionMirror mirror;
-            Core core = TestRunnerRunOnly(includePath, code, map, geometryFactory, persistentManager, out mirror);
+            ProtoLanguage.CompileStateTracker compileState = null;
+            Core core = TestRunnerRunOnly(includePath, code, map, geometryFactory, persistentManager, out mirror, out compileState);
 
             //XML Result
             Dictionary<Expression, List<string>> expressionValues = InjectionExecutive.ExpressionMap;
@@ -254,7 +257,7 @@ namespace ProtoTestFx
             //Log
             string logFile = Path.GetFileName(Path.ChangeExtension(scriptFile, ".log"));
             string outputLogFile = Path.Combine(outputDir, logFile);
-            TextOutputStream tStream = core.BuildStatus.MessageHandler as TextOutputStream;
+            TextOutputStream tStream = compileState.BuildStatus.MessageHandler as TextOutputStream;
             StreamWriter osw = new StreamWriter(outputLogFile);
             osw.Write(tStream.ToString());
             if (null != mirror)

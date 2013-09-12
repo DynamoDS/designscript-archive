@@ -1041,11 +1041,11 @@ namespace ProtoCore.Lang
             //For IDE output
             ProtoCore.Core core = runtime.runtime.Core;
             OutputMessage t_output = new OutputMessage(result);
-            core.BuildStatus.MessageHandler.Write(t_output);
-            if (core.Options.WebRunner)
-            {
-                core.BuildStatus.WebMsgHandler.Write(t_output);
-            }
+            //core.BuildStatus.MessageHandler.Write(t_output);
+            //if (core.Options.WebRunner)
+            //{
+            //    core.BuildStatus.WebMsgHandler.Write(t_output);
+            //}
             return DSASM.StackUtils.BuildNull();
         }
     }

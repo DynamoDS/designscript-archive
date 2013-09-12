@@ -59,7 +59,7 @@ namespace ProtoTestFx
             ProtoCore.DSASM.Mirror.ExecutionMirror mirror = new ProtoCore.DSASM.Mirror.ExecutionMirror(this, Core);
             string result = mirror.GetStringValue(sv, Core.Heap, 0, true);
 
-            TextOutputStream tStream = Core.BuildStatus.MessageHandler as TextOutputStream;
+            TextOutputStream tStream = Core.RuntimeStatus.MessageHandler as TextOutputStream;
             if (tStream != null)
             {
                 Dictionary<int, List<string>> map = tStream.Map;
@@ -333,7 +333,7 @@ namespace ProtoTestFx
             // by overriding the POP_handler instruction - pratapa
             core.ExecutiveProvider = new InjectionExecutiveProvider();
 
-            core.BuildStatus.MessageHandler = fs;
+            //core.BuildStatus.MessageHandler = fs;
             core.RuntimeStatus.MessageHandler = fs;
 
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
@@ -343,10 +343,10 @@ namespace ProtoTestFx
             runnerConfig.IsParrallel = false;
             
             DLLFFIHandler.Register(FFILanguage.CSharp, new CSModuleHelper());
-            
-            //Run
 
-            Mirror = fsr.Execute(code, core);
+            //Run
+            ProtoLanguage.CompileStateTracker compileState = null;
+            Mirror = fsr.Execute(code, core, out compileState);
 
             //sw.Close();
             core.Cleanup();
