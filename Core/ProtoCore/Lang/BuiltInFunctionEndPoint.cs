@@ -279,7 +279,7 @@ namespace ProtoCore.Lang
                         if (svCondition.optype != AddressType.Boolean)
                         {
                             // Comment Jun: Perhaps we can allow coercion?
-                            Type booleanType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeBool, false, 0);
+                            Type booleanType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeBool, false, 0);
                             svCondition = TypeSystem.Coerce(svCondition, booleanType, core);
                             GCUtils.GCRetain(svCondition, core);
                         }
@@ -1041,11 +1041,11 @@ namespace ProtoCore.Lang
             //For IDE output
             ProtoCore.Core core = runtime.runtime.Core;
             OutputMessage t_output = new OutputMessage(result);
-            core.BuildStatus.MessageHandler.Write(t_output);
-            if (core.Options.WebRunner)
-            {
-                core.BuildStatus.WebMsgHandler.Write(t_output);
-            }
+            //core.BuildStatus.MessageHandler.Write(t_output);
+            //if (core.Options.WebRunner)
+            //{
+            //    core.BuildStatus.WebMsgHandler.Write(t_output);
+            //}
             return DSASM.StackUtils.BuildNull();
         }
     }
@@ -1767,7 +1767,7 @@ namespace ProtoCore.Lang
             StackValue[] svArray = runtime.runtime.rmem.GetArrayElements(sv1);
 
             if (typeString == "array")
-                typeString = ProtoCore.DSDefinitions.Kw.kw_array;
+                typeString = ProtoCore.DSDefinitions.Keyword.Array;
             int type = runtime.runtime.Core.TypeSystem.GetType(typeString);
             foreach (ProtoCore.DSASM.StackValue op in svArray)
             {

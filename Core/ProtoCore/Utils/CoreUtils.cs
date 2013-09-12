@@ -26,7 +26,7 @@ namespace ProtoCore.Utils
     {
         var ident = new ProtoCore.AST.AssociativeAST.IdentifierNode();
         ident.Name = ident.Value = name;
-        ident.datatype = compileState.TypeSystem.BuildTypeObject(type, false);
+        ident.datatype = TypeSystem.BuildPrimitiveTypeObject(type, false);
         return ident;
     }
 
@@ -106,7 +106,7 @@ namespace ProtoCore.Utils
         funcDefNode.Singnature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
+        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
 
         ProtoCore.AST.AssociativeAST.DotFunctionBodyNode dotNode = new ProtoCore.AST.AssociativeAST.DotFunctionBodyNode(args.Arguments[0].NameNode, args.Arguments[1].NameNode, args.Arguments[2].NameNode, args.Arguments[3].NameNode);
         body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = ProtoCore.DSASM.Operator.assign, RightNode = dotNode});
@@ -169,7 +169,7 @@ namespace ProtoCore.Utils
         funcDefNode.Singnature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
+        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
 
         ProtoCore.AST.AssociativeAST.DotFunctionBodyNode dotNode = new ProtoCore.AST.AssociativeAST.DotFunctionBodyNode(args.Arguments[0].NameNode, args.Arguments[1].NameNode, args.Arguments[2].NameNode, args.Arguments[3].NameNode, args.Arguments[4].NameNode, args.Arguments[5].NameNode);
         body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = ProtoCore.DSASM.Operator.assign, RightNode = dotNode});
@@ -184,7 +184,7 @@ namespace ProtoCore.Utils
         funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
         funcDefNode.IsAssocOperator = true;
         funcDefNode.IsBuiltIn = true;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funcDefNode.Name = Op.GetOpFunction(op);
         funcDefNode.ReturnType = new ProtoCore.Type() { Name = compileState.TypeSystem.GetType((int)r), UID = (int)r, rank = retRank, IsIndexable = (retRank > 0)};
         ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
         args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
@@ -204,7 +204,7 @@ namespace ProtoCore.Utils
         funcDefNode.Singnature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
+        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
 
         ProtoCore.AST.AssociativeAST.IdentifierNode lhs = BuildAssocIdentifier(compileState, ProtoCore.DSASM.Constants.kLHS);
         ProtoCore.AST.AssociativeAST.IdentifierNode rhs = BuildAssocIdentifier(compileState, ProtoCore.DSASM.Constants.kRHS);
@@ -221,7 +221,7 @@ namespace ProtoCore.Utils
         funcDefNode.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
         funcDefNode.IsAssocOperator = true;
         funcDefNode.IsBuiltIn = true;
-        funcDefNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funcDefNode.Name = Op.GetUnaryOpFunction(op);
         funcDefNode.ReturnType = new ProtoCore.Type() { Name = compileState.TypeSystem.GetType((int)r), UID = (int)r };
         ProtoCore.AST.AssociativeAST.ArgumentSignatureNode args = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
         args.AddArgument(new ProtoCore.AST.AssociativeAST.VarDeclNode()
@@ -234,7 +234,7 @@ namespace ProtoCore.Utils
         funcDefNode.Singnature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
+        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
         ProtoCore.AST.AssociativeAST.IdentifierNode param = BuildAssocIdentifier(compileState, "%param");
         body.Body.Add(new ProtoCore.AST.AssociativeAST.BinaryExpressionNode() { LeftNode = _return, Optr = ProtoCore.DSASM.Operator.assign, RightNode = new ProtoCore.AST.AssociativeAST.UnaryExpressionNode() { Expression = param, Operator = op } });
         funcDefNode.FunctionBody = body;
@@ -272,7 +272,7 @@ namespace ProtoCore.Utils
         funcDefNode.Singnature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Kw.kw_return, ProtoCore.PrimitiveType.kTypeReturn);
+        ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(compileState, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
         ProtoCore.AST.AssociativeAST.IdentifierNode con = BuildAssocIdentifier(compileState, "%condition");
         ProtoCore.AST.AssociativeAST.IdentifierNode t = BuildAssocIdentifier(compileState, "%trueExp");
         ProtoCore.AST.AssociativeAST.IdentifierNode f = BuildAssocIdentifier(compileState, "%falseExp");
@@ -386,10 +386,16 @@ namespace ProtoCore.Utils
             core.RuntimeStatus.LogWarning(id, msg, fileName, line, col);
         }
 
-        public static void LogSemanticError(this Interpreter dsi, string msg, string fileName = null, int line = -1, int col = -1)
+        //public static void LogSemanticError(this Interpreter dsi, string msg, string fileName = null, int line = -1, int col = -1)
+        //{
+        //    ProtoCore.Core core = dsi.runtime.Core;
+        //    core.BuildStatus.LogSemanticError(msg, fileName, line, col);
+        //}
+
+        public static void LogError(this Interpreter dsi, string msg, string fileName = null, int line = -1, int col = -1)
         {
             ProtoCore.Core core = dsi.runtime.Core;
-            core.BuildStatus.LogSemanticError(msg, fileName, line, col);
+            core.RuntimeStatus.LogWarning(ProtoCore.RuntimeData.WarningID.kDefault, msg, fileName, line, col);
         }
 
         public static void LogWarning(this Core core, ProtoCore.RuntimeData.WarningID id, string msg, string fileName = null, int line = -1, int col = -1)
@@ -397,15 +403,15 @@ namespace ProtoCore.Utils
             core.RuntimeStatus.LogWarning(id, msg, fileName, line, col);
         }
 
-        public static void LogWarning(this Core core, ProtoCore.BuildData.WarningID id, string msg, string fileName = null, int line = -1, int col = -1)
-        {
-            core.BuildStatus.LogWarning(id, msg, fileName, line, col);
-        }
+        //public static void LogWarning(this Core core, ProtoCore.BuildData.WarningID id, string msg, string fileName = null, int line = -1, int col = -1)
+        //{
+        //    core.BuildStatus.LogWarning(id, msg, fileName, line, col);
+        //}
 
-        public static void LogSemanticError(this Core core, string msg, string fileName = null, int line = -1, int col = -1)
-        {
-            core.BuildStatus.LogSemanticError(msg, fileName, line, col);
-        }
+        //public static void LogSemanticError(this Core core, string msg, string fileName = null, int line = -1, int col = -1)
+        //{
+        //    core.BuildStatus.LogSemanticError(msg, fileName, line, col);
+        //}
 
 
         public static string GenerateIdentListNameString(ProtoCore.AST.AssociativeAST.AssociativeNode node)
@@ -606,7 +612,7 @@ namespace ProtoCore.Utils
             if (lhs is ProtoCore.AST.AssociativeAST.IdentifierNode)
             {
                 lhsName = (lhs as ProtoCore.AST.AssociativeAST.IdentifierNode).Name;
-                if (lhsName == ProtoCore.DSDefinitions.Kw.kw_this)
+                if (lhsName == ProtoCore.DSDefinitions.Keyword.This)
                 {
                     lhs = new ProtoCore.AST.AssociativeAST.ThisPointerNode();
                 }

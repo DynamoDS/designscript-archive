@@ -18,7 +18,7 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
 
-
+            ProtoLanguage.CompileStateTracker compileState = null;
 
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
 
@@ -33,7 +33,7 @@ namespace ProtoTest
 		 px = 1234321;
 	}
 }
-", core);
+", core, out compileState);
         }
 
 
@@ -47,6 +47,7 @@ namespace ProtoTest
         [Test]
         public void ParserFailTest1()
         {
+            ProtoLanguage.CompileStateTracker compileState = null;
             ProtoCore.Core core = new ProtoCore.Core(new ProtoCore.Options());
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
@@ -63,13 +64,14 @@ namespace ProtoTest
 {
     a = 3
 }
-", core);
+", core, out compileState);
             });
         }
 
         [Test]
         public void ParserFailTest2()
         {
+            ProtoLanguage.CompileStateTracker compileState = null;
             ProtoCore.Core core = new ProtoCore.Core(new ProtoCore.Options());
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
@@ -87,13 +89,14 @@ namespace ProtoTest
 {
     a = 3
 }
-", core);
+", core, out compileState);
             });
         }
 
         [Test]
         public void ParserFailTest3()
         {
+            ProtoLanguage.CompileStateTracker compileState = null;
             ProtoCore.Core core = new ProtoCore.Core(new ProtoCore.Options());
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
@@ -112,7 +115,7 @@ namespace ProtoTest
 	a = 1;
 	
 }
-", core);
+", core, out compileState);
             });
         }
 

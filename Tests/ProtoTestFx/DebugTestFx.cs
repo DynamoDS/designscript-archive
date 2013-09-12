@@ -77,7 +77,8 @@ namespace ProtoTestFx
 
             //Run
 
-            fsr.Execute(code, core);
+            ProtoLanguage.CompileStateTracker compileState = null;
+            fsr.Execute(code, core, out compileState);
 
             return core;
         }
