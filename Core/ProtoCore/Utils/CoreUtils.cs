@@ -386,10 +386,16 @@ namespace ProtoCore.Utils
             core.RuntimeStatus.LogWarning(id, msg, fileName, line, col);
         }
 
-        public static void LogSemanticError(this Interpreter dsi, string msg, string fileName = null, int line = -1, int col = -1)
+        //public static void LogSemanticError(this Interpreter dsi, string msg, string fileName = null, int line = -1, int col = -1)
+        //{
+        //    ProtoCore.Core core = dsi.runtime.Core;
+        //    core.BuildStatus.LogSemanticError(msg, fileName, line, col);
+        //}
+
+        public static void LogError(this Interpreter dsi, string msg, string fileName = null, int line = -1, int col = -1)
         {
             ProtoCore.Core core = dsi.runtime.Core;
-            core.BuildStatus.LogSemanticError(msg, fileName, line, col);
+            core.RuntimeStatus.LogWarning(ProtoCore.RuntimeData.WarningID.kDefault, msg, fileName, line, col);
         }
 
         public static void LogWarning(this Core core, ProtoCore.RuntimeData.WarningID id, string msg, string fileName = null, int line = -1, int col = -1)
@@ -397,15 +403,15 @@ namespace ProtoCore.Utils
             core.RuntimeStatus.LogWarning(id, msg, fileName, line, col);
         }
 
-        public static void LogWarning(this Core core, ProtoCore.BuildData.WarningID id, string msg, string fileName = null, int line = -1, int col = -1)
-        {
-            core.BuildStatus.LogWarning(id, msg, fileName, line, col);
-        }
+        //public static void LogWarning(this Core core, ProtoCore.BuildData.WarningID id, string msg, string fileName = null, int line = -1, int col = -1)
+        //{
+        //    core.BuildStatus.LogWarning(id, msg, fileName, line, col);
+        //}
 
-        public static void LogSemanticError(this Core core, string msg, string fileName = null, int line = -1, int col = -1)
-        {
-            core.BuildStatus.LogSemanticError(msg, fileName, line, col);
-        }
+        //public static void LogSemanticError(this Core core, string msg, string fileName = null, int line = -1, int col = -1)
+        //{
+        //    core.BuildStatus.LogSemanticError(msg, fileName, line, col);
+        //}
 
 
         public static string GenerateIdentListNameString(ProtoCore.AST.AssociativeAST.AssociativeNode node)

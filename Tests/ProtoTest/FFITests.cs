@@ -12,6 +12,7 @@ namespace ProtoTest
     public class FFITests
     {
         public ProtoCore.Core core;
+        private ProtoLanguage.CompileStateTracker compileState = null;
 
         [SetUp]
         public void Setup()
@@ -46,8 +47,9 @@ namespace ProtoTest
             ProtoCore.Core core = new ProtoCore.Core(new ProtoCore.Options());
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
-
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            
+            ProtoLanguage.CompileStateTracker compileState = null;
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
             Obj o = mirror.GetValue("a");
             Assert.IsTrue((Int64)o.Payload == 24);
@@ -68,7 +70,8 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            fsr.Execute(scriptCode, core);
+            ProtoLanguage.CompileStateTracker compileState = null;
+            fsr.Execute(scriptCode, core, out compileState);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace ProtoTest
     public class ModifierStackTests
     {
         private ProtoCore.Core core;
+        private ProtoLanguage.CompileStateTracker compileState;
 
         [SetUp]
         public void Setup() 
@@ -36,7 +37,7 @@ namespace ProtoTest
                         {
                             a = 10;
                         }
-                        ", core);
+                        ", core, out compileState);
         }
 
         [Test]
@@ -54,7 +55,7 @@ namespace ProtoTest
                             }
                             x = foo(2);
                         }
-                        ", core);
+                        ", core, out compileState);
         }
 
         [Test]
@@ -72,7 +73,7 @@ a;
                                     10;
                                 }
                         }
-                        ", core);
+                        ", core, out compileState);
             Assert.IsTrue((Int64)mirror.GetValue("a", 0).Payload == 10);
             
         }
@@ -93,7 +94,7 @@ a;
                                     20;
                                 }
                         }
-                        ", core);
+                        ", core, out compileState);
             Assert.IsTrue((Int64)mirror.GetValue("a", 0).Payload == 20);
         }
 
@@ -114,7 +115,7 @@ a;
                                     *2;
                                 }
                         }
-                        ", core);
+                        ", core, out compileState);
             Assert.IsTrue((Int64)mirror.GetValue("a", 0).Payload == 60);
         }
         
@@ -137,7 +138,7 @@ a;a@init;
                                 *2;
                                  }
                         }
-                        ", core);
+                        ", core, out compileState);
             Assert.IsTrue((Int64)mirror.GetValue("a@init", 0).Payload == 2);
             Assert.IsTrue((Int64)mirror.GetValue("a", 0).Payload == 6);
         }
@@ -160,7 +161,7 @@ a;a@init;a@first;
                                     *2;
                                 }
                         }
-                        ", core);
+                        ", core, out compileState);
             Assert.IsTrue((Int64)mirror.GetValue("a@init", 0).Payload == 3);
             Assert.IsTrue((Int64)mirror.GetValue("a@first", 0).Payload == 4);
             Assert.IsTrue((Int64)mirror.GetValue("a", 0).Payload == 16);
@@ -184,7 +185,7 @@ a@first;
                                     1 => a@first;
                                 }
                         }
-                        ", core);
+                        ", core, out compileState);
             
             Obj o = mirror.GetValue("a@init");
             List<Obj> os = mirror.GetArrayElements(o);
@@ -216,7 +217,7 @@ a@first;
                                      foo(7) => a@first;
                                  }
                          }
-                        ", core);
+                        ", core, out compileState);
 
             Obj o = mirror.GetValue("a@init");
             List<Obj> os = mirror.GetArrayElements(o);
@@ -251,7 +252,7 @@ a@first;
                                      foo(a@init) => a@first;
                                  }
                          }
-                        ", core);
+                        ", core, out compileState);
 
             Assert.IsTrue((Int64)mirror.GetValue("a@init", 0).Payload == 8);
             Assert.IsTrue((Int64)mirror.GetValue("a@first", 0).Payload == 10);
@@ -278,7 +279,7 @@ a@first;
                                      foo(a@init) => a@first;
                                  }
                          }
-                        ", core);
+                        ", core, out compileState);
 
             Obj o = mirror.GetValue("a@init");
             List<Obj> os = mirror.GetArrayElements(o);
@@ -325,7 +326,7 @@ a@first;
                               }
                                 point = Point.Point(10,10,10);
                             }
-                            ", core);
+                            ", core, out compileState);
 
            //Object o = mirror.GetValue("point.mx");
            //Assert.IsTrue((long)o == 10);

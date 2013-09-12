@@ -939,7 +939,6 @@ namespace ProtoCore
         public List<Instruction> Breakpoints { get; set; }
 
         public Options Options { get; private set; }
-        public BuildStatus BuildStatus { get; private set; }
         public RuntimeStatus RuntimeStatus { get; private set; }
 
         public TypeSystem TypeSystem { get; set; }
@@ -1487,7 +1486,6 @@ namespace ProtoCore
             secondCore.AssocNode = AssocNode;
             secondCore.BaseOffset = BaseOffset;
             secondCore.Breakpoints = new List<Instruction>(Breakpoints);
-            secondCore.BuildStatus = BuildStatus; //For now just retarget the build infomration to same output
 
             //@TODO(Luke) Should these be deep cloned? They will need to be fixed before we do any form of dynamic
             //code injection
