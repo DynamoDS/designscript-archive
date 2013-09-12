@@ -735,6 +735,9 @@ namespace ProtoCore.Lang
                         ret = StackUtils.BuildNull();
                         break;
                     }
+                case BuiltInMethods.BuiltInMethodID.kStringLength:
+                    ret = StackUtils.BuildInt(StringUtils.StringLength(formalParameters[0], core));
+                    break;
                 default:
                     throw new ProtoCore.Exceptions.CompilerInternalException("Unknown built-in method. {AAFAE85A-2AEB-4E8C-90D1-BCC83F27C852}");
             }

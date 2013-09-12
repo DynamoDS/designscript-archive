@@ -62,6 +62,7 @@ namespace ProtoCore.Lang
             kUnion,
             kInlineConditional,
             kBreak,
+            kStringLength,
         }
 
         public class BuiltInMethod
@@ -1118,6 +1119,23 @@ namespace ProtoCore.Lang
                     new KeyValuePair<string, ProtoCore.Type>("connectionParameters", new ProtoCore.Type { UID = (int)PrimitiveType.kTypeVar, Name = "var", IsIndexable = true, rank = ProtoCore.DSASM.Constants.kArbitraryRank})
                 },
                 ID = BuiltInMethods.BuiltInMethodID.kImportData
+            });
+
+            Methods.Add(new BuiltInMethod
+            {
+                Name = "StringLength",
+                ReturnType = new Type
+                {
+                    UID = (int)PrimitiveType.kTypeInt,
+                    rank = 0,
+                    IsIndexable = false,
+                    Name = "int",
+                },
+                Parameters = new List<KeyValuePair<string, ProtoCore.Type>>
+                {
+                    new KeyValuePair<string, ProtoCore.Type>("sv", new ProtoCore.Type { UID = (int)PrimitiveType.kTypeString, Name = "string", IsIndexable = false, rank = 0 })
+                },
+                ID = BuiltInMethods.BuiltInMethodID.kStringLength
             });
         }
     }

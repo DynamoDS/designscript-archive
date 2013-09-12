@@ -848,6 +848,20 @@ sort = Sort(sorterFunction, c);
             thisTest.Verify("sort", new object[] { null,1, 2,2, 3 });
 
         }
+
+        [Test]
+        public void BIM32_StringLength()
+        {
+            String code =
+@"a = StringLength(""designscript"");
+b = ""dynamo"";
+c = StringLen(b);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 12);
+            Assert.IsTrue((Int64)mirror.GetValue("c").Payload == 6);
+        }
+
        
     }
     class MathematicalFunctionMethodsTest
