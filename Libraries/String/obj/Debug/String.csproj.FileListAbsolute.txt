@@ -1,0 +1,5 @@
+C:\Users\t_praka\Documents\GitHub\designscript\bin\x86\Debug\String.dll
+C:\Users\t_praka\Documents\GitHub\designscript\bin\x86\Debug\String.pdb
+C:\Users\t_praka\Documents\GitHub\designscript\Libraries\String\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\t_praka\Documents\GitHub\designscript\Libraries\String\obj\Debug\String.dll
+C:\Users\t_praka\Documents\GitHub\designscript\Libraries\String\obj\Debug\String.pdb
