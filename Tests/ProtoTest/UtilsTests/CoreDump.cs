@@ -13,6 +13,7 @@ namespace ProtoTest.UtilsTests
     public class CoreDumpTest
     {
         private ProtoCore.Core core = null;
+        private ProtoLanguage.CompileStateTracker compileState = null;
         private ProtoScriptTestRunner coreRunner = null;
 
         [SetUp]
@@ -40,7 +41,7 @@ namespace ProtoTest.UtilsTests
 
                 values = A.B(1..20..1);";
 
-            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core);
+            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core, out compileState);
             List<string> globalVariables = null;
             mirror.GetCoreDump(out globalVariables, 7, 4);
 
@@ -67,7 +68,7 @@ namespace ProtoTest.UtilsTests
                 over = A.B(1..9..1);
 ";
 
-            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core);
+            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core, out compileState);
             List<string> globalVariables = null;
             mirror.GetCoreDump(out globalVariables, 8, 4);
 
@@ -96,7 +97,7 @@ namespace ProtoTest.UtilsTests
                 over = A.B(1..8..1);
 ";
 
-            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core);
+            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core, out compileState);
             List<string> globalVariables = null;
             mirror.GetCoreDump(out globalVariables, 7, 4);
 
@@ -118,7 +119,7 @@ namespace ProtoTest.UtilsTests
                 x = a.x;
                 a.x = a;";
 
-            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core);
+            ExecutionMirror mirror = coreRunner.Execute(sourceCode, core, out compileState);
             List<string> globalVariables = null;
             mirror.GetCoreDump(out globalVariables, 7, 4);
 

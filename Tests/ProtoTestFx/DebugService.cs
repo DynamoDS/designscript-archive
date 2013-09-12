@@ -66,7 +66,7 @@ namespace ProtoTestFx
                 options.IncludeDirectories.Add(incDir);
 
                 core = new ProtoCore.Core(options);
-                core.BuildStatus.SetStream(stringStream);
+                //core.BuildStatus.SetStream(stringStream);
                 core.Options.RootModulePathName = ProtoCore.Utils.FileUtils.GetFullPathName(dsPath);
                 core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
                 core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
@@ -112,7 +112,7 @@ namespace ProtoTestFx
             {
                 if (core != null)
                 {
-                    core.BuildStatus.SetStream(null);
+                    //core.BuildStatus.SetStream(null);
                     core.Cleanup();
                 }
             }
@@ -138,7 +138,7 @@ namespace ProtoTestFx
             try
             {
                 core = new ProtoCore.Core(new ProtoCore.Options());
-                core.BuildStatus.SetStream(stringStream);
+                //core.BuildStatus.SetStream(stringStream);
                 core.Options.RootModulePathName = ProtoCore.Utils.FileUtils.GetFullPathName(dsPath);
                 core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
                 core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
@@ -201,7 +201,7 @@ namespace ProtoTestFx
             {
                 if (core != null)
                 {
-                    core.BuildStatus.SetStream(null);                    
+                    //core.BuildStatus.SetStream(null);                    
                 }
             }
 

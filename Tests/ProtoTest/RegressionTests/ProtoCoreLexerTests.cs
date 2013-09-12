@@ -9,6 +9,7 @@ namespace ProtoTest.RegressionTests
         public class LexerRegressionTests
         {
             public ProtoCore.Core core;
+            private ProtoLanguage.CompileStateTracker compileState = null;
 
             [SetUp]
             public void Setup()
@@ -36,7 +37,7 @@ namespace ProtoTest.RegressionTests
 
 
                 ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-                ExecutionMirror mirror = fsr.Execute(code, core);
+                ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
                 Obj o = mirror.GetValue("x");
                 Assert.IsTrue((Int64)o.Payload == 1001);
