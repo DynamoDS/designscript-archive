@@ -7484,7 +7484,7 @@ namespace ProtoCore.DSASM
 
             // Comment Jun: Dispose calls are always implicit and need to terminate
             // TODO Jun: This instruction should not know about dispose
-            bool isDispose = procNode.name.Equals(ProtoCore.DSDefinitions.Kw.kw_Dispose);
+            bool isDispose = procNode.name.Equals(ProtoCore.DSDefinitions.Keyword.Dispose);
             if (isDispose)
             {
                 terminate = true;

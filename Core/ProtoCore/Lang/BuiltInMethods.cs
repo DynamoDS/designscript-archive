@@ -885,7 +885,7 @@ namespace ProtoCore.Lang
                     UID = (int)PrimitiveType.kTypeArray,
                     rank = 0,
                     IsIndexable = true,
-                    Name = ProtoCore.DSDefinitions.Kw.kw_array,
+                    Name = ProtoCore.DSDefinitions.Keyword.Array,
                 },
                 Parameters = new List<KeyValuePair<string, ProtoCore.Type>>
                 {

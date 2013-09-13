@@ -42,26 +42,26 @@ namespace ProtoFFI
             switch (type)
             {
                 case ProtoCore.PrimitiveType.kTypeDouble:
-                    protoType.Name = ProtoCore.DSDefinitions.Kw.kw_double;
+                    protoType.Name = ProtoCore.DSDefinitions.Keyword.Double;
                     break;
                 case ProtoCore.PrimitiveType.kTypeInt:
-                    protoType.Name = ProtoCore.DSDefinitions.Kw.kw_int;
+                    protoType.Name = ProtoCore.DSDefinitions.Keyword.Int;
                     break;
                 case ProtoCore.PrimitiveType.kTypeBool:
-                    protoType.Name = ProtoCore.DSDefinitions.Kw.kw_bool;
+                    protoType.Name = ProtoCore.DSDefinitions.Keyword.Bool;
                     break;
                 case ProtoCore.PrimitiveType.kTypeChar:
-                    protoType.Name = ProtoCore.DSDefinitions.Kw.kw_char;
+                    protoType.Name = ProtoCore.DSDefinitions.Keyword.Char;
                     break;
                 case ProtoCore.PrimitiveType.kTypeString: 
-                    protoType.Name = ProtoCore.DSDefinitions.Kw.kw_string;
+                    protoType.Name = ProtoCore.DSDefinitions.Keyword.String;
                     break;
                 case ProtoCore.PrimitiveType.kTypePointer:
                 case ProtoCore.PrimitiveType.kTypeVar:
-                    protoType.Name = ProtoCore.DSDefinitions.Kw.kw_var;
+                    protoType.Name = ProtoCore.DSDefinitions.Keyword.Var;
                     break;
                 case ProtoCore.PrimitiveType.kTypeVoid:
-                    protoType.Name = ProtoCore.DSDefinitions.Kw.kw_void;
+                    protoType.Name = ProtoCore.DSDefinitions.Keyword.Void;
                     break;
                 default:
                     throw new NotSupportedException(string.Format("Primitive type {0} is not supported for marshaling.", type));
