@@ -25,8 +25,8 @@ namespace ProtoLanguage
     {
         public CompileOptions()
         {
-            DumpIL = false;
-            DumpByteCode = false;
+            DumpIL = true;
+            DumpByteCode = true;
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
             SuppressBuildOutput = false;
