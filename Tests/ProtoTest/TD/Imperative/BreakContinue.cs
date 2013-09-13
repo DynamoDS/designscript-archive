@@ -1,63 +1,147 @@
-﻿using System;
+using System;
 using NUnit.Framework;
 using ProtoCore.DSASM.Mirror;
 using ProtoTestFx.TD;
-
 namespace ProtoTest.TD.Imperative
 {
     class BreakContinueTest
     {
-        public TestFrameWork thisTest  = new TestFrameWork();
-
+        public TestFrameWork thisTest = new TestFrameWork();
         [SetUp]
         public void Setup()
         {
         }
 
         [Test]
-        [Category ("SmokeTest")]
- public void T01_WhileBreakContinue()
+        [Category("SmokeTest")]
+        public void T01_WhileBreakContinue()
         {
-            ExecutionMirror mirror = thisTest.RunScript(@"..\\..\\..\\Scripts\\TD\\Imperative\\BreakContinue\\T01_WhileBreakContinue.ds");
-
+            string src = @"x;
+y;
+[Imperative]
+{
+    x = 0;
+    y = 0;
+    while (true) 
+    {
+        x = x + 1;
+        if (x > 10)
+            break;
+        
+        if ((x == 1) || (x == 3) || (x == 5) || (x == 7) || (x == 9))
+            continue;
+        
+        y = y + 1;
+    }
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(src);
             Assert.IsTrue((Int64)mirror.GetValue("x").Payload == 11);
             Assert.IsTrue((Int64)mirror.GetValue("y").Payload == 5);
         }
 
         [Test]
-        [Category ("SmokeTest")]
- public void T02_WhileBreakContinue()
+        [Category("SmokeTest")]
+        public void T02_WhileBreakContinue()
         {
-            ExecutionMirror mirror = thisTest.RunScript(@"..\\..\\..\\Scripts\\TD\\Imperative\\BreakContinue\\T02_WhileBreakContinue.ds");
-
+            string src = @"sum;
+[Imperative]
+{
+    x = 0;
+    sum = 0;
+    while (x <= 10) 
+    {
+        x = x + 1;
+        if (x >= 5)
+            break;
+        
+        y = 0;
+        while (true) 
+        {
+            y = y + 1;
+            if (y >= 10)
+                break;
+        }
+        // y == 10 
+        sum = sum + y;
+    }
+    // sum == 40 
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(src);
             Assert.IsTrue((Int64)mirror.GetValue("sum").Payload == 40);
         }
 
-
         [Test]
-        [Category ("SmokeTest")]
- public void T03_ForLoopBreakContinue()
+        [Category("SmokeTest")]
+        public void T03_ForLoopBreakContinue()
         {
-            ExecutionMirror mirror = thisTest.RunScript(@"..\\..\\..\\Scripts\\TD\\Imperative\\BreakContinue\\T03_ForLoopBreakContinue.ds");
-
+            string src = @"sum;
+[Imperative]
+{
+    sum = 0;
+    for (x in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13})
+    {
+        if (x >= 11)
+            break;
+        sum = sum + x;
+    }
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(src);
             Assert.IsTrue((Int64)mirror.GetValue("sum").Payload == 55);
         }
 
         [Test]
-        [Category ("SmokeTest")]
- public void T04_ForLoopBreakContinue()
+        [Category("SmokeTest")]
+        public void T04_ForLoopBreakContinue()
         {
-            ExecutionMirror mirror = thisTest.RunScript(@"..\\..\\..\\Scripts\\TD\\Imperative\\BreakContinue\\T04_ForLoopBreakContinue.ds");
-
+            string src = @"sum;
+[Imperative]
+{
+    sum = 0;
+    for (x in {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+    {
+        sum = sum + x;
+        if (x <= 5)
+            continue;
+        sum = sum + 1;
+    }
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(src);
             Assert.IsTrue((Int64)mirror.GetValue("sum").Payload == 60);
         }
 
         [Test]
-        [Category ("SmokeTest")]
- public void T05_FunctionBreakContinue()
+        [Category("SmokeTest")]
+        public void T05_FunctionBreakContinue()
         {
-            ExecutionMirror mirror = thisTest.RunScript(@"..\\..\\..\\Scripts\\TD\\Imperative\\BreakContinue\\T05_FunctionBreakContinue.ds");
-
+            string src = @"a;
+b;
+c;
+d;
+[Imperative]
+{
+    def ding:int(x:int)
+    {
+        if (x >= 5)
+            break;
+        return = 2 * x;
+    }
+    def dong:int(x: int)
+    {
+        if (x >= 5)
+            continue;
+        return = 2 * x;
+    }
+    a = ding(1);
+    b = ding(6);
+    c = dong(2);
+    d = dong(7);
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(src);
             TestFrameWork.VerifyBuildWarning(ProtoCore.BuildData.WarningID.kFunctionAbnormalExit);
             Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 2);
             Assert.IsTrue(mirror.GetValue("b").DsasmValue.optype == ProtoCore.DSASM.AddressType.Null);

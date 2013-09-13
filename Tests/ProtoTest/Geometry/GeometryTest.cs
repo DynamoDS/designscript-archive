@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,6 @@ using System.Text;
 using NUnit.Framework;
 using ProtoTest.DebugTests;
 using ProtoTestFx;
-
 namespace ProtoTest
 {
     [TestFixture]
@@ -32,6 +31,5 @@ namespace ProtoTest
             String filePath = @"..\..\..\Scripts\Geometry\line_creation.ds";
             GeometryTestFrame.RunAndCompare(filePath);
         }
-
     }
 }
