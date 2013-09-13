@@ -124,7 +124,7 @@ namespace ProtoCore
     {
         public Options()
         {
-            Verbose = true;
+            Verbose = false;
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
             SuppressBuildOutput = false;
