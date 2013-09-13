@@ -1,5 +1,4 @@
-﻿using NUnit.Framework;
-
+using NUnit.Framework;
 namespace ProtoTest
 {
     public class Program
@@ -8,10 +7,6 @@ namespace ProtoTest
         {
             //EntryClass.Exec4();
         }
-
-
-
-
         [TestFixture]
         public class TestsFromScripts
         {
@@ -19,20 +14,15 @@ namespace ProtoTest
             public void TestFile(string filename)
             {
                 System.Console.WriteLine(filename);
-
             }
-
             public static string[] LoadFiles()
             {
                 string path = "..\\..\\..\\Scripts";
-
                 return System.IO.Directory.GetFiles(path, "*.ds");
-
             }
-
         }
-        
-   
-    
+
+
+
     }
 }

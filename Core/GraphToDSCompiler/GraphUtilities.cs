@@ -1057,11 +1057,11 @@ namespace GraphToDSCompiler
         {
             BuildCore(true);
             List<SynchronizeData> sdList = new List<SynchronizeData>();
-            string readContents;
-            using (StreamReader streamReader = new StreamReader(filepath, Encoding.UTF8))
-            {
-                readContents = streamReader.ReadToEnd();
-            }
+            string readContents = filepath;
+            //using (StreamReader streamReader = new StreamReader(filepath, Encoding.UTF8))
+            //{
+            //    readContents = streamReader.ReadToEnd();
+            //}
             sdList = (SynchronizeDataCollection.Deserialize(readContents)).sdList;
             return sdList;
         }

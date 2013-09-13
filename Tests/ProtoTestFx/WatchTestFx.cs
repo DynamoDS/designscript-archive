@@ -281,6 +281,44 @@ namespace ProtoTestFx
 
         }
 
+        public static void GeneratePrintStatements(string fileContent, ref Dictionary<int, List<string>> map)
+        {
+            string line;
+
+            int lineNo = 0;
+            int colNo = 0;
+
+            string[] lines = fileContent.Split('\n');
+
+            // split code into program statements and loop thro' them            
+            foreach (string contentLine in lines)
+            {
+                line = contentLine;
+                lineNo++;
+                line = line.Trim();
+
+                if (line.Equals(String.Empty))
+                    continue;
+
+                // TODO: implement strategy to skip commented code block
+                // skip commented lines
+                if (line.StartsWith("//"))
+                    continue;
+
+                List<string> identifiers = null;
+                int equalIndex = line.IndexOf('=');
+                if (equalIndex != -1)
+                {
+                    identifiers = ProtoCore.Utils.ParserUtils.GetLHSatAssignment(line, equalIndex);
+                    if (identifiers.Count == 0)
+                        continue;
+
+                    map.Add(lineNo, identifiers);
+                }
+
+            }
+        }
+
         public void CompareRunAndWatchResults(string includePath, string code, Dictionary<int, List<string>> map, bool watchNestedMode = false)
         {
             try
