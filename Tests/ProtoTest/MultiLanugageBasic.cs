@@ -6,6 +6,8 @@ namespace ProtoTest
     [TestFixture]
     class MultiLanugageBasic
     {
+        private ProtoLanguage.CompileStateTracker compileState = null;
+
         [SetUp]
         public void TestSetup()
         {
@@ -18,8 +20,15 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             fsr.Execute(
-@"[Imperative]{    a = 3;    b = 4;}", core);
-        }
+@"
+[Imperative]
+{
+    a = 3;
+    b = 4;
+}
+", core, out compileState);
+       }
+
         [Test]
         public void TestSingleLanguageAssociative()
         {
@@ -28,7 +37,13 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             fsr.Execute(
-@"[Associative]{    a = 3;    b = 4;}", core);
+@"
+[Associative]
+{
+    a = 3;
+    b = 4;
+}
+", core, out compileState);
         }
         [Test]
         public void TestMultLanguageAssociativeImperative()
@@ -38,7 +53,16 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             fsr.Execute(
-@"[Associative]{    a = [Imperative]        {            return= 5;        }    b = 4;}", core);
+@"
+[Associative]
+{
+    a = [Imperative]
+        {
+            return= 5;
+        }
+    b = 4;
+}
+", core, out compileState);
         }
         [Test]
         public void TestMultLanguageImperativeAssociative()
@@ -48,7 +72,16 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             fsr.Execute(
-@"[Imperative]{    [Associative]    {        return= 5;    }    b = 4;}", core);
+@"
+[Imperative]
+{
+    [Associative]
+    {
+        return= 5;
+    }
+    b = 4;
+}
+", core, out compileState);
         }
         [Test]
         public void TestMultLanguageVariableUsage()
@@ -59,7 +92,25 @@ namespace ProtoTest
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
 
             fsr.Execute(
-@"[Associative]{    a = 2;    [Imperative]    {        if(a == 2 )        {            b = a + 5;            a = 20;        }        else         {            b = 4;        }    }    c = a;}", core);
+@"
+[Associative]
+{
+    a = 2;
+    [Imperative]
+    {
+        if(a == 2 )
+        {
+            b = a + 5;
+            a = 20;
+        }
+        else 
+        {
+            b = 4;
+        }
+    }
+    c = a;
+}
+", core, out compileState);
         }
         [Test]
         public void TestClassUsageInImpeartive()
@@ -69,8 +120,26 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             ExecutionMirror mirror = fsr.Execute(
-@"class foo{	m : var;	constructor Create(a1 : int)	{		m = a1;	}}x;y;[Imperative]{	p = foo.Create(16);    x = p.m;    p.m = 32;    y = p.m;}"
-    , core);
+@"
+class foo
+{
+	m : var;
+	constructor Create(a1 : int)
+	{
+		m = a1;
+	}
+}
+x;y;
+[Imperative]
+{
+	p = foo.Create(16);
+    x = p.m;
+
+    p.m = 32;
+    y = p.m;
+}
+"
+    , core, out compileState);
             Assert.IsTrue((Int64)mirror.GetValue("x", 0).Payload == 16);
             Assert.IsTrue((Int64)mirror.GetValue("y", 0).Payload == 32);
         }

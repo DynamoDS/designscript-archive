@@ -18,7 +18,6 @@ namespace ProtoFFITests
             DLLFFIHandler.Register(FFILanguage.CSharp, new CSModuleHelper());
             CLRModuleType.ClearTypes();
             core.Options.Verbose = true;
-            core.Options.DumpByteCode = true;
             return core;
         }
         protected struct ValidationData
@@ -45,9 +44,11 @@ namespace ProtoFFITests
         {
             ProtoCore.Core core = Setup();
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core, context);
+
+            ProtoLanguage.CompileStateTracker compileState = null;
+            ExecutionMirror mirror = fsr.Execute(code, core, context, out compileState);
             int nWarnings = core.RuntimeStatus.Warnings.Count;
-            nErrors = core.BuildStatus.ErrorCount;
+            nErrors = compileState.BuildStatus.ErrorCount;
             if (data == null)
             {
                 core.Cleanup();

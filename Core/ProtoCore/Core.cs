@@ -124,17 +124,10 @@ namespace ProtoCore
     {
         public Options()
         {
-            DumpByteCode = false;
             Verbose = false;
-
-            FullSSA = false;
-            DumpIL = false;
-
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
             SuppressBuildOutput = false;
-            BuildOptWarningAsError = false;
-            BuildOptErrorAsWarning = false;
             ExecutionMode = ProtoCore.ExecutionMode.Serial;
             IDEDebugMode = false;
             WatchTestMode = false;
@@ -147,11 +140,7 @@ namespace ProtoCore
             CompileToLib = false;
             AssocOperatorAsMethod = true;
 
-            EnableProcNodeSanityCheck = true;
-            EnableReturnTypeCheck = true;
-
             RootModulePathName = Path.GetFullPath(@".");
-            staticCycleCheck = true;
             dynamicCycleCheck = true;
             RecursionChecking = false;
             EmitBreakpoints = true;
@@ -161,7 +150,6 @@ namespace ProtoCore
             TempReplicationGuideEmptyFlag = true;
             AssociativeToImperativePropagation = true;
             SuppressFunctionResolutionWarning = true;
-            EnableVariableAccumulator = true;
             WebRunner = false;
             DisableDisposeFunctionDebug = true;
             GenerateExprID = true;
@@ -170,14 +158,9 @@ namespace ProtoCore
 
         }
 
-        public bool DumpByteCode { get; set; }
-        public bool DumpIL { get; private set; }
-        public bool FullSSA { get; set; }
         public bool Verbose { get; set; }
         public bool DumpOperatorToMethodByteCode { get; set; }
         public bool SuppressBuildOutput { get; set; }
-        public bool BuildOptWarningAsError { get; set; }
-        public bool BuildOptErrorAsWarning { get; set; }
         public bool IDEDebugMode { get; set; }      //set to true if two way mapping b/w DesignScript and JIL code is needed
         public bool WatchTestMode { get; set; }     // set to true when running automation tests for expression interpreter
         public ExecutionMode ExecutionMode { get; set; }
@@ -185,7 +168,6 @@ namespace ProtoCore
         public bool CompileToLib { get; set; }
         public bool AssocOperatorAsMethod { get; set; }
         public string LibPath { get; set; }
-        public bool staticCycleCheck { get; set; }
         public bool dynamicCycleCheck { get; set; }
         public bool RecursionChecking { get; set; }
         public bool DumpFunctionResolverLogic { get; set; }
@@ -197,7 +179,6 @@ namespace ProtoCore
 
         public bool TempReplicationGuideEmptyFlag { get; set; }
         public bool AssociativeToImperativePropagation { get; set; }
-        public bool EnableVariableAccumulator { get; set; }
         public bool DisableDisposeFunctionDebug { get; set; }
         public bool GenerateExprID { get; set; }
         public bool IsDeltaExecution { get; set; }
@@ -261,11 +242,6 @@ namespace ProtoCore
                 }
             }
         }
-
-        public bool EnableReturnTypeCheck { get; set; }
-
-        public bool EnableProcNodeSanityCheck { get; set; }
-
     }
 
     public struct InlineConditional
@@ -582,7 +558,7 @@ namespace ProtoCore
             {
                 debugFrame.IsDotArgCall = true;
             }
-            else if (fNode.name.Equals(ProtoCore.DSDefinitions.Kw.kw_Dispose))
+            else if (fNode.name.Equals(ProtoCore.DSDefinitions.Keyword.Dispose))
             {
                 debugFrame.IsDisposeCall = true;
                 ReturnPCFromDispose = DebugEntryPC;
@@ -916,11 +892,6 @@ namespace ProtoCore
             public RuntimeData.WarningID RuntimeId;
             public int Line;
             public int Col;
-
-            //public ErrorEntry()
-            //{
-
-            //}
         }
 
         public Dictionary<ulong, ulong> codeToLocation = new Dictionary<ulong, ulong>();
@@ -968,7 +939,6 @@ namespace ProtoCore
         public List<Instruction> Breakpoints { get; set; }
 
         public Options Options { get; private set; }
-        public BuildStatus BuildStatus { get; private set; }
         public RuntimeStatus RuntimeStatus { get; private set; }
 
         public TypeSystem TypeSystem { get; set; }
@@ -990,7 +960,7 @@ namespace ProtoCore
         public Dictionary<string, object> Configurations { get; set; }
 
         //Manages injected context data.
-        internal ContextDataManager ContextDataManager { get; set; }
+        public ContextDataManager ContextDataManager { get; set; }
 
         public ParseMode ParsingMode { get; set; }
 
@@ -1008,20 +978,6 @@ namespace ProtoCore
             ContextDataManager.GetInstance(this).AddData(data);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        //public void AddContextData(IEnumerable<IContextData> data)
-        //{
-        //    if (data == null)
-        //        return;
-
-        //    if (null == mCotextManager)
-        //        mCotextManager = new ContextDataManager(this);
-
-        //    mCotextManager.AddData(data);
-        //}
 
         // Cached replication guides for the current call. 
         // TODO Jun: Store this in the dynamic table node
@@ -1061,6 +1017,9 @@ namespace ProtoCore
         public bool builtInsLoaded { get; set; }
         public List<string> LoadedDLLs = new List<string>();
         public int deltaCompileStartPC { get; set; }
+
+        public bool EnableCallsiteExecutionState { get; set; }
+        public CallsiteExecutionState csExecutionState { get; set; }
 
         public void LogErrorInGlobalMap(Core.ErrorType type, string msg, string fileName = null, int line = -1, int col = -1, 
             BuildData.WarningID buildId = BuildData.WarningID.kDefault, RuntimeData.WarningID runtimeId = RuntimeData.WarningID.kDefault)
@@ -1275,28 +1234,6 @@ namespace ProtoCore
 
             AssocNode = null;
 
-
-            //
-            //
-            // Comment Jun: Delta execution should not reset the class tables as they are preserved
-            //
-            //      FunctionTable = new Lang.FunctionTable();
-            //      ClassTable = new DSASM.ClassTable();
-            //      TypeSystem = new TypeSystem();
-            //      TypeSystem.SetClassTable(ClassTable);
-            //      ProcNode = null;
-            //      ProcTable = new DSASM.ProcedureTable(ProtoCore.DSASM.Constants.kGlobalScope);
-            //
-            //      CodeBlockList = new List<DSASM.CodeBlock>();
-            //
-            //
-
-            //      CodeBlockIndex = 0;
-            //      RuntimeTableIndex = 0;
-
-            //
-
-
             //Initialize the function pointer table
             FunctionPointerTable = new DSASM.FunctionPointerTable();
 
@@ -1308,18 +1245,6 @@ namespace ProtoCore
             ExceptionHandlingManager = new ExceptionHandlingManager();
             startPC = ProtoCore.DSASM.Constants.kInvalidIndex;
 
-            if (Options.SuppressBuildOutput)
-            {
-                //  don't log any of the build related messages
-                //  just accumulate them in relevant containers with
-                //  BuildStatus object
-                //
-                BuildStatus = new BuildStatus(this, false, false, false);
-            }
-            else
-            {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
-            }
             RuntimeStatus = new RuntimeStatus(this);
 
             SSASubscript = 0;
@@ -1367,28 +1292,6 @@ namespace ProtoCore
             DynamicVariableTable = new DSASM.DynamicVariableTable();
             DynamicFunctionTable = new DSASM.DynamicFunctionTable();
 
-            // If the previous compilation for import resulted in a build error, 
-            // ignore it and continue compiling other import statements
-            /*if (BuildStatus.ErrorCount > 0)
-            {
-                ImportHandler = null;
-                CodeBlockList.Clear();
-                CompleteCodeBlockList.Clear();
-            }*/
-
-            if (Options.SuppressBuildOutput)
-            {
-                //  don't log any of the build related messages
-                //  just accumulate them in relevant containers with
-                //  BuildStatus object
-                //
-                BuildStatus = new BuildStatus(this, false, false, false);
-            }
-            else
-            {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError);
-            }
-            
             if (AstNodeList != null) 
                 AstNodeList.Clear();
 
@@ -1454,18 +1357,7 @@ namespace ProtoCore
 
             deltaCompileStartPC = ProtoCore.DSASM.Constants.kInvalidIndex;
 
-            if (options.SuppressBuildOutput)
-            {
-                //  don't log any of the build related messages
-                //  just accumulate them in relevant containers with
-                //  BuildStatus object
-                //
-                BuildStatus = new BuildStatus(this, false, false, false);
-            }
-            else
-            {
-                BuildStatus = new BuildStatus(this, Options.BuildOptWarningAsError, null, Options.BuildOptErrorAsWarning);
-            }
+
             RuntimeStatus = new RuntimeStatus(this);
 
             SSASubscript = 0;
@@ -1504,7 +1396,18 @@ namespace ProtoCore
             builtInsLoaded = false;
             FFIPropertyChangedMonitor = new FFIPropertyChangedMonitor(this);
 
+            csExecutionState = null;
+            EnableCallsiteExecutionState = false;
 
+            // TODO: Remove check once fully implemeted
+            if (EnableCallsiteExecutionState)
+            {
+                csExecutionState = CallsiteExecutionState.LoadState();
+            }
+            else
+            {
+                csExecutionState = new CallsiteExecutionState();
+            }
         }
 
         // The unique subscript for SSA temporaries
@@ -1597,7 +1500,6 @@ namespace ProtoCore
             secondCore.AssocNode = AssocNode;
             secondCore.BaseOffset = BaseOffset;
             secondCore.Breakpoints = new List<Instruction>(Breakpoints);
-            secondCore.BuildStatus = BuildStatus; //For now just retarget the build infomration to same output
 
             //@TODO(Luke) Should these be deep cloned? They will need to be fixed before we do any form of dynamic
             //code injection
@@ -1989,7 +1891,9 @@ namespace ProtoCore
             }
         }
 
-
+        //
+        // Comment Jun: The compile state will now handle executable generation
+        /*
         public void GenerateExprExe()
         {
             // TODO Jun: Determine if we really need another executable for the expression interpreter
@@ -2018,6 +1922,7 @@ namespace ProtoCore
                 }
             }
         }
+        
 
 
         public void GenerateExprExeInstructions(int blockScope)
@@ -2066,7 +1971,7 @@ namespace ProtoCore
             }
             GenerateExprExe();
         }
-
+        */
 
 
         public string GenerateTempVar()

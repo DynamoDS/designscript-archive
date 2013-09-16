@@ -19,6 +19,7 @@ namespace ProtoScript.Runners
         private bool executionsuspended;
         private VMState lastState;
         private ProtoCore.Core core;
+        public ProtoLanguage.CompileStateTracker compileState;
         private String code;
         private List<Dictionary<DebugInfo, Instruction>> diList;
         private readonly List<Instruction> allbreakPoints = new List<Instruction>();
@@ -74,7 +75,8 @@ namespace ProtoScript.Runners
             }
 
             //Run the compilation process
-            if (Compile(out resumeBlockID))
+            compileState = Compile(out resumeBlockID);
+            if (compileState.compileSucceeded)
             {
                 inited = true;
                 core.NotifyExecutionEvent(ProtoCore.ExecutionStateEventArgs.State.kExecutionBegin);
@@ -426,10 +428,12 @@ namespace ProtoScript.Runners
 
         private readonly ProtoCore.DebugServices.EventSink EventSink = new ProtoCore.DebugServices.ConsoleEventSink();
 
-        private bool Compile(out int blockId)
+        private ProtoLanguage.CompileStateTracker Compile(out int blockId)
         {
-            bool buildSucceeded = false;
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+
+            compileState = ProtoScript.CompilerUtils.BuildDebuggertCompilerState();
+
             try
             {
                 //defining the global Assoc block that wraps the entire .ds source file
@@ -442,15 +446,26 @@ namespace ProtoScript.Runners
                 //passing the global Assoc wrapper block to the compiler
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
                 ProtoCore.Language id = globalBlock.language;
-                core.Executives[id].Compile(out blockId, null, globalBlock, context, EventSink);
 
-                core.BuildStatus.ReportBuildResult();
+
+
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink);
+
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
-                core.GenerateExecutable();
-                core.Rmem.PushGlobFrame(core.GlobOffset);
+                compileState.compileSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
+
+
+                // This is the boundary between compilestate and runtime core
+                // Generate the executable
+                compileState.GenerateExecutable();
+
+                // Get the executable from the compileState
+                core.DSExecutable = compileState.DSExecutable;
+
+                core.Rmem.PushGlobFrame(compileState.GlobOffset);
 
             }
             catch (Exception ex)
@@ -458,10 +473,10 @@ namespace ProtoScript.Runners
                 Messages.FatalCompileError fce = new Messages.FatalCompileError { Message = ex.ToString() };
 
                 Console.WriteLine(fce.Message);
-                return false;
+                return null;
             }
 
-            return buildSucceeded;
+            return compileState;
         }
 
         /// <summary>

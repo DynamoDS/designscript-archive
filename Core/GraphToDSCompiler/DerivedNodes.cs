@@ -149,7 +149,7 @@ namespace GraphToDSCompiler
                 }
                 else
                 {
-                    result += ProtoCore.DSDefinitions.Kw.kw_null + " ";
+                    result += ProtoCore.DSDefinitions.Keyword.Null + " ";
                 }
 
                 // Handle operator
@@ -172,7 +172,7 @@ namespace GraphToDSCompiler
                 }
                 else
                 {
-                    result += " " + ProtoCore.DSDefinitions.Kw.kw_null;
+                    result += " " + ProtoCore.DSDefinitions.Keyword.Null;
                 }
             }
             else
@@ -197,7 +197,7 @@ namespace GraphToDSCompiler
 
                     result += " ";
                 }
-                else result += ProtoCore.DSDefinitions.Kw.kw_null + " ";
+                else result += ProtoCore.DSDefinitions.Keyword.Null + " ";
                 if (null != op)
                     result += op.ToScript();
                 if (null != right)
@@ -218,7 +218,7 @@ namespace GraphToDSCompiler
 
                     result += " ";
                 }
-                else result += " " + ProtoCore.DSDefinitions.Kw.kw_null;
+                else result += " " + ProtoCore.DSDefinitions.Keyword.Null;
             }
             return result + ")";
         }
@@ -346,7 +346,7 @@ namespace GraphToDSCompiler
                                     if (count == 3)
                                         ;
                                     else
-                                        result += ProtoCore.DSDefinitions.Kw.kw_null + "..";
+                                        result += ProtoCore.DSDefinitions.Keyword.Null + "..";
                                 }
                             }
                         }
@@ -410,7 +410,7 @@ namespace GraphToDSCompiler
                                     if (count == 3)
                                         ;
                                     else
-                                        result += ProtoCore.DSDefinitions.Kw.kw_null + "..";
+                                        result += ProtoCore.DSDefinitions.Keyword.Null + "..";
                                 }
                             }
                         }
@@ -454,7 +454,7 @@ namespace GraphToDSCompiler
                             }
                             else
                             {
-                                result += " " + ProtoCore.DSDefinitions.Kw.kw_null + ",";
+                                result += " " + ProtoCore.DSDefinitions.Keyword.Null + ",";
                             }
                             n++;
                         }
@@ -519,7 +519,7 @@ namespace GraphToDSCompiler
                                     }
                                     else
                                     {
-                                        result += " " + ProtoCore.DSDefinitions.Kw.kw_null + ",";
+                                        result += " " + ProtoCore.DSDefinitions.Keyword.Null + ",";
                                     }
                                 }
                             }
@@ -568,7 +568,7 @@ namespace GraphToDSCompiler
                                     }
                                     else
                                     {
-                                        result += " " + ProtoCore.DSDefinitions.Kw.kw_null + ",";
+                                        result += " " + ProtoCore.DSDefinitions.Keyword.Null + ",";
                                     }
                                 }
                                 n++;

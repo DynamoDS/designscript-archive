@@ -12,6 +12,8 @@ namespace ProtoTest.UtilsTests
     public class ClassUtilsTest
     {
         public ProtoCore.Core core;
+        private ProtoLanguage.CompileStateTracker compileState = null;
+
         [SetUp]
         public void Setup()
         {
@@ -28,7 +30,8 @@ namespace ProtoTest.UtilsTests
             String code =
 @"class A {}class B extends A {}class C extends B {}";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-            ExecutionMirror mirror = fsr.Execute(code, core);
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
+
             int idA = core.ClassTable.IndexOf("A");
             int idB = core.ClassTable.IndexOf("B");
             int idC = core.ClassTable.IndexOf("C");

@@ -60,12 +60,25 @@ public:
     virtual void updateGraph(const wchar_t* codesegment) = 0;
 
     /// <summary>
+    /// Synchronous method to update the VM with given code segment. This 
+    /// call waits till the live execution finishes for the changes due to new code 
+    /// segment from command-line interpreter. 
+    /// </summary>
+    virtual void updateCLInterpreter(const wchar_t* codesegment) = 0;
+
+    /// <summary>
     /// Asynchronous method to update the graph with given code segment. This 
     /// call queues the given code segment to the graph for evaluation. Once
     /// graph is completely evaluated, GraphUpdateReady method is called on the
     /// passed callback object.
     /// </summary>
     virtual void updateGraphAsync(const wchar_t* codesegment) = 0;
+
+    /// <summary>
+    /// Asynchronous method to update the VM with given code segment from the command-line interpreter. This 
+    /// call queues the given code segment to the live engine for evaluation. 
+    /// </summary>
+    virtual void updateCLInterpreterAsync(const wchar_t* codesegment) = 0;
     
     /// <summary>
     /// Queries the value of the given node/variable using it's name.
@@ -82,6 +95,13 @@ public:
     /// in the graph.
     /// </summary>
     virtual DesignScriptObject* getCoreDump() = 0;
+    
+    /// <summary>
+    /// Dumps the current VM state as a formatted string of values
+    /// in the graph.
+    /// </summary>
+    virtual const wchar_t* getCoreDumpCmdLineREPL() = 0;
+
 };
 
 

@@ -12,18 +12,15 @@ namespace ProtoScript.Runners
         public ProtoCore.DebugServices.EventSink EventSink = new ProtoCore.DebugServices.ConsoleEventSink();
 
 
-        public bool Compile(ProtoCore.CompileTime.Context context, ProtoCore.Core core, out int blockId)
+        public ProtoLanguage.CompileStateTracker Compile(ProtoCore.CompileTime.Context context, ProtoCore.Core core, out int blockId)
         {
-            bool buildSucceeded = false;
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
 
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
 
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
             try
             {
-                // No More HashAngleReplace for unified parser (Fuqiang)
-                //String strSource = ProtoCore.Utils.LexerUtils.HashAngleReplace(code);    
-
                 //defining the global Assoc block that wraps the entire .ds source file
                 ProtoCore.LanguageCodeBlock globalBlock = new ProtoCore.LanguageCodeBlock();
                 globalBlock.language = ProtoCore.Language.kAssociative;
@@ -36,24 +33,27 @@ namespace ProtoScript.Runners
 
                 //passing the global Assoc wrapper block to the compiler
                 ProtoCore.Language id = globalBlock.language;
-                core.Executives[id].Compile(out blockId, null, globalBlock, context, EventSink);
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink);
 
-                core.BuildStatus.ReportBuildResult();
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+                compileState.compileSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return buildSucceeded;
+            return compileState;
         }
 
-        public bool Compile(string code, ProtoCore.Core core, out int blockId)
+
+        public ProtoLanguage.CompileStateTracker Compile(string code, ProtoCore.Core core, out int blockId)
         {
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+
             bool buildSucceeded = false;
 
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
@@ -61,9 +61,6 @@ namespace ProtoScript.Runners
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
             try
             {
-                // No More HashAngleReplace for unified parser (Fuqiang)
-                //String strSource = ProtoCore.Utils.LexerUtils.HashAngleReplace(code);    
-
                 //defining the global Assoc block that wraps the entire .ds source file
                 ProtoCore.LanguageCodeBlock globalBlock = new ProtoCore.LanguageCodeBlock();
                 globalBlock.language = ProtoCore.Language.kAssociative;
@@ -75,28 +72,100 @@ namespace ProtoScript.Runners
                 //passing the global Assoc wrapper block to the compiler
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
                 ProtoCore.Language id = globalBlock.language;
-                core.Executives[id].Compile(out blockId, null, globalBlock, context, EventSink);
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink);
 
-                core.BuildStatus.ReportBuildResult();
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+                compileState.compileSucceeded = buildSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return buildSucceeded;
+            return compileState;
         }
 
-
-        public bool Compile(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList, ProtoCore.Core core, out int blockId)
+        public ProtoLanguage.CompileStateTracker Compile(string code, ProtoCore.Core core, Dictionary<string, Object> contextData, out int blockId)
         {
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState(contextData);
+
             bool buildSucceeded = false;
 
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
+
+            blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+            try
+            {
+                //defining the global Assoc block that wraps the entire .ds source file
+                ProtoCore.LanguageCodeBlock globalBlock = new ProtoCore.LanguageCodeBlock();
+                globalBlock.language = ProtoCore.Language.kAssociative;
+                globalBlock.body = code;
+                //the wrapper block can be given a unique id to identify it as the global scope
+                globalBlock.id = ProtoCore.LanguageCodeBlock.OUTERMOST_BLOCK_ID;
+
+
+                //passing the global Assoc wrapper block to the compiler
+                ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
+                ProtoCore.Language id = globalBlock.language;
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink);
+
+                compileState.BuildStatus.ReportBuildResult();
+
+                int errors = 0;
+                int warnings = 0;
+                compileState.compileSucceeded = buildSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return compileState;
+        }
+
+        public ProtoLanguage.CompileStateTracker Compile(string code, out int blockId)
+        {
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+
+            blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+            try
+            {
+                //defining the global Assoc block that wraps the entire .ds source file
+                ProtoCore.LanguageCodeBlock globalBlock = new ProtoCore.LanguageCodeBlock();
+                globalBlock.language = ProtoCore.Language.kAssociative;
+                globalBlock.body = code;
+                //the wrapper block can be given a unique id to identify it as the global scope
+                globalBlock.id = ProtoCore.LanguageCodeBlock.OUTERMOST_BLOCK_ID;
+
+
+                //passing the global Assoc wrapper block to the compiler
+                ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
+                ProtoCore.Language id = globalBlock.language;
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink);
+
+                compileState.BuildStatus.ReportBuildResult();
+
+                int errors = 0;
+                int warnings = 0;
+                compileState.compileSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return compileState;
+        }
+
+
+        public ProtoLanguage.CompileStateTracker Compile(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList, ProtoCore.Core core, out int blockId)
+        {
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+
+            compileState.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
 
             blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
             try
@@ -117,31 +186,29 @@ namespace ProtoScript.Runners
 		        ProtoCore.AST.AssociativeAST.CodeBlockNode codeblock = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
                 codeblock.Body.AddRange(astList);
 
-                core.Executives[id].Compile(out blockId, null, globalBlock, context, EventSink, codeblock);
+                compileState.Executives[id].Compile(compileState, out blockId, null, globalBlock, context, EventSink, codeblock);
 
-                core.BuildStatus.ReportBuildResult();
+                compileState.BuildStatus.ReportBuildResult();
 
                 int errors = 0;
                 int warnings = 0;
-                buildSucceeded = core.BuildStatus.GetBuildResult(out errors, out warnings);
+                compileState.compileSucceeded = compileState.BuildStatus.GetBuildResult(out errors, out warnings);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
 
-            return buildSucceeded;
+            return compileState;
         }
 
-        public void Execute(ProtoCore.Core core, ProtoCore.Runtime.Context context)
+        public void Execute(ProtoCore.Core core, ProtoCore.Runtime.Context context, ProtoLanguage.CompileStateTracker compileState)
         {
             try
             {
-                core.NotifyExecutionEvent(ProtoCore.ExecutionStateEventArgs.State.kExecutionBegin);
-                foreach (ProtoCore.DSASM.CodeBlock codeblock in core.CodeBlockList)
+                compileState.NotifyExecutionEvent(ProtoCore.ExecutionStateEventArgs.State.kExecutionBegin);
+                foreach (ProtoCore.DSASM.CodeBlock codeblock in core.DSExecutable.CodeBlockList)
                 {
-                    //ProtoCore.Runtime.Context context = new ProtoCore.Runtime.Context();
-
                     int locals = 0;
 
 
@@ -166,29 +233,50 @@ namespace ProtoScript.Runners
             }
         }
 
-        public ExecutionMirror Execute(string code, ProtoCore.Core core, Dictionary<string, Object> values, bool isTest = true)
+        public ExecutionMirror Execute(string code, ProtoCore.Core core, Dictionary<string, Object> values, out ProtoLanguage.CompileStateTracker outcompileState, bool isTest = true)
         {
             //Inject the context data values from external source.
-            core.AddContextData(values);
+            //core.AddContextData(values);
+
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            bool succeeded = Compile(code, core, out blockId);
-            if (succeeded)
+            ProtoLanguage.CompileStateTracker compileState = outcompileState = Compile(code, core, values, out blockId);
+            Validity.Assert(null != compileState);
+
+            core.ContextDataManager = compileState.ContextDataManager;
+
+            if (compileState.compileSucceeded)
             {
-                core.GenerateExecutable();
-                core.Rmem.PushGlobFrame(core.GlobOffset);
+                // This is the boundary between compilestate and runtime core
+                // Generate the executable
+                compileState.GenerateExecutable();
+
+                // Get the executable from the compileState
+                core.DSExecutable = compileState.DSExecutable;
+
+                core.Rmem.PushGlobFrame(compileState.GlobOffset);
                 core.RunningBlock = blockId;
 
-                Execute(core, new ProtoCore.Runtime.Context());
+                Execute(core, new ProtoCore.Runtime.Context(), compileState);
 
                 if (!isTest) { core.Heap.Free(); }
             }
             else
+            {
                 throw new ProtoCore.Exceptions.CompileErrorsOccured();
-            if (isTest && !core.Options.CompileToLib)
-                return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
-            else
-                return null;
+            }
 
+            if (isTest && !core.Options.CompileToLib)
+            {
+                return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
+            }
+
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
+            }
+
+            return null;
         }
 
         public ExecutionMirror Execute(ProtoCore.CompileTime.Context staticContext, ProtoCore.Runtime.Context runtimeContext, ProtoCore.Core core, bool isTest = true)
@@ -196,16 +284,23 @@ namespace ProtoScript.Runners
             Validity.Assert(null != staticContext.SourceCode && String.Empty != staticContext.SourceCode);
             
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            bool succeeded = Compile(staticContext, core, out blockId);
-            if (succeeded)
+            ProtoLanguage.CompileStateTracker compileState = Compile(staticContext, core, out blockId);
+            Validity.Assert(null != compileState);
+            if (compileState.compileSucceeded)
             {
-                core.GenerateExecutable();
-                core.Rmem.PushGlobFrame(core.GlobOffset);
+                // This is the boundary between compilestate and runtime core
+                // Generate the executable
+                compileState.GenerateExecutable();
+
+                // Get the executable from the compileState
+                core.DSExecutable = compileState.DSExecutable;
+
+                core.Rmem.PushGlobFrame(compileState.GlobOffset);
                 core.RunningBlock = blockId;
                 core.InitializeContextGlobals(staticContext.GlobalVarList);
 
                 Validity.Assert(null != runtimeContext);
-                Execute(core, runtimeContext);
+                Execute(core, runtimeContext, compileState);
                 if (!isTest)
                 {
                     core.Heap.Free();
@@ -221,49 +316,70 @@ namespace ProtoScript.Runners
                 return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
             }
 
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
+            }
+
             return null;
         }
 
-        public ExecutionMirror Execute(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList, ProtoCore.Core core, bool isTest = true)
+        public ExecutionMirror Execute(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList, ProtoCore.Core core)
         {
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            bool succeeded = Compile(astList, core, out blockId);
-            if (succeeded)
+            ProtoLanguage.CompileStateTracker compileState = Compile(astList, core, out blockId);
+            Validity.Assert(null != compileState);
+            if (compileState.compileSucceeded)
             {
-                core.GenerateExecutable();
-                core.Rmem.PushGlobFrame(core.GlobOffset);
+                // This is the boundary between compilestate and runtime core
+                // Generate the executable
+                compileState.GenerateExecutable();
+
+                // Get the executable from the compileState
+                core.DSExecutable = compileState.DSExecutable;
+
+                core.Rmem.PushGlobFrame(compileState.GlobOffset);
                 core.RunningBlock = blockId;
 
-                Execute(core, new ProtoCore.Runtime.Context());
-                if (!isTest) 
-                { 
-                    core.Heap.Free(); 
-                }
+                Execute(core, new ProtoCore.Runtime.Context(), compileState);
             }
             else
             {
                 throw new ProtoCore.Exceptions.CompileErrorsOccured();
             }
 
-            if (isTest && !core.Options.CompileToLib)
+            if (!core.Options.CompileToLib)
             {
                 return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
+            }
+
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
             }
 
             return null;
         }
 
-        public ExecutionMirror Execute(string code, ProtoCore.Core core, bool isTest = true)
+        public ExecutionMirror Execute(string code, ProtoCore.Core core, out ProtoLanguage.CompileStateTracker outcompileState, bool isTest = true)
         {
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            bool succeeded = Compile(code, core, out blockId);
-            if (succeeded)
+            ProtoLanguage.CompileStateTracker compileState = outcompileState = Compile(code, out blockId);
+            if (compileState.compileSucceeded)
             {
-                core.GenerateExecutable();
-                core.Rmem.PushGlobFrame(core.GlobOffset);
+                // This is the boundary between compilestate and runtime core
+                // Generate the executable
+                compileState.GenerateExecutable();
+
+                // Get the executable from the compileState
+                core.DSExecutable = compileState.DSExecutable;
+                core.Rmem.PushGlobFrame(compileState.GlobOffset);
+
                 core.RunningBlock = blockId;
 
-                Execute(core, new ProtoCore.Runtime.Context());
+                Execute(core, new ProtoCore.Runtime.Context(), compileState);
                 if (!isTest)
                 {
                     core.Heap.Free();
@@ -277,6 +393,12 @@ namespace ProtoScript.Runners
             if (isTest && !core.Options.CompileToLib)
             {
                 return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
+            }
+
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
             }
 
             return null;
@@ -301,7 +423,9 @@ namespace ProtoScript.Runners
 
             core.Options.RootModulePathName = ProtoCore.Utils.FileUtils.GetFullPathName(filename);
             core.CurrentDSFileName = core.Options.RootModulePathName;
-            Execute(strSource, core);
+
+            ProtoLanguage.CompileStateTracker compileState = null;
+            Execute(strSource, core, out compileState);
 
             if (isTest && !core.Options.CompileToLib)
                 return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);

@@ -73,6 +73,7 @@ namespace DesignScript.Editor.Core
         DebugRunner debugRunner = null;
 
         // For script execution without debugger attached.
+        ProtoLanguage.CompileStateTracker compileState = null;
         ProtoCore.Core core = null;
         ProtoScriptTestRunner scriptRunner = null;
 
@@ -488,11 +489,9 @@ namespace DesignScript.Editor.Core
             runnerConfig.IsParrallel = false;
 
 #if DEBUG
-            var dumpBytecCodeFlag = this.core.Options.DumpByteCode;
             var verboseFlag = this.core.Options.Verbose;
             var prevAsmOutput = this.core.AsmOutput;
 
-            this.core.Options.DumpByteCode = true;
             this.core.Options.Verbose = true;
 
             this.ByteCodeStream = new MemoryStream();
@@ -503,7 +502,6 @@ namespace DesignScript.Editor.Core
             bool startSucceeded = debugRunner.LoadAndPreStart(scriptPath, runnerConfig);
 
 #if DEBUG
-            this.core.Options.DumpByteCode = dumpBytecCodeFlag;
             this.core.Options.Verbose = verboseFlag;
             this.core.AsmOutput.Close();
             this.core.AsmOutput = prevAsmOutput == null ? Console.Out : prevAsmOutput;
@@ -538,7 +536,6 @@ namespace DesignScript.Editor.Core
             }
 
             IOutputStream messageList = Solution.Current.GetMessage(false);
-            this.core.BuildStatus.MessageHandler = messageList;
             this.core.RuntimeStatus.MessageHandler = messageList;
 
             workerParams.RegularRunMirror = null;
@@ -590,7 +587,7 @@ namespace DesignScript.Editor.Core
 
             try
             {
-                workerParams.RegularRunMirror = scriptRunner.Execute(scriptCode, core);
+                workerParams.RegularRunMirror = scriptRunner.Execute(scriptCode, core, out compileState);
             }
             catch (System.Exception exception)
             {
@@ -773,11 +770,9 @@ namespace DesignScript.Editor.Core
             currentWatchedStackValue = null;
             ExpressionInterpreterRunner exprInterpreter = null;
 
-            IOutputStream buildStream = core.BuildStatus.MessageHandler;
             IOutputStream runtimeStream = core.RuntimeStatus.MessageHandler;
 
             // Disable output before interpret expression.
-            core.BuildStatus.MessageHandler = null;
             core.RuntimeStatus.MessageHandler = null;
             exprInterpreter = new ExpressionInterpreterRunner(this.core);
 
@@ -801,7 +796,6 @@ namespace DesignScript.Editor.Core
             }
 
             // Re-enable output after execution is done.
-            core.BuildStatus.MessageHandler = buildStream;
             core.RuntimeStatus.MessageHandler = runtimeStream;
             return (null != currentWatchedStackValue);
         }

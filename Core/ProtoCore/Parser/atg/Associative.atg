@@ -1166,7 +1166,6 @@ Associative_FunctionalStatement<out ProtoCore.AST.AssociativeAST.AssociativeNode
                                        // Create function call node from binary expression node 
                                        expressionNode.RightNode = GenerateBinaryOperatorMethodCallNode(op, previousElementNode.LeftNode, rightNode);
                                        NodeUtils.SetNodeStartLocation(expressionNode.RightNode, opLine, opCol);
-                                       expressionNode.IsModifier = true;
                                     }
 
                                     if (null == identifier)
@@ -1235,16 +1234,6 @@ Associative_FunctionalStatement<out ProtoCore.AST.AssociativeAST.AssociativeNode
                                     if (isLeftMostNode) 
                                     {
                                         leftVar = null;
-                                        if (node is ProtoCore.AST.AssociativeAST.BinaryExpressionNode)
-                                        {
-                                            node.IsModifier = isModifier;   
-                                            /*
-                                            if ((node as ProtoCore.AST.AssociativeAST.BinaryExpressionNode).RightNode is ProtoCore.AST.AssociativeAST.InlineConditionalNode)
-                                            {
-                                               node.IsModifier = false;
-                                            }                                                             
-                                            */
-                                        }
                                         isModifier = false;
                                         withinModifierCheckScope = false;
                                         isLeftVarIdentList = false;                                  
@@ -2122,7 +2111,7 @@ Associative_NameReference<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
             ProtoCore.AST.AssociativeAST.AssociativeNode rnode = null;
             Associative_NameReference(out rnode);
             if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
-               (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
+               (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Keyword.This &&
                (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
             {
                 node = rnode;
@@ -2162,7 +2151,7 @@ Associative_IdentifierList<out ProtoCore.AST.AssociativeAST.AssociativeNode node
         Associative_NameReference<out rnode>
                                     (.
                                         if ((inode is ProtoCore.AST.AssociativeAST.IdentifierNode) &&
-                                            (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Kw.kw_this &&
+                                            (inode as ProtoCore.AST.AssociativeAST.IdentifierNode).Name == ProtoCore.DSDefinitions.Keyword.This &&
                                             (rnode is ProtoCore.AST.AssociativeAST.FunctionCallNode))
                                         {
                                             node = rnode;

@@ -75,7 +75,7 @@ namespace ProtoCore.Lang
 
         public List<BuiltInMethod> Methods { get; set; }
 
-        public BuiltInMethods(Core core)
+        public BuiltInMethods(ProtoLanguage.CompileStateTracker compileState)
         {
             Validity.Assert(null == Methods);
             Methods = new List<BuiltInMethod>();
@@ -885,7 +885,7 @@ namespace ProtoCore.Lang
                     UID = (int)PrimitiveType.kTypeArray,
                     rank = 0,
                     IsIndexable = true,
-                    Name = ProtoCore.DSDefinitions.Kw.kw_array,
+                    Name = ProtoCore.DSDefinitions.Keyword.Array,
                 },
                 Parameters = new List<KeyValuePair<string, ProtoCore.Type>>
                 {

@@ -94,12 +94,14 @@
     <Compile Include="AssociativeGraph.cs" />
     <Compile Include="AttributeEntry.cs" />
     <Compile Include="BuildStatus.cs" />
+    <Compile Include="CallsiteExecutionState\CallsiteExecutionState.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeGen.cs" />
     <Compile Include="CodeFile.cs" />
     <Compile Include="CodeGenDS.cs" />
     <Compile Include="CodePoint.cs" />
     <Compile Include="CompilerOptions.cs" />
+    <Compile Include="CompileStateTracker.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="ClassTable.cs" />
     <Compile Include="DSASM\FunctionCounter.cs" />
@@ -204,4 +206,5 @@
       <Name>ProtoInterface</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
 </Project>

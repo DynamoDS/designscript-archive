@@ -11,6 +11,7 @@ namespace ProtoFFI
     public class ContextDataManager
     {
         private ProtoCore.Core mCoreObject = null;
+        private ProtoLanguage.CompileStateTracker compileState = null;
 
         private Dictionary<string, IContextData> mData = new Dictionary<string, IContextData>();
         private static Dictionary<string, IContextDataProvider> mDataProviders = null;
@@ -29,6 +30,27 @@ namespace ProtoFFI
 
             core.ContextDataManager = new ContextDataManager(core);
             return core.ContextDataManager;
+        }
+
+        private ContextDataManager(ProtoLanguage.CompileStateTracker compileState)
+        {
+            this.compileState = compileState;
+            mCoreDataProvider = new CoreDataProvider(compileState);
+        }
+
+        public static ContextDataManager GetInstance(ProtoLanguage.CompileStateTracker compileState)
+        {
+            if (compileState.ContextDataManager != null)
+                return compileState.ContextDataManager;
+
+            compileState.ContextDataManager = new ContextDataManager(compileState);
+            return compileState.ContextDataManager;
+        }
+
+        public static ContextDataManager SetInstance(ProtoLanguage.CompileStateTracker compileState)
+        {
+            compileState.ContextDataManager = compileState.ContextDataManager;
+            return compileState.ContextDataManager;
         }
 
         public void AddData(Dictionary<string, Object> data)

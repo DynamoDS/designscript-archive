@@ -279,7 +279,7 @@ namespace ProtoCore.Lang
                         if (svCondition.optype != AddressType.Boolean)
                         {
                             // Comment Jun: Perhaps we can allow coercion?
-                            Type booleanType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeBool, false, 0);
+                            Type booleanType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeBool, false, 0);
                             svCondition = TypeSystem.Coerce(svCondition, booleanType, core);
                             GCUtils.GCRetain(svCondition, core);
                         }
@@ -361,7 +361,7 @@ namespace ProtoCore.Lang
 
                         StackValue svDynamicFunctionIndex = formalParameters[1];
 
-                        ProtoCore.DSASM.DynamicFunctionNode dynamicFunctionNode = core.DynamicFunctionTable.functionTable[(int)svDynamicFunctionIndex.opdata];
+                        ProtoCore.DSASM.DynamicFunctionNode dynamicFunctionNode = interpreter.runtime.exe.DynamicFunctionTable.functionTable[(int)svDynamicFunctionIndex.opdata];
 
 
 
@@ -380,7 +380,7 @@ namespace ProtoCore.Lang
 
 
                         // Build a context object in JILDispatch and call the Dispatch
-                        ProtoCore.CallSite callsite = new ProtoCore.CallSite(ProtoCore.DSASM.Constants.kGlobalScope, mangledName, core.FunctionTable, core.Options.ExecutionMode);
+                        ProtoCore.CallSite callsite = new ProtoCore.CallSite(ProtoCore.DSASM.Constants.kGlobalScope, mangledName, core.DSExecutable.FunctionTable, core.Options.ExecutionMode);
 
 
 
@@ -459,7 +459,7 @@ namespace ProtoCore.Lang
                         Validity.Assert(svFunctionArgCount.optype == AddressType.Int);
                         int functionArgs = (int)svFunctionArgCount.opdata;
 
-                        ProtoCore.DSASM.DynamicFunctionNode dynamicFunctionNode = core.DynamicFunctionTable.functionTable[(int)svMethodDynamictableIndex.opdata];
+                        ProtoCore.DSASM.DynamicFunctionNode dynamicFunctionNode = interpreter.runtime.exe.DynamicFunctionTable.functionTable[(int)svMethodDynamictableIndex.opdata];
 
 
                         // Build the function arguments
@@ -583,7 +583,7 @@ namespace ProtoCore.Lang
                         }
 
                         // Build a context object in JILDispatch and call the Dispatch
-                        ProtoCore.CallSite callsite = new ProtoCore.CallSite(thisPtrType, functionName, core.FunctionTable, core.Options.ExecutionMode);
+                        ProtoCore.CallSite callsite = new ProtoCore.CallSite(thisPtrType, functionName, core.DSExecutable.FunctionTable, core.Options.ExecutionMode);
 
                         ProtoCore.DSASM.Executive exec = core.CurrentExecutive.CurrentDSASMExec;
                         // TODO: Disabling support for stepping into replicated function calls temporarily - pratapa
@@ -1041,11 +1041,11 @@ namespace ProtoCore.Lang
             //For IDE output
             ProtoCore.Core core = runtime.runtime.Core;
             OutputMessage t_output = new OutputMessage(result);
-            core.BuildStatus.MessageHandler.Write(t_output);
-            if (core.Options.WebRunner)
-            {
-                core.BuildStatus.WebMsgHandler.Write(t_output);
-            }
+            //core.BuildStatus.MessageHandler.Write(t_output);
+            //if (core.Options.WebRunner)
+            //{
+            //    core.BuildStatus.WebMsgHandler.Write(t_output);
+            //}
             return DSASM.StackUtils.BuildNull();
         }
     }
@@ -1767,7 +1767,7 @@ namespace ProtoCore.Lang
             StackValue[] svArray = runtime.runtime.rmem.GetArrayElements(sv1);
 
             if (typeString == "array")
-                typeString = ProtoCore.DSDefinitions.Kw.kw_array;
+                typeString = ProtoCore.DSDefinitions.Keyword.Array;
             int type = runtime.runtime.Core.TypeSystem.GetType(typeString);
             foreach (ProtoCore.DSASM.StackValue op in svArray)
             {
