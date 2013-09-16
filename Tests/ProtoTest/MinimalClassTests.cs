@@ -2,16 +2,11 @@ using System;
 using NUnit.Framework;
 using ProtoCore.DSASM.Mirror;
 using ProtoCore.Lang;
-
 namespace ProtoTest
 {
-
-
-
     class MinimalClassTests
     {
         public ProtoCore.Core core;
-
         [SetUp]
         public void Setup()
         {
@@ -19,20 +14,11 @@ namespace ProtoTest
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
         }
-
         [Test]
         public void TestDS()
         {
-
             String code =
-@"
-size;
-[Imperative]
-{
-	size = 5;
-}
-";
-
+@"size;[Imperative]{	size = 5;}";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             ProtoLanguage.CompileStateTracker compileState = null;
             ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
@@ -40,6 +26,5 @@ size;
             Obj o = mirror.GetValue("size");
             Assert.IsTrue((Int64)o.Payload == 5);
         }
-
     }
 }
