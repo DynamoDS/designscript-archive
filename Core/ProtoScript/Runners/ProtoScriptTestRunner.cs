@@ -14,7 +14,7 @@ namespace ProtoScript.Runners
 
         public ProtoLanguage.CompileStateTracker Compile(ProtoCore.CompileTime.Context context, ProtoCore.Core core, out int blockId)
         {
-            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState(core.Options.IsDeltaExecution);
 
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
 
@@ -90,7 +90,7 @@ namespace ProtoScript.Runners
 
         public ProtoLanguage.CompileStateTracker Compile(string code, ProtoCore.Core core, Dictionary<string, Object> contextData, out int blockId)
         {
-            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState(contextData);
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState(core.Options.IsDeltaExecution, contextData);
 
             bool buildSucceeded = false;
 

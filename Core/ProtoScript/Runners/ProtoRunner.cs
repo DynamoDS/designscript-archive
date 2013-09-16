@@ -131,10 +131,12 @@ namespace ProtoScript.Runners
 
             public ProtoCore.Mirror.RuntimeMirror LookupName(string name, int blockID)
             {
+                ProtoLanguage.CompileStateTracker compileState = GraphToDSCompiler.GraphUtilities.GetCompilationState();
+
                 // TODO Jun: The expression interpreter must be integrated into the mirror
                 core.Rmem.PushConstructBlockId(blockID);
                 core.DebugProps.CurrentBlockId = blockID;
-                ProtoScript.Runners.ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core, null);
+                ProtoScript.Runners.ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core, compileState);
 
                 List<ProtoCore.Core.CodeBlockCompilationSnapshot> snapShots = null;
                 if (core.Options.IsDeltaExecution)
@@ -148,7 +150,6 @@ namespace ProtoScript.Runners
                 }
                 ProtoCore.Lang.Obj objExecVal = mirror.GetWatchValue();
 
-                ProtoLanguage.CompileStateTracker compileState = GraphToDSCompiler.GraphUtilities.GetCompilationState();
 
                 ProtoCore.Mirror.RuntimeMirror runtimeMirror = new ProtoCore.Mirror.RuntimeMirror(new ProtoCore.Mirror.MirrorData(core, objExecVal.DsasmValue), core, compileState);
                 Validity.Assert(runtimeMirror != null);
