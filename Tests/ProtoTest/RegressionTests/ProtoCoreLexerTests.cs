@@ -2,29 +2,29 @@ using System;
 using NUnit.Framework;
 using ProtoCore.DSASM.Mirror;
 using ProtoCore.Lang;
-
 namespace ProtoTest.RegressionTests
 {
     [TestFixture]
-        public class LexerRegressionTests
+    public class LexerRegressionTests
+    {
+        public ProtoCore.Core core;
+
+        private ProtoLanguage.CompileStateTracker compileState = null;
+
+        [SetUp]
+        public void Setup()
         {
-            public ProtoCore.Core core;
-            private ProtoLanguage.CompileStateTracker compileState = null;
+            core = new ProtoCore.Core(new ProtoCore.Options());
+            core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
+            core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
+        }
 
-            [SetUp]
-            public void Setup()
-            {
-                core = new ProtoCore.Core(new ProtoCore.Options());
-                core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
-                core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
-            }
+        [Test]
+        public void PreClarifyPreParseBracket001()
+        {
 
-            [Test]
-            public void PreClarifyPreParseBracket001()
-            {
-
-                String code =
- @"x;
+            String code =
+@"x;
 [Associative]
 {
  a = {1001,1002};    
@@ -36,12 +36,11 @@ namespace ProtoTest.RegressionTests
 
 
 
-                ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
-                ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
+            ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
+            ExecutionMirror mirror = fsr.Execute(code, core, out compileState);
 
-                Obj o = mirror.GetValue("x");
-                Assert.IsTrue((Int64)o.Payload == 1001);
-            }
-
+            Obj o = mirror.GetValue("x");
+            Assert.IsTrue((Int64)o.Payload == 1001);
         }
     }
+}
