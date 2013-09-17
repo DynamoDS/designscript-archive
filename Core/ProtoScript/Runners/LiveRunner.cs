@@ -251,7 +251,8 @@ namespace ProtoScript.Runners
             //Validity.Assert(coreOptions.IsDeltaExecution && !coreOptions.GenerateExprID);
 
             runnerCore = new ProtoCore.Core(coreOptions);
-            compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+
+            compileState = ProtoScript.CompilerUtils.BuildLiveRunnerCompilerState();
             
             SyncCoreConfigurations(runnerCore, executionOptions);
 
@@ -678,6 +679,8 @@ namespace ProtoScript.Runners
 
             compileState = runner.Compile(staticContext, runnerCore, out blockId);
             Validity.Assert(null != compileState);
+
+
             if (compileState.compileSucceeded)
             {
                 // This is the boundary between compilestate and runtime core
@@ -718,7 +721,7 @@ namespace ProtoScript.Runners
 
             runner.Execute(runnerCore, runtimeContext, compileState);
 
-            return new ProtoRunner.ProtoVMState(runnerCore);
+            return new ProtoRunner.ProtoVMState(runnerCore, compileState);
         }
 
         private bool CompileAndExecute(string code)

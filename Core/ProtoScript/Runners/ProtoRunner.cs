@@ -43,7 +43,7 @@ namespace ProtoScript.Runners
             // TODO Jun: Implement run and halt at the first instruction
             //ProtoCore.DSASM.Mirror.ExecutionMirror mirror = null; // runner.Execute(executionContext, RunnerCore);
 
-            return new ProtoVMState(RunnerCore);
+            return new ProtoVMState(RunnerCore, null);
         }
 
         public ProtoVMState PreStart(String source, ProtoVMState state)
@@ -85,7 +85,7 @@ namespace ProtoScript.Runners
             // TODO Jun: Implement as DebugRunner, where breakpoints are inserted here.
             ProtoCore.DSASM.Mirror.ExecutionMirror mirror = Runner.Execute(ExecutionContext, runtimeContext, RunnerCore);
 
-            return new ProtoVMState(RunnerCore);
+            return new ProtoVMState(RunnerCore, null);
         }
 
         #endregion
@@ -123,10 +123,12 @@ namespace ProtoScript.Runners
         public class ProtoVMState
         {
             private ProtoCore.Core core;
+            private ProtoLanguage.CompileStateTracker compileState;
 
-            public ProtoVMState(ProtoCore.Core core)
+            public ProtoVMState(ProtoCore.Core core, ProtoLanguage.CompileStateTracker compileState)
             {
                 this.core = core;
+                this.compileState = compileState;
             }
 
             public ProtoCore.Mirror.RuntimeMirror LookupName(string name, int blockID)
@@ -134,7 +136,7 @@ namespace ProtoScript.Runners
                 // TODO Jun: The expression interpreter must be integrated into the mirror
                 core.Rmem.PushConstructBlockId(blockID);
                 core.DebugProps.CurrentBlockId = blockID;
-                ProtoScript.Runners.ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core, null);
+                ProtoScript.Runners.ExpressionInterpreterRunner watchRunner = new ExpressionInterpreterRunner(core, compileState);
 
                 List<ProtoCore.Core.CodeBlockCompilationSnapshot> snapShots = null;
                 if (core.Options.IsDeltaExecution)
@@ -148,7 +150,6 @@ namespace ProtoScript.Runners
                 }
                 ProtoCore.Lang.Obj objExecVal = mirror.GetWatchValue();
 
-                ProtoLanguage.CompileStateTracker compileState = GraphToDSCompiler.GraphUtilities.GetCompilationState();
 
                 ProtoCore.Mirror.RuntimeMirror runtimeMirror = new ProtoCore.Mirror.RuntimeMirror(new ProtoCore.Mirror.MirrorData(core, objExecVal.DsasmValue), core, compileState);
                 Validity.Assert(runtimeMirror != null);

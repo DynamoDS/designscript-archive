@@ -78,7 +78,7 @@ namespace ProtoScript.Runners
             //Core.ExprInterpreterExe = new Executable();
 
             int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            Core.Rmem.AlignStackForExprInterpreter();
+            //Core.Rmem.AlignStackForExprInterpreter();
 
             //Initialize the watch stack and watchBaseOffset
             //The watchBaseOffset is used to indexing the watch variables and related temporary variables
