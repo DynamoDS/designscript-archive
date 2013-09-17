@@ -31,7 +31,6 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\VS2010\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
-    <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\bin\$(Platform)\$(Configuration)</OutputPath>
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
   </PropertyGroup>
@@ -47,7 +46,6 @@
     <CodeAnalysisRuleDirectories>;C:\VS2010\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <DefineConstants>_USE_FREE_LIST</DefineConstants>
-    <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\bin\$(Platform)\$(Configuration)</OutputPath>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
@@ -64,6 +62,7 @@
     <Compile Include="AssociativeGraph.cs" />
     <Compile Include="AttributeEntry.cs" />
     <Compile Include="BuildStatus.cs" />
+    <Compile Include="CallsiteExecutionState.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeGen.cs" />
     <Compile Include="CodeFile.cs" />
@@ -172,7 +171,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ProtoInterface\ProtoInterfaceMono.csproj">
       <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
-      <Name>ProtoInterface</Name>
+      <Name>ProtoInterfaceMono</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
