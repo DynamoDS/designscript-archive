@@ -613,4 +613,31 @@ namespace ProtoTest.Associative
 
 
     }
+    class StringFunctionMethodsTest
+    {
+        public TestFrameWork thisTest = new TestFrameWork();
+        [Test]
+        public void TestStringFunction()
+        {
+            String code =
+            @"import(""string.dll"");
+            a = String.StringLength(""designScripT"");
+            b = String.ToUpper(""DynaMo"");
+            c = String.ToLower(""DYNamO"");
+            d = String.ToNumber(""157.589"");
+            e = String.SplitString(""Star_Wars_1_The_Phantom_Menace"",""_"");
+            f = String.JoinStrings(e,""_"");
+            g = String.JoinStrings(e);
+            h = String.SubString(""DesignScript"",2,5);";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("a", 12);
+            thisTest.Verify("b", "DYNAMO");
+            thisTest.Verify("c", "dynamo");
+            thisTest.Verify("d", 157.589);
+            thisTest.Verify("e", new object[] { "Star", "Wars", "1", "The", "Phantom", "Menace" });
+            thisTest.Verify("f", "Star_Wars_1_The_Phantom_Menace");
+            thisTest.Verify("g", "StarWars1ThePhantomMenace");
+            thisTest.Verify("h", "signS");
+        }
+    }
 }
