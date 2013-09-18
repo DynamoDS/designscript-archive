@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using ProtoCore.Utils;
 
 namespace ProtoCore.DSASM
 {
@@ -14,6 +15,7 @@ namespace ProtoCore.DSASM
         private int AllocSize { get; set; }
         public int VisibleSize { get; set; }
         public int Refcount { get; set; }
+        public Dictionary<StackValue, StackValue> Dict;
         public StackValue[] Stack;
 
         public int GetAllocatedSize()
@@ -27,6 +29,7 @@ namespace ProtoCore.DSASM
             Symbol = symbolindex;
             AllocSize = VisibleSize = size;
             Refcount = 0;
+            Dict = null; 
             Stack = new StackValue[AllocSize];
 
             for (int n = 0; n < AllocSize; ++n)
@@ -171,10 +174,52 @@ namespace ProtoCore.DSASM
                 second.Stack[i] = Stack[i].ShallowClone();
 
             return second;
-
-
         }
-    
+    }
+
+    public class StackValueComparer : IEqualityComparer<StackValue>
+    {
+        private Core core;
+
+        public StackValueComparer(Core core)
+        {
+            this.core = core;
+        }
+
+        public bool Equals(StackValue x, StackValue y)
+        {
+            return StackUtils.CompareStackValues(x, y, core, core);
+        }
+
+        public int GetHashCode(StackValue value)
+        {
+            if (AddressType.String == value.optype)
+            {
+                HeapElement he = ArrayUtils.GetHeapElement(value, core);
+                int length = he.VisibleSize;
+
+                unchecked
+                {
+                    int hash = 0;
+                    int step = (length >> 5) + 1;
+                    for (int i = he.VisibleSize; i >= step; i -= step)
+                    {
+                        hash = (hash * 397) ^ he.Stack[i - 1].opdata.GetHashCode();
+                    }
+                    return hash;
+                }
+            }
+            else
+            {
+                unchecked
+                {
+                    int hash = 0;
+                    hash = (hash * 397) ^ value.opdata.GetHashCode();
+                    hash = (hash * 397) ^ value.metaData.type.GetHashCode();
+                    return hash;
+                }
+            }
+        }
     }
 
     public class Heap
