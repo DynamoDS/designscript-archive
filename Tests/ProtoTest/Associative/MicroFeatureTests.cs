@@ -952,6 +952,61 @@ r = b[true];
         }
 
         [Test]
+        public void TestDictionary15()
+        {
+            // Test for-loop to get values
+            String code = @"
+a = {1, 2, 3};
+a[true] = 42;
+r = [Imperative]
+{
+    x = null;
+    for (v in a)
+    {
+        x = v;
+    }
+    return = x;
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary16()
+        {
+            // Test replication for function call
+            String code = @"
+a = {1, 2, 3};
+a[true] = 42;
+
+def foo(x) { return = x; }
+r1 = foo(a);
+r2 = r1[3];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r2", 42);
+        }
+
+        [Test]
+        public void TestDictionary17()
+        {
+            // Test replication for function call
+            String code = @"
+a = {1, 2, 3};
+a[true] = 21;
+b = {1, 2, 3};
+b[false] = 21;
+
+def foo(x, y) { return = x + y; }
+sum = foo(a, b);
+r = sum[3];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
