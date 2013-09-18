@@ -541,15 +541,53 @@ namespace ProtoCore.DSASM
         private static bool CompareStackValuesFromHeap(StackValue sv1, StackValue sv2, Core c1, Core c2, ProtoCore.Runtime.Context context)
         {
             HeapElement heap1 = ArrayUtils.GetHeapElement(sv1, c1); 
-            HeapElement heap2 = ArrayUtils.GetHeapElement(sv1, c2); 
+            HeapElement heap2 = ArrayUtils.GetHeapElement(sv1, c2);
+
             if (heap1.Stack.Length != heap2.Stack.Length)
+            {
                 return false;
+            }
+
             for (int i = 0; i < heap1.Stack.Length; i++)
             {
                 if (!CompareStackValues(heap1.Stack[i], heap2.Stack[i], c1, c2, context))
+                {
                     return false;
+                }
             }
-            return true;
+
+            if (heap1.Dict != null && heap2.Dict != null)
+            {
+                if (heap1.Dict == heap2.Dict)
+                {
+                    return true;
+                }
+
+                foreach (var key in heap1.Dict.Keys)
+                {
+                    StackValue value1 = heap1.Dict[key];
+                    StackValue value2 = StackUtils.BuildNull();
+                    if (!heap2.Dict.TryGetValue(key, out value2))
+                    {
+                        return false;
+                    }
+
+                    if (!CompareStackValues(value1, value2, c1, c2))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            else if (heap1.Dict == null && heap2.Dict == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public static bool Equals(this StackValue lhs, StackValue rhs)
