@@ -931,7 +931,7 @@ namespace ProtoCore
                     }
                 }
 
-                StackValue ret = HeapUtils.StoreArray(retSVs, core);
+                StackValue ret = HeapUtils.StoreArray(retSVs, null, core);
                 GCUtils.GCRetain(ret, core);
                 return ret;
             }
@@ -1053,7 +1053,7 @@ namespace ProtoCore
                     }
                 }
 
-                StackValue ret = HeapUtils.StoreArray(retSVs, core);
+                StackValue ret = HeapUtils.StoreArray(retSVs, null, core);
                 GCUtils.GCRetain(ret, core);
                 return ret;
 

@@ -1220,7 +1220,7 @@ namespace ProtoCore.Lang
                     break;
                 }
             }
-            return range == null ? StackUtils.BuildNull() : HeapUtils.StoreArray(range, core);
+            return range == null ? StackUtils.BuildNull() : HeapUtils.StoreArray(range, null, core);
         }
     }
     internal class ArrayUtilsForBuiltIns
@@ -1260,7 +1260,7 @@ namespace ProtoCore.Lang
 
             List<ProtoCore.DSASM.StackValue> newElements = new List<DSASM.StackValue>();
             GetFlattenedArrayElements(sv, runtime, ref newElements);
-            return HeapUtils.StoreArray(newElements.ToArray(), runtime.runtime.Core);
+            return HeapUtils.StoreArray(newElements.ToArray(), null, runtime.runtime.Core);
         }
 
         internal static ProtoCore.DSASM.StackValue Concat(ProtoCore.DSASM.StackValue sv1, ProtoCore.DSASM.StackValue sv2, ProtoCore.DSASM.Interpreter runtime)
@@ -2199,7 +2199,7 @@ namespace ProtoCore.Lang
             //Convert list to Operand
             if (svList.Count >= 0)
             {
-                return HeapUtils.StoreArray(svList.ToArray(), runtime.runtime.Core);
+                return HeapUtils.StoreArray(svList.ToArray(), null, runtime.runtime.Core);
             }
             //That means an empty array
             return DSASM.StackUtils.BuildNull();
@@ -2209,7 +2209,7 @@ namespace ProtoCore.Lang
             for (; countBraces > 0; countBraces--)
             {
                 GCUtils.GCRetain(sv, runtime.runtime.Core);
-                sv = HeapUtils.StoreArray(new StackValue[] { sv }, runtime.runtime.Core);
+                sv = HeapUtils.StoreArray(new StackValue[] { sv }, null, runtime.runtime.Core);
             }
             return sv;
         }

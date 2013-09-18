@@ -382,7 +382,6 @@ namespace ProtoCore
 
         public static StackValue Coerce(StackValue sv, Type targetType, Core core)
         {
-
             //@TODO(Jun): FIX ME - abort coersion for default args
             if (sv.optype == AddressType.DefaultArg)
                 return sv;
@@ -394,13 +393,7 @@ namespace ProtoCore
             {
                 core.RuntimeStatus.LogWarning(RuntimeData.WarningID.kConversionNotPossible, ProtoCore.RuntimeData.WarningMessage.kConvertNonConvertibleTypes);
                 return StackUtils.BuildNull();
-
             }
-
-
-
-
-
 
             //if it's an array
             if (sv.optype == AddressType.ArrayPointer && !targetType.IsIndexable && targetType.rank != DSASM.Constants.kUndefinedRank)// && targetType.UID != (int)PrimitiveType.kTypeVar)
@@ -413,20 +406,18 @@ namespace ProtoCore
             }
 
 
-            if (sv.optype == AddressType.ArrayPointer && targetType.IsIndexable)
+            if (sv.optype == AddressType.ArrayPointer && 
+                targetType.IsIndexable)
             {
                 Validity.Assert(ArrayUtils.IsArray(sv));
 
                 //We're being asked to convert an array into an array
                 //walk over the structure converting each othe elements
-                
+               
                 if (targetType.UID == (int)PrimitiveType.kTypeVar && targetType.rank == DSASM.Constants.kArbitraryRank && core.Heap.IsTemporaryPointer(sv))
                 {
                     return sv;
                 }
-
-                HeapElement he = ArrayUtils.GetHeapElement(sv, core); 
-                StackValue[] newSubSVs = new StackValue[he.VisibleSize];
 
                 //Validity.Assert(targetType.rank != -1, "Arbitrary rank array conversion not yet implemented {2EAF557F-62DE-48F0-9BFA-F750BBCDF2CB}");
 
@@ -448,26 +439,17 @@ namespace ProtoCore
                     }
                     else
                     {
-
                         newTargetType.rank = ProtoCore.DSASM.Constants.kArbitraryRank;
                         newTargetType.IsIndexable = true;
                     }
                     
                 }
 
-
-                for (int i = 0; i < he.VisibleSize; i++)
-                {
-                    StackValue coercedValue = Coerce(he.Stack[i], newTargetType, core);
-                    GCUtils.GCRetain(coercedValue, core);
-                    newSubSVs[i] = coercedValue;
-                }
-
-                StackValue newSV = HeapUtils.StoreArray(newSubSVs, core);
-                return newSV;
+                return ArrayUtils.CopyArray(sv, newTargetType, core);
             }
 
-            if (sv.optype != AddressType.ArrayPointer && sv.optype != AddressType.Null && 
+            if (sv.optype != AddressType.ArrayPointer && 
+                sv.optype != AddressType.Null && 
                 targetType.IsIndexable && 
                 targetType.rank != DSASM.Constants.kArbitraryRank)
             {
@@ -480,11 +462,10 @@ namespace ProtoCore
                     newTargetType.Name = targetType.Name;
                     newTargetType.rank = 0;
                     
-
                     //Upcast once
                     StackValue coercedValue = Coerce(sv, newTargetType, core);
                     GCUtils.GCRetain(coercedValue, core);
-                    StackValue newSv = HeapUtils.StoreArray(new StackValue[] { coercedValue }, core);
+                    StackValue newSv = HeapUtils.StoreArray(new StackValue[] { coercedValue }, null, core);
                     return newSv;
                 }
                 else
@@ -497,17 +478,13 @@ namespace ProtoCore
                     newTargetType.Name = targetType.Name;
                     newTargetType.rank = targetType.rank -1;
 
-
                     //Upcast once
                     StackValue coercedValue = Coerce(sv, newTargetType, core);
                     GCUtils.GCRetain(coercedValue, core);
-                    StackValue newSv = HeapUtils.StoreArray(new StackValue[] { coercedValue }, core);
+                    StackValue newSv = HeapUtils.StoreArray(new StackValue[] { coercedValue }, null, core);
                     return newSv;
                 }
-
-
             }
-
 
             if (sv.optype == AddressType.Pointer)
             {
@@ -582,7 +559,6 @@ namespace ProtoCore
 
                 case (int)PrimitiveType.kTypeString:
                     {
-                        
                         StackValue newSV = sv.ShallowClone();
                         newSV.metaData = new MetaData { type = (int)PrimitiveType.kTypeString };
                         if (sv.metaData.type == (int)PrimitiveType.kTypeChar)
@@ -598,38 +574,19 @@ namespace ProtoCore
                         return sv;
                     }
 
-
                 case (int)PrimitiveType.kTypeArray:
                     {
-
-                        HeapElement he = ArrayUtils.GetHeapElement(sv, core); 
-                        StackValue[] newSubSVs = new StackValue[he.VisibleSize];
-
-                        for (int i = 0; i < he.VisibleSize; i++)
-                        {
-                            StackValue coercedValue = Coerce(he.Stack[i], targetType, core);
-                            GCUtils.GCRetain(coercedValue, core);
-                            newSubSVs[i] = coercedValue;
-                        }
-
-                        StackValue newSV = HeapUtils.StoreArray(newSubSVs, core);
-                        return newSV;
+                        return ArrayUtils.CopyArray(sv, targetType, core);
                     }
-
 
                 default:
                     if (sv.optype == AddressType.Null)
                         return StackUtils.BuildNull();
                     else
-                    throw new NotImplementedException("Requested coercion not implemented");
+                        throw new NotImplementedException("Requested coercion not implemented");
             }
 
-
-
             throw new NotImplementedException("Requested coercion not implemented");
-
-
         }
-
     }
 }

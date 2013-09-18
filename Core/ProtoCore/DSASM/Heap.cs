@@ -486,6 +486,16 @@ namespace ProtoCore.DSASM
                     if(svPtr.optype == AddressType.Pointer)
                         GCDisposeObject(ref svPtr, exe);
 
+                    if (svPtr.optype == AddressType.ArrayPointer && hs.Dict != null)
+                    {
+                        foreach (var item in hs.Dict)
+                        {
+                            GCRelease(new StackValue[] {item.Key}, exe);
+                            GCRelease(new StackValue[] {item.Value}, exe);
+                        }
+                    }
+
+                    hs.Dict = null;
                     hs.Active = false;
 
                     GCRelease(hs.Stack, exe);
