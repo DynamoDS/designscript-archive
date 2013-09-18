@@ -62,7 +62,6 @@
     <Compile Include="AssociativeGraph.cs" />
     <Compile Include="AttributeEntry.cs" />
     <Compile Include="BuildStatus.cs" />
-    <Compile Include="CallsiteExecutionState.cs" />
     <Compile Include="CodeBlock.cs" />
     <Compile Include="CodeGen.cs" />
     <Compile Include="CodeFile.cs" />
@@ -72,6 +71,7 @@
     <Compile Include="CompileStateTracker.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="ClassTable.cs" />
+	<Compile Include="CallsiteExecutionState\CallsiteExecutionState.cs" />
     <Compile Include="DSASM\FunctionCounter.cs" />
     <Compile Include="DSASM\DSAsmDefs.cs" />
     <Compile Include="DSASM\Interpreter.cs" />
