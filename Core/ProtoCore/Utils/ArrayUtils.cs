@@ -395,7 +395,7 @@ namespace ProtoCore.Utils
             return true;
         }
     
-    
+        /*
         [Obsolete]
         public static StackValue CoerceArray(StackValue array, Type typ, Core core)
         {
@@ -431,10 +431,8 @@ namespace ProtoCore.Utils
             }
             
             return HeapUtils.StoreArray(newSVs, core);
-
-
         }
-
+        */
 
 
         // Retrieve the first non-array element in an array 
@@ -646,6 +644,9 @@ namespace ProtoCore.Utils
                 {
                     oldValue = StackUtils.BuildNull();
                 }
+
+                GCUtils.GCRetain(index, core);
+                GCUtils.GCRetain(value, core);
                 he.Dict[index] = value;
 
                 return oldValue;
@@ -719,9 +720,9 @@ namespace ProtoCore.Utils
                 GCUtils.GCRetain(coercedData, core);
                 return ArrayUtils.SetValueForIndices(array, zippedIndices[0], coercedData, core);
             }
-            // Replication on both side
             else if (value.optype == AddressType.ArrayPointer)
             {
+                // Replication happens on both side.
                 if (t.rank > 0)
                 {
                     t.rank = t.rank - 1;
@@ -741,10 +742,14 @@ namespace ProtoCore.Utils
                     GCUtils.GCRetain(coercedData, core);
                     oldValues[i] = SetValueForIndices(array, zippedIndices[i], coercedData, core);
                 }
-                return HeapUtils.StoreArray(oldValues, core);
+
+                // The returned old values shouldn't have any key-value pairs
+                return HeapUtils.StoreArray(oldValues, null, core);
             }
             else
             {
+                // Replication is only on the LHS, so collect all old values 
+                // and return them in an array. 
                 StackValue coercedData = TypeSystem.Coerce(value, t, core);
                 GCUtils.GCRetain(coercedData, core);
 
@@ -753,7 +758,9 @@ namespace ProtoCore.Utils
                 {
                     oldValues[i] = SetValueForIndices(array, zippedIndices[i], coercedData, core);
                 }
-                return HeapUtils.StoreArray(oldValues, core);
+
+                // The returned old values shouldn't have any key-value pairs
+                return HeapUtils.StoreArray(oldValues, null, core);
             }
         }
 
@@ -894,12 +901,71 @@ namespace ProtoCore.Utils
                     GCUtils.GCRelease(values[i], core);
                 }
 
-                return HeapUtils.StoreArray(values, core);
+                return HeapUtils.StoreArray(values, null, core);
             }
             else
             {
                 return values[0];
             }
+        }
+
+        /// <summary>
+        /// Simply copy an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue CopyArray(StackValue array, Core core)
+        {
+            Type anyType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false, Constants.kArbitraryRank);
+            return CopyArray(array, anyType, core);
+        }
+
+        /// <summary>
+        /// Copy an array and coerce its elements/values to target type
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="type"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue CopyArray(StackValue array, Type type, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
+            {
+                return StackUtils.BuildNull();
+            }
+
+            HeapElement he = GetHeapElement(array, core);
+            Validity.Assert(he != null);
+
+            int elementSize = GetElementSize(array, core);
+            StackValue[] elements = new StackValue[elementSize];
+            for (int i = 0; i < elementSize; i++)
+            {
+                StackValue coercedValue = TypeSystem.Coerce(he.Stack[i], type, core);
+                GCUtils.GCRetain(coercedValue, core);
+                elements[i] = coercedValue;
+            }
+
+            Dictionary<StackValue, StackValue> dict = null;
+            if (he.Dict != null)
+            {
+                dict = new Dictionary<StackValue, StackValue>(new StackValueComparer(core));
+                foreach (var pair in he.Dict)
+                {
+                    StackValue key = pair.Key;
+                    StackValue value = pair.Value;
+                    StackValue coercedValue = TypeSystem.Coerce(value, type, core);
+
+                    GCUtils.GCRetain(key, core);
+                    GCUtils.GCRetain(coercedValue, core);
+
+                    dict[key] = coercedValue;
+                }
+            }
+
+            return HeapUtils.StoreArray(elements, dict, core);
         }
     }
 }
