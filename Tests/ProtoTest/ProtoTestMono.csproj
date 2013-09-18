@@ -75,8 +75,7 @@
     <Compile Include="Associative\ReplicatorTest.cs" />
     <Compile Include="Associative\SSATransformTest.cs" />
     <Compile Include="Associative\TypeSystemTests.cs" />
-    <Compile Include="BasicCallsiteStateTest.cs" />
-    <Compile Include="DebugTests\BasicTests.cs" />
+    <Compile Include="CallsiteExecutionState\BasicCallsiteStateTest.cs" />
     <Compile Include="DebugTests\RunEqualityTests.cs" />
     <Compile Include="DebugTests\RunWatchTestsIncluded.cs">
       <SubType>Code</SubType>
@@ -152,6 +151,7 @@
     <Compile Include="UtilsTests\ClassUtilsTest.cs" />
     <Compile Include="UtilsTests\CoreDump.cs" />
     <Compile Include="UtilsTests\TextFxTests.cs" />
+    <Compile Include="DebugTests\BasicTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\GraphToDSCompiler\GraphToDSCompilerMono.csproj">
