@@ -4451,7 +4451,7 @@ i = 0;
             thisTest.Verify("a", 1);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("SmokeTest")]
         public void T73_Cyclic_globalvariable_1467439()
         {
