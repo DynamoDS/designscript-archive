@@ -1007,6 +1007,23 @@ r = sum[3];
         }
 
         [Test]
+        public void TestDictionary18()
+        {
+            // Test replication for array indexing
+            String code = @"
+a = {1, 2, 3};
+a[true] = 42;
+b = {};
+b[a] = 1;
+b[42] = 42;
+c = b[a];
+r = c[3];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
