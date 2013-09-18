@@ -71,7 +71,7 @@
     <Compile Include="CompileStateTracker.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="ClassTable.cs" />
-	<Compile Include="CallsiteExecutionState\CallsiteExecutionState.cs" />
+    <Compile Include="CallsiteExecutionState\CallsiteExecutionState.cs" />
     <Compile Include="DSASM\FunctionCounter.cs" />
     <Compile Include="DSASM\DSAsmDefs.cs" />
     <Compile Include="DSASM\Interpreter.cs" />
