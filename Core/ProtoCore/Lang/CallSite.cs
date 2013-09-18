@@ -887,8 +887,7 @@ namespace ProtoCore
                 List<int> repIndecies = ri.ZipIndecies;
 
                 //this will hold the heap elements for all the arrays that are going to be replicated over
-
-                List<HeapElement> heapElements = new List<HeapElement>();
+                List<StackValue[]> parameters = new List<StackValue[]>();
 
                 int retSize = Int32.MaxValue;
 
@@ -897,10 +896,9 @@ namespace ProtoCore
                     //if (ArrayUtils.IsArray(formalParameters[repIndex]))
                     //    throw new NotImplementedException("Replication Case not implemented - Jagged Arrays - Slow path: {8606D4AA-9225-4F34-BE53-74270B8D0A90}");
 
-
-                    HeapElement he = ArrayUtils.GetHeapElement(formalParameters[repIndex], core);
-                    heapElements.Add(he);
-                    retSize = Math.Min(he.VisibleSize, retSize); //We need the smallest array
+                    StackValue[] subParameters = ArrayUtils.GetValues(formalParameters[repIndex], core);
+                    parameters.Add(subParameters);
+                    retSize = Math.Min(retSize, subParameters.Length); //We need the smallest array
                 }
 
                 StackValue[] retSVs = new StackValue[retSize];
@@ -917,7 +915,7 @@ namespace ProtoCore
 
                         for (int repIi = 0; repIi < repIndecies.Count; repIi++)
                         {
-                            newFormalParams[repIndecies[repIi]] = heapElements[repIi].Stack[i];
+                            newFormalParams[repIndecies[repIi]] = parameters[repIi][i];
                         }
 
                         List<ReplicationInstruction> newRIs = new List<ReplicationInstruction>();
@@ -949,12 +947,12 @@ namespace ProtoCore
 
                 bool supressArray = false;
                 int retSize;
-                HeapElement he = null;
-
+                StackValue[] parameters = null; 
+                
                 if (formalParameters[cartIndex].optype == AddressType.ArrayPointer)
                 {
-                    he = ArrayUtils.GetHeapElement(formalParameters[cartIndex], core);
-                    retSize = he.VisibleSize;
+                    parameters = ArrayUtils.GetValues(formalParameters[cartIndex], core);
+                    retSize = parameters.Length;
                 }
                 else
                 {
@@ -1037,10 +1035,10 @@ namespace ProtoCore
                         List<StackValue> newFormalParams = new List<StackValue>();
                         newFormalParams.AddRange(formalParameters);
 
-                        if (he != null)
+                        if (parameters != null)
                         {
                             //It was an array pack the arg with the current value
-                            newFormalParams[cartIndex] = he.Stack[i];
+                            newFormalParams[cartIndex] = parameters[i];
                         }
 
                         List<ReplicationInstruction> newRIs = new List<ReplicationInstruction>();
