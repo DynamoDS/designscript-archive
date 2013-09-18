@@ -426,7 +426,7 @@ namespace ProtoCore.DSASM
                 case AddressType.Pointer:
                     return BuildBoolean(true);
                 case AddressType.String:
-                    if (core.Heap.Heaplist[(int)operand.opdata].VisibleSize == 0)
+                    if (ArrayUtils.GetElementSize(operand, core) == 0)
                     {
                         return BuildBoolean(false);
                     }
@@ -540,8 +540,8 @@ namespace ProtoCore.DSASM
         //this method compares the heap for the stack variables and determines if the values of the heap are same
         private static bool CompareStackValuesFromHeap(StackValue sv1, StackValue sv2, Core c1, Core c2, ProtoCore.Runtime.Context context)
         {
-            HeapElement heap1 = c1.Heap.Heaplist[(int)sv1.opdata];
-            HeapElement heap2 = c2.Heap.Heaplist[(int)sv2.opdata];
+            HeapElement heap1 = ArrayUtils.GetHeapElement(sv1, c1); 
+            HeapElement heap2 = ArrayUtils.GetHeapElement(sv1, c2); 
             if (heap1.Stack.Length != heap2.Stack.Length)
                 return false;
             for (int i = 0; i < heap1.Stack.Length; i++)

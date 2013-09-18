@@ -425,7 +425,7 @@ namespace ProtoCore
                     return sv;
                 }
 
-                HeapElement he = core.Heap.Heaplist[(int)sv.opdata];
+                HeapElement he = ArrayUtils.GetHeapElement(sv, core); 
                 StackValue[] newSubSVs = new StackValue[he.VisibleSize];
 
                 //Validity.Assert(targetType.rank != -1, "Arbitrary rank array conversion not yet implemented {2EAF557F-62DE-48F0-9BFA-F750BBCDF2CB}");
@@ -602,7 +602,7 @@ namespace ProtoCore
                 case (int)PrimitiveType.kTypeArray:
                     {
 
-                        HeapElement he = core.Heap.Heaplist[(int)sv.opdata];
+                        HeapElement he = ArrayUtils.GetHeapElement(sv, core); 
                         StackValue[] newSubSVs = new StackValue[he.VisibleSize];
 
                         for (int i = 0; i < he.VisibleSize; i++)
