@@ -894,6 +894,64 @@ r = a[""xyz""];
         }
 
         [Test]
+        public void TestDictionary11()
+        {
+            // Copy array should also copy key-value pairs
+            String code = @"
+a = {};
+a[true] = 42;
+b = a;
+r = b[true];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary14()
+        {
+            // Copy array should also copy key-value pairs
+            String code = @"
+a = {};
+a[true] = 42;
+def foo(x: var[]..[])
+{
+    return = x[true];
+}
+r = foo(a);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary12()
+        {
+            // Type conversion applied to values as well
+            String code = @"
+a:int[] = {1.1, 2.2, 3.3};
+a[true] = 42.4;
+r = a[true];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary13()
+        {
+            // Type conversion applied to values as well
+            String code = @"
+a = {1.1, 2.2, 3.3};
+a[true] = 42.4;
+b:int[] = a;
+r = b[true];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
