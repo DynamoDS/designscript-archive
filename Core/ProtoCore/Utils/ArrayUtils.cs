@@ -967,5 +967,33 @@ namespace ProtoCore.Utils
 
             return HeapUtils.StoreArray(elements, dict, core);
         }
+
+        /// <summary>
+        /// Get all values from an array.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue[] GetValues(StackValue array, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
+            {
+                return null;
+            }
+
+            HeapElement he = GetHeapElement(array, core);
+            List<StackValue> values = new List<StackValue>(he.Stack);
+
+            if (he.Dict != null)
+            {
+                foreach (var value in he.Dict.Values)
+                {
+                    values.Add(value);
+                }
+            }
+
+            return values.ToArray();
+        }
     }
 }
