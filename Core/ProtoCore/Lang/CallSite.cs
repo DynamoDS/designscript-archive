@@ -860,7 +860,7 @@ namespace ProtoCore
                     //    throw new NotImplementedException("Replication Case not implemented - Jagged Arrays - Slow path: {8606D4AA-9225-4F34-BE53-74270B8D0A90}");
 
 
-                    HeapElement he = core.Heap.Heaplist[(int) formalParameters[repIndex].opdata];
+                    HeapElement he = ArrayUtils.GetHeapElement(formalParameters[repIndex], core);
                     heapElements.Add(he);
                     retSize = Math.Min(he.VisibleSize, retSize); //We need the smallest array
                 }
@@ -915,7 +915,7 @@ namespace ProtoCore
 
                 if (formalParameters[cartIndex].optype == AddressType.ArrayPointer)
                 {
-                    he = core.Heap.Heaplist[(int) formalParameters[cartIndex].opdata];
+                    he = ArrayUtils.GetHeapElement(formalParameters[cartIndex], core);
                     retSize = he.VisibleSize;
                 }
                 else

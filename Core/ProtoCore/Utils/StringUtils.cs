@@ -17,8 +17,8 @@ namespace ProtoCore.Utils
                 return ProtoCore.DSASM.Constants.kInvalidIndex;
             }
 
-            HeapElement he1 = core.Heap.Heaplist[(int)s1.opdata];
-            HeapElement he2 = core.Heap.Heaplist[(int)s2.opdata];
+            HeapElement he1 = ArrayUtils.GetHeapElement(s1, core);
+            HeapElement he2 = ArrayUtils.GetHeapElement(s2, core);
 
             int len1 = he1.VisibleSize;
             int len2 = he2.VisibleSize;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ProtoCore.DSASM;
 using ProtoCore.Exceptions;
+using ProtoCore.RuntimeData;
 
 namespace ProtoCore.Utils
 {
@@ -171,7 +172,7 @@ namespace ProtoCore.Utils
             Dictionary<int, StackValue> usageFreq = new Dictionary<int, StackValue>();
 
             //This is the element on the heap that manages the data structure
-            HeapElement heapElement = core.Heap.Heaplist[(int)array.opdata];
+            HeapElement heapElement = GetHeapElement(array, core); 
 
             for (int i = 0; i < heapElement.VisibleSize; ++i)
             {
@@ -202,7 +203,7 @@ namespace ProtoCore.Utils
             Dictionary<ClassNode, int> usageFreq = new Dictionary<ClassNode,int>();
 
             //This is the element on the heap that manages the data structure
-            HeapElement heapElement = core.Heap.Heaplist[(int)array.opdata];
+            HeapElement heapElement = GetHeapElement(array, core); 
 
             for (int i = 0; i < heapElement.VisibleSize; ++i)
             {
@@ -236,7 +237,7 @@ namespace ProtoCore.Utils
             Dictionary<ClassNode, int> usageFreq = new Dictionary<ClassNode, int>();
 
             //This is the element on the heap that manages the data structure
-            HeapElement heapElement = core.Heap.Heaplist[(int)array.opdata];
+            HeapElement heapElement = GetHeapElement(array, core); 
 
             for (int i = 0; i < heapElement.VisibleSize; ++i)
             {
@@ -281,7 +282,7 @@ namespace ProtoCore.Utils
             int ret = 1;
 
             //This is the element on the heap that manages the data structure
-            HeapElement heapElement = core.Heap.Heaplist[(int)array.opdata];
+            HeapElement heapElement = GetHeapElement(array, core); 
 
 
             int largestSub = 0;
@@ -369,35 +370,18 @@ namespace ProtoCore.Utils
         /// <summary>
         /// Pull the heap element out of an array pointer
         /// </summary>
-        /// <param name="sv"></param>
+        /// <param name="array"></param>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static HeapElement GetHeapElement(StackValue sv, Core core)
+        public static HeapElement GetHeapElement(StackValue array, Core core)
         {
-            Validity.Assert(IsArray(sv));
-
-            HeapElement he = core.Heap.Heaplist[(int)sv.opdata];
-            return he;
-        }
-
-        public static StackValue GetArrayElement(StackValue svPtr, List<StackValue> svDimList, Core core)
-        {
-            Validity.Assert(IsArray(svPtr));
-            HeapElement heapElem = null;
-
-            StackValue svFinal = StackUtils.BuildNull();
-            foreach (StackValue sv in svDimList)
+            Validity.Assert(AddressType.ArrayPointer == array.optype || AddressType.String == array.optype);
+            if (array.optype != AddressType.ArrayPointer && array.optype != AddressType.String)
             {
-                if (svPtr.optype != AddressType.ArrayPointer)
-                {
-                    core.RuntimeStatus.LogWarning(RuntimeData.WarningID.kOverIndexing, ProtoCore.RuntimeData.WarningMessage.kArrayOverIndexed);
-                    return StackUtils.BuildNull();
-                }
-                heapElem = core.Heap.Heaplist[(int)svPtr.opdata];
-                svPtr = StackUtils.GetValue(heapElem, (int)sv.opdata, core);
-                svFinal = svPtr;
+                return null;
             }
-            return svFinal;
+
+            return core.Heap.Heaplist[(int)array.opdata];
         }
 
         public static bool IsUniform(StackValue sv, Core core)
@@ -420,7 +404,7 @@ namespace ProtoCore.Utils
             Validity.Assert(IsArray(array), "Argument needs to be an array {99FB71A6-72AD-4C93-8F1E-0B1F419C1A6D}");
 
             //This is the element on the heap that manages the data structure
-            HeapElement heapElement = core.Heap.Heaplist[(int)array.opdata];
+            HeapElement heapElement = GetHeapElement(array, core); 
             StackValue[] newSVs = new StackValue[heapElement.VisibleSize];
 
             for (int i = 0; i < heapElement.VisibleSize; ++i)
@@ -473,126 +457,129 @@ namespace ProtoCore.Utils
             return true;
         }
 
-        public static StackValue SetDataAtIndex(StackValue svArray, int index, StackValue svData, Core core)
+        /// <summary>
+        /// Return the element size of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static int GetElementSize(StackValue array, Core core)
         {
-            Validity.Assert(svArray.optype == AddressType.ArrayPointer || svArray.optype == AddressType.String);
-            if (svArray.optype == AddressType.String && svData.optype != AddressType.Char)
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
             {
-                core.RuntimeStatus.LogWarning(RuntimeData.WarningID.kTypeMismatch, RuntimeData.WarningMessage.kAssignNonCharacterToString);
-                return StackUtils.BuildNull();
+                return Constants.kInvalidIndex;
             }
 
-            lock (core.Heap.cslock)
-            {
-                HeapElement arrayHeap = core.Heap.Heaplist[(int)svArray.opdata];
-                index = arrayHeap.ExpandByAcessingAt(index);
-                StackValue oldValue = arrayHeap.SetValue(index, svData);
-                return oldValue;
-            }
+            return GetHeapElement(array, core).VisibleSize;
         }
 
-        public static StackValue SetDataAtIndices(StackValue array, int[] indices, StackValue data, Core core)
+        public static int GetValueSize(StackValue array, Core core)
         {
-            Validity.Assert(array.optype == AddressType.ArrayPointer || array.optype == AddressType.String);
-
-            StackValue arrayItem = array;
-            for (int i = 0; i < indices.Length - 1; ++i)
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
             {
-                HeapElement arrayHeap = core.Heap.Heaplist[(int)arrayItem.opdata];
-                int index = arrayHeap.ExpandByAcessingAt(indices[i]);
-                arrayItem = arrayHeap.Stack[index];
-
-                if (arrayItem.optype == AddressType.String)
-                {
-                    core.RuntimeStatus.LogWarning(RuntimeData.WarningID.kOverIndexing, ProtoCore.RuntimeData.WarningMessage.kStringOverIndexed);
-                    return StackUtils.BuildNull();
-                }
-                else if (arrayItem.optype != AddressType.ArrayPointer)
-                {
-                    StackValue sv = HeapUtils.StoreArray(new StackValue[] { arrayItem }, core);
-                    GCUtils.GCRetain(sv, core);
-                    arrayHeap.Stack[index] = sv;
-                    arrayItem = arrayHeap.Stack[index];
-                }
+                return Constants.kInvalidIndex;
             }
 
-            return ArrayUtils.SetDataAtIndex(arrayItem, indices[indices.Length - 1], data, core);
+            HeapElement he = GetHeapElement(array, core);
+            if (null == he)
+            {
+                return 0;
+            }
+
+            var dict = he.Dict as Dictionary<StackValue, StackValue>;
+            return (null == dict) ? 0 : dict.Count;
         }
 
-        public static int[][] GetZippedIndices(List<StackValue> svIndices, Core core)
+        public static int GetFullSize(StackValue array, Core core)
         {
-            // Get replication count firstly to avoid iterate a potentially 
-            // large array later on
-            int repCount = System.Int32.MaxValue;
-            foreach (var svIndex in svIndices)
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
             {
-                if (svIndex.optype == AddressType.ArrayPointer)
+                return Constants.kInvalidIndex;
+            }
+
+            return GetElementSize(array, core) + GetValueSize(array, core);
+        }
+
+        /// <summary>
+        /// For an array we supporting zipped replicaiton for array indexing as 
+        /// well. I.e., for the following expression:
+        /// 
+        ///     a[1..3][2..4] = x;
+        /// 
+        /// It will be expanded to 
+        /// 
+        ///     a[1][2] = x;
+        ///     a[2][3] = x;
+        ///     a[3][4] = x;
+        ///     
+        /// So here we need to calculate zipped indices. The length of returned 
+        /// indices is decided by the shortest length of index that used in 
+        /// array indexing. E.g.,
+        /// 
+        /// For array indexing
+        /// 
+        ///     [{1, 2, 3}][{"x", "y"}][{6, 7, 8}], i.e., 
+        ///     
+        ///     1 -> "x" -> 6
+        ///     2 -> "y" -> 7
+        ///     3 ->     -> 8
+        /// 
+        /// The shortest length of index is 2 ({"x", "y"}), so function will 
+        /// returns:
+        /// 
+        ///     {{1, "x", 6}, {2, "y", 7}}
+        ///     
+        /// </summary>
+        /// <param name="indices"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        private static StackValue[][] GetZippedIndices(List<StackValue> indices, Core core)
+        {
+            int zipLength = System.Int32.MaxValue;
+            foreach (var index in indices)
+            {
+                int length = StackUtils.IsArray(index) ? GetElementSize(index, core) : 1;
+                if (zipLength > length)
                 {
-                    int count = core.Heap.Heaplist[(int)svIndex.opdata].VisibleSize;
-                    if (repCount > count)
-                    {
-                        repCount = count;
-                    }
-                }
-                else
-                {
-                    repCount = 1;
-                    break;
+                    zipLength = length;
                 }
             }
 
-            if (repCount == 1)
+            if (zipLength == 0)
             {
-                int[] indices = new int[svIndices.Count];
-                for (int i = 0; i < svIndices.Count; ++i)
-                {
-                    StackValue svIndex = svIndices[i];
-                    StackValue coercedIndex;
-
-                    if (svIndex.optype == AddressType.ArrayPointer)
-                    {
-                        coercedIndex = core.Heap.Heaplist[(int)svIndex.opdata].Stack[0].AsInt();
-                    }
-                    else
-                    {
-                        coercedIndex = svIndex.AsInt();
-                    }
-
-                    if (coercedIndex.optype == AddressType.Null)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        indices[i] = (int)coercedIndex.opdata;
-                    }
-                }
-                return new int[][] { indices };
+                return null;
             }
             else
             {
-                int dimCount = svIndices.Count;
-                int[][] zippedIndices = new int[repCount][];
-                for (int i = 0; i < repCount; ++i)
+                int dims = indices.Count;
+                StackValue[][] zippedIndices = new StackValue[zipLength][];
+                for (int i = 0; i < zipLength; ++i)
                 {
-                    zippedIndices[i] = new int[dimCount];
+                    zippedIndices[i] = new StackValue[dims];
                 }
 
-                for (int i = 0; i < dimCount; ++i)
+                for (int i = 0; i < dims; ++i)
                 {
-                    StackValue svIndex = svIndices[i];
-                    HeapElement subIndicesHeap = core.Heap.Heaplist[(int)svIndex.opdata];
-
-                    for (int j = 0; j < repCount; ++j)
+                    StackValue index = indices[i];
+                    if (1 == zipLength)
                     {
-                        StackValue coercedIndex = subIndicesHeap.Stack[j].AsInt();
-                        if (coercedIndex.optype == AddressType.Null)
+                        if (AddressType.ArrayPointer == index.optype)
                         {
-                            return null;
+                            zippedIndices[0][i] = GetValueFromIndex(index, 0, core);
                         }
                         else
                         {
-                            zippedIndices[j][i] = (int)coercedIndex.opdata;
+                            zippedIndices[0][i] = index; 
+                        }
+                    }
+                    else
+                    {
+                        for (int j = 0; j < zipLength; ++j)
+                        {
+                            zippedIndices[j][i] = GetValueFromIndex(index, j, core);
                         }
                     }
                 }
@@ -601,9 +588,126 @@ namespace ProtoCore.Utils
             }
         }
 
-        public static StackValue SetDataAtIndices(StackValue array, List<StackValue> indices, StackValue data, Type t, Core core)
+        /// <summary>
+        /// array[index] = value. The array will be expanded if necessary.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue SetValueForIndex(StackValue array, int index, StackValue value, Core core)
         {
-            int[][] zippedIndices = ArrayUtils.GetZippedIndices(indices, core);
+            Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
+            if (StackUtils.IsString(array) && value.optype != AddressType.Char)
+            {
+                core.RuntimeStatus.LogWarning(RuntimeData.WarningID.kTypeMismatch, RuntimeData.WarningMessage.kAssignNonCharacterToString);
+                return StackUtils.BuildNull();
+            }
+
+            lock (core.Heap.cslock)
+            {
+                HeapElement arrayHeap = GetHeapElement(array, core);
+                index = arrayHeap.ExpandByAcessingAt(index);
+                StackValue oldValue = arrayHeap.SetValue(index, value);
+                return oldValue;
+            }
+        }
+
+        /// <summary>
+        /// array[index] = value. Here index can be any type. 
+        /// 
+        /// Note this function doesn't support the replication of array indexing.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue SetValueForIndex(StackValue array, StackValue index, StackValue value, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
+
+            if (StackUtils.IsNumeric(index))
+            {
+                index = index.AsInt();
+                return SetValueForIndex(array, (int)index.opdata, value, core);
+            }
+            else
+            {
+                HeapElement he = GetHeapElement(array, core);
+                if (he.Dict == null)
+                {
+                    he.Dict = new Dictionary<StackValue, StackValue>(new StackValueComparer(core));
+                }
+
+                StackValue oldValue;
+                if (!he.Dict.TryGetValue(index, out oldValue))
+                {
+                    oldValue = StackUtils.BuildNull();
+                }
+                he.Dict[index] = value;
+
+                return oldValue;
+            }
+        }
+
+        /// <summary>
+        /// array[index1][index2][...][indexN] = value, and
+        /// indices = {index1, index2, ..., indexN}
+        ///
+        /// Note this function doesn't support the replication of array indexing.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="indices"></param>
+        /// <param name="value"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue SetValueForIndices(StackValue array, StackValue[] indices, StackValue value, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
+
+            for (int i = 0; i < indices.Length - 1; ++i)
+            {
+                if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
+                {
+                    core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
+                    return StackUtils.BuildNull();
+                }
+
+                StackValue index = indices[i];
+                if (StackUtils.IsNumeric(index))
+                {
+                    index = index.AsInt();
+                    array = GetValueFromIndex(array, (int)index.opdata, core);
+                }
+                else
+                {
+                    if (!StackUtils.IsArray(array))
+                    {
+                        core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
+                        return StackUtils.BuildNull();
+                    }
+                    array = GetValueFromIndex(array, index, core);
+                }
+            }
+
+            return SetValueForIndex(array, indices[indices.Length - 1], value, core);
+        }
+
+        /// <summary>
+        /// array[index1][index2][...][indexN] = value, and
+        /// indices = {index1, index2, ..., indexN}
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="indices"></param>
+        /// <param name="value"></param>
+        /// <param name="t"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue SetValueForIndices(StackValue array, List<StackValue> indices, StackValue value, Type t, Core core)
+        {
+            StackValue[][] zippedIndices = ArrayUtils.GetZippedIndices(indices, core);
             if (zippedIndices == null || zippedIndices.Length == 0)
             {
                 return StackUtils.BuildNull();
@@ -611,11 +715,12 @@ namespace ProtoCore.Utils
 
             if (zippedIndices.Length == 1)
             {
-                StackValue coercedData = TypeSystem.Coerce(data, t, core);
+                StackValue coercedData = TypeSystem.Coerce(value, t, core);
                 GCUtils.GCRetain(coercedData, core);
-                return ArrayUtils.SetDataAtIndices(array, zippedIndices[0], coercedData, core);
+                return ArrayUtils.SetValueForIndices(array, zippedIndices[0], coercedData, core);
             }
-            else if (data.optype == AddressType.ArrayPointer)
+            // Replication on both side
+            else if (value.optype == AddressType.ArrayPointer)
             {
                 if (t.rank > 0)
                 {
@@ -626,7 +731,7 @@ namespace ProtoCore.Utils
                     }
                 }
 
-                HeapElement dataHeapElement = core.Heap.Heaplist[(int)data.opdata];
+                HeapElement dataHeapElement = GetHeapElement(value, core);
                 int length = Math.Min(zippedIndices.Length, dataHeapElement.VisibleSize);
 
                 StackValue[] oldValues = new StackValue[length];
@@ -634,30 +739,167 @@ namespace ProtoCore.Utils
                 {
                     StackValue coercedData = TypeSystem.Coerce(dataHeapElement.Stack[i], t, core);
                     GCUtils.GCRetain(coercedData, core);
-                    oldValues[i] = ArrayUtils.SetDataAtIndices(array, zippedIndices[i], coercedData, core);
+                    oldValues[i] = SetValueForIndices(array, zippedIndices[i], coercedData, core);
                 }
                 return HeapUtils.StoreArray(oldValues, core);
             }
             else
             {
-                StackValue coercedData = TypeSystem.Coerce(data, t, core);
+                StackValue coercedData = TypeSystem.Coerce(value, t, core);
                 GCUtils.GCRetain(coercedData, core);
 
                 StackValue[] oldValues = new StackValue[zippedIndices.Length];
                 for (int i = 0; i < zippedIndices.Length; ++i)
                 {
-                    oldValues[i] = ArrayUtils.SetDataAtIndices(array, zippedIndices[i], coercedData, core);
+                    oldValues[i] = SetValueForIndices(array, zippedIndices[i], coercedData, core);
                 }
                 return HeapUtils.StoreArray(oldValues, core);
             }
         }
 
-
-        public static StackValue GetArrayElementAt(StackValue array, int index, Core core)
+        /// <summary>
+        /// = array[index]
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue GetValueFromIndex(StackValue array, int index, Core core)
         {
-            int ptr = (int)array.opdata;
-            HeapElement hs = core.Rmem.Heap.Heaplist[ptr];
-            return hs.Stack[index];
+            Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
+            if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
+            {
+                return StackUtils.BuildNull();
+            }
+
+            HeapElement he = GetHeapElement(array, core);
+            return StackUtils.GetValue(he, index, core);
+        }
+
+        /// <summary>
+        /// = array[index].
+        /// 
+        /// Note this function doesn't support the replication of array indexing.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue GetValueFromIndex(StackValue array, StackValue index, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
+            if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
+            {
+                return StackUtils.BuildNull();
+            }
+
+            if (StackUtils.IsNumeric(index))
+            {
+                index = index.AsInt();
+                return GetValueFromIndex(array, (int)index.opdata, core);
+            }
+            else
+            {
+                HeapElement he = GetHeapElement(array, core);
+                StackValue value = StackUtils.BuildNull();
+
+                if (he.Dict != null && he.Dict.TryGetValue(index, out value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return StackUtils.BuildNull();
+                }
+            }
+        }
+
+        /// <summary>
+        /// = array[index1][index2][...][indexN], and
+        /// indices = {index1, index2, ..., indexN}
+        /// 
+        /// Note this function doesn't support the replication of array indexing.
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="indices"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue GetValueFromIndices(StackValue array, StackValue[] indices, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
+            for (int i = 0; i < indices.Length - 1; ++i)
+            {
+                if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
+                {
+                    core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
+                    return StackUtils.BuildNull();
+                }
+
+                StackValue index = indices[i];
+                if (StackUtils.IsNumeric(index))
+                {
+                    index = index.AsInt();
+                    array = GetValueFromIndex(array, (int)index.opdata, core);
+                }
+                else
+                {
+                    if (array.optype != AddressType.ArrayPointer)
+                    {
+                        core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
+                        return StackUtils.BuildNull();
+                    }
+                    array = GetValueFromIndex(array, index, core);
+                }
+            }
+
+            return GetValueFromIndex(array, indices[indices.Length - 1], core);
+        }
+
+        /// <summary>
+        /// = array[index1][index2][...][indexN], and
+        /// indices = {index1, index2, ..., indexN}
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="indices"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue GetValueFromIndices(StackValue array, List<StackValue> indices, Core core)
+        {
+            if (indices.Count == 0)
+            {
+                return array;
+            }
+            else if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
+            {
+                core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
+                return StackUtils.BuildNull();
+            }
+
+            StackValue[][] zippedIndices = ArrayUtils.GetZippedIndices(indices, core);
+            if (zippedIndices == null || zippedIndices.Length == 0)
+            {
+                return StackUtils.BuildNull();
+            }
+
+            StackValue[] values = new StackValue[zippedIndices.Length];
+            for (int i = 0; i < zippedIndices.Length; ++i)
+            {
+                values[i] = GetValueFromIndices(array, zippedIndices[i], core);
+            }
+
+            if (zippedIndices.Length > 1)
+            {
+                for (int i = 0; i < values.Length; ++i)
+                {
+                    GCUtils.GCRelease(values[i], core);
+                }
+
+                return HeapUtils.StoreArray(values, core);
+            }
+            else
+            {
+                return values[0];
+            }
         }
     }
 }
