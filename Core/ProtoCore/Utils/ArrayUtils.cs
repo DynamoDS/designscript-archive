@@ -539,7 +539,7 @@ namespace ProtoCore.Utils
             int zipLength = System.Int32.MaxValue;
             foreach (var index in indices)
             {
-                int length = StackUtils.IsArray(index) ? GetElementSize(index, core) : 1;
+                int length = StackUtils.IsArray(index) ? GetFullSize(index, core) : 1;
                 if (zipLength > length)
                 {
                     zipLength = length;
@@ -562,22 +562,28 @@ namespace ProtoCore.Utils
                 for (int i = 0; i < dims; ++i)
                 {
                     StackValue index = indices[i];
+                    StackValue[] values = null;
+                    if (StackUtils.IsArray(index))
+                    {
+                        values = GetValues(index, core);
+                    }
+
                     if (1 == zipLength)
                     {
                         if (AddressType.ArrayPointer == index.optype)
                         {
-                            zippedIndices[0][i] = GetValueFromIndex(index, 0, core);
+                            zippedIndices[0][i] = values[0];
                         }
                         else
                         {
-                            zippedIndices[0][i] = index; 
+                            zippedIndices[0][i] = index;
                         }
                     }
                     else
                     {
                         for (int j = 0; j < zipLength; ++j)
                         {
-                            zippedIndices[j][i] = GetValueFromIndex(index, j, core);
+                            zippedIndices[j][i] = values[j];
                         }
                     }
                 }
