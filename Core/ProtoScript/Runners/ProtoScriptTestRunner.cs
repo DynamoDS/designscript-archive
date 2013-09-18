@@ -14,7 +14,7 @@ namespace ProtoScript.Runners
 
         public ProtoLanguage.CompileStateTracker Compile(ProtoCore.CompileTime.Context context, ProtoCore.Core core, out int blockId)
         {
-            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState();
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState(core.Options.IsDeltaExecution);
 
             core.ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
 
@@ -90,7 +90,7 @@ namespace ProtoScript.Runners
 
         public ProtoLanguage.CompileStateTracker Compile(string code, ProtoCore.Core core, Dictionary<string, Object> contextData, out int blockId)
         {
-            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState(contextData);
+            ProtoLanguage.CompileStateTracker compileState = ProtoScript.CompilerUtils.BuildDefaultCompilerState(core.Options.IsDeltaExecution, contextData);
 
             bool buildSucceeded = false;
 
@@ -261,12 +261,22 @@ namespace ProtoScript.Runners
                 if (!isTest) { core.Heap.Free(); }
             }
             else
+            {
                 throw new ProtoCore.Exceptions.CompileErrorsOccured();
-            if (isTest && !core.Options.CompileToLib)
-                return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
-            else
-                return null;
+            }
 
+            if (isTest && !core.Options.CompileToLib)
+            {
+                return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
+            }
+
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
+            }
+
+            return null;
         }
 
         public ExecutionMirror Execute(ProtoCore.CompileTime.Context staticContext, ProtoCore.Runtime.Context runtimeContext, ProtoCore.Core core, bool isTest = true)
@@ -306,6 +316,12 @@ namespace ProtoScript.Runners
                 return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
             }
 
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
+            }
+
             return null;
         }
 
@@ -336,6 +352,12 @@ namespace ProtoScript.Runners
             if (!core.Options.CompileToLib)
             {
                 return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
+            }
+
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
             }
 
             return null;
@@ -371,6 +393,12 @@ namespace ProtoScript.Runners
             if (isTest && !core.Options.CompileToLib)
             {
                 return new ExecutionMirror(core.CurrentExecutive.CurrentDSASMExec, core);
+            }
+
+            // Save the Callsite state for this execution
+            if (core.EnableCallsiteExecutionState)
+            {
+                ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
             }
 
             return null;

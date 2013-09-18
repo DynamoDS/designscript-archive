@@ -17,7 +17,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
-   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG</DefineConstants>
     <DebugType>full</DebugType>
@@ -69,7 +69,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ProtoCore\ProtoCoreMono.csproj">
       <Project>{7A9E0314-966F-4584-BAA3-7339CBB849D1}</Project>
-      <Name>ProtoCore</Name>
+      <Name>ProtoCoreMono</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

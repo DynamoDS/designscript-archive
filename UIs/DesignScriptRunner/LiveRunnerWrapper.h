@@ -12,6 +12,7 @@ public:
 
     virtual ~LiveRunnerWrapper();
     virtual void updateGraph(const wchar_t* codesegment);
+    virtual void importLibrary(const wchar_t* codesegment);
     virtual void updateCLInterpreter(const wchar_t* codesegment);
     virtual void updateGraphAsync(const wchar_t* codesegment);
     virtual void updateCLInterpreterAsync(const wchar_t* codesegment);

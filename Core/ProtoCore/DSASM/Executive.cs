@@ -389,7 +389,6 @@ namespace ProtoCore.DSASM
         {
             PushInterpreterProps(Properties);
             Properties.Reset();
-            //Properties = new InterpreterProperties();
 
             if (core.ExecMode == InterpreterMode.kNormal)
             {
@@ -1372,6 +1371,7 @@ namespace ProtoCore.DSASM
 
                         // Set the current graphnode being executed
                         Properties.executingGraphNode = graphNode;
+                        core.ExpressionUID = graphNode.exprUID;
 
                         if (core.Options.dynamicCycleCheck)
                         {
@@ -1428,12 +1428,14 @@ namespace ProtoCore.DSASM
                         pc = graphNode.updateBlock.startpc;
                         graphNode.isDirty = false;
                         Properties.executingGraphNode = graphNode;
+                        core.ExpressionUID = graphNode.exprUID;
                         break;
                     }
                 }
                 else if (graphNode.updateBlock.startpc == entrypoint)
                 {
                     Properties.executingGraphNode = graphNode;
+                    core.ExpressionUID = graphNode.exprUID;
                     if (graphNode.isDirty)
                     {
                         graphNode.isDirty = false;

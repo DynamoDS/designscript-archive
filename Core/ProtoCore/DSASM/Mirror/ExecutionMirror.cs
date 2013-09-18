@@ -1416,6 +1416,21 @@ namespace ProtoCore.DSASM.Mirror
                     throw new NotImplementedException();
             }
         }
+
+        //
+        public void Verify(string dsVariable, object expectedValue, int startBlock = 0)
+        {
+            try
+            {
+                Obj dsObj = this.GetFirstValue(dsVariable, startBlock);
+                var indices = new List<int>();
+                //VerifyInternal(expectedValue, dsObj, dsVariable, indices);
+            }
+            catch (NotImplementedException)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 
     class OutputFormatParameters
