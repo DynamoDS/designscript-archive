@@ -14,8 +14,8 @@ namespace ProtoCore.Lang
 {
     public class BuiltInFunctionEndPoint : FunctionEndPoint
     {
-        private readonly ProtoCore.Lang.BuiltInMethods.BuiltInMethodID buildInMethodId;
-        public BuiltInFunctionEndPoint(ProtoCore.Lang.BuiltInMethods.BuiltInMethodID id)
+        private readonly ProtoCore.Lang.BuiltInMethods.MethodID buildInMethodId;
+        public BuiltInFunctionEndPoint(ProtoCore.Lang.BuiltInMethods.MethodID id)
         {
             buildInMethodId = id;
         }
@@ -34,7 +34,7 @@ namespace ProtoCore.Lang
 
             switch (buildInMethodId)
             {
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kCount:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kCount:
                     {
                         if (formalParameters[0].optype != DSASM.AddressType.ArrayPointer)
                             ret = ProtoCore.DSASM.StackUtils.BuildInt(1);
@@ -44,30 +44,30 @@ namespace ProtoCore.Lang
                             ret =  ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.Count(formalParameters[0], interpreter));
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kRank:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kRank:
                     {
                     ret = ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.Rank(formalParameters[0], interpreter));
                     break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kFlatten:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kFlatten:
                     ret = ArrayUtilsForBuiltIns.Flatten(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kCancat:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kConcat:
                     ret = ArrayUtilsForBuiltIns.Concat(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kDifference:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kDifference:
                     ret = ArrayUtilsForBuiltIns.Difference(formalParameters[0], formalParameters[1], interpreter, c);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kUnion:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kUnion:
                     ret = ArrayUtilsForBuiltIns.Union(formalParameters[0], formalParameters[1], interpreter, c);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kIntersection:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kIntersection:
                     ret = ArrayUtilsForBuiltIns.Intersection(formalParameters[0], formalParameters[1], interpreter, c);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSomeNulls:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSomeNulls:
                     ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.SomeNulls(formalParameters[0], interpreter));
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kCountTrue:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kCountTrue:
                     {
                         if (formalParameters[0].optype != DSASM.AddressType.ArrayPointer)
                         {
@@ -86,7 +86,7 @@ namespace ProtoCore.Lang
                         }
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kCountFalse:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kCountFalse:
                     {
                         if (formalParameters[0].optype != DSASM.AddressType.ArrayPointer)
                         {
@@ -105,7 +105,7 @@ namespace ProtoCore.Lang
                         }
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kRangeExpression:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kRangeExpression:
                     ret = RangeExpressionUntils.RangeExpression(formalParameters[0],
                                                                 formalParameters[1],
                                                                 formalParameters[2],
@@ -113,7 +113,7 @@ namespace ProtoCore.Lang
                                                                 formalParameters[4],
                                                                 core);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kAllFalse:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kAllFalse:
                     {
                         if (formalParameters[0].optype != DSASM.AddressType.ArrayPointer)
                             ret = ProtoCore.DSASM.StackUtils.BuildNull();
@@ -121,7 +121,7 @@ namespace ProtoCore.Lang
                             ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.AllFalse(formalParameters[0], interpreter));
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kAllTrue:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kAllTrue:
                     {
                         if (formalParameters[0].optype != DSASM.AddressType.ArrayPointer)
                             ret = ProtoCore.DSASM.StackUtils.BuildNull();
@@ -129,21 +129,21 @@ namespace ProtoCore.Lang
                             ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.AllTrue(formalParameters[0], interpreter));
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kIsHomogeneous:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kIsHomogeneous:
                     //throw new NotImplementedException("LC urgent fix");
                     ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.IsHomogeneous(formalParameters[0], interpreter));
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSum:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSum:
                     {
                         ret = ArrayUtilsForBuiltIns.Sum(formalParameters[0], interpreter);
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kAverage:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kAverage:
                     {
                         ret = ArrayUtilsForBuiltIns.Average(formalParameters[0], interpreter);
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSomeTrue:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSomeTrue:
                     {
                         if (formalParameters[0].optype != DSASM.AddressType.ArrayPointer)
                             ret = ProtoCore.DSASM.StackUtils.BuildNull();
@@ -151,7 +151,7 @@ namespace ProtoCore.Lang
                             ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.SomeTrue(formalParameters[0], interpreter));
                         break;
                     }
-                case BuiltInMethods.BuiltInMethodID.kSleep:
+                case BuiltInMethods.MethodID.kSleep:
                     {
                         StackValue stackValue = formalParameters[0];
                         if (stackValue.optype == AddressType.Int)
@@ -166,7 +166,7 @@ namespace ProtoCore.Lang
                         ret = DSASM.StackUtils.BuildNull();
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSomeFalse:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSomeFalse:
                     {
                         if (formalParameters[0].optype != DSASM.AddressType.ArrayPointer)
                             ret = ProtoCore.DSASM.StackUtils.BuildNull();
@@ -174,25 +174,25 @@ namespace ProtoCore.Lang
                             ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.SomeFalse(formalParameters[0], interpreter));
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kRemove:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kRemove:
                     ret = ArrayUtilsForBuiltIns.Remove(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kRemoveDuplicates:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kRemoveDuplicates:
                     ret = ArrayUtilsForBuiltIns.RemoveDuplicates(formalParameters[0], interpreter, c);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kRemoveNulls:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kRemoveNulls:
                     ret = ArrayUtilsForBuiltIns.RemoveNulls(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kRemoveIfNot:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kRemoveIfNot:
                     ret = ArrayUtilsForBuiltIns.RemoveIfNot(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kReverse:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kReverse:
                     ret = ArrayUtilsForBuiltIns.Reverse(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kEquals:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kEquals:
                     ret = ArrayUtilsForBuiltIns.Equals(formalParameters[0], formalParameters[1], interpreter, c);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kContains:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kContains:
                     {
                         if (formalParameters[1].optype == DSASM.AddressType.ArrayPointer)
                             ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.ContainsArray(formalParameters[0], formalParameters[1], interpreter));
@@ -200,7 +200,7 @@ namespace ProtoCore.Lang
                             ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.Contains(formalParameters[0], formalParameters[1], interpreter));
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kIndexOf:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kIndexOf:
                     {
                         if (formalParameters[0].optype == DSASM.AddressType.ArrayPointer)
                             ret = ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.ArrayIndexOfArray(formalParameters[0], formalParameters[1], interpreter));
@@ -208,25 +208,25 @@ namespace ProtoCore.Lang
                             ret = ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.IndexOf(formalParameters[0], formalParameters[1], interpreter));
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSort:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSort:
                     ret = ArrayUtilsForBuiltIns.Sort(formalParameters[0], interpreter);
                     break;
-                case BuiltInMethods.BuiltInMethodID.kSortPointer:
+                case BuiltInMethods.MethodID.kSortPointer:
                     ret = ArrayUtilsForBuiltIns.SortPointers(formalParameters[0], formalParameters[1], interpreter, stackFrame);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSortWithMode:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSortWithMode:
                     ret = ArrayUtilsForBuiltIns.SortWithMode(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSortIndexByValue:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSortIndexByValue:
                     ret = ArrayUtilsForBuiltIns.SortIndexByValue(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kSortIndexByValueWithMode:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kSortIndexByValueWithMode:
                     ret = ArrayUtilsForBuiltIns.SortIndexByValueWithMode(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kReorder:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kReorder:
                     ret = ArrayUtilsForBuiltIns.Reorder(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kInsert:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kInsert:
                     {
                         if (formalParameters[1].optype == DSASM.AddressType.ArrayPointer)
                             ret = ArrayUtilsForBuiltIns.InsertArray(formalParameters[0], formalParameters[1], formalParameters[2], interpreter);
@@ -234,46 +234,46 @@ namespace ProtoCore.Lang
                             ret = ArrayUtilsForBuiltIns.Insert(formalParameters[0], formalParameters[1], formalParameters[2], interpreter);
                         break;
                     }
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kMap:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kMap:
                     ret = ProtoCore.DSASM.StackUtils.BuildDouble(MapBuiltIns.Map(formalParameters[0], formalParameters[1], formalParameters[2], interpreter));
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kMapTo:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kMapTo:
                     ret = ProtoCore.DSASM.StackUtils.BuildDouble(MapBuiltIns.MapTo(formalParameters[0], formalParameters[1], formalParameters[2], formalParameters[3], formalParameters[4], interpreter));
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kIsUniformDepth:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kIsUniformDepth:
                     ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.IsUniformDepth(formalParameters[0], interpreter));
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kIsRectangular:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kIsRectangular:
                     if (formalParameters[0].optype == DSASM.AddressType.ArrayPointer)
                         ret = ProtoCore.DSASM.StackUtils.BuildBoolean(ArrayUtilsForBuiltIns.IsRectangular(formalParameters[0], interpreter));
                     else
                         ret = ProtoCore.DSASM.StackUtils.BuildNull();
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kNormalizeDepthWithRank:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kNormalizeDepthWithRank:
                     ret = ArrayUtilsForBuiltIns.NormalizeDepthWithRank(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kNormalizeDepth:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kNormalizeDepth:
                     ret = ArrayUtilsForBuiltIns.NormalizeDepth(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kTranspose:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kTranspose:
                     ret = ArrayUtilsForBuiltIns.Transpose(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kLoadCSV:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kLoadCSV:
                     ret = FileIOBuiltIns.LoadCSV(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kLoadCSVWithMode:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kLoadCSVWithMode:
                     ret = FileIOBuiltIns.LoadCSVWithMode(formalParameters[0], formalParameters[1], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kPrint:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kPrint:
                     ret = FileIOBuiltIns.Print(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kPrintIndexable:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kPrintIndexable:
                     ret = FileIOBuiltIns.Print(formalParameters[0], interpreter);
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kGetElapsedTime:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kGetElapsedTime:
                     ret = ProtoCore.DSASM.StackUtils.BuildInt(ProgramUtilsBuiltIns.GetElapsedTime(interpreter));
                     break;
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kInlineConditional:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kInlineConditional:
                     {
                         StackValue svCondition = formalParameters[0];
                         if (svCondition.optype != AddressType.Boolean)
@@ -347,7 +347,7 @@ namespace ProtoCore.Lang
                     }
 
                     
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kDotDynamic:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kDotDynamic:
                     {
                         StackValue svThisPtr = formalParameters[0];
                         bool isPointer = svThisPtr.optype == AddressType.Pointer || svThisPtr.optype == AddressType.ArrayPointer;
@@ -418,7 +418,7 @@ namespace ProtoCore.Lang
                         
                     }
 
-                case ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kDot:
+                case ProtoCore.Lang.BuiltInMethods.MethodID.kDot:
                     {
                         // Pop off the list of rhs data from the stack (They were pushed in by the dotarg)
                         // Call the method
@@ -672,7 +672,7 @@ namespace ProtoCore.Lang
                         break;
                     }
 
-                case BuiltInMethods.BuiltInMethodID.kGetType:
+                case BuiltInMethods.MethodID.kGetType:
                     AddressType objType = formalParameters[0].optype;
                     int typeUID = (int)PrimitiveType.kInvalidType;
 
@@ -723,18 +723,31 @@ namespace ProtoCore.Lang
                     }
 
                     return StackUtils.BuildInt(typeUID);
-                case BuiltInMethods.BuiltInMethodID.kToString:
+                case BuiltInMethods.MethodID.kToString:
                     ret = StringUtils.ConvertToString(formalParameters[0], core, core.Rmem);
                     break;
-                case BuiltInMethods.BuiltInMethodID.kImportData:
+                case BuiltInMethods.MethodID.kImportData:
                     ret = ContextDataBuiltIns.ImportData(formalParameters[0], formalParameters[1], core, interpreter, c);
                     break;
-                case BuiltInMethods.BuiltInMethodID.kBreak:
+                case BuiltInMethods.MethodID.kBreak:
                     {
                         DebuggerBuiltIns.Break(interpreter, stackFrame);
                         ret = StackUtils.BuildNull();
                         break;
                     }
+
+                case BuiltInMethods.MethodID.kGetKeys:
+                    ret = StackUtils.BuildNull();
+                    break;
+                case BuiltInMethods.MethodID.kGetValues:
+                    ret = StackUtils.BuildNull();
+                    break;
+                case BuiltInMethods.MethodID.kContainKey:
+                    ret = StackUtils.BuildNull();
+                    break;
+                case BuiltInMethods.MethodID.kRemoveKey:
+                    ret = StackUtils.BuildNull();
+                    break;
                 default:
                     throw new ProtoCore.Exceptions.CompilerInternalException("Unknown built-in method. {AAFAE85A-2AEB-4E8C-90D1-BCC83F27C852}");
             }
@@ -742,7 +755,7 @@ namespace ProtoCore.Lang
             // Dot operator is a special case and its arguments are not meant to be gc'd
             // The debugger will always get to here as it applies for only those built-ins that are also external
             // and therefore that the debugger does not break out of - pratapa
-            if (ProtoCore.Lang.BuiltInMethods.BuiltInMethodID.kDot != buildInMethodId)
+            if (ProtoCore.Lang.BuiltInMethods.MethodID.kDot != buildInMethodId)
             {
                 foreach (StackValue param in formalParameters)
                 {
