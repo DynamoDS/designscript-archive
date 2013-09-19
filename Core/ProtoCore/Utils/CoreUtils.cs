@@ -38,7 +38,7 @@ namespace ProtoCore.Utils
     private static ProtoCore.AST.AssociativeAST.FunctionDefinitionNode GenerateBuiltInMethodSignatureNode(ProtoCore.Lang.BuiltInMethods.BuiltInMethod method)
     {
         ProtoCore.AST.AssociativeAST.FunctionDefinitionNode fDef = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-        fDef.Name = method.Name;
+        fDef.Name = ProtoCore.Lang.BuiltInMethods.GetMethodName(method.ID);
         fDef.ReturnType = method.ReturnType;
         fDef.IsExternLib = true;
         fDef.IsBuiltIn = true;
