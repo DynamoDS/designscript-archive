@@ -18,7 +18,8 @@ public:
     virtual DesignScriptObject* queryNodeValue(const wchar_t* nodeName);
     virtual void queryNodeValuesAsync(const std::list<unsigned int>& nodeIds);
     virtual DesignScriptObject* getCoreDump();
-
+    virtual const wchar_t* getCoreDumpCmdLineREPL();
+    
 private:
     SynchronizeData^ createSyncDataFromCode(System::String^ codesegment);
     DesignScriptRunnerCallback* mpCallback;
