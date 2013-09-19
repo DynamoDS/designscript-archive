@@ -8857,10 +8857,8 @@ namespace ProtoAssociative
 
         public AssociativeNode BuildIdentfier(string name, PrimitiveType type = PrimitiveType.kTypeVar)
         {
-            var ident = new ProtoCore.AST.AssociativeAST.IdentifierNode();
-            ident.Name = ident.Value = name;
+            var ident = AstFactory.BuildIdentifier(name);
             ident.datatype = core.TypeSystem.BuildTypeObject(type, false);
-
             return ident;
         }
 
@@ -8890,11 +8888,7 @@ namespace ProtoAssociative
 
         public AssociativeNode BuildBinaryExpression(AssociativeNode leftNode, AssociativeNode rightNode, ProtoCore.DSASM.Operator op = Operator.assign)
         {
-            var binaryExpr = new BinaryExpressionNode();
-            binaryExpr.LeftNode = leftNode;
-            binaryExpr.Optr = op;
-            binaryExpr.RightNode = rightNode;
-
+            var binaryExpr = AstFactory.BuildBinaryExpression(leftNode, rightNode, op);
             if (core.Options.GenerateExprID)
             {
                 binaryExpr.exprUID = core.ExpressionUID;
@@ -8906,13 +8900,8 @@ namespace ProtoAssociative
 
         public AssociativeNode BuildFunctionCall(string functionName, List<AssociativeNode> arguments)
         {
-            var func = new FunctionCallNode();
-            func.Function = BuildIdentfier(functionName);
-            func.FormalArguments = arguments;
-
-            return func;
+            return AstFactory.BuildFunctionCall(functionName, arguments);
         }
-
     }
 }
 
