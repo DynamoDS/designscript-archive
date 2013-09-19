@@ -13,14 +13,14 @@ namespace ProtoCore
     {
         public static string GetTLSData()
         {
-             return "hello world data";
+            return "hello world data";
         }
     }
 
     public class CallsiteExecutionState
     {
 
-#region Static_Utils
+        #region Static_Utils
 
         private static string ext = "csstate";
         public static string filename = "vmstate_test";
@@ -39,7 +39,7 @@ namespace ProtoCore
             // This is a naive implementation, explore a better one
             MD5 md5 = System.Security.Cryptography.MD5.Create();
             string inString = functionUID + ExprUID.ToString();
-            
+
             byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(inString);
             byte[] hash = md5.ComputeHash(inputBytes);
 
@@ -59,9 +59,9 @@ namespace ProtoCore
             return filename + "." + ext;
         }
 
-#endregion
+        #endregion
 
-#region Static_LoadStore_Methods
+        #region Static_LoadStore_Methods
 
         public static bool SaveState(CallsiteExecutionState data)
         {
@@ -108,14 +108,12 @@ namespace ProtoCore
             return csState;
         }
 
-#endregion
+        #endregion
 
 
         public CallsiteExecutionState()
         {
-            //CallsiteDataMap = new Dictionary<string, string>();
-            key = new List<string>();
-            value = new List<string>();
+            CallsiteDataMap = new SerializableDictionary<string, string>();
         }
 
         /// <summary>
@@ -123,11 +121,7 @@ namespace ProtoCore
         /// This data is updated for every call to a callsite
         /// Determine why this needs to be public in order to serialize
         /// </summary>
-        //public Dictionary<string, string> CallsiteDataMap { get; set; }
-
-        public List<string> key { get; set; }
-        public List<string> value { get; set; }
-
+        public SerializableDictionary<string, string> CallsiteDataMap { get; set; }
 
         //public void Store(string callsiteID, string data)
         //{
@@ -157,34 +151,24 @@ namespace ProtoCore
             // TODO Jun: implement serializable object
             string data = dataObj as string;
 
-            int valueIndex = -1;
-            if (key.Contains(callsiteID))
-            {
-                valueIndex = key.IndexOf(callsiteID);
-                value[valueIndex] = data;
-            }
+            if (CallsiteDataMap.ContainsKey(callsiteID))
+                CallsiteDataMap[callsiteID] = data;
             else
-            {
-                key.Add(callsiteID);
-                value.Add(data);
-            }
+                CallsiteDataMap.Add(callsiteID, data);
         }
 
         public string Load(string callsiteID)
         {
-            int valueIndex = -1;
-            if (key.Contains(callsiteID))
-            {
-                valueIndex = key.IndexOf(callsiteID);
-                return value[valueIndex];
-            }
-            return null;
+            if (CallsiteDataMap.ContainsKey(callsiteID))
+                return CallsiteDataMap[callsiteID];
+            else
+                return null;
         }
 
         public int GetVMStateCount()
         {
-            Validity.Assert(null != key);
-            return key.Count;
+            return CallsiteDataMap.Count;
+
         }
 
         /// <summary>
@@ -192,19 +176,21 @@ namespace ProtoCore
         /// This will be obsolete if once the serializable dictionary is implemented
         /// </summary>
         /// <returns></returns>
-        public Dictionary<string, string> BuildCSStateDictionary()
-        {
-            Validity.Assert(null != key);
-            Validity.Assert(null != value);
-            Validity.Assert(key.Count == value.Count);
+        /// 
 
-            Dictionary<string, string> vmstate = new Dictionary<string, string>();
-            int index = 0;
-            foreach(string id in key)
-            {
-                vmstate.Add(id, value[index++]);
-            }
-            return vmstate;
-        }
+        //public Dictionary<string, string> BuildCSStateDictionary()
+        //{
+        //    Validity.Assert(null != key);
+        //    Validity.Assert(null != value);
+        //    Validity.Assert(key.Count == value.Count);
+
+        //    Dictionary<string, string> vmstate = new Dictionary<string, string>();
+        //    int index = 0;
+        //    foreach(string id in key)
+        //    {
+        //        vmstate.Add(id, value[index++]);
+        //    }
+        //    return vmstate;
+        //}
     }
 }
