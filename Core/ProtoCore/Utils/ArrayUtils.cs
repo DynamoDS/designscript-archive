@@ -1001,5 +1001,113 @@ namespace ProtoCore.Utils
 
             return values.ToArray();
         }
+
+        /// <summary>
+        /// Get all keys from an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static StackValue[] GetKeys(StackValue array, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
+            {
+                return null;
+            }
+
+            HeapElement he = GetHeapElement(array, core);
+            List<StackValue> keys = new List<StackValue>();
+
+            for (int i = 0; i < he.VisibleSize; ++i)
+            {
+                keys.Add(StackUtils.BuildInt(i));
+            }
+
+            if (he.Dict != null)
+            {
+                foreach (var key in he.Dict.Keys)
+                {
+                    keys.Add(key);
+                }
+            }
+
+            return keys.ToArray();
+        }
+
+        /// <summary>
+        /// Check if an array contain key
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="key"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static bool ContainsKey(StackValue array, StackValue key, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
+            {
+                return false;
+            }
+
+            HeapElement he = GetHeapElement(array, core);
+            if (StackUtils.IsNumeric(key))
+            {
+                long index = key.AsInt().opdata;
+                if (index < 0)
+                {
+                    index = index + he.VisibleSize;
+                }
+                return (index >= 0 && index < he.VisibleSize);
+            }
+            else
+            {
+                return he.Dict != null && he.Dict.ContainsKey(key);
+            }
+        }
+
+        public static bool RemoveKey(StackValue array, StackValue key, Core core)
+        {
+            Validity.Assert(StackUtils.IsArray(array));
+            if (!StackUtils.IsArray(array))
+            {
+                return false;
+            }
+
+            HeapElement he = GetHeapElement(array, core);
+
+            if (StackUtils.IsNumeric(key))
+            {
+                long index = key.AsInt().opdata;
+                if (index < 0)
+                {
+                    index = index + he.VisibleSize;
+                }
+
+                if (index >= 0 && index < he.VisibleSize)
+                {
+                    StackValue oldValue = he.Stack[index];
+                    he.Stack[index] = StackUtils.BuildNull();
+
+                    if (index == he.VisibleSize - 1)
+                    {
+                        he.VisibleSize -= 1;
+                    }
+                    return true;
+                }
+            }
+            else
+            {
+                if (he.Dict != null && he.Dict.ContainsKey(key))
+                {
+                    StackValue value = he.Dict[key];
+                    GCUtils.GCRelease(key, core);
+                    GCUtils.GCRelease(value, core);
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
