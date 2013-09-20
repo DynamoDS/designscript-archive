@@ -1062,6 +1062,10 @@ namespace ProtoCore
         public List<string> LoadedDLLs = new List<string>();
         public int deltaCompileStartPC { get; set; }
 
+
+        public bool EnableCallsiteExecutionState { get; set; }
+        public CallsiteExecutionState csExecutionState { get; set; }
+
         public void LogErrorInGlobalMap(Core.ErrorType type, string msg, string fileName = null, int line = -1, int col = -1, 
             BuildData.WarningID buildId = BuildData.WarningID.kDefault, RuntimeData.WarningID runtimeId = RuntimeData.WarningID.kDefault)
         {
@@ -1504,7 +1508,18 @@ namespace ProtoCore
             builtInsLoaded = false;
             FFIPropertyChangedMonitor = new FFIPropertyChangedMonitor(this);
 
+            csExecutionState = null;
+            EnableCallsiteExecutionState = false;
 
+            // TODO: Remove check once fully implemeted
+            if (EnableCallsiteExecutionState)
+            {
+                csExecutionState = CallsiteExecutionState.LoadState();
+            }
+            else
+            {
+                csExecutionState = new CallsiteExecutionState();
+            }
         }
 
         // The unique subscript for SSA temporaries
