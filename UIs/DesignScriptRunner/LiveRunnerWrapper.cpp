@@ -23,6 +23,12 @@ void LiveRunnerWrapper::updateGraph(const wchar_t* codesegment)
     wrapper()->UpdateGraph(syncData);
 }
 
+void LiveRunnerWrapper::importLibrary(const wchar_t* codesegment) 
+{
+    return GraphUtilities::PreloadAssembly(WcharToString(codesegment));
+}
+
+
 void LiveRunnerWrapper::updateCLInterpreter(const wchar_t* codesegment)
 {
     wrapper()->UpdateCmdLineInterpreter(WcharToString(codesegment));
