@@ -65,7 +65,7 @@ namespace ProtoCore.Lang
             kGetKeys,
             kGetValues,
             kRemoveKey,
-            kContainKey
+            kContainsKey
         }
 
         private static string[] methodNames = new string[]
@@ -126,7 +126,7 @@ namespace ProtoCore.Lang
             "GetKeys",                  // kGetKeys    
             "GetValues",                // kGetValues    
             "RemoveKey",                // kRemoveKey
-            "ContainKey"                // kContainKey
+            "ContainsKey"               // kContainsKey
         };
 
         public static string GetMethodName(MethodID id)
@@ -1149,7 +1149,7 @@ namespace ProtoCore.Lang
             Methods.Add(new BuiltInMethod
             {
                 ID = MethodID.kRemoveKey,
-                ReturnType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVoid, false, 0),
+                ReturnType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeBool, false, 0),
                 Parameters = new List<KeyValuePair<string, Type>> 
                 {
                     new KeyValuePair<string, Type>("array", TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, true, Constants.kArbitraryRank)),
@@ -1159,7 +1159,7 @@ namespace ProtoCore.Lang
 
             Methods.Add(new BuiltInMethod
             {
-                ID = MethodID.kContainKey,
+                ID = MethodID.kContainsKey,
                 ReturnType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeBool, false, 0),
                 Parameters = new List<KeyValuePair<string, Type>> 
                 {
