@@ -349,9 +349,6 @@ namespace ProtoCore
                 {
                     // Store the data associated with this callsite
                     core.csExecutionState.Store(callsiteGUID, callsiteData);
-
-                    // Save the VMSTate for this callsite
-                    ProtoCore.CallsiteExecutionState.SaveState(core.csExecutionState);
                 }
             }
         }
