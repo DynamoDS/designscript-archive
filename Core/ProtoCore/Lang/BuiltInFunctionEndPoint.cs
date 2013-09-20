@@ -40,14 +40,14 @@ namespace ProtoCore.Lang
                             ret = ProtoCore.DSASM.StackUtils.BuildInt(1);
                         else if (!ArrayUtils.ContainsNonArrayElement(formalParameters[0], core))
                             ret = ProtoCore.DSASM.StackUtils.BuildInt(0);
-                        else 
-                            ret =  ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.Count(formalParameters[0], interpreter));
+                        else
+                            ret = ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.Count(formalParameters[0], interpreter));
                         break;
                     }
                 case ProtoCore.Lang.BuiltInMethods.MethodID.kRank:
                     {
-                    ret = ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.Rank(formalParameters[0], interpreter));
-                    break;
+                        ret = ProtoCore.DSASM.StackUtils.BuildInt(ArrayUtilsForBuiltIns.Rank(formalParameters[0], interpreter));
+                        break;
                     }
                 case ProtoCore.Lang.BuiltInMethods.MethodID.kFlatten:
                     ret = ArrayUtilsForBuiltIns.Flatten(formalParameters[0], interpreter);
@@ -297,7 +297,7 @@ namespace ProtoCore.Lang
                         core.RunningBlock = blockId;
 
                         int returnAddr = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
-                        
+
                         int ci = ProtoCore.DSASM.Constants.kInvalidIndex;
                         int fi = ProtoCore.DSASM.Constants.kInvalidIndex;
                         if (interpreter.runtime.rmem.Stack.Count >= ProtoCore.DSASM.StackFrame.kStackFrameSize)
@@ -346,7 +346,7 @@ namespace ProtoCore.Lang
                         break;
                     }
 
-                    
+
                 case ProtoCore.Lang.BuiltInMethods.MethodID.kDotDynamic:
                     {
                         StackValue svThisPtr = formalParameters[0];
@@ -415,7 +415,7 @@ namespace ProtoCore.Lang
                         ret = sv;
 
                         break;
-                        
+
                     }
 
                 case ProtoCore.Lang.BuiltInMethods.MethodID.kDot:
@@ -649,26 +649,26 @@ namespace ProtoCore.Lang
 #endif
                         sv = callsite.JILDispatchViaNewInterpreter(c, arguments, replicationGuides, newStackFrame, core);
 
-                ret = sv;
+                        ret = sv;
 #if __DEBUG_REPLICATE
                 if (sv.optype != AddressType.ExplicitCall)
 #endif
-                {
-                    // Restore debug properties after returning from a CALL/CALLR
-                    if (core.Options.IDEDebugMode && core.ExecMode != ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter)
-                    {
-                        if (fNode != null)
                         {
-                            core.DebugProps.RestoreCallrForNoBreak(core, fNode);
+                            // Restore debug properties after returning from a CALL/CALLR
+                            if (core.Options.IDEDebugMode && core.ExecMode != ProtoCore.DSASM.InterpreterMode.kExpressionInterpreter)
+                            {
+                                if (fNode != null)
+                                {
+                                    core.DebugProps.RestoreCallrForNoBreak(core, fNode);
+                                }
+                            }
+
+                            interpreter.runtime.GCRelease(lhsObject);
+
+                            ret = sv;
+                            interpreter.runtime.DecRefCounter(ret);
                         }
-                    }
 
-                    interpreter.runtime.GCRelease(lhsObject);
-
-                    ret = sv;
-                    interpreter.runtime.DecRefCounter(ret);
-                }
-                
                         break;
                     }
 
@@ -737,17 +737,57 @@ namespace ProtoCore.Lang
                     }
 
                 case BuiltInMethods.MethodID.kGetKeys:
-                    ret = StackUtils.BuildNull();
-                    break;
+                    {
+                        StackValue array = formalParameters[0];
+                        StackValue[] result = ArrayUtils.GetKeys(array, core);
+                        if (null == result)
+                        {
+                            ret = StackUtils.BuildNull();
+                        }
+                        else
+                        {
+                            foreach (var key in result)
+                            {
+                                GCUtils.GCRetain(key, core); 
+                            }
+                            ret = HeapUtils.StoreArray(result, null, core);
+                        }
+                        break;
+                    }
                 case BuiltInMethods.MethodID.kGetValues:
-                    ret = StackUtils.BuildNull();
-                    break;
-                case BuiltInMethods.MethodID.kContainKey:
-                    ret = StackUtils.BuildNull();
-                    break;
+                    {
+                        StackValue array = formalParameters[0];
+                        StackValue[] result = ArrayUtils.GetValues(array, core);
+                        if (null == result)
+                        {
+                            ret = StackUtils.BuildNull();
+                        }
+                        else
+                        {
+                            foreach (var key in result)
+                            {
+                                GCUtils.GCRetain(key, core);
+                            }
+                            ret = HeapUtils.StoreArray(result, null, core);
+                        }
+                        break;
+                    }
+                case BuiltInMethods.MethodID.kContainsKey:
+                    {
+                        StackValue array = formalParameters[0];
+                        StackValue key = formalParameters[1];
+                        bool result = ArrayUtils.ContainsKey(array, key, core);
+                        ret = StackUtils.BuildBoolean(result);
+                        break;
+                    }
                 case BuiltInMethods.MethodID.kRemoveKey:
-                    ret = StackUtils.BuildNull();
-                    break;
+                    {
+                        StackValue array = formalParameters[0];
+                        StackValue key = formalParameters[1];
+                        bool result = ArrayUtils.RemoveKey(array, key, core);
+                        ret = StackUtils.BuildBoolean(result);
+                        break;
+                    }
                 default:
                     throw new ProtoCore.Exceptions.CompilerInternalException("Unknown built-in method. {AAFAE85A-2AEB-4E8C-90D1-BCC83F27C852}");
             }
