@@ -1,0 +1,14 @@
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ResolveAssemblyReference.cache
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\MainWindow.g.cs
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\Application.g.cs
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\DesignScriptStudio.App_MarkupCompile.cache
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\DesignScriptStudio.App_MarkupCompile.lref
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\MainWindow.baml
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\DesignScriptStudio.App.g.resources
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\DesignScriptStudio.App.Properties.Resources.resources
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\GenerateResource.read.1.tlog
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\GenerateResource.write.1.tlog
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\DesignScriptStudio.App.exe
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\DesignScriptStudio.App.pdb
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\DesignScriptStudio.App.exe
+D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\DesignScriptStudio.App.pdb
