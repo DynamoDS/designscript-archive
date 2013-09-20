@@ -1,8 +1,0 @@
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ResolveAssemblyReference.cache
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\Autodesk.DesignScript.Geometry.Properties.Resources.resources
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\GenerateResource.read.1.tlog
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\GenerateResource.write.1.tlog
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ProtoGeometry.dll
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ProtoGeometry.pdb
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoGeometry.dll
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoGeometry.pdb

@@ -1,5 +1,0 @@
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\ResolveAssemblyReference.cache
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\Math.dll
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\int\x64\Debug\Math.pdb
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\Math.dll
-D:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\Math.pdb
