@@ -1024,6 +1024,70 @@ r = c[3];
         }
 
         [Test]
+        public void TestDictionary19()
+        {
+            // Test builtin functions GetKeys() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r = Count(GetKeys(a));
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+        }
+
+        [Test]
+        public void TestDictionary20()
+        {
+            // Test builtin functions GetValues() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r = Count(GetValues(a));
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+        }
+
+        [Test]
+        public void TestDictionary21()
+        {
+            // Test builtin functions ContainsKey() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r1 = ContainsKey(a, ""x"");
+r2 = ContainsKey(a, true);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", true);
+        }
+
+        [Test]
+        public void TestDictionary22()
+        {
+            // Test builtin functions RemoveKey() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r1 = RemoveKey(a, ""x"");
+r2 = RemoveKey(a, true);
+r3 = ContainsKey(a, ""x"");
+r4 = ContainsKey(a, true);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", true);
+            thisTest.Verify("r3", false);
+            thisTest.Verify("r4", false);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
