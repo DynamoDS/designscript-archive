@@ -1117,6 +1117,7 @@ namespace ProtoCore.Utils
                     StackValue value = he.Dict[key];
                     GCUtils.GCRelease(key, core);
                     GCUtils.GCRelease(value, core);
+                    he.Dict.Remove(key);
                     return true;
                 }
             }
