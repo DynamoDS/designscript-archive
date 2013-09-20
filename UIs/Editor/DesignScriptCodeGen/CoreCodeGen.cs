@@ -192,7 +192,7 @@ namespace DesignScript.Editor.CodeGen
                 {
                     finalType.UID = lefttype.UID = ci;
                 }
-                else if (identnode.Value == ProtoCore.DSDefinitions.Kw.kw_this)
+                else if (identnode.Value == ProtoCore.DSDefinitions.Keyword.This)
                 {
                     finalType.UID = lefttype.UID = contextClassScope;
                     depth++;
