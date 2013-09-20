@@ -549,7 +549,7 @@ namespace ProtoCore
                         // In this case, the lhs type is undefined
                         // Just attempt to create a symbol node
                         string ident = identnode.Value;
-                        if (0 != ident.CompareTo(ProtoCore.DSDefinitions.Kw.kw_this))
+                        if (0 != ident.CompareTo(ProtoCore.DSDefinitions.Keyword.This))
                         {
                             symbolnode = new SymbolNode();
                             symbolnode.name = identnode.Value;
@@ -675,7 +675,7 @@ namespace ProtoCore
                 {
                     finalType.UID = lefttype.UID = ci;
                 }
-                else if (identnode.Value == ProtoCore.DSDefinitions.Kw.kw_this)
+                else if (identnode.Value == ProtoCore.DSDefinitions.Keyword.This)
                 {
                     finalType.UID = lefttype.UID = contextClassScope;
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, 0 + "[dim]");

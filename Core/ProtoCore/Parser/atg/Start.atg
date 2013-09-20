@@ -406,17 +406,17 @@ COMPILER DesignScriptParser
 
     private bool IsKeyWord(string identName, bool checkReturn = false, bool checkThis = true)
     {
-        if (identName == ProtoCore.DSDefinitions.Kw.kw_return && !checkReturn)
+        if (identName == ProtoCore.DSDefinitions.Keyword.Return && !checkReturn)
         {
             return false;
         }
 
-        if (checkThis && identName == ProtoCore.DSDefinitions.Kw.kw_this)
+        if (checkThis && identName == ProtoCore.DSDefinitions.Keyword.This)
         {
             return true;
         }
 
-        foreach (string kw in ProtoCore.DSDefinitions.Kw.kwList)
+        foreach (string kw in ProtoCore.DSDefinitions.Keyword.KeywordList)
         {
             if (kw == identName)
                 return true;
