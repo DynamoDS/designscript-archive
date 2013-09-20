@@ -165,14 +165,8 @@ namespace ProtoAssociative
             if (core.Options.IsDeltaExecution)
             {
                 codeBlock = GetDeltaCompileCodeBlock();
-                if (core.Options.IsDeltaCompile)
-                {
-                    pc = codeBlock.instrStream.instrList.Count;
-                }
-                else
-                {
-                    pc = core.deltaCompileStartPC;
-                }
+                //pc = core.deltaCompileStartPC;
+                pc = codeBlock.instrStream.instrList.Count;
             }
             else
             {

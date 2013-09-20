@@ -587,7 +587,7 @@ namespace ProtoScript.Runners
         }
        
 
-       
+
         public void UpdateGraph(SynchronizeData syndData)
         {
 
@@ -610,7 +610,6 @@ namespace ProtoScript.Runners
 
         }
 
-
         public void UpdateGraph(GraphSyncData syncData)
         {
             while (true)
@@ -620,8 +619,6 @@ namespace ProtoScript.Runners
                     if (taskQueue.Count == 0)
                     {
                         string code = null;
-                        runnerCore.Options.IsDeltaCompile = true;
-                        
                         SynchronizeInternal(syncData, out code);
                         return;
                     }
@@ -792,25 +789,14 @@ namespace ProtoScript.Runners
             runnerCore.CompleteCodeBlockList.Clear();       
         }
 
-        private void CompileAndExecuteForDeltaExecution(string code)
-        {
-            System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
-
-            ResetForDeltaASTExecution();
-            bool succeeded = CompileAndExecute(code);
-
-            if (succeeded)
-            {
-                RetainVMStatesForDeltaExecution();
-            }
-        }
 
         private void SynchronizeInternal(GraphSyncData syncData, out string code)
         {
+            //throw new NotImplementedException();
             code = string.Empty;
             if (syncData == null)
             {
-                ResetForDeltaASTExecution();
+                //ResetForDeltaASTExecution();
                 return;
             }
 
@@ -853,7 +839,22 @@ namespace ProtoScript.Runners
                     code += codeGen.GenerateCode();
                 }
             }
-            CompileAndExecuteForDeltaExecution(code);
+
+            //Synchronize the core configuration before compilation and execution.
+            //if (syncCoreConfigurations)
+            //{
+            //    SyncCoreConfigurations(runnerCore, executionOptions);
+            //    syncCoreConfigurations = false;
+            //}
+
+            ResetForDeltaASTExecution();
+            bool succeeded = CompileAndExecute(code);
+
+            if (succeeded)
+            {
+                //graphCompiler.ResetPropertiesForNextExecution();
+                RetainVMStatesForDeltaExecution();
+            }
         }
 
         private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
@@ -894,18 +895,38 @@ namespace ProtoScript.Runners
                 }
             }
         }
+
+        // TODO: Aparajit: This needs to be fixed for Command Line REPL
         private void SynchronizeInternal(string code)
         {
+            Validity.Assert(null != runner);
+            //Validity.Assert(null != graphCompiler);
+
             if (string.IsNullOrEmpty(code))
             {
                 code = "";
-
-                ResetForDeltaASTExecution();
+                
+                ResetVMForDeltaExecution();
                 return;
             }
             else
             {
-                CompileAndExecuteForDeltaExecution(code);
+                System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
+
+                ResetVMForDeltaExecution();
+
+                //Synchronize the core configuration before compilation and execution.
+                if (syncCoreConfigurations)
+                {
+                    SyncCoreConfigurations(runnerCore, executionOptions);
+                    syncCoreConfigurations = false;
+                }
+
+                bool succeeded = CompileAndExecute(code);
+                //if (succeeded)
+                //{
+                //    graphCompiler.ResetPropertiesForNextExecution();
+                //}
             }
         }
         #endregion
