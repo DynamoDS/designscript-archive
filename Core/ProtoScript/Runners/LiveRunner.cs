@@ -1,4 +1,3 @@
-﻿
 using System;
 using System.IO;
 using System.Text;
@@ -11,7 +10,8 @@ using System.ComponentModel;
 using System.Threading;
 using ProtoFFI;
 using ProtoCore.AssociativeGraph;
-
+using ProtoCore.AST.AssociativeAST;
+using ProtoCore.Mirror;
 
 namespace ProtoScript.Runners
 {
@@ -22,94 +22,39 @@ namespace ProtoScript.Runners
         Warning
     }
 
-
-    public class NodeValueReadyEventArgs : EventArgs
+    public struct Subtree
     {
-        public NodeValueReadyEventArgs(ProtoCore.Mirror.RuntimeMirror mirror, uint nodeId)
-            : this(mirror, nodeId, EventStatus.OK, null)
-        {
-        }
-
-        public NodeValueReadyEventArgs(ProtoCore.Mirror.RuntimeMirror mirror, uint nodeId, EventStatus resultStatus, String errorString)
-        {
-            this.RuntimeMirror = mirror;
-            this.NodeId = nodeId;
-            ResultStatus = resultStatus;
-            ErrorString = errorString;
-        }
-
-        public uint NodeId { get; private set; }
-        public EventStatus ResultStatus { get; private set; }
-        public String ErrorString { get; private set; }
-        public ProtoCore.Mirror.RuntimeMirror RuntimeMirror { get; private set; }
+        public Guid GUID;
+        public List<AssociativeNode> AstNodes;
     }
 
-    public class NodeValueNotAvailableEventArgs: NodeValueReadyEventArgs
+    public class GraphSyncData
     {
-        public NodeValueNotAvailableEventArgs(uint nodeId):
-            base(null, nodeId, EventStatus.OK, "Not value available for this node")
-        {}
-    }
-
-    public class GraphUpdateReadyEventArgs : EventArgs
-    {
-
-        public SynchronizeData SyncData { get; private set; }
-        public EventStatus ResultStatus { get; private set; }
-        public String ErrorString { get; private set; }
-
-        public struct ErrorObject
+        public List<Subtree> DeletedSubtrees
         {
-            public string Message;
-
-            /// <summary>
-            /// SSN UID
-            /// </summary>
-            public uint Id;
-
-            //public bool IsError;
-        }
-        public List<ErrorObject> Errors { get; set; }
-        public List<ErrorObject> Warnings { get; set; }
-
-        public GraphUpdateReadyEventArgs(SynchronizeData syncData) : this(syncData, EventStatus.OK, null)
-        {
+            get;
+            private set;
         }
 
-        public GraphUpdateReadyEventArgs(SynchronizeData syncData, EventStatus resultStatus, String errorString)
+        public List<Subtree> AddedSubtrees
         {
-            this.SyncData = syncData;
-            this.ResultStatus = resultStatus;
-            this.ErrorString = errorString;
+            get;
+            private set;
+        }
 
-            if (string.IsNullOrEmpty(this.ErrorString))
-                this.ErrorString = "";
+        public List<Subtree> ModifiedSubtrees
+        {
+            get;
+            private set;
+        }
 
-            Errors = new List<ErrorObject>();
-            Warnings = new List<ErrorObject>();
+        public GraphSyncData(List<Subtree> deleted, List<Subtree> added, List<Subtree> modified)
+        {
+            DeletedSubtrees = deleted;
+            AddedSubtrees = added;
+            ModifiedSubtrees = modified;
         }
     }
-
-    public class NodesToCodeCompletedEventArgs : EventArgs
-    {
-        public List<uint> InputNodeIds { get; private set; }
-        public List<SnapshotNode> OutputNodes { get; private set; }
-        public EventStatus ResultStatus { get; private set; }
-        public String ErrorString { get; private set; }
-
-        public NodesToCodeCompletedEventArgs(List<uint> inputNodeIds,
-            List<SnapshotNode> outputNodes, EventStatus resultStatus, String errorString)
-        {
-            this.InputNodeIds = inputNodeIds;
-            this.OutputNodes = outputNodes;
-            this.ResultStatus = resultStatus;
-            this.ErrorString = errorString;
-        }
-    }
-
-    public delegate void NodeValueReadyEventHandler(object sender, NodeValueReadyEventArgs e);
-    public delegate void GraphUpdateReadyEventHandler(object sender, GraphUpdateReadyEventArgs e);
-    public delegate void NodesToCodeCompletedEventHandler(object sender, NodesToCodeCompletedEventArgs e);
 
     public interface ILiveRunner
     {
@@ -117,18 +62,29 @@ namespace ProtoScript.Runners
         void BeginUpdateGraph(GraphToDSCompiler.SynchronizeData syncData);
         void BeginConvertNodesToCode(List<SnapshotNode> snapshotNodes);
 
+        void UpdateGraph(GraphSyncData syncData);
+        void BeginUpdateGraph(GraphSyncData syncData);
+        void BeginConvertNodesToCode(List<Subtree> subtrees);
+
         void BeginQueryNodeValue(uint nodeId);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName);
         void BeginQueryNodeValue(List<uint> nodeIds);
         string GetCoreDump();
-        
+
+        void BeginQueryNodeValue(Guid nodeGuid);
+        ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
+        void BeginQueryNodeValue(List<Guid> nodeGuid);
+
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
         event NodesToCodeCompletedEventHandler NodesToCodeCompleted;
+
+        event DynamoNodeValueReadyEventHandler DynamoNodeValueReady;
+        event DynamoGraphUpdateReadyEventHandler DynamoGraphUpdateReady;
     }
 
-    public class LiveRunner : ILiveRunner
+    public partial class LiveRunner : ILiveRunner
     {
         /// <summary>
         ///  These are configuration parameters passed by host application to be consumed by geometry library and persistent manager implementation. 
@@ -158,127 +114,6 @@ namespace ProtoScript.Runners
             public bool InterpreterMode = false;
         }
 
-        private abstract class Task
-        {
-            protected LiveRunner runner;
-            protected Task(LiveRunner runner)
-            {
-                this.runner = runner;
-            }
-            public abstract void Execute();
-        }
-
-        private class NodeValueRequestTask : Task
-        {
-            private uint nodeId;
-            public NodeValueRequestTask(uint nodeId, LiveRunner runner) : base(runner)
-            {
-                this.nodeId = nodeId;
-            }
-
-            public override void Execute()
-            {
-                lock (runner.operationsMutex)
-                {
-                     if (runner.NodeValueReady != null) // If an event handler is registered.
-                     {
-                         NodeValueReadyEventArgs retArgs = null;
-
-                        try
-                        {
-
-                            // Now that background worker is free, get the value...
-                            ProtoCore.Mirror.RuntimeMirror mirror = runner.InternalGetNodeValue(nodeId);
-                            if (null != mirror)
-                            {
-                                retArgs = new NodeValueReadyEventArgs(mirror, nodeId);
-
-                                System.Diagnostics.Debug.WriteLine("Node {0} => {1}",
-                                    nodeId.ToString("x8"), mirror.GetData().GetStackValue());
-                            }
-                            else
-                            {
-                                retArgs = new NodeValueNotAvailableEventArgs(nodeId);
-                            }
-
-                        }
-                        catch (Exception e)
-                        {
-                            retArgs = new NodeValueReadyEventArgs(null, nodeId, EventStatus.Error,  e.ToString());
-                        }
-
-                        if (null != retArgs)
-                        {
-                            runner.NodeValueReady(this, retArgs); // Notify all listeners (e.g. UI).
-                        }
-                    }
-                }
-            }
-        }
-
-        private class PropertyChangedTask : Task
-        {
-            public PropertyChangedTask(LiveRunner runner, GraphNode graphNode) 
-                : base(runner)
-            {
-                objectCreationGraphNode = graphNode;
-            }
-
-            public override void Execute()
-            {
-                if (!objectCreationGraphNode.propertyChanged)
-                { 
-                    return;
-                }
-                objectCreationGraphNode.propertyChanged = false;
-                UpdateNodeRef updateNode = objectCreationGraphNode.updateNodeRefList[0];
-
-                GraphUpdateReadyEventArgs retArgs = null;
-                lock (runner.operationsMutex)
-                {
-                    try
-                    {
-                        // @keyu: graph nodes may have been recreated caused of
-                        // some update on the UI so that we have to find out
-                        // new graph code that create this ffi object.
-                        var graph = runner.runnerCore.DSExecutable.instrStreamList[0].dependencyGraph;
-                        var graphnodes = graph.GetGraphNodesAtScope(this.objectCreationGraphNode.classIndex, this.objectCreationGraphNode.procIndex);
-                        foreach (var graphnode in graphnodes)
-                        {
-                            if ((graphnode == objectCreationGraphNode) ||
-                                (graphnode.updateNodeRefList.Count == 1 &&
-                                 updateNode.IsEqual(graphnode.updateNodeRefList[0])))
-                            {
-                                graphnode.propertyChanged = true;
-                                break;
-                            }
-                        }
-
-                        runner.ResetVMForExecution();
-                        runner.Execute();
-
-                        var modfiedGuidList = runner.GetModifiedGuidList();
-                        runner.ResetModifiedSymbols();
-                        var syncDataReturn = runner.CreateSynchronizeDataForGuidList(modfiedGuidList);
-                        retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-                    }
-                    catch (Exception e)
-                    {
-                        retArgs = new GraphUpdateReadyEventArgs(new SynchronizeData(), 
-                                                                EventStatus.Error, 
-                                                                e.Message);
-                    }
-                }
-
-                if (runner.GraphUpdateReady != null)
-                {
-                    runner.GraphUpdateReady(this, retArgs); 
-                }
-            }
-
-            public GraphNode objectCreationGraphNode { get; set; }
-        }
-
         private Dictionary<uint, string> GetModifiedGuidList()
         {
             // Retrieve the actual modified nodes 
@@ -304,7 +139,7 @@ namespace ProtoScript.Runners
 
         private void ResetModifiedSymbols()
         {
-             this.runnerCore.Rmem.ResetModifedSymbols();
+            this.runnerCore.Rmem.ResetModifedSymbols();
         }
 
         private SynchronizeData CreateSynchronizeDataForGuidList(Dictionary<uint, string> modfiedGuidList)
@@ -334,470 +169,6 @@ namespace ProtoScript.Runners
             return syncDataReturn;
         }
 
-        private class UpdateGraphTask : Task
-        {
-            private SynchronizeData syncData;
-            public UpdateGraphTask(SynchronizeData syncData, LiveRunner runner) : base(runner)
-            {
-                this.syncData = syncData;
-                
-            }
-
-            public override void Execute()
-            {
-                GraphUpdateReadyEventArgs retArgs;
-
-                lock (runner.operationsMutex)
-                {
-                    try
-                    {
-                        string code = null;
-                        runner.SynchronizeInternal(syncData, out code);
-
-                        var modfiedGuidList = runner.GetModifiedGuidList();
-                        runner.ResetModifiedSymbols(); 
-                        var syncDataReturn = runner.CreateSynchronizeDataForGuidList(modfiedGuidList);
-
-                        retArgs = null;
-
-                        ReportErrors(code, syncDataReturn, modfiedGuidList, ref retArgs);
-
-                        //ReportBuildErrorsAndWarnings(code, syncDataReturn, modfiedGuidList, ref retArgs);
-                        //ReportRuntimeWarnings(code, syncDataReturn, modfiedGuidList, ref retArgs);
-
-                        if(retArgs == null)
-                            retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-                    }
-                    // Any exceptions that are caught here are most likely from the graph compiler
-                    catch (Exception e)
-                    {
-                        retArgs = new GraphUpdateReadyEventArgs(syncData, EventStatus.Error, e.Message);
-                    }
-                }
-
-                if (runner.GraphUpdateReady != null)
-                {                    
-                    runner.GraphUpdateReady(this, retArgs); // Notify all listeners (e.g. UI).
-                }
-            }
-
-            private void ReportErrors(string code, SynchronizeData syncDataReturn, Dictionary<uint, string> modifiedGuidList, ref GraphUpdateReadyEventArgs retArgs)
-            {
-                Dictionary<ulong, ProtoCore.Core.ErrorEntry> errorMap = runner.runnerCore.LocationErrorMap;
-
-                if (errorMap.Count == 0)
-                    return;
-
-                retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-                foreach (var kvp in errorMap)
-                {
-                    ProtoCore.Core.ErrorEntry err = kvp.Value;
-                    string msg = err.Message;
-                    int lineNo = err.Line;
-
-                    // If error is a Build error
-                    if (err.BuildId != ProtoCore.BuildData.WarningID.kDefault)
-                    {
-                        // Error comes from imported DS file
-                        if (!string.IsNullOrEmpty(err.FileName))
-                        {
-                            msg += " At line " + err.Line + ", column " + err.Col + ", in " + Path.GetFileName(err.FileName);
-                            if (err.Type == ProtoCore.Core.ErrorType.Error)
-                            {
-                                retArgs.Errors.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = 0 });
-                            }
-                            else if (err.Type == ProtoCore.Core.ErrorType.Warning)
-                            {
-                                retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = 0 });
-                            }
-                            continue;
-                        }
-
-                    }
-
-                    string varName = GetVarNameFromCode(lineNo, code);
-
-                    // Errors
-                    if (err.Type == ProtoCore.Core.ErrorType.Error)
-                    {
-                        // TODO: How can the lineNo be invalid ?
-                        if (lineNo == ProtoCore.DSASM.Constants.kInvalidIndex || varName == null)
-                        {
-                            retArgs.Errors.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = 0 });
-                            continue;
-                        }
-
-                        foreach (var pair in runner.graphCompiler.mapModifiedName)
-                        {
-                            string name = pair.Key;
-                            if (name.Equals(varName))
-                            {
-                                uint guid = pair.Value;
-                                retArgs.Errors.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = runner.graphCompiler.GetRealUID(guid) });
-                                break;
-                            }
-
-                        }
-                    }
-                    else if(err.Type == ProtoCore.Core.ErrorType.Warning) // Warnings
-                    {
-                        // TODO: How can the lineNo be invalid ?
-                        if (lineNo == ProtoCore.DSASM.Constants.kInvalidIndex || varName == null)
-                        {
-                            retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = 0 });
-                            continue;
-                        }
-
-                        foreach (var pair in modifiedGuidList)
-                        {
-                            // Get the uid recognized by the graphIDE                            
-                            string name = pair.Value;
-                            if (name.Equals(varName))
-                            {
-                                uint guid = pair.Key;
-                                retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = runner.graphCompiler.GetRealUID(guid) });
-                                break;
-                            }
-                        }
-                        if (retArgs.Warnings.Count == 0)
-                        {
-                            foreach (var pair in runner.graphCompiler.mapModifiedName)
-                            {
-                                string name = pair.Key;
-                                if (name.Equals(varName))
-                                {
-                                    uint guid = pair.Value;
-                                    retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = runner.graphCompiler.GetRealUID(guid) });
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            private void ReportBuildErrorsAndWarnings(string code, SynchronizeData syncDataReturn, Dictionary<uint, string> modifiedGuidList, ref GraphUpdateReadyEventArgs retArgs)
-            {
-                //GraphUpdateReadyEventArgs retArgs = null;
-
-                if (runner.runnerCore.BuildStatus.ErrorCount > 0)
-                {
-                    retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-
-                    foreach (var err in runner.runnerCore.BuildStatus.Errors)
-                    {
-                        string msg = err.Message;
-                        int lineNo = err.Line;
-
-                        // TODO: How can the lineNo be invalid ?
-                        if (lineNo == ProtoCore.DSASM.Constants.kInvalidIndex)
-                        {
-                            retArgs.Errors.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = 0 });
-                            continue;
-                        }
-
-                        string varName = GetVarNameFromCode(lineNo, code);
-
-                        foreach (var ssnode in syncData.AddedNodes)
-                        {
-                            if (ssnode.Content.Contains(varName))
-                            {
-                                uint id = ssnode.Id;
-                                
-                                retArgs.Errors.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = id });
-                                break;
-                            }
-                        }
-                        if (retArgs.Errors.Count == 0)
-                        {
-                            foreach (var ssnode in syncData.ModifiedNodes)
-                            {
-                                if (ssnode.Content.Contains(varName))
-                                {
-                                    uint id = ssnode.Id;
-
-                                    retArgs.Errors.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = id });
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (runner.runnerCore.BuildStatus.WarningCount > 0)
-                {
-                    if (retArgs == null)
-                        retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-
-                    foreach (var warning in runner.runnerCore.BuildStatus.Warnings)
-                    {
-                        string msg = warning.msg;
-                        int lineNo = warning.line;
-
-                        // TODO: How can the lineNo be invalid ?
-                        if (lineNo == ProtoCore.DSASM.Constants.kInvalidIndex)
-                        {
-                            retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = 0 });
-                            continue;
-                        }
-
-                        string varName = GetVarNameFromCode(lineNo, code);
-
-                        // This array should be empty for Build errors
-                        
-                        /*foreach (var ssnode in syncDataReturn.ModifiedNodes)
-                        {
-                            if(ssnode.Content.Contains(varName))
-                            {
-                                uint id = ssnode.Id;
-
-                                retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = id });
-                                break;
-                            }
-                        }*/
-                        foreach (var kvp in modifiedGuidList)
-                        {
-                            // Get the uid recognized by the graphIDE
-                            uint guid = kvp.Key;
-                            string name = kvp.Value;
-                            if (name.Equals(varName))
-                            {
-                                retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = runner.graphCompiler.GetRealUID(guid) });
-                                break;
-                            }
-                        }
-                        
-                        if(retArgs.Warnings.Count == 0)
-                        {
-                            LogWarningsFromInputNodes(retArgs, varName, msg);
-                        }
-                        
-                    }
-                }
-
-            }
-
-            void LogWarningsFromInputNodes(GraphUpdateReadyEventArgs retArgs, string varName, string msg)
-            {
-                
-                foreach (var ssnode in syncData.AddedNodes)
-                {
-                    if (ssnode.Content.Contains(varName))
-                    {
-                        uint id = ssnode.Id;
-
-                        retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = id });
-                        break;
-                    }
-                }
-
-                if (retArgs.Warnings.Count == 0)
-                {
-                    foreach (var ssnode in syncData.ModifiedNodes)
-                    {
-                        if (ssnode.Content.Contains(varName))
-                        {
-                            uint id = ssnode.Id;
-
-                            retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = id });
-                            break;
-                        }
-                    }
-                }
-            }
-
-            private void ReportRuntimeWarnings(string code, SynchronizeData syncDataReturn, Dictionary<uint, string> modifiedGuidList, ref GraphUpdateReadyEventArgs retArgs)
-            {
-                //GraphUpdateReadyEventArgs retArgs = null;
-
-                if (runner.runnerCore.RuntimeStatus.Warnings.Count > 0)
-                {
-                    if(retArgs == null)
-                        retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-
-                    foreach (var err in runner.runnerCore.RuntimeStatus.Warnings)
-                    {
-                        string msg = err.message;
-                        int lineNo = err.Line;
-                        
-                        // TODO: How can the lineNo be invalid ?
-                        if (lineNo == ProtoCore.DSASM.Constants.kInvalidIndex)
-                        {
-                            retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id = 0 });
-                            continue;
-                        }
-
-                        string varName = GetVarNameFromCode(lineNo, code);
-
-                        foreach (var kvp in modifiedGuidList)
-                        {
-                            // Get the uid recognized by the graphIDE
-                            uint guid = kvp.Key;
-                            string name = kvp.Value;
-                            if(name.Equals(varName))
-                            {
-                                retArgs.Warnings.Add(new GraphUpdateReadyEventArgs.ErrorObject { Message = msg, Id =  runner.graphCompiler.GetRealUID(guid)});
-                                break;
-                            }
-                        }
-
-                        if (retArgs.Warnings.Count == 0)
-                        {
-                            LogWarningsFromInputNodes(retArgs, varName, msg);
-                        }
-                    }
-                }
-
-            }
-
-            private string GetVarNameFromCode(int lineNo, string code)
-            {
-                string varName = null;
-
-                // Search the code using the input line no.
-                /*string[] lines = code.Split('\n');
-                string stmt = "";
-                for (int i = lineNo - 1; i < lines.Length; ++i)
-                {
-                    stmt += lines[i];
-                }
-
-                List<ProtoCore.AST.Node> nodes = GraphUtilities.ParseCodeBlock(stmt);
-                 
-                // The first node must be a binary expressions
-                ProtoCore.AST.AssociativeAST.BinaryExpressionNode ben = nodes[0] as ProtoCore.AST.AssociativeAST.BinaryExpressionNode;*/
-
-                // Search for the binary expression in the input code which contains the warning
-                ProtoCore.AST.AssociativeAST.BinaryExpressionNode ben = null;
-                Validity.Assert(runner.runnerCore.AstNodeList != null);
-                foreach (var node in runner.runnerCore.AstNodeList)
-                {
-                    if (node is ProtoCore.AST.AssociativeAST.BinaryExpressionNode)
-                    {
-                        if (lineNo >= node.line && lineNo <= node.endLine)
-                        {
-                            ben = node as ProtoCore.AST.AssociativeAST.BinaryExpressionNode;
-                            break;
-                        }
-                    }
-                }
-                
-                if (ben != null)
-                {
-                    ProtoCore.AST.AssociativeAST.IdentifierNode lhs = ben.LeftNode as ProtoCore.AST.AssociativeAST.IdentifierNode;
-                    //Validity.Assert(lhs != null);
-                    if (lhs != null)
-                    {
-                        varName = lhs.Name;
-                    }
-                    else // lhs could be an IdentifierListNode in a CodeBlock
-                    {
-                        ProtoCore.AST.AssociativeAST.IdentifierListNode lhsIdent = ben.LeftNode as ProtoCore.AST.AssociativeAST.IdentifierListNode;
-                        Validity.Assert(lhsIdent != null);
-   
-                        // Extract line of code corresponding to this Ast node and get its LHS string
-                        string identstmt = ProtoCore.Utils.ParserUtils.ExtractStatementFromCode(code, lhsIdent);
-                        int equalIndex = identstmt.IndexOf('=');
-                        varName = ProtoCore.Utils.ParserUtils.GetLHSatAssignment(identstmt, equalIndex)[0]; 
-                    }
-                    
-                }
-
-                return varName;
-            }
-
-            
-        }
-
-        private class UpdateCmdLineInterpreterTask : Task
-        {
-            private string cmdLineString;
-            public UpdateCmdLineInterpreterTask(string code, LiveRunner runner)
-                : base(runner)
-            {
-                this.cmdLineString = code;
-            }
-
-            public override void Execute()
-            {
-                GraphUpdateReadyEventArgs retArgs = null;
-
-                lock (runner.operationsMutex)
-                {
-                    try
-                    {
-                        string code = null;
-                        runner.SynchronizeInternal(code);
-
-                        var modfiedGuidList = runner.GetModifiedGuidList();
-                        runner.ResetModifiedSymbols();
-                        var syncDataReturn = runner.CreateSynchronizeDataForGuidList(modfiedGuidList);
-
-                        retArgs = null;
-
-                        // TODO: Implement ReportErrors override to report errors for command line statements
-                        //ReportErrors(code, syncDataReturn, modfiedGuidList, ref retArgs);
-                        
-                        if (retArgs == null)
-                            retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-                    }
-                    // Any exceptions that are caught here are most likely from the graph compiler
-                    catch (Exception e)
-                    {
-                        //retArgs = new GraphUpdateReadyEventArgs(syncData, EventStatus.Error, e.Message);
-                    }
-                }
-
-                if (runner.GraphUpdateReady != null)
-                {
-                    runner.GraphUpdateReady(this, retArgs); // Notify all listeners (e.g. UI).
-                }
-            }
-
-        }
-
-        private class ConvertNodesToCodeTask : Task
-        {
-            private List<SnapshotNode> snapshotNodes;
-            public ConvertNodesToCodeTask(List<SnapshotNode> snapshotNodes, LiveRunner runner)
-                : base(runner)
-            {
-                if (null == snapshotNodes || (snapshotNodes.Count <= 0))
-                    throw new ArgumentException("snapshotNodes", "Invalid SnapshotNode list (35CA7759D0C9)");
-
-                this.snapshotNodes = snapshotNodes;
-            }
-
-            public override void Execute()
-            {
-                NodesToCodeCompletedEventArgs args = null;
-
-                // Gather a list of node IDs to be sent back.
-                List<uint> inputNodeIds = new List<uint>();
-                foreach (SnapshotNode node in snapshotNodes)
-                    inputNodeIds.Add(node.Id);
-
-                lock (runner.operationsMutex)
-                {
-                    try
-                    {
-                        // Do the thing you do...
-                        List<SnapshotNode> outputNodes = GraphToDSCompiler.GraphUtilities.NodeToCodeBlocks(snapshotNodes, runner.graphCompiler);
-                        args = new NodesToCodeCompletedEventArgs(inputNodeIds,
-                            outputNodes, EventStatus.OK, "Yay, it works!");
-                    }
-                    catch (Exception exception)
-                    {
-                        args = new NodesToCodeCompletedEventArgs(inputNodeIds,
-                            null, EventStatus.Error, exception.Message);
-                    }
-                }
-
-                // Notify the listener (e.g. UI) of the completion.
-                if (null != runner.NodesToCodeCompleted)
-                    runner.NodesToCodeCompleted(this, args);
-            }
-        }
-
         private ProtoScriptTestRunner runner;
         private ProtoRunner.ProtoVMState vmState;
         private GraphToDSCompiler.GraphCompiler graphCompiler;
@@ -810,27 +181,26 @@ namespace ProtoScript.Runners
 
         private readonly Object operationsMutex = new object();
 
-        private Queue<Task> taskQueue; 
+        private Queue<Task> taskQueue;
 
         private Thread workerThread;
 
         public LiveRunner()
         {
-            InitRunner( new Options());
+            InitRunner(new Options());
         }
 
-        
         public LiveRunner(Options options)
         {
             InitRunner(options);
         }
         public GraphToDSCompiler.GraphCompiler GetCurrentGraphCompilerInstance()
-        { 
+        {
             return graphCompiler;
         }
+
         private void InitRunner(Options options)
         {
-
             graphCompiler = GraphToDSCompiler.GraphCompiler.CreateInstance();
             graphCompiler.SetCore(GraphUtilities.GetCore());
             runner = new ProtoScriptTestRunner();
@@ -843,7 +213,7 @@ namespace ProtoScript.Runners
             taskQueue = new Queue<Task>();
 
             workerThread = new Thread(new ThreadStart(TaskExecMethod));
-            
+
 
             workerThread.IsBackground = true;
             workerThread.Start();
@@ -859,15 +229,14 @@ namespace ProtoScript.Runners
             coreOptions = new ProtoCore.Options();
             coreOptions.GenerateExprID = true;
             coreOptions.IsDeltaExecution = true;
-            coreOptions.BuildOptErrorAsWarning = true;
-            
+
             coreOptions.WebRunner = false;
             coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             //coreOptions.DumpByteCode = true;
             //coreOptions.Verbose = true;
 
             // This should have been set in the consturctor
-            Validity.Assert(executionOptions != null); 
+            Validity.Assert(executionOptions != null);
         }
 
         private void InitCore()
@@ -880,8 +249,9 @@ namespace ProtoScript.Runners
             //Validity.Assert(coreOptions.IsDeltaExecution && !coreOptions.GenerateExprID);
 
             runnerCore = new ProtoCore.Core(coreOptions);
-            
+
             SyncCoreConfigurations(runnerCore, executionOptions);
+
 
             runnerCore.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(runnerCore));
             runnerCore.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(runnerCore));
@@ -902,10 +272,10 @@ namespace ProtoScript.Runners
             if (null == options)
                 return;
             //update the root module path name, if set.
-            if(!string.IsNullOrEmpty(options.RootModulePathName))
+            if (!string.IsNullOrEmpty(options.RootModulePathName))
                 core.Options.RootModulePathName = options.RootModulePathName;
             //then update the search path, if set.
-            if(null != options.SearchDirectories)
+            if (null != options.SearchDirectories)
                 core.Options.IncludeDirectories = options.SearchDirectories;
 
             //Finally update the pass thru configuration values
@@ -931,9 +301,9 @@ namespace ProtoScript.Runners
         public event GraphUpdateReadyEventHandler GraphUpdateReady = null;
         public event NodesToCodeCompletedEventHandler NodesToCodeCompleted = null;
 
+        public event DynamoNodeValueReadyEventHandler DynamoNodeValueReady = null;
+        public event DynamoGraphUpdateReadyEventHandler DynamoGraphUpdateReady = null;
         #endregion
-
-
 
         /// <summary>
         /// Push new synchronization data, returns immediately and will
@@ -951,6 +321,14 @@ namespace ProtoScript.Runners
 
             //Todo(Luke) add a Monitor queue to prevent having to have the 
             //work poll
+        }
+
+        public void BeginUpdateGraph(GraphSyncData syncData)
+        {
+            lock (taskQueue)
+            {
+                taskQueue.Enqueue(new DynamoUpdateGraphTask(syncData, this));
+            }
         }
 
         /// <summary>
@@ -986,6 +364,17 @@ namespace ProtoScript.Runners
             }
         }
 
+        public void BeginConvertNodesToCode(List<Subtree> subtrees)
+        {
+            if (null == subtrees || (subtrees.Count <= 0))
+                return; // Do nothing, there's no nodes to be converted.
+
+            lock (taskQueue)
+            {
+                taskQueue.Enqueue(new DynamoConvertNodesToCodeTask(subtrees, this));
+            }
+        }
+
         /// <summary>
         /// Query For a node value this will trigger a NodeValueReady callback
         /// when the value is available
@@ -1000,13 +389,6 @@ namespace ProtoScript.Runners
             }
         }
 
-        /// <summary>
-        /// Query For a node value this will trigger a NodeValueReady callback
-        /// when the value is available
-        /// This version is more efficent than calling the BeginQueryNodeValue(uint)
-        /// repeatedly 
-        /// </summary>
-        /// <param name="nodeId"></param>
         public void BeginQueryNodeValue(List<uint> nodeIds)
         {
             lock (taskQueue)
@@ -1019,7 +401,25 @@ namespace ProtoScript.Runners
             }
         }
 
+        public void BeginQueryNodeValue(Guid nodeGuid)
+        {
+            lock (taskQueue)
+            {
+                taskQueue.Enqueue(new DynamoNodeValueRequestTask(nodeGuid, this));
+            }
+        }
 
+        public void BeginQueryNodeValue(List<Guid> nodeGuids)
+        {
+            lock (taskQueue)
+            {
+                foreach (Guid nodeGuid in nodeGuids)
+                {
+                    taskQueue.Enqueue(
+                        new DynamoNodeValueRequestTask(nodeGuid, this));
+                }
+            }
+        }
 
         /// <summary>
         /// Query for a node value. This will block until the value is available.
@@ -1041,6 +441,27 @@ namespace ProtoScript.Runners
                         //Synchronous query to get the node
 
                         return InternalGetNodeValue(nodeId);
+                    }
+                }
+                Thread.Sleep(0);
+            }
+
+        }
+
+        public ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeGuid)
+        {
+            while (true)
+            {
+                lock (taskQueue)
+                {
+                    //Spin waiting for the queue to be empty
+                    if (taskQueue.Count == 0)
+                    {
+
+                        //No entries and we have the lock
+                        //Synchronous query to get the node
+
+                        return InternalGetNodeValue(nodeGuid);
                     }
                 }
                 Thread.Sleep(0);
@@ -1147,14 +568,29 @@ namespace ProtoScript.Runners
                     if (taskQueue.Count == 0)
                     {
                         string code = null;
-                         SynchronizeInternal(syndData, out code);
+                        SynchronizeInternal(syndData, out code);
                         return;
 
                     }
                 }
                 Thread.Sleep(0);
             }
-            
+
+        }
+
+        public void UpdateGraph(GraphSyncData syncData)
+        {
+            while (true)
+            {
+                lock (taskQueue)
+                {
+                    if (taskQueue.Count == 0)
+                    {
+                        SynchronizeInternal(syncData);
+                        return;
+                    }
+                }
+            }
         }
 
         public void UpdateCmdLineInterpreter(string code)
@@ -1189,9 +625,9 @@ namespace ProtoScript.Runners
 
                 if (task != null)
                 {
-                        task.Execute();
+                    task.Execute();
                     continue;
-                    
+
                 }
 
                 Thread.Sleep(50);
@@ -1212,7 +648,7 @@ namespace ProtoScript.Runners
             // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
             const int blockID = 0;
 
-            return  vmState.LookupName(varname, blockID);
+            return vmState.LookupName(varname, blockID);
         }
 
         private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(uint nodeId)
@@ -1228,7 +664,10 @@ namespace ProtoScript.Runners
             return InternalGetNodeValue(varname);
         }
 
-
+        private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(Guid nodeGuid)
+        {
+            throw new NotImplementedException();
+        }
 
         private bool Compile(string code, out int blockId)
         {
@@ -1272,7 +711,7 @@ namespace ProtoScript.Runners
 
             runner.Execute(runnerCore, runtimeContext);
 
-           // ExecutionMirror mirror = new ExecutionMirror(runnerCore.CurrentExecutive.CurrentDSASMExec, runnerCore);
+            // ExecutionMirror mirror = new ExecutionMirror(runnerCore.CurrentExecutive.CurrentDSASMExec, runnerCore);
 
             return new ProtoRunner.ProtoVMState(runnerCore);
         }
@@ -1298,6 +737,11 @@ namespace ProtoScript.Runners
         private void ResetVMForDeltaExecution()
         {
             runnerCore.ResetForDeltaExecution();
+        }
+
+        private void SynchronizeInternal(GraphSyncData syncData)
+        {
+            throw new NotImplementedException();
         }
 
         private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
@@ -1348,7 +792,7 @@ namespace ProtoScript.Runners
             if (string.IsNullOrEmpty(code))
             {
                 code = "";
-                
+
                 ResetVMForDeltaExecution();
                 return;
             }
