@@ -26,7 +26,14 @@ namespace ProtoScript.Runners
     {
         public Guid GUID;
         public List<AssociativeNode> AstNodes;
+
+        public Subtree(List<AssociativeNode> astNodes)
+        {
+            GUID = Guid.Empty;
+            AstNodes = astNodes;
+        }
     }
+
 
     public class GraphSyncData
     {
@@ -63,18 +70,11 @@ namespace ProtoScript.Runners
         void BeginConvertNodesToCode(List<SnapshotNode> snapshotNodes);
 
         void UpdateGraph(GraphSyncData syncData);
-        void BeginUpdateGraph(GraphSyncData syncData);
-        void BeginConvertNodesToCode(List<Subtree> subtrees);
-
         void BeginQueryNodeValue(uint nodeId);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName);
         void BeginQueryNodeValue(List<uint> nodeIds);
         string GetCoreDump();
-
-        void BeginQueryNodeValue(Guid nodeGuid);
-        ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
-        void BeginQueryNodeValue(List<Guid> nodeGuid);
 
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
@@ -556,6 +556,8 @@ namespace ProtoScript.Runners
 
         }
 
+      
+
         public void UpdateGraph(SynchronizeData syndData)
         {
 
@@ -578,6 +580,7 @@ namespace ProtoScript.Runners
 
         }
 
+
         public void UpdateGraph(GraphSyncData syncData)
         {
             while (true)
@@ -586,7 +589,8 @@ namespace ProtoScript.Runners
                 {
                     if (taskQueue.Count == 0)
                     {
-                        SynchronizeInternal(syncData);
+                        string code = null;
+                        SynchronizeInternal(syncData, out code);
                         return;
                     }
                 }
@@ -739,9 +743,86 @@ namespace ProtoScript.Runners
             runnerCore.ResetForDeltaExecution();
         }
 
-        private void SynchronizeInternal(GraphSyncData syncData)
+        private void ResetForDeltaASTExecution()
         {
-            throw new NotImplementedException();
+            runnerCore.ResetForDeltaASTExecution();
+        }
+
+        /// <summary>
+        /// This function resets properties in LiveRunner core and compileStateTracker required in preparation for a subsequent run
+        /// </summary>
+        private void RetainVMStatesForDeltaExecution()
+        {
+            //builtInsLoaded = true;
+            //deltaCompileStartPC = runnerCore.CodeBlockList[0].instrStream.instrList.Count;
+            runnerCore.CompleteCodeBlockList.Clear();            
+        }
+
+        private void SynchronizeInternal(GraphSyncData syncData, out string code)
+        {
+            //throw new NotImplementedException();
+            code = string.Empty;
+            if (syncData == null)
+            {
+                //ResetForDeltaASTExecution();
+                return;
+            }
+
+            if (syncData.AddedSubtrees != null)
+            {
+                foreach (var st in syncData.AddedSubtrees)
+                {
+                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+                    ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(st.AstNodes);
+                    code += codeGen.GenerateCode();
+                }
+            }
+
+            if (syncData.DeletedSubtrees != null)
+            {
+                foreach (var st in syncData.DeletedSubtrees)
+                {
+                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+
+                    List<ProtoCore.AST.AssociativeAST.AssociativeNode> astNodeList = new List<AssociativeNode>();
+                    foreach (var node in st.AstNodes)
+                    {
+                        if (node is BinaryExpressionNode)
+                        {
+                            (node as BinaryExpressionNode).RightNode = new NullNode();
+                            astNodeList.Add(node);
+                        }
+                    }
+                    ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(astNodeList);
+                    code += codeGen.GenerateCode();
+                }
+            }
+
+            if (syncData.ModifiedSubtrees != null)
+            {
+                foreach (var st in syncData.ModifiedSubtrees)
+                {
+                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+                    ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(st.AstNodes);
+                    code += codeGen.GenerateCode();
+                }
+            }
+
+            //Synchronize the core configuration before compilation and execution.
+            //if (syncCoreConfigurations)
+            //{
+            //    SyncCoreConfigurations(runnerCore, executionOptions);
+            //    syncCoreConfigurations = false;
+            //}
+
+            ResetForDeltaASTExecution();
+            bool succeeded = CompileAndExecute(code);
+
+            if (succeeded)
+            {
+                //graphCompiler.ResetPropertiesForNextExecution();
+                RetainVMStatesForDeltaExecution();
+            }
         }
 
         private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
@@ -792,7 +873,6 @@ namespace ProtoScript.Runners
             if (string.IsNullOrEmpty(code))
             {
                 code = "";
-
                 ResetVMForDeltaExecution();
                 return;
             }
