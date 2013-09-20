@@ -1,0 +1,5 @@
+D:\jun\AutodeskResearch\git\designscript\UIs\Prototype\bin\x64\Debug\DHLoggingLib.dll
+D:\jun\AutodeskResearch\git\designscript\UIs\Prototype\bin\x64\Debug\DHLoggingLib.pdb
+D:\jun\AutodeskResearch\git\designscript\UIs\Editor\DHLoggingLib\obj\x64\Debug\ResolveAssemblyReference.cache
+D:\jun\AutodeskResearch\git\designscript\UIs\Editor\DHLoggingLib\obj\x64\Debug\DHLoggingLib.dll
+D:\jun\AutodeskResearch\git\designscript\UIs\Editor\DHLoggingLib\obj\x64\Debug\DHLoggingLib.pdb
