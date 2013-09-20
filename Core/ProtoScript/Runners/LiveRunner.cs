@@ -11,7 +11,8 @@ using System.ComponentModel;
 using System.Threading;
 using ProtoFFI;
 using ProtoCore.AssociativeGraph;
-
+using ProtoCore.AST.AssociativeAST;
+using ProtoCore.Mirror;
 
 namespace ProtoScript.Runners
 {
@@ -20,6 +21,46 @@ namespace ProtoScript.Runners
         OK,
         Error,
         Warning
+    }
+
+    public struct Subtree
+    {
+        public Guid GUID;
+        public List<AssociativeNode> AstNodes;
+
+        public Subtree(List<AssociativeNode> astNodes)
+        {
+            GUID = Guid.Empty;
+            AstNodes = astNodes;
+        }
+    }
+
+    public class GraphSyncData
+    {
+        public List<Subtree> DeletedSubtrees
+        {
+            get;
+            private set;
+        }
+
+        public List<Subtree> AddedSubtrees
+        {
+            get;
+            private set;
+        }
+
+        public List<Subtree> ModifiedSubtrees
+        {
+            get;
+            private set;
+        }
+
+        public GraphSyncData(List<Subtree> deleted, List<Subtree> added, List<Subtree> modified)
+        {
+            DeletedSubtrees = deleted;
+            AddedSubtrees = added;
+            ModifiedSubtrees = modified;
+        }
     }
 
 
@@ -117,10 +158,12 @@ namespace ProtoScript.Runners
         void BeginUpdateGraph(GraphToDSCompiler.SynchronizeData syncData);
         void BeginConvertNodesToCode(List<SnapshotNode> snapshotNodes);
 
+        void UpdateGraph(GraphSyncData syncData);
         void BeginQueryNodeValue(uint nodeId);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName);
         void BeginQueryNodeValue(List<uint> nodeIds);
+        string GetCoreDump();
 
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
@@ -1067,6 +1110,72 @@ namespace ProtoScript.Runners
 
         }
 
+        /// <summary>
+        /// VM Debugging API for general Debugging purposes 
+        /// temporarily used by Cmmand Line REPL in FormitDesktop
+        /// </summary>
+        /// <returns></returns>
+        public string GetCoreDump()
+        {
+            // Prints out the final Value of every symbol in the program
+            // Traverse order:
+            //  Exelist, Globals symbols
+
+            StringBuilder globaltrace = null;
+
+            ProtoCore.DSASM.Executive exec = runnerCore.CurrentExecutive.CurrentDSASMExec;
+            ProtoCore.DSASM.Mirror.ExecutionMirror execMirror = new ProtoCore.DSASM.Mirror.ExecutionMirror(exec, runnerCore);
+            ProtoCore.DSASM.Executable exe = exec.rmem.Executable;
+
+            // Only display symbols defined in the default top-most langauge block;
+            // Otherwise garbage information may be displayed.
+            string formattedString = string.Empty;
+            if (exe.runtimeSymbols.Length > 0)
+            {
+                int blockId = 0;
+
+                ProtoCore.DSASM.SymbolTable symbolTable = exe.runtimeSymbols[blockId];
+
+                for (int i = 0; i < symbolTable.symbolList.Count; ++i)
+                {
+                    //int n = symbolTable.symbolList.Count - 1;
+                    //formatParams.ResetOutputDepth();
+                    ProtoCore.DSASM.SymbolNode symbolNode = symbolTable.symbolList[i];
+
+                    bool isLocal = ProtoCore.DSASM.Constants.kGlobalScope != symbolNode.functionIndex;
+                    bool isStatic = (symbolNode.classScope != ProtoCore.DSASM.Constants.kInvalidIndex && symbolNode.isStatic);
+                    if (symbolNode.isArgument || isLocal || isStatic || symbolNode.isTemp)
+                    {
+                        // These have gone out of scope, their values no longer exist
+                        //return ((null == globaltrace) ? string.Empty : globaltrace.ToString());
+                        continue;
+                    }
+
+                    ProtoCore.Runtime.RuntimeMemory rmem = exec.rmem;
+                    ProtoCore.DSASM.StackValue sv = rmem.GetStackData(blockId, i, ProtoCore.DSASM.Constants.kGlobalScope);
+                    formattedString = formattedString + string.Format("{0} = {1}\n", symbolNode.name, execMirror.GetStringValue(sv, rmem.Heap, blockId));
+
+                    //if (null != globaltrace)
+                    //{
+                    //    int maxLength = 1020;
+                    //    while (formattedString.Length > maxLength)
+                    //    {
+                    //        globaltrace.AppendLine(formattedString.Substring(0, maxLength));
+                    //        formattedString = formattedString.Remove(0, maxLength);
+                    //    }
+
+                    //    globaltrace.AppendLine(formattedString);
+                    //}
+                }
+
+                //formatParams.ResetOutputDepth();
+            }
+
+            //return ((null == globaltrace) ? string.Empty : globaltrace.ToString());
+            return formattedString;
+        }
+
+
         public void UpdateGraph(SynchronizeData syndData)
         {
 
@@ -1087,6 +1196,22 @@ namespace ProtoScript.Runners
                 Thread.Sleep(0);
             }
             
+        }
+
+        public void UpdateGraph(GraphSyncData syncData)
+        {
+            while (true)
+            {
+                lock (taskQueue)
+                {
+                    if (taskQueue.Count == 0)
+                    {
+                        string code = null;
+                        SynchronizeInternal(syncData, out code);
+                        return;
+                    }
+                }
+            }
         }
 
         public void UpdateCmdLineInterpreter(string code)
@@ -1160,6 +1285,10 @@ namespace ProtoScript.Runners
             return InternalGetNodeValue(varname);
         }
 
+        private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(Guid nodeGuid)
+        {
+            throw new NotImplementedException();
+        }
 
 
         private bool Compile(string code, out int blockId)
@@ -1232,6 +1361,88 @@ namespace ProtoScript.Runners
             runnerCore.ResetForDeltaExecution();
         }
 
+        private void ResetForDeltaASTExecution()
+        {
+            runnerCore.ResetForDeltaASTExecution();
+        }
+
+        /// <summary>
+        /// This function resets properties in LiveRunner core and compileStateTracker required in preparation for a subsequent run
+        /// </summary>
+        private void RetainVMStatesForDeltaExecution()
+        {
+            //builtInsLoaded = true;
+            //deltaCompileStartPC = runnerCore.CodeBlockList[0].instrStream.instrList.Count;
+            runnerCore.CompleteCodeBlockList.Clear();            
+        }
+
+        private void SynchronizeInternal(GraphSyncData syncData, out string code)
+        {
+            //throw new NotImplementedException();
+            code = string.Empty;
+            if (syncData == null)
+            {
+                //ResetForDeltaASTExecution();
+                return;
+            }
+
+            if (syncData.AddedSubtrees != null)
+            {
+                foreach (var st in syncData.AddedSubtrees)
+                {
+                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+                    ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(st.AstNodes);
+                    code += codeGen.GenerateCode();
+                }
+            }
+
+            if (syncData.DeletedSubtrees != null)
+            {
+                foreach (var st in syncData.DeletedSubtrees)
+                {
+                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+
+                    List<ProtoCore.AST.AssociativeAST.AssociativeNode> astNodeList = new List<AssociativeNode>();
+                    foreach (var node in st.AstNodes)
+                    {
+                        if (node is BinaryExpressionNode)
+                        {
+                            (node as BinaryExpressionNode).RightNode = new NullNode();
+                            astNodeList.Add(node);
+                        }
+                    }
+                    ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(astNodeList);
+                    code += codeGen.GenerateCode();
+                }
+            }
+
+            if (syncData.ModifiedSubtrees != null)
+            {
+                foreach (var st in syncData.ModifiedSubtrees)
+                {
+                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+                    ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(st.AstNodes);
+                    code += codeGen.GenerateCode();
+                }
+            }
+
+            //Synchronize the core configuration before compilation and execution.
+            //if (syncCoreConfigurations)
+            //{
+            //    SyncCoreConfigurations(runnerCore, executionOptions);
+            //    syncCoreConfigurations = false;
+            //}
+
+            ResetForDeltaASTExecution();
+            bool succeeded = CompileAndExecute(code);
+
+            if (succeeded)
+            {
+                //graphCompiler.ResetPropertiesForNextExecution();
+                RetainVMStatesForDeltaExecution();
+            }
+        }
+
         private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
         {
             Validity.Assert(null != runner);
@@ -1271,14 +1482,16 @@ namespace ProtoScript.Runners
             }
         }
 
+        // TODO: Aparajit: This needs to be fixed for Command Line REPL
         private void SynchronizeInternal(string code)
         {
             Validity.Assert(null != runner);
-            Validity.Assert(null != graphCompiler);
+            //Validity.Assert(null != graphCompiler);
 
             if (string.IsNullOrEmpty(code))
             {
                 code = "";
+                
                 ResetVMForDeltaExecution();
                 return;
             }
@@ -1286,7 +1499,6 @@ namespace ProtoScript.Runners
             {
                 System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
 
-                //List<string> deletedVars = new List<string>();
                 ResetVMForDeltaExecution();
 
                 //Synchronize the core configuration before compilation and execution.
@@ -1297,10 +1509,10 @@ namespace ProtoScript.Runners
                 }
 
                 bool succeeded = CompileAndExecute(code);
-                if (succeeded)
-                {
-                    graphCompiler.ResetPropertiesForNextExecution();
-                }
+                //if (succeeded)
+                //{
+                //    graphCompiler.ResetPropertiesForNextExecution();
+                //}
             }
         }
         #endregion

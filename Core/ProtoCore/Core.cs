@@ -1241,6 +1241,12 @@ namespace ProtoCore
             RunningBlock = 0;
         }
 
+        public void ResetForDeltaASTExecution()
+        {
+            ResetForExecution();
+            ExprInterpreterExe = null;
+        }
+
         // Comment Jun:
         // The core is reused on delta execution
         // These are properties that need to be reset on subsequent executions
