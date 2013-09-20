@@ -413,7 +413,7 @@ namespace ProtoFFI
     class DisposeFunctionPointer : CLRFFIFunctionPointer
     {
         public DisposeFunctionPointer(CLRDLLModule module, MemberInfo method, ProtoCore.Type retType)
-            : base(module, ProtoCore.DSDefinitions.Kw.kw_Dispose, method, default(List<ProtoCore.Type>), retType)
+            : base(module, ProtoCore.DSDefinitions.Keyword.Dispose, method, default(List<ProtoCore.Type>), retType)
         {
         }
 
