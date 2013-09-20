@@ -25,7 +25,6 @@ namespace DesignScript.Editor.CodeGen
         protected bool enforceTypeCheck;
         public ProtoCore.DSASM.CodeBlock codeBlock { get; set; }
         public ProtoCore.CompileTime.Context context { get; set; }
-        protected ProtoCore.DSASM.OpKeywordData opKwData;
         protected int globalProcIndex;
         protected ProtoCore.DSASM.ProcedureNode localProcedure;
         protected int tryLevel;
@@ -57,7 +56,6 @@ namespace DesignScript.Editor.CodeGen
                 CoreCodeGen.ImportTable = new ImportTable();
 
             context = new ProtoCore.CompileTime.Context();
-            opKwData = new ProtoCore.DSASM.OpKeywordData();
 
             targetLangBlock = ProtoCore.DSASM.Constants.kInvalidIndex;
 
