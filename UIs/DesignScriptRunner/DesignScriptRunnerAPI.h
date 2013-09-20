@@ -74,6 +74,8 @@ public:
     /// </summary>
     virtual void updateGraphAsync(const wchar_t* codesegment) = 0;
 
+    virtual void importLibrary(const wchar_t* codesegment) = 0;
+
     /// <summary>
     /// Asynchronous method to update the VM with given code segment from the command-line interpreter. This 
     /// call queues the given code segment to the live engine for evaluation. 

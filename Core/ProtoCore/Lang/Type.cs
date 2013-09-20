@@ -89,7 +89,7 @@ namespace ProtoCore
         {
             if (type == PrimitiveType.kInvalidType || type == PrimitiveType.kMaxPrimitives)
             {
-                throw new ArgumentOutOfRangeException("Not a valid primitive type");
+                return null;
             }
 
             if (null == primitiveTypeNames)
