@@ -25,6 +25,9 @@ namespace ProtoCore
         private static string ext = "csstate";
         public static string filename = "vmstate_test";
 
+        private static FileStream fileStream = null;
+        private static string filePath = GetThisSessionFileName();
+
         /// <summary>
         /// Generate a callsite guid, given a functiongroup ID and the expression ID
         /// </summary>
@@ -60,10 +63,8 @@ namespace ProtoCore
 
 #region Static_LoadStore_Methods
 
-        internal static bool SaveState(CallsiteExecutionState data)
+        public static bool SaveState(CallsiteExecutionState data)
         {
-            string filePath = GetThisSessionFileName();
-            FileStream fileStream = null;
             try
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(CallsiteExecutionState));
@@ -83,11 +84,9 @@ namespace ProtoCore
             return true;
         }
 
-        internal static CallsiteExecutionState LoadState()
+        public static CallsiteExecutionState LoadState()
         {
-            string filePath = GetThisSessionFileName();
             CallsiteExecutionState csState = null;
-            FileStream fileStream = null; 
             if (!string.IsNullOrEmpty(filePath) && (File.Exists(filePath)))
             {
                 try
@@ -106,10 +105,6 @@ namespace ProtoCore
                 csState = new CallsiteExecutionState();
             }
 
-            if (null != fileStream)
-            {
-                fileStream.Close();
-            }
             return csState;
         }
 
