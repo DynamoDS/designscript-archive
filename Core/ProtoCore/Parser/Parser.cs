@@ -445,9 +445,9 @@ public Node root { get; set; }
     private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateBinaryOperatorMethodCallNode(Operator op, ProtoCore.AST.AssociativeAST.AssociativeNode op1, ProtoCore.AST.AssociativeAST.AssociativeNode op2)
     {
         ProtoCore.AST.AssociativeAST.FunctionCallNode funCallNode = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString(), Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString() };
+        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Op.GetOpFunction(op), Name = ProtoCore.DSASM.Op.GetOpFunction(op) };
         funCallNode.Function = funcName;
-        funCallNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funCallNode.Name = ProtoCore.DSASM.Op.GetOpFunction(op);
         funCallNode.FormalArguments.Add(op1); funCallNode.FormalArguments.Add(op2);
 
         NodeUtils.SetNodeLocation(funCallNode, op1, op2);
@@ -457,9 +457,9 @@ public Node root { get; set; }
  	private ProtoCore.AST.AssociativeAST.AssociativeNode GenerateUnaryOperatorMethodCallNode(UnaryOperator op, ProtoCore.AST.AssociativeAST.AssociativeNode operand)
     {
         ProtoCore.AST.AssociativeAST.FunctionCallNode funCallNode = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
-        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString(), Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString() };
+        ProtoCore.AST.AssociativeAST.IdentifierNode funcName = new ProtoCore.AST.AssociativeAST.IdentifierNode { Value = ProtoCore.DSASM.Op.GetUnaryOpFunction(op), Name = ProtoCore.DSASM.Op.GetUnaryOpFunction(op) };
         funCallNode.Function = funcName;
-        funCallNode.Name = ProtoCore.DSASM.Constants.kInternalNamePrefix + op.ToString();
+        funCallNode.Name = ProtoCore.DSASM.Op.GetUnaryOpFunction(op);
         funCallNode.FormalArguments.Add(operand);
 
         NodeUtils.CopyNodeLocation(funCallNode, operand);
