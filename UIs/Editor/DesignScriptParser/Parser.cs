@@ -74,8 +74,6 @@ public class Parser {
 	public Scanner scanner;
 	public Errors  errors;
 
-    private ProtoCore.DSASM.OpKeywordData opKwData;
-
 	public Token t;    // last recognized token
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
@@ -322,7 +320,6 @@ public DesignScript.Parser.Associative.CodeBlockNode root { get; set; }
 	public Parser(Scanner scanner, ProtoCore.Core coreObj) {
 		this.scanner = scanner;
 		errors = new Errors();
-        opKwData = new ProtoCore.DSASM.OpKeywordData();
         core = coreObj;
 		root = new DesignScript.Parser.Associative.CodeBlockNode();
 	}
