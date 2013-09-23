@@ -186,9 +186,9 @@ namespace ProtoImperative
                     opAX.opdata = (int)ProtoCore.DSASM.Registers.AX;
                     EmitPop(opAX, Constants.kGlobalScope);
 
-                    string op = opKwData.opStringTable[ProtoCore.DSASM.Operator.add];
+                    string op = Op.GetOpName(ProtoCore.DSASM.Operator.add);
                     EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX, ProtoCore.DSASM.kw.regBX);
-                    EmitBinary(opKwData.opCodeTable[ProtoCore.DSASM.Operator.add], opAX, opBX);
+                    EmitBinary(Op.GetOpCode(ProtoCore.DSASM.Operator.add), opAX, opBX);
 
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                     EmitPush(opAX);
@@ -248,9 +248,9 @@ namespace ProtoImperative
                 EmitInstrConsole(ProtoCore.DSASM.kw.pop, ProtoCore.DSASM.kw.regAX);
                 EmitPop(opAX, Constants.kGlobalScope);
 
-                op = opKwData.opStringTable[ProtoCore.DSASM.Operator.mul];
+                op = Op.GetOpName(ProtoCore.DSASM.Operator.mul);
                 EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX, ProtoCore.DSASM.kw.regBX);
-                EmitBinary(opKwData.opCodeTable[ProtoCore.DSASM.Operator.mul], opAX, opBX);
+                EmitBinary(Op.GetOpCode(ProtoCore.DSASM.Operator.mul), opAX, opBX);
 
                 EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                 EmitPush(opRes);
@@ -266,9 +266,9 @@ namespace ProtoImperative
                     EmitInstrConsole(ProtoCore.DSASM.kw.pop, ProtoCore.DSASM.kw.regAX);
                     EmitPop(opAX, Constants.kGlobalScope);
 
-                    op = opKwData.opStringTable[ProtoCore.DSASM.Operator.add];
+                    op = Op.GetOpName(ProtoCore.DSASM.Operator.add);
                     EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX, ProtoCore.DSASM.kw.regBX);
-                    EmitBinary(opKwData.opCodeTable[ProtoCore.DSASM.Operator.add], opAX, opBX);
+                    EmitBinary(Op.GetOpCode(ProtoCore.DSASM.Operator.add), opAX, opBX);
 
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                     EmitPush(opRes);
@@ -375,7 +375,7 @@ namespace ProtoImperative
                 ProtoCore.DSASM.Constants.kInvalidIndex, 
                 funcIndex, 
                 datatype,
-                core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false),
+                TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false),
                 size, 
                 datasize,
                 false,
@@ -1024,7 +1024,7 @@ namespace ProtoImperative
         private void EmitIdentifierNode(ImperativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null)
         {
             IdentifierNode t = node as IdentifierNode;
-            if (t.Name.Equals(ProtoCore.DSDefinitions.Kw.kw_this))
+            if (t.Name.Equals(ProtoCore.DSDefinitions.Keyword.This))
             {
                 if (localProcedure != null)
                 {
@@ -1130,7 +1130,7 @@ namespace ProtoImperative
 
                 EmitPushVarData(runtimeIndex, dimensions);
 
-                ProtoCore.Type varType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false, 0);
+                ProtoCore.Type varType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false, 0);
                 symbolnode = Allocate(t.Value, globalProcIndex, varType);
 
                 EmitInstrConsole(ProtoCore.DSASM.kw.pop, t.Value);
@@ -2171,7 +2171,7 @@ namespace ProtoImperative
                 ProtoCore.DSASM.SymbolNode symbolnode = null;
 
                 string s = t.Value;
-                bool isReturn = (s == ProtoCore.DSDefinitions.Kw.kw_return);
+                bool isReturn = (s == ProtoCore.DSDefinitions.Keyword.Return);
                 if (isReturn)
                 {
                     EmitReturnStatement(node, inferedType);
@@ -2267,7 +2267,7 @@ namespace ProtoImperative
                         dimensions = DfsEmitArrayIndexHeap(t.ArrayDimensions);
                     }
 
-                    ProtoCore.Type castType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false);
+                    ProtoCore.Type castType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeVar, false);
                     var tident = b.LeftNode as TypedIdentifierNode;
                     if (tident != null)
                     {
@@ -2281,7 +2281,7 @@ namespace ProtoImperative
                         {
                             string message = String.Format(ProtoCore.BuildData.WarningMessage.kTypeUndefined, tident.datatype.Name);
                             buildStatus.LogWarning(ProtoCore.BuildData.WarningID.kTypeUndefined, message, core.CurrentDSFileName, b.line, b.col);
-                            castType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kInvalidType, false);
+                            castType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kInvalidType, false);
                             castType.Name = tident.datatype.Name;
                             castType.rank = tident.datatype.rank;
                             castType.IsIndexable = (castType.rank != 0);
@@ -2502,9 +2502,9 @@ namespace ProtoImperative
                     opAX.opdata = (int)ProtoCore.DSASM.Registers.AX;
                     EmitPop(opAX, Constants.kGlobalScope);
 
-                    string op = opKwData.unaryOpStringTable[u.Operator];
+                    string op = Op.GetUnaryOpName(u.Operator);
                     EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX);
-                    EmitUnary(opKwData.unaryOpCodeTable[u.Operator], opAX);
+                    EmitUnary(Op.GetUnaryOpCode(u.Operator), opAX);
 
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
                     ProtoCore.DSASM.StackValue opRes = new ProtoCore.DSASM.StackValue();
@@ -3182,10 +3182,10 @@ namespace ProtoImperative
             if (leftMostIdentList.LeftNode is IdentifierNode)
             {
                 IdentifierNode leftMostIdent = leftMostIdentList.LeftNode as IdentifierNode;
-                if (!string.Equals(ProtoCore.DSDefinitions.Kw.kw_this, leftMostIdent.Name) &&
+                if (!string.Equals(ProtoCore.DSDefinitions.Keyword.This, leftMostIdent.Name) &&
                     IsProperty(leftMostIdent.Name))
                 {
-                    var thisIdent = nodeBuilder.BuildIdentfier(ProtoCore.DSDefinitions.Kw.kw_this);
+                    var thisIdent = nodeBuilder.BuildIdentfier(ProtoCore.DSDefinitions.Keyword.This);
                     var thisIdentList = nodeBuilder.BuildIdentList(thisIdent, leftMostIdent);
                     leftMostIdentList.LeftNode = thisIdentList;
                 }
@@ -3622,7 +3622,7 @@ namespace ProtoImperative
         {
             var ident = new IdentifierNode();
             ident.Name = ident.Value = name;
-            ident.datatype = core.TypeSystem.BuildTypeObject(type, false);
+            ident.datatype = TypeSystem.BuildPrimitiveTypeObject(type, false);
 
             return ident;
         }
@@ -3634,7 +3634,7 @@ namespace ProtoImperative
 
         public ImperativeNode BuildReturn()
         {
-            return BuildIdentfier(ProtoCore.DSDefinitions.Kw.kw_return, PrimitiveType.kTypeReturn);
+            return BuildIdentfier(ProtoCore.DSDefinitions.Keyword.Return, PrimitiveType.kTypeReturn);
         }
 
         public ImperativeNode BuildIdentList(ImperativeNode leftNode, ImperativeNode rightNode)
