@@ -1088,6 +1088,48 @@ r4 = ContainsKey(a, true);
         }
 
         [Test]
+        public void TestDictionary23()
+        {
+            // Test for-loop
+            String code = @"
+r = [Imperative]
+{
+    a = {1, 5, 7};
+    a[""x""] = 9;
+    a[true] = 11;
+    x = 0; 
+    for (v in a) 
+    {
+        x = x + v;
+    }
+    return = x;
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 33);
+        }
+
+        [Test]
+        public void TestDictionary24()
+        {
+            // Test for-loop
+            String code = @"
+r = [Imperative]
+{
+    a = {};
+    x = 0;
+    for (v in a) 
+    {
+        x = x + v;
+    }
+    return = x;
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 0);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
