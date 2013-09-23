@@ -160,6 +160,9 @@ namespace ProtoScript.Runners
 
         void UpdateGraph(GraphSyncData syncData);
         void BeginQueryNodeValue(uint nodeId);
+
+        void UpdateCmdLineInterpreter(string code);
+
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName);
         ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName);
@@ -1250,6 +1253,8 @@ namespace ProtoScript.Runners
                     //Spin waiting for the queue to be empty
                     if (taskQueue.Count == 0)
                     {
+                        runnerCore.Options.IsDeltaCompile = true;
+
                         SynchronizeInternal(code);
                         return;
                     }
