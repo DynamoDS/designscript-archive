@@ -20,7 +20,7 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         public static ClassNode GetGreatestCommonSubclassForArray(StackValue array, Core core)
         {
-            if (!IsArray(array))
+            if (!StackUtils.IsArray(array))
                 throw new ArgumentException("The stack value provided was not an array");
 
             Dictionary<ClassNode, int> typeStats = GetTypeStatisticsForArray(array, core);
@@ -176,7 +176,7 @@ namespace ProtoCore.Utils
 
         public static Dictionary<int, StackValue> GetTypeExamplesForLayer(StackValue array, Core core)
         {
-            if (!IsArray(array))
+            if (!StackUtils.IsArray(array))
             {
                 Dictionary<int, StackValue> ret = new Dictionary<int, StackValue>();
                 ret.Add((int)array.metaData.type, array);
@@ -207,7 +207,7 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         public static Dictionary<ClassNode, int> GetTypeStatisticsForLayer(StackValue array, Core core)
         {
-            if (!IsArray(array))
+            if (!StackUtils.IsArray(array))
             {
                 Dictionary<ClassNode, int> ret = new Dictionary<ClassNode, int>();
                 ret.Add(core.ClassTable.ClassNodes[(int)array.metaData.type], 1);
@@ -241,7 +241,7 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         public static Dictionary<ClassNode, int> GetTypeStatisticsForArray(StackValue array, Core core)
         {
-            if (!IsArray(array))
+            if (!StackUtils.IsArray(array))
             {
                 Dictionary<ClassNode, int> ret = new Dictionary<ClassNode, int>();
                 ret.Add(core.ClassTable.ClassNodes[(int) array.metaData.type], 1);
@@ -289,7 +289,7 @@ namespace ProtoCore.Utils
             if (tracer > RECURSION_LIMIT)
                 throw new CompilerInternalException("Internal Recursion limit exceeded in Rank Check - Possible heap corruption {3317D4F6-4758-4C19-9680-75B68DA0436D}");
 
-            if (!IsArray(array))
+            if (!StackUtils.IsArray(array))
                 return 0;
             //throw new ArgumentException("The stack value provided was not an array");
 
@@ -324,16 +324,6 @@ namespace ProtoCore.Utils
         }
 
         /// <summary>
-        /// Is the StackValue An Array
-        /// </summary>
-        /// <param name="sv"></param>
-        /// <returns></returns>
-        public static bool IsArray(StackValue sv)
-        {
-            return sv.optype == AddressType.ArrayPointer;
-        }
-
-        /// <summary>
         /// Whether sv is double or arrays contains double value.
         /// </summary>
         /// <param name="sv"></param>
@@ -341,13 +331,13 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         public static bool ContainsDoubleElement(StackValue sv, Core core)
         {
-            if (!IsArray(sv))
+            if (!StackUtils.IsArray(sv))
                 return core.TypeSystem.GetType(sv) == (int)PrimitiveType.kTypeDouble;
 
             StackValue[] svArray = core.Rmem.GetArrayElements(sv);
             foreach (var item in svArray)
             {
-                if (IsArray(item) && ContainsDoubleElement(item, core))
+                if (StackUtils.IsArray(item) && ContainsDoubleElement(item, core))
                     return true;
 
                 if (core.TypeSystem.GetType(item) == (int)PrimitiveType.kTypeDouble)
@@ -368,7 +358,7 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         public static bool ContainsNonArrayElement(StackValue sv, Core core)
         {
-            if (!IsArray(sv))
+            if (!StackUtils.IsArray(sv))
                 return true;
 
             StackValue[] svArray = core.Rmem.GetArrayElements(sv);
@@ -400,7 +390,7 @@ namespace ProtoCore.Utils
 
         public static bool IsUniform(StackValue sv, Core core)
         {
-            if (!IsArray(sv))
+            if (!StackUtils.IsArray(sv))
                 return false;
 
             if (Utils.ArrayUtils.GetTypeStatisticsForArray(sv, core).Count != 1)
@@ -458,7 +448,7 @@ namespace ProtoCore.Utils
             }
 
             int ptr = (int)svArray.opdata;
-            while (IsArray(core.Rmem.Heap.Heaplist[ptr].Stack[0]))
+            while (StackUtils.IsArray(core.Rmem.Heap.Heaplist[ptr].Stack[0]))
             {
                 ptr = (int)core.Rmem.Heap.Heaplist[ptr].Stack[0].opdata;
             }
