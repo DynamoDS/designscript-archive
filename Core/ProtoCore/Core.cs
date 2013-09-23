@@ -174,6 +174,8 @@ namespace ProtoCore
 
             IsDeltaCompile = false;
 
+            IsDeltaCompile = false;
+
         }
 
         public bool DumpByteCode { get; set; }
