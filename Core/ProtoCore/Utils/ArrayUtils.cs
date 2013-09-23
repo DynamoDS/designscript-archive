@@ -676,29 +676,33 @@ namespace ProtoCore.Utils
 
             for (int i = 0; i < indices.Length - 1; ++i)
             {
-                if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
-                {
-                    core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
-                    return StackUtils.BuildNull();
-                }
-
                 StackValue index = indices[i];
+                HeapElement he = GetHeapElement(array, core);
+
+                StackValue subArray;
+
                 if (StackUtils.IsNumeric(index))
                 {
                     index = index.AsInt();
-                    array = GetValueFromIndex(array, (int)index.opdata, core);
+                    int absIndex = he.ExpandByAcessingAt((int)index.opdata);
+                    subArray = he.Stack[absIndex];
                 }
                 else
                 {
-                    if (!StackUtils.IsArray(array))
-                    {
-                        core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
-                        return StackUtils.BuildNull();
-                    }
-                    array = GetValueFromIndex(array, index, core);
+                    subArray = GetValueFromIndex(array, index, core);
                 }
-            }
 
+                // auto-promotion
+                if (!StackUtils.IsArray(subArray))
+                {
+                    subArray = HeapUtils.StoreArray(new StackValue[] { subArray }, null, core);
+                    GCUtils.GCRetain(subArray, core);
+                    SetValueForIndex(array, index, subArray, core);
+                }
+
+                array = subArray;
+            }
+            
             return SetValueForIndex(array, indices[indices.Length - 1], value, core);
         }
 
