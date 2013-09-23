@@ -409,7 +409,7 @@ namespace ProtoCore
             if (sv.optype == AddressType.ArrayPointer && 
                 targetType.IsIndexable)
             {
-                Validity.Assert(ArrayUtils.IsArray(sv));
+                Validity.Assert(StackUtils.IsArray(sv));
 
                 //We're being asked to convert an array into an array
                 //walk over the structure converting each othe elements
