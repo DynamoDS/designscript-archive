@@ -459,7 +459,7 @@ namespace ProtoCore.DSASM
                 return sv;
             }
 
-            if (!ArrayUtils.IsArray(sv))
+            if (!StackUtils.IsArray(sv))
             {
                 sv = StackUtils.BuildNull();
             }

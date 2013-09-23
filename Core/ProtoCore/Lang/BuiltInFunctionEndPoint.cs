@@ -428,7 +428,7 @@ namespace ProtoCore.Lang
                         //  Get the first non-array value of the first arg and taht will be the pointer
                         StackValue lhsObject = formalParameters[0];
                         StackValue svThisPtr = lhsObject;
-                        if (ArrayUtils.IsArray(svThisPtr))
+                        if (StackUtils.IsArray(svThisPtr))
                         {
                             ProtoCore.Utils.ArrayUtils.GetFirstNonArrayStackValue(formalParameters[0], ref svThisPtr, core);
                         }

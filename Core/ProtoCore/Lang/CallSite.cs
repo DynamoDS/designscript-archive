@@ -229,7 +229,7 @@ namespace ProtoCore
 
             log.AppendLine("Case 4: Replication + Type conversion");
             {
-                if (arguments.Any(ArrayUtils.IsArray))
+                if (arguments.Any(StackUtils.IsArray))
                 {
                     //Build the possible ways in which we might replicate
                     List<List<ReplicationInstruction>> replicationTrials =
@@ -893,7 +893,7 @@ namespace ProtoCore
 
                 foreach (int repIndex in repIndecies)
                 {
-                    //if (ArrayUtils.IsArray(formalParameters[repIndex]))
+                    //if (StackUtils.IsArray(formalParameters[repIndex]))
                     //    throw new NotImplementedException("Replication Case not implemented - Jagged Arrays - Slow path: {8606D4AA-9225-4F34-BE53-74270B8D0A90}");
 
                     StackValue[] subParameters = ArrayUtils.GetValues(formalParameters[repIndex], core);
@@ -1278,7 +1278,7 @@ namespace ProtoCore
             }
 
 
-            if (ArrayUtils.IsArray(ret) && procNode.returntype.IsIndexable)
+            if (StackUtils.IsArray(ret) && procNode.returntype.IsIndexable)
             {
                 StackValue coercedRet = TypeSystem.Coerce(ret, retType, core);
                 GCUtils.GCRetain(coercedRet, core);
@@ -1595,7 +1595,7 @@ namespace ProtoCore
 
                 #region Case 4: Match with type conversion and replication
                 {
-                    if (arguments.Any(ArrayUtils.IsArray))
+                    if (arguments.Any(StackUtils.IsArray))
                     {
 
                         //Build the possible ways in which we might replicate
