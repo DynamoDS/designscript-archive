@@ -497,6 +497,7 @@ namespace ProtoScript.Runners
 
         }
 
+     
 
         /// <summary>
         /// VM Debugging API for general Debugging purposes 
@@ -783,12 +784,6 @@ namespace ProtoScript.Runners
         }
 
 
-        private void CompileAndExecuteForDeltaExecution(string code)
-        {
-            System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
-        }
-
-
         /// <summary>
         /// This function resets properties in LiveRunner core and compileStateTracker required in preparation for a subsequent run
         /// </summary>
@@ -799,13 +794,26 @@ namespace ProtoScript.Runners
             runnerCore.CompleteCodeBlockList.Clear();        
         }
 
+        private void CompileAndExecuteForDeltaExecution(string code)
+        {
+            System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
+
+            ResetForDeltaASTExecution();
+            bool succeeded = CompileAndExecute(code);
+
+            if (succeeded)
+            {
+                RetainVMStatesForDeltaExecution();
+            }
+        }
+
         private void SynchronizeInternal(GraphSyncData syncData, out string code)
         {
             //throw new NotImplementedException();
             code = string.Empty;
             if (syncData == null)
             {
-                //ResetForDeltaASTExecution();
+                ResetForDeltaASTExecution();
                 return;
             }
 
@@ -855,15 +863,9 @@ namespace ProtoScript.Runners
             //    syncCoreConfigurations = false;
             //}
 
-            ResetForDeltaASTExecution();
-            bool succeeded = CompileAndExecute(code);
-
-            if (succeeded)
-            {
-                //graphCompiler.ResetPropertiesForNextExecution();
-                RetainVMStatesForDeltaExecution();
-            }
+            CompileAndExecuteForDeltaExecution(code);
         }
+
         private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
         {
             Validity.Assert(null != runner);
@@ -905,34 +907,16 @@ namespace ProtoScript.Runners
         // TODO: Aparajit: This needs to be fixed for Command Line REPL
         private void SynchronizeInternal(string code)
         {
-            Validity.Assert(null != runner);
-            //Validity.Assert(null != graphCompiler);
-
             if (string.IsNullOrEmpty(code))
             {
                 code = "";
-                
-                ResetVMForDeltaExecution();
+
+                ResetForDeltaASTExecution();
                 return;
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
-
-                ResetVMForDeltaExecution();
-
-                //Synchronize the core configuration before compilation and execution.
-                if (syncCoreConfigurations)
-                {
-                    SyncCoreConfigurations(runnerCore, executionOptions);
-                    syncCoreConfigurations = false;
-                }
-
-                bool succeeded = CompileAndExecute(code);
-                //if (succeeded)
-                //{
-                //    graphCompiler.ResetPropertiesForNextExecution();
-                //}
+                CompileAndExecuteForDeltaExecution(code);
             }
         }
         #endregion
