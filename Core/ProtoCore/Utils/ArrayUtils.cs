@@ -811,6 +811,34 @@ namespace ProtoCore.Utils
                 index = index.AsInt();
                 return GetValueFromIndex(array, (int)index.opdata, core);
             }
+            else if (index.optype == AddressType.ArrayKey)
+            {
+                int fullIndex = (int)index.opdata;
+                HeapElement he = GetHeapElement(array, core);
+
+                if (he.VisibleSize > fullIndex)
+                {
+                    return GetValueFromIndex(array, fullIndex, core);
+                }
+                else
+                {
+                    fullIndex = fullIndex - he.VisibleSize;
+                    if (he.Dict != null && he.Dict.Count > fullIndex)
+                    {
+                        int count = 0;
+                        foreach (var key in he.Dict.Keys)
+                        {
+                            if (count == fullIndex)
+                            {
+                                return he.Dict[key];
+                            }
+                            count = count + 1;
+                        }
+                    }
+                }
+
+                return StackUtils.BuildNull();
+            }
             else
             {
                 HeapElement he = GetHeapElement(array, core);
@@ -1109,6 +1137,31 @@ namespace ProtoCore.Utils
             }
 
             return false;
+        }
+
+        public static StackValue GetNextKey(StackValue key, Core core)
+        {
+            if (StackUtils.IsNull(key) || 
+                key.optype != AddressType.ArrayKey ||
+                key.opdata < 0 ||
+                key.metaData.type < 0)
+            {
+                return StackUtils.BuildNull();
+            }
+
+            int ptr = key.metaData.type;
+            int index = (int) key.opdata;
+
+            HeapElement he = core.Heap.Heaplist[ptr];
+            if ((he.VisibleSize  > index + 1) ||
+                (he.Dict != null && he.Dict.Count + he.VisibleSize > index + 1))
+            {
+                StackValue newKey = key;
+                newKey.opdata = newKey.opdata + 1;
+                return newKey;
+            }
+
+            return StackUtils.BuildNull();
         }
     }
 }

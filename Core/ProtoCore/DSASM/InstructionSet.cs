@@ -46,7 +46,8 @@ namespace ProtoCore.DSASM
         CallingConvention,
         FrameType,
         ThisPtr,
-        ExplicitCall
+        ExplicitCall,
+        ArrayKey
     }
 
     public enum OpCode
@@ -126,7 +127,7 @@ namespace ProtoCore.DSASM
 
         THROW,
         // TODO Jun: This is temporary until the lib system is implemented. 
-        PUSH_VARSIZE,
+        PUSH_ARRAYKEY,
         SETEXPUID
     }
 

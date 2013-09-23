@@ -3861,7 +3861,7 @@ namespace ProtoCore.DSASM
 
             if (AddressType.ArrayPointer != thisArray.optype)
             {
-                if (varname.StartsWith(ProtoCore.DSASM.Constants.kStartOfAutogenForloopExprIdent))
+                if (varname.StartsWith(ProtoCore.DSASM.Constants.kForLoopExpression))
                 {
                     return thisArray;
                 }
@@ -3911,7 +3911,7 @@ namespace ProtoCore.DSASM
 
             if (AddressType.ArrayPointer != thisArray.optype)
             {
-                if (varname.StartsWith(ProtoCore.DSASM.Constants.kStartOfAutogenForloopExprIdent))
+                if (varname.StartsWith(ProtoCore.DSASM.Constants.kForLoopExpression))
                 {
                     return thisArray;
                 }
@@ -4980,6 +4980,7 @@ namespace ProtoCore.DSASM
             ++pc;
             return;
         }
+
         private void PUSH_VARSIZE_Handler(Instruction instruction)
         {
             // TODO Jun: This is a temporary solution to retrieving the array size until lib files are implemented
@@ -4996,26 +4997,26 @@ namespace ProtoCore.DSASM
             runtimeVerify(null != snode);
 
             int stackindex = rmem.GetStackIndex(snode);
-            StackValue sv = rmem.GetAtRelative(snode);
+            StackValue array = rmem.GetAtRelative(snode);
 
-            int size = 1;
-            int ptr = (int)sv.opdata;
-            if (AddressType.ArrayPointer == sv.optype)
+            if (AddressType.ArrayPointer != array.optype && snode.datatype.IsIndexable)
             {
-                size = core.Heap.Heaplist[ptr].VisibleSize;
-            }
-            else if (AddressType.Null == sv.optype)
-            {
-                size = 0;
-            }
-            else if (snode.datatype.IsIndexable)
-            {
-                StackValue svArray = core.Heap.Heaplist[ptr].Stack[0];
-                ptr = (int)svArray.opdata;
-                size = core.Heap.Heaplist[ptr].VisibleSize;
+                array = core.Heap.Heaplist[(int)array.opdata].Stack[0];
             }
 
-            rmem.Push(StackUtils.BuildInt(size));
+            StackValue key = StackUtils.BuildNull();
+            HeapElement he = ArrayUtils.GetHeapElement(array, core);
+            if (he != null)
+            {
+                if (he.VisibleSize > 0 || (he.Dict != null && he.Dict.Count > 0))
+                {
+                    key = new StackValue();
+                    key.optype = AddressType.ArrayKey;
+                    key.opdata = 0;
+                    key.metaData.type = (int)array.opdata;
+                }
+            }
+            rmem.Push(key);
 
             ++pc;
             return;
@@ -5845,6 +5846,7 @@ namespace ProtoCore.DSASM
             StackValue opdata1 = GetOperandData(instruction.op2);
             StackValue opdata2 = GetOperandData(instruction.op1);
 
+            // Need to optmize these if-elses to a table. 
             if ((AddressType.Int == opdata1.optype) && (AddressType.Int == opdata2.optype))
             {
                 opdata2 = StackUtils.BuildInt(opdata1.opdata + opdata2.opdata);
@@ -5887,6 +5889,17 @@ namespace ProtoCore.DSASM
                 else
                 {
                     opdata2 = StringUtils.ConcatString(opdata2, opdata1, rmem);
+                }
+            }
+            else if (opdata2.optype == AddressType.ArrayKey && opdata1.optype == AddressType.Int)
+            {
+                if (opdata1.opdata == 1)
+                {
+                    opdata2 = ArrayUtils.GetNextKey(opdata2, core);
+                }
+                else
+                {
+                    opdata2 = StackUtils.BuildNull();
                 }
             }
             else
@@ -8158,7 +8171,7 @@ namespace ProtoCore.DSASM
                         PUSHLIST_Handler(instruction);
                         return;
                     }
-                case OpCode.PUSH_VARSIZE:
+                case OpCode.PUSH_ARRAYKEY:
                     {
                         PUSH_VARSIZE_Handler(instruction);
                         return;
