@@ -2600,6 +2600,11 @@ namespace ProtoAssociative
                 InlineConditionalNode inlineCondition = node as InlineConditionalNode;
                 replicationGuides = null;
             }
+            else if (node is ExprListNode)
+            {
+                ExprListNode exprlistNode = node as ExprListNode;
+                replicationGuides = exprlistNode.ReplicationGuides;
+            }
             else
             {
                 // A parser error has occured if a replication guide gets attached to any AST besides"
