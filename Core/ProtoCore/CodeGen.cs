@@ -61,7 +61,6 @@ namespace ProtoCore
         protected bool enforceTypeCheck;
         public ProtoCore.DSASM.CodeBlock codeBlock { get; set; }
         public ProtoCore.CompileTime.Context context { get; set; }
-        protected ProtoCore.DSASM.OpKeywordData opKwData;
         protected BuildStatus buildStatus;
 
         protected int globalProcIndex;
@@ -116,7 +115,6 @@ namespace ProtoCore
             globalClassIndex = core.ClassIndex;
 
             context = new ProtoCore.CompileTime.Context();
-            opKwData = new ProtoCore.DSASM.OpKeywordData();
 
             targetLangBlock = ProtoCore.DSASM.Constants.kInvalidIndex;
 
@@ -551,7 +549,7 @@ namespace ProtoCore
                         // In this case, the lhs type is undefined
                         // Just attempt to create a symbol node
                         string ident = identnode.Value;
-                        if (0 != ident.CompareTo(ProtoCore.DSDefinitions.Kw.kw_this))
+                        if (0 != ident.CompareTo(ProtoCore.DSDefinitions.Keyword.This))
                         {
                             symbolnode = new SymbolNode();
                             symbolnode.name = identnode.Value;
@@ -677,7 +675,7 @@ namespace ProtoCore
                 {
                     finalType.UID = lefttype.UID = ci;
                 }
-                else if (identnode.Value == ProtoCore.DSDefinitions.Kw.kw_this)
+                else if (identnode.Value == ProtoCore.DSDefinitions.Keyword.This)
                 {
                     finalType.UID = lefttype.UID = contextClassScope;
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, 0 + "[dim]");
@@ -2648,10 +2646,10 @@ namespace ProtoCore
             // TODO Jun: double operations are executed in the main instruction for now, until this proves to be a performance issue
             bool isDoubleOp = false; // (optype1 == ProtoCore.DSASM.AddressType.Double || optype2 == ProtoCore.DSASM.AddressType.Double);
 
-            optr = (isDoubleOp) ? opKwData.opDoubleTable[optr] : optr;
-            string op = opKwData.opStringTable[optr];
+            optr = (isDoubleOp) ? Op.GetFloatingOp(optr) : optr;
+            string op = Op.GetOpName(optr);
             EmitInstrConsole(op, ProtoCore.DSASM.kw.regAX, ProtoCore.DSASM.kw.regBX);
-            EmitBinary(opKwData.opCodeTable[optr], opAX, opBX);
+            EmitBinary(Op.GetOpCode(optr), opAX, opBX);
 
             EmitInstrConsole(ProtoCore.DSASM.kw.push, ProtoCore.DSASM.kw.regAX);
             ProtoCore.DSASM.StackValue opRes = new ProtoCore.DSASM.StackValue();

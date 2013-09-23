@@ -19,11 +19,13 @@ namespace ProtoCore.Utils
         public static void AssertExpiry()
         {
             //Expires on 30th September 2013
+            /*
             DateTime expires = new DateTime(2013, 9, 30);
             if(!mAppStartupTime.HasValue)
                 mAppStartupTime = DateTime.Now;
             if (mAppStartupTime.Value >= expires)
                 throw new ProductExpiredException("DesignScript Technology Preview has expired. Visit http://labs.autodesk.com for more information.", expires);
+            */
         }
     }
 

@@ -23,6 +23,12 @@ void LiveRunnerWrapper::updateGraph(const wchar_t* codesegment)
     wrapper()->UpdateGraph(syncData);
 }
 
+void LiveRunnerWrapper::importLibrary(const wchar_t* codesegment) 
+{
+    return GraphUtilities::PreloadAssembly(WcharToString(codesegment));
+}
+
+
 void LiveRunnerWrapper::updateCLInterpreter(const wchar_t* codesegment)
 {
     wrapper()->UpdateCmdLineInterpreter(WcharToString(codesegment));
@@ -71,6 +77,12 @@ DesignScriptObject* LiveRunnerWrapper::getCoreDump()
     System::String^ dump = mirror->GetUtils()->GetCoreDump();
     return new SimpleDSObject(dump);
 }
+
+const wchar_t* LiveRunnerWrapper::getCoreDumpCmdLineREPL()
+{
+    return StringToWchar(wrapper()->GetCoreDump());
+}
+
 
 SynchronizeData^ LiveRunnerWrapper::createSyncDataFromCode(System::String^ codesegment)
 {

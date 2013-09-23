@@ -105,6 +105,7 @@
     <Compile Include="Associative\ReplicatorTest.cs" />
     <Compile Include="Associative\SSATransformTest.cs" />
     <Compile Include="Associative\TypeSystemTests.cs" />
+    <Compile Include="CallsiteExecutionState\BasicCallsiteStateTest.cs" />
     <Compile Include="DebugTests\BasicTests.cs" />
     <Compile Include="DebugTests\RunEqualityTests.cs" />
     <Compile Include="DebugTests\RunWatchTestsIncluded.cs">
