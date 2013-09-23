@@ -147,8 +147,14 @@ namespace ProtoAssociative
             if (core.Options.IsDeltaExecution)
             {
                 codeBlock = GetDeltaCompileCodeBlock();
-                //pc = core.deltaCompileStartPC;
-                pc = codeBlock.instrStream.instrList.Count;
+                if (core.Options.IsDeltaCompile)
+                {
+                    pc = codeBlock.instrStream.instrList.Count;
+                }
+                else
+                {
+                    pc = core.deltaCompileStartPC;
+                }
             }
             else
             {
@@ -3477,7 +3483,7 @@ namespace ProtoAssociative
             // This means that all import statments and its classes and functions have already been codegen'd
             if (compilePass == AssociativeCompilePass.kGlobalFuncBody)
             {
-                if (core.Options.IsDeltaExecution)
+                if (core.Options.IsDeltaExecution && !core.Options.IsDeltaCompile)
                 {
                     if (node is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode)
                     {
