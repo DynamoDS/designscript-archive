@@ -486,6 +486,54 @@ namespace ProtoTest.LiveRunner
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
             
         }
+
+        [Test]
+        public void TestDeltaExpression_01()
+        {
+            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            
+            // emit the DS code from the AST tree
+            liveRunner.UpdateCmdLineInterpreter("a=10;");
+
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+
+            //string o = liveRunner.GetCoreDump();
+
+            // emit the DS code from the AST tree
+            liveRunner.UpdateCmdLineInterpreter("c=20;");
+
+            mirror = liveRunner.InspectNodeValue("a");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            mirror = liveRunner.InspectNodeValue("c");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+
+            //string o = liveRunner.GetCoreDump();
+
+            // emit the DS code from the AST tree
+            liveRunner.UpdateCmdLineInterpreter("b = a+c;");
+
+            mirror = liveRunner.InspectNodeValue("a");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            mirror = liveRunner.InspectNodeValue("c");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+            mirror = liveRunner.InspectNodeValue("b");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+
+            //o = liveRunner.GetCoreDump();
+
+            // emit the DS code from the AST tree
+            liveRunner.UpdateCmdLineInterpreter("c= 30;");
+
+            mirror = liveRunner.InspectNodeValue("a");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            mirror = liveRunner.InspectNodeValue("c");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+            mirror = liveRunner.InspectNodeValue("b");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 40);
+
+            //o = liveRunner.GetCoreDump();
+        }
     }
     
 }
