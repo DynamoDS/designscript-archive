@@ -41,7 +41,7 @@ namespace ProtoTest.LiveRunner
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
             
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("a");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
         }
 
@@ -65,7 +65,7 @@ namespace ProtoTest.LiveRunner
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("a");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
@@ -77,7 +77,7 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            mirror = liveRunner.QueryNodeValue("a");
+            mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
         }
 
@@ -104,7 +104,7 @@ namespace ProtoTest.LiveRunner
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("a");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
         }
 
@@ -151,7 +151,7 @@ namespace ProtoTest.LiveRunner
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("b");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("b");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
         }
 
@@ -176,7 +176,7 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("a");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
@@ -193,9 +193,9 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            mirror = liveRunner.QueryNodeValue("a");
+            mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
-            mirror = liveRunner.QueryNodeValue("c");
+            mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
             
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
@@ -215,11 +215,11 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            mirror = liveRunner.QueryNodeValue("a");
+            mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
-            mirror = liveRunner.QueryNodeValue("c");
+            mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
-            mirror = liveRunner.QueryNodeValue("b");
+            mirror = liveRunner.InspectNodeValue("b");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
         }
 
@@ -244,8 +244,10 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("a");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+
+            //string o = liveRunner.GetCoreDump();
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign2 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
@@ -261,10 +263,12 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            mirror = liveRunner.QueryNodeValue("a");
+            mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
-            mirror = liveRunner.QueryNodeValue("c");
+            mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+
+            //string o = liveRunner.GetCoreDump();
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign3 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
@@ -283,12 +287,14 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            mirror = liveRunner.QueryNodeValue("a");
+            mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
-            mirror = liveRunner.QueryNodeValue("c");
+            mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
-            mirror = liveRunner.QueryNodeValue("b");
+            mirror = liveRunner.InspectNodeValue("b");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+
+            //o = liveRunner.GetCoreDump();
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             astList.Add(assign2);
@@ -299,12 +305,14 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
 
-            mirror = liveRunner.QueryNodeValue("a");
+            mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
-            mirror = liveRunner.QueryNodeValue("c");
+            mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
-            mirror = liveRunner.QueryNodeValue("b");
+            mirror = liveRunner.InspectNodeValue("b");
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+
+            //o = liveRunner.GetCoreDump();
         }
 
         [Test]
@@ -374,7 +382,7 @@ namespace ProtoTest.LiveRunner
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("xval");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10.0);
             
         }
@@ -474,7 +482,7 @@ namespace ProtoTest.LiveRunner
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("xval");
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
             
         }

@@ -168,6 +168,8 @@ namespace ProtoCore
             IsDeltaExecution = false;
             ElementBasedArrayUpdate = true;
 
+            IsDeltaCompile = false;
+
         }
 
         public bool DumpByteCode { get; set; }
@@ -202,6 +204,13 @@ namespace ProtoCore
         public bool GenerateExprID { get; set; }
         public bool IsDeltaExecution { get; set; }
         public bool ElementBasedArrayUpdate { get; set; }
+
+        /// <summary>
+        /// TODO: Aparajit: This flag is true for Delta AST compilation
+        /// This will be removed once we make this the default and deprecate "deltaCompileStartPC" 
+        /// which requires recompiling the entire source code for every delta execution 
+        /// </summary>
+        public bool IsDeltaCompile { get; set; }
 
         
         // This is being moved to Core.Options as this needs to be overridden for the Watch test framework runner        
