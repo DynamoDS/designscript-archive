@@ -496,6 +496,7 @@ namespace ProtoScript.Runners
 
         }
 
+
         /// <summary>
         /// VM Debugging API for general Debugging purposes 
         /// temporarily used by Cmmand Line REPL in FormitDesktop
@@ -849,6 +850,12 @@ namespace ProtoScript.Runners
                     code += codeGen.GenerateCode();
                 }
             }
+            //Synchronize the core configuration before compilation and execution.
+            //if (syncCoreConfigurations)
+            //{
+            //    SyncCoreConfigurations(runnerCore, executionOptions);
+            //    syncCoreConfigurations = false;
+            //}
 
             CompileAndExecuteForDeltaExecution(code);
         }
@@ -897,32 +904,15 @@ namespace ProtoScript.Runners
         // TODO: Aparajit: This needs to be fixed for Command Line REPL
         private void SynchronizeInternal(string code)
         {
-            Validity.Assert(null != runner);
-            //Validity.Assert(null != graphCompiler);
             if (string.IsNullOrEmpty(code))
             {
                 code = "";
-                ResetVMForDeltaExecution();
+                ResetForDeltaASTExecution();
                 return;
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
-
-                ResetVMForDeltaExecution();
-
-                //Synchronize the core configuration before compilation and execution.
-                if (syncCoreConfigurations)
-                {
-                    SyncCoreConfigurations(runnerCore, executionOptions);
-                    syncCoreConfigurations = false;
-                }
-
-                bool succeeded = CompileAndExecute(code);
-                //if (succeeded)
-                //{
-                //    graphCompiler.ResetPropertiesForNextExecution();
-                //}
+                CompileAndExecuteForDeltaExecution(code);
             }
         }
         #endregion
