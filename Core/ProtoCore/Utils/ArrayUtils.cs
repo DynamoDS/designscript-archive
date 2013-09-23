@@ -526,10 +526,23 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         private static StackValue[][] GetZippedIndices(List<StackValue> indices, Core core)
         {
+            List<StackValue[]> allFlattenValues = new List<StackValue[]>();
+
             int zipLength = System.Int32.MaxValue;
             foreach (var index in indices)
             {
-                int length = StackUtils.IsArray(index) ? GetFullSize(index, core) : 1;
+                int length = 1;
+                if (StackUtils.IsArray(index))
+                {
+                    StackValue[] flattenValues = GetFlattenValue(index, core);
+                    allFlattenValues.Add(flattenValues);
+                    length = flattenValues.Count();
+                }
+                else
+                {
+                    allFlattenValues.Add(null);
+                }
+
                 if (zipLength > length)
                 {
                     zipLength = length;
@@ -555,7 +568,7 @@ namespace ProtoCore.Utils
                     StackValue[] values = null;
                     if (StackUtils.IsArray(index))
                     {
-                        values = GetValues(index, core);
+                        values = allFlattenValues[i];
                     }
 
                     if (1 == zipLength)
@@ -1022,6 +1035,54 @@ namespace ProtoCore.Utils
             }
 
             return values.ToArray();
+        }
+
+        private static StackValue[] GetFlattenValue(StackValue array, Core core)
+        {
+            Queue<StackValue> workingSet = new Queue<StackValue>();
+            List<StackValue> flattenValues = new List<StackValue>();
+
+            if (!StackUtils.IsArray(array))
+            {
+                return null;
+            }
+
+            workingSet.Enqueue(array);
+            while (workingSet.Count > 0)
+            {
+                array = workingSet.Dequeue();
+                HeapElement he = GetHeapElement(array, core);
+
+                for (int i = 0; i < he.VisibleSize; ++i)
+                {
+                    StackValue value = he.Stack[i];
+                    if (StackUtils.IsArray(value))
+                    {
+                        workingSet.Enqueue(value);
+                    }
+                    else
+                    {
+                        flattenValues.Add(value);
+                    }
+                }
+
+                if (he.Dict != null)
+                {
+                    foreach (var value in he.Dict.Values)
+                    {
+                        if (StackUtils.IsArray(value))
+                        {
+                            workingSet.Enqueue(value);
+                        }
+                        else
+                        {
+                            flattenValues.Add(value);
+                        }
+                    }
+                }
+            }
+
+            return flattenValues.ToArray();
         }
 
         /// <summary>
