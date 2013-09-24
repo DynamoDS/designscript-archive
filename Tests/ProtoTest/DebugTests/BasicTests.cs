@@ -17,7 +17,7 @@ namespace ProtoTest.DebugTests
         public ProtoCore.Core core;
         private DebugRunner fsr;
         private ProtoScript.Config.RunConfiguration runnerConfig;
-        private string testPath = @"..\..\..\Scripts\Debugger\";
+        private string testPath = @"..\..\..\Tests\ProtoTest\ImportFiles\";
 
         [SetUp]
         public void Setup()
@@ -15923,7 +15923,7 @@ x = add(y);
         public ProtoCore.Core core;
         private DebugRunner fsr;
         private ProtoScript.Config.RunConfiguration runnerConfig;
-        private string testPath = @"..\..\..\Scripts\Debugger\";
+        private string testPath = @"..\..\..\Tests\ProtoTest\ImportFiles\";
 
         [SetUp]
         public void Setup()
