@@ -3145,6 +3145,7 @@ namespace ProtoAssociative
                             {
                                 if (core.Options.GenerateExprID)
                                 {
+                                    //ssaID = core.StaticExpressionUID++;
                                     ssaID = core.ExpressionUID++;
                                 }
                                 else
@@ -3172,6 +3173,7 @@ namespace ProtoAssociative
                         {
                             if (core.Options.GenerateExprID)
                             {
+                                //bnode.exprUID = generatedUID = core.StaticExpressionUID++;
                                 bnode.exprUID = generatedUID = core.ExpressionUID++;
                             }
                             newAstList.Add(node);

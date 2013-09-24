@@ -1541,6 +1541,7 @@ namespace ProtoCore
         // TODO Jun: Organize these variables in core into proper enums/classes/struct
         public int SSASubscript { get; set; }
         public int ExpressionUID { get; set; }
+        public int RuntimeExpressionUID = 0;
         public int ModifierBlockUID { get; set; }
         public int ModifierStateSubscript { get; set; }
 
