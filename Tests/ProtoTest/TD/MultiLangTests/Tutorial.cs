@@ -7,7 +7,7 @@ namespace ProtoTest.TD.MultiLangTests
     class Tutorial
     {
         public TestFrameWork thisTest = new TestFrameWork();
-        string testCasePath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Tutorial\\";
+        string importPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void Setup()
         {
@@ -112,7 +112,7 @@ t2 = line_0[1].StartPoint.X;
 t3 = line_0[2].StartPoint.X;
 t4 = line_0[3].StartPoint.X;
 t5 = line_0[4].StartPoint.X;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             //Object[] v1 = new Object[] { 1, 2, 3, 4, 5 };
             //thisTest.Verify("line_0_StartPoint_X", v1, 0);
@@ -148,7 +148,7 @@ t2 = line_0[1].StartPoint.X;
 t3 = line_0[2].StartPoint.X;
 t4 = line_0[3].StartPoint.X;
 t5 = line_0[4].StartPoint.X;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             Object[] v1 = new Object[] { 1.0, 2.0, 3.0, 4.0, 5.0 };
 
             thisTest.Verify("line_0_StartPoint_X", v1, 0);
@@ -185,7 +185,7 @@ startPt = Point.ByCartesianCoordinates( (1..8..2)<1>, (1..8..2)<2>, 0 ); // repl
 startPt = Point.ByCartesianCoordinates( (1..5..1)<1>, (1..5..1)<2>, 0 ); // replicate in X and Y with replication guides
 startPt = Point.ByCartesianCoordinates( 2, 1, 0 );
 ";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, importPath);
 
             thisTest.Verify("line_0_StartPoint_X", 2.0, 0);
 
@@ -208,7 +208,7 @@ t1 = lines[0][0].StartPoint.X;
 t2 = lines[1][0].StartPoint.X;
 t3 = lines[2][0].StartPoint.X;
 t4 = lines[3][0].StartPoint.X;";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, importPath);
 
             //Object[] v1 = new Object[] { new Object[] { 10.000, 10.000, 10.000, 10.000 }, new Object[] { -5.000, -5.000, -5.000, -5.000 }, new Object[] { -5.000, -5.000, -5.000, -5.000 }, new Object[] { 10.000, 10.000, 10.000, 10.000 } };
             //thisTest.Verify("lines_StartPoint_X", v1, 0);
@@ -238,7 +238,7 @@ numPoints = 3;
 t1 = lines[0].StartPoint.X;
 t2 = lines[1].StartPoint.X;
 t3 = lines[2].StartPoint.X;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             //Object[] v1 = new Object[] { 10.000, 10.000, -10.000 };
             //thisTest.Verify("lines_StartPoint_X", v1, 0);
@@ -264,7 +264,7 @@ lines = drawUniqueLines(circlePoints, (1..(Count(circlePoints)-2)..1), (2..(Coun
 lines_StartPoint_X = lines.StartPoint.X; 
 t1 = lines[0][0].StartPoint.X;
 t2 = lines[1][2].StartPoint.X;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             thisTest.Verify("t1", 10.0, 0);
             thisTest.Verify("t2", 12.0, 0);
         }
@@ -335,7 +335,7 @@ a 		= a.incrementTheta(10.0);				// apply different modifiers [POINT does not up
 //a		= a.visible(false);
 a 		= a.incrementRadius(0.2); 				// [POINT does not updates]
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("testLine_SP_X", 0, 0);
             thisTest.Verify("aRadius", 0.95, 0);
@@ -371,7 +371,7 @@ t2 = tubes[1].EndPoint.X;
 t3 = tubes[2].EndPoint.X;
 t4 = tubes[3].EndPoint.X;
 t5 = tubes[4].EndPoint.X;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("t1", 8.0, 0);
             thisTest.Verify("t2", 8.0, 0);
@@ -437,7 +437,7 @@ x6 = otherLine.StartPoint.X;
 x7 = tube_0.StartPoint.X;
 x8 = tube_3.StartPoint.X;
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("x1", 0.8, 0);
             thisTest.Verify("x2", 5.6, 0);
@@ -522,7 +522,7 @@ x1 = triangle0000.Side_b_c.MidPoint.X;
 x2 = triangle0001.Side_b_c.MidPoint.X;
 x3 = triangle0002.Side_b_c.MidPoint.X;
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("x1", 5.0, 0);
             thisTest.Verify("x2", 2.5, 0);
@@ -603,7 +603,7 @@ x1 = MyTriangle0001[0].side_a_b.midPoint.X;
 x2 = MyTriangle0001[1].side_b_c.midPoint.X;
 x3 = MyTriangle0001[2].side_c_a.midPoint.X;
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("x1", 5.0, 0);
             thisTest.Verify("x2", 2.5, 0);
@@ -672,7 +672,7 @@ x4 = side_r_s.MidPoint.X;
 x5 = side_s_t.MidPoint.X;
 x6 = side_t_r.MidPoint.X;
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("x1", 15.0, 0);
             thisTest.Verify("x2", 5.0, 0);
@@ -709,7 +709,7 @@ lineTest  = Line.ByStartPointEndPoint( centrePoint, { point_1, point_2, point_3 
 point_1 = Point.ByCartesianCoordinates( 40.0, 80.0, 0.0 );
 x1 = lineTest[2].EndPoint.X;
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             thisTest.Verify("x1", 50.0, 0);
         }
 
@@ -896,7 +896,7 @@ x1 = testTube[0][1].secondary.StartPoint.X;
 // testTube = Tubulor.ByPoint(""H"", pointsForPolygons[2][1], radius, radius, factor);
 // testTube = Tubulor.ByPoint(""P"", pointsForPolygons[2][2], radius, radius, factor);
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             Object[] v1 = new Object[] { 10.200, -2.556 };
             thisTest.Verify("x1", v1, 0);

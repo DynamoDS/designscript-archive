@@ -10,7 +10,7 @@ namespace ProtoTest.TD.MultiLangTests
     class Old_Language_Manual_Examples
     {
         readonly TestFrameWork thisTest = new TestFrameWork();
-        string testPath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Manual_Examples\\";
+        string importPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void SetUp()
         {
@@ -33,7 +33,7 @@ myAltSingleXvalue   = myPoint.X[1]; 	// = 4
 // referencing all of the myPoint collection and then
 // indexing into one of member of one of its properties
 ";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, importPath);
             thisTest.Verify("myCollectionXvalues", new Object[] { 2.0, 4.0, 6.0, 8.0, 10.0 });
             thisTest.Verify("mySingleXvalue", 4.0);
             thisTest.Verify("myAltSingleXvalue", 4.0);
@@ -118,7 +118,7 @@ raggedCollection = {collection[0][1], {collection[1][0], collection[1][1]}, coll
 result =  IsRectangular(raggedCollection)? BSplineSurface.ByPoints(raggedCollection): BSplineSurface.ByPoints(collection); // Known Limitation : both paths of the inline conditional will be executed, which will lead to some error messages currently
 test2 = result.P1.X;
 ";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, importPath);
             thisTest.Verify("test1", new Object[] { new Object[] { 1.0, 1.0 }, new Object[] { 2.0, 2.0 } });
             thisTest.Verify("test2", new Object[] { new Object[] { 1.0, 1.0 }, new Object[] { 2.0, 2.0 } });
         }
