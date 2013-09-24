@@ -315,7 +315,7 @@ namespace ProtoTest.DebugTests
         public void DebugEQBIM23_LoadCSV()
         {
             String code =
-                @"a = ""CSVTestCase\test1.csv"";b = LoadCSV(a);c = LoadCSV(a, false);d = LoadCSV(a, true);x = b[0][2];y = c[0][2];z = d[0][2];";
+                @"a = ""CSVTestCase/test1.csv"";b = LoadCSV(a);c = LoadCSV(a, false);d = LoadCSV(a, true);x = b[0][2];y = c[0][2];z = d[0][2];";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
