@@ -891,12 +891,6 @@ namespace ProtoCore.Utils
             Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
             for (int i = 0; i < indices.Length - 1; ++i)
             {
-                if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
-                {
-                    core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
-                    return StackUtils.BuildNull();
-                }
-
                 StackValue index = indices[i];
                 if (StackUtils.IsNumeric(index))
                 {
@@ -911,6 +905,12 @@ namespace ProtoCore.Utils
                         return StackUtils.BuildNull();
                     }
                     array = GetValueFromIndex(array, index, core);
+                }
+
+                if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
+                {
+                    core.RuntimeStatus.LogWarning(WarningID.kOverIndexing, WarningMessage.kArrayOverIndexed);
+                    return StackUtils.BuildNull();
                 }
             }
 
@@ -1213,12 +1213,12 @@ namespace ProtoCore.Utils
             if (StackUtils.IsNull(key) || 
                 key.optype != AddressType.ArrayKey ||
                 key.opdata < 0 ||
-                key.metaData.type < 0)
+                key.opdata_d < 0)
             {
                 return StackUtils.BuildNull();
             }
 
-            int ptr = key.metaData.type;
+            int ptr = (int)key.opdata_d;
             int index = (int) key.opdata;
 
             HeapElement he = core.Heap.Heaplist[ptr];

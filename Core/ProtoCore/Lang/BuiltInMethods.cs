@@ -97,7 +97,7 @@ namespace ProtoCore.Lang
             "Map",                      // kMap
             "MapTo",                    // kMapTo
             "NormalizeDepth",           // kNormalizeDepth
-            "NormalizeDepthWithRank",   // kNormalizeDepthWithRank
+            "NormalizeDepth",           // kNormalizeDepthWithRank
             "Print",                    // kPrint
             "Print",                    // kPrint
             "Rank",                     // kRank
@@ -111,10 +111,10 @@ namespace ProtoCore.Lang
             "SomeNulls",                // kSomeNulls
             "SomeTrue",                 // kSomeTrue
             "Sort",                     // kSort
-            "SortWithMode",             // kSortWithMode
+            "Sort",                     // kSortWithMode
             "SortIndexByValue",         // kSortIndexByValue
-            "SortIndexByValueWithMode", // kSortIndexByValueWithMode
-            "SortPointer",              // kSortPointer
+            "SortIndexByValue",         // kSortIndexByValueWithMode
+            "Sort",                     // kSortPointer
             "Reorder",                  // kReorder
             "%generate_range",          // kGenerateRange
             "Sum",                      // kSum

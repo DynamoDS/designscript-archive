@@ -5124,8 +5124,9 @@ namespace ProtoCore.DSASM
                 {
                     key = new StackValue();
                     key.optype = AddressType.ArrayKey;
+                    // Or they could be combined together?
                     key.opdata = 0;
-                    key.metaData.type = (int)array.opdata;
+                    key.opdata_d = array.opdata;
                 }
             }
             rmem.Push(key);
