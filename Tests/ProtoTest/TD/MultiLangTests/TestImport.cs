@@ -6,7 +6,7 @@ namespace ProtoTest.TD.MultiLangTests
     public class TestImport
     {
         public TestFrameWork thisTest = new TestFrameWork();
-        string testCasePath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Import\\";
+        string testCasePath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void Setup()
         {
