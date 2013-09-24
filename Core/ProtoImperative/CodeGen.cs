@@ -2585,13 +2585,13 @@ namespace ProtoImperative
                     case "ProtoCore.AST.ImperativeAST.IdentifierNode":
                     case "ProtoCore.AST.ImperativeAST.ExprListNode":
                         newOptions |= DebugProperties.BreakpointOptions.EmitPopForTempBreakpoint;
-                        compileStateTracker.DebugProps.breakOptions = newOptions;
+                        core.DebugProps.breakOptions = newOptions;
                         break;
                 }
 
                 type.UID = (int)ProtoCore.PrimitiveType.kTypeVoid;
                 EmitBinaryExpressionNode(arrayexprAssignment, ref type, isBooleanOp, graphNode);
-                compileStateTracker.DebugProps.breakOptions = oldOptions; // Restore breakpoint behaviors.
+                core.DebugProps.breakOptions = oldOptions; // Restore breakpoint behaviors.
 
                 // Get the size of expr and assign it to the autogen iteration var
                 int symbolIndex = Constants.kInvalidIndex;
@@ -2624,7 +2624,7 @@ namespace ProtoImperative
                 opDest.optype = ProtoCore.DSASM.AddressType.VarIndex;
                 if (ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex && !IsInLanguageBlockDefinedInFunction())
                 {
-                    symbolIndex = compileStateTracker.ClassTable.ClassNodes[globalClassIndex].symbols.IndexOf(keyIdent);
+                    symbolIndex = core.ClassTable.ClassNodes[globalClassIndex].symbols.IndexOf(keyIdent);
                     if (symbolIndex != Constants.kInvalidIndex)
                     {
                         symbol = core.ClassTable.ClassNodes[globalClassIndex].symbols.symbolList[symbolIndex];
