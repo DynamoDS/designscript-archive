@@ -55,7 +55,7 @@ c = Scale(a,b);
         public void T004_BasicImport_CurrentDirectoryWithDotAndSlash()
         {
             string code = @"
-import ("".\basicImport.ds"");
+import (""\basicImport.ds"");
 a = {1.1,2.2};
 b = 2;
 c = Scale(a,b);";
@@ -69,7 +69,7 @@ c = Scale(a,b);";
         public void T005_BasicImport_RelativePath()
         {
             string code = @"
-import ("".\ExtraFolderToTestRelativePath\basicImport.ds"");
+import (""\ExtraFolderToTestRelativePath\basicImport.ds"");
 a = {1.1,2.2};
 b = 2;
 c = Scale(a,b);";
