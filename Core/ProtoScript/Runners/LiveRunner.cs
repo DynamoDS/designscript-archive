@@ -850,13 +850,6 @@ namespace ProtoScript.Runners
                     code += codeGen.GenerateCode();
                 }
             }
-            //Synchronize the core configuration before compilation and execution.
-            //if (syncCoreConfigurations)
-            //{
-            //    SyncCoreConfigurations(runnerCore, executionOptions);
-            //    syncCoreConfigurations = false;
-            //}
-
             CompileAndExecuteForDeltaExecution(code);
         }
 
@@ -901,7 +894,6 @@ namespace ProtoScript.Runners
             }
         }
 
-        // TODO: Aparajit: This needs to be fixed for Command Line REPL
         private void SynchronizeInternal(string code)
         {
             if (string.IsNullOrEmpty(code))
