@@ -11,6 +11,7 @@ namespace ProtoTest.DebugTests
     public class RunWatchTests
     {
 
+        string importpath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
 
         [Test]
         [Category("WatchFx Tests")]
@@ -4967,7 +4968,7 @@ v3 = DisposeVerify.x; // 6
 }
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -4989,7 +4990,7 @@ a1 = A.A();
 }
 v = DisposeVerify.x; // 3";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5014,7 +5015,7 @@ v1;
 }
 v2 = DisposeVerify.x; // 3";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5039,7 +5040,7 @@ v1;
 }
 v2 = DisposeVerify.x; // 2";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5066,7 +5067,7 @@ m = 10;
 v2 = DisposeVerify.x; // 4
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5102,7 +5103,7 @@ v3 = DisposeVerify.x; // 7
 }
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5137,7 +5138,7 @@ v3 = DisposeVerify.x; // 7
 }
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5180,7 +5181,7 @@ a3 = null;
 v7 = DisposeVerify.x; // 7
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5213,7 +5214,7 @@ v5 = DisposeVerify.x; // 6
 c = foo( { A.A(), A.A(), A.A() } );
 v6 = DisposeVerify.x; // 9";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5238,7 +5239,7 @@ m = null;
 v2 = DisposeVerify.x; // 4
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5263,7 +5264,7 @@ bb = foo(aa);
 v1 = DisposeVerify.x; // 2
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5299,7 +5300,7 @@ v1;
 }
 v2 = DisposeVerify.x; // 4";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5331,7 +5332,7 @@ arrr2 = flatten(arrr);
 v1 = DisposeVerify.x; // 1
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -44425,7 +44426,7 @@ result =  IsRectangular(raggedCollection)? BSplineSurface.ByPoints(raggedCollect
 test2 = result.P1.X;
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -44607,7 +44608,7 @@ myAltSingleXvalue   = myPoint.X[1]; 	// = 4
 // indexing into one of member of one of its properties
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47680,7 +47681,7 @@ t3 = line_0[2].StartPoint.X;
 t4 = line_0[3].StartPoint.X;
 t5 = line_0[4].StartPoint.X;";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47707,7 +47708,7 @@ t3 = line_0[2].StartPoint.X;
 t4 = line_0[3].StartPoint.X;
 t5 = line_0[4].StartPoint.X;";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47736,7 +47737,7 @@ startPt = Point.ByCartesianCoordinates( (1..5..1)<1>, (1..5..1)<2>, 0 ); // repl
 startPt = Point.ByCartesianCoordinates( 2, 1, 0 );
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47756,7 +47757,7 @@ t2 = lines[1][0].StartPoint.X;
 t3 = lines[2][0].StartPoint.X;
 t4 = lines[3][0].StartPoint.X;";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47778,7 +47779,7 @@ t1 = lines[0].StartPoint.X;
 t2 = lines[1].StartPoint.X;
 t3 = lines[2].StartPoint.X;";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47794,7 +47795,7 @@ lines_StartPoint_X = lines.StartPoint.X;
 t1 = lines[0][0].StartPoint.X;
 t2 = lines[1][2].StartPoint.X;";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47863,7 +47864,7 @@ a 		= a.incrementTheta(10.0);				// apply different modifiers [POINT does not up
 a 		= a.incrementRadius(0.2); 				// [POINT does not updates]
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -47892,7 +47893,7 @@ t3 = tubes[2].EndPoint.X;
 t4 = tubes[3].EndPoint.X;
 t5 = tubes[4].EndPoint.X;";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -48026,7 +48027,7 @@ x2 = triangle0001.Side_b_c.MidPoint.X;
 x3 = triangle0002.Side_b_c.MidPoint.X;
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -48101,7 +48102,7 @@ x2 = MyTriangle0001[1].side_b_c.midPoint.X;
 x3 = MyTriangle0001[2].side_c_a.midPoint.X;
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -48165,7 +48166,7 @@ x5 = side_s_t.MidPoint.X;
 x6 = side_t_r.MidPoint.X;
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -48379,7 +48380,7 @@ x1 = testTube[0][1].secondary.StartPoint.X;
 // testTube = Tubulor.ByPoint(""P"", pointsForPolygons[2][2], radius, radius, factor);
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -51961,7 +51962,7 @@ i = 5;
     }
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -52597,7 +52598,7 @@ test = projectedCurve.P1[0].X;
 surfLength = 35; 
 projectVector = Vector.ByCoordinates(5.0,0,-1);";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -52613,7 +52614,7 @@ t1= line1.Color;
 line2.Color = 1.0; // can't assign to a writable property if it is collection.. is this a replication issue?
 t2= line2.Color;";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -52657,7 +52658,7 @@ i = 5;
 	}
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
