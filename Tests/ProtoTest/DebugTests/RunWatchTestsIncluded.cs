@@ -11,6 +11,7 @@ namespace ProtoTest.DebugTests
     public class RunWatchTests
     {
 
+        string importpath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
 
         [Test]
         [Category("WatchFx Tests")]
@@ -4967,7 +4968,7 @@ v3 = DisposeVerify.x; // 6
 }
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -4989,7 +4990,7 @@ a1 = A.A();
 }
 v = DisposeVerify.x; // 3";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5014,7 +5015,7 @@ v1;
 }
 v2 = DisposeVerify.x; // 3";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5039,7 +5040,7 @@ v1;
 }
 v2 = DisposeVerify.x; // 2";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5066,7 +5067,7 @@ m = 10;
 v2 = DisposeVerify.x; // 4
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5102,7 +5103,7 @@ v3 = DisposeVerify.x; // 7
 }
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5137,7 +5138,7 @@ v3 = DisposeVerify.x; // 7
 }
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5180,7 +5181,7 @@ a3 = null;
 v7 = DisposeVerify.x; // 7
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5213,7 +5214,7 @@ v5 = DisposeVerify.x; // 6
 c = foo( { A.A(), A.A(), A.A() } );
 v6 = DisposeVerify.x; // 9";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5238,7 +5239,7 @@ m = null;
 v2 = DisposeVerify.x; // 4
 }";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5263,7 +5264,7 @@ bb = foo(aa);
 v1 = DisposeVerify.x; // 2
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5299,7 +5300,7 @@ v1;
 }
 v2 = DisposeVerify.x; // 4";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
@@ -5331,7 +5332,7 @@ arrr2 = flatten(arrr);
 v1 = DisposeVerify.x; // 1
 ";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
         }
 
         [Test]
