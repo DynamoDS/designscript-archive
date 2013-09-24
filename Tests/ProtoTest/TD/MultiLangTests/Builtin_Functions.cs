@@ -3588,7 +3588,7 @@ t8 = Math.Factorial(arr);
         public void T073_Defect_ImportFromCSV_1467579()
         {
             String code =
-@"a = ""..\..\..\Scripts\TD\testCSV\trailing_comma.csv"";b = ImportFromCSV(a);";
+@"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\trailing_comma.csv"";b = ImportFromCSV(a);";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("b", new object[] { new object[] { 10, 40 }, new object[] { 20.0, 50 }, new object[] { 30.0, 60.00 } }
 );
