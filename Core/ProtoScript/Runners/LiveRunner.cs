@@ -789,9 +789,7 @@ namespace ProtoScript.Runners
         /// </summary>
         private void RetainVMStatesForDeltaExecution()
         {
-            //builtInsLoaded = true;
-            //deltaCompileStartPC = runnerCore.CodeBlockList[0].instrStream.instrList.Count;
-            runnerCore.CompleteCodeBlockList.Clear();        
+            runnerCore.CompleteCodeBlockList.Clear();       
         }
 
         private void CompileAndExecuteForDeltaExecution(string code)
@@ -809,7 +807,6 @@ namespace ProtoScript.Runners
 
         private void SynchronizeInternal(GraphSyncData syncData, out string code)
         {
-            //throw new NotImplementedException();
             code = string.Empty;
             if (syncData == null)
             {
@@ -856,13 +853,6 @@ namespace ProtoScript.Runners
                     code += codeGen.GenerateCode();
                 }
             }
-            //Synchronize the core configuration before compilation and execution.
-            //if (syncCoreConfigurations)
-            //{
-            //    SyncCoreConfigurations(runnerCore, executionOptions);
-            //    syncCoreConfigurations = false;
-            //}
-
             CompileAndExecuteForDeltaExecution(code);
         }
 
@@ -904,7 +894,6 @@ namespace ProtoScript.Runners
                 }
             }
         }
-        // TODO: Aparajit: This needs to be fixed for Command Line REPL
         private void SynchronizeInternal(string code)
         {
             if (string.IsNullOrEmpty(code))
