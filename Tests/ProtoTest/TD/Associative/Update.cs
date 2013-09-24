@@ -11,7 +11,7 @@ namespace ProtoTest.TD.Associative
         public ProtoCore.Core core;
         public TestFrameWork thisTest = new TestFrameWork();
         ProtoScript.Config.RunConfiguration runnerConfig;
-        string testCasePath = "..\\..\\..\\Scripts\\TD\\Associative\\Update\\";
+        string importPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         ProtoScript.Runners.DebugRunner fsr;
         [SetUp]
         public void Setup()
@@ -1916,7 +1916,7 @@ x2;
 t = 5;
 z = a.x;
 ";
-            thisTest.RunScriptSource(code, errmsg);
+            thisTest.RunScriptSource(code, errmsg, importPath);
             thisTest.Verify("z", 6);
 
         }
