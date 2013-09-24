@@ -8,11 +8,12 @@ namespace ProtoTest.MultiLangTests
     {
         public ProtoCore.Core core;
         public TestFrameWork thisTest = new TestFrameWork();
-        string testCasePath = "..\\..\\..\\Scripts\\MultiLangTests\\GCTest\\";
+        string testCasePath = "..\\..\\..\\Tests\\ProtoTest\\Include\\";
         [SetUp]
         public void Setup()
         {
-            core = new ProtoCore.Core(new ProtoCore.Options());
+            ProtoCore.Options options = new ProtoCore.Options();
+            core = new ProtoCore.Core(options);
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
         }
@@ -45,7 +46,7 @@ a2 = A.A();
 v3 = DisposeVerify.x; // 6
 }
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 4);
             thisTest.Verify("v2", 5);
             thisTest.Verify("v3", 6);
@@ -68,7 +69,7 @@ a1 = A.A();
     a4 = A.A();
 }
 v = DisposeVerify.x; // 3";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v", 3);
         }
 
@@ -92,7 +93,7 @@ v1;
 	v1 = DisposeVerify.x; // 2
 }
 v2 = DisposeVerify.x; // 3";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 2);
             thisTest.Verify("v2", 3);
         }
@@ -117,7 +118,7 @@ v1;
 	// block, the ref count of that value is still 1
 }
 v2 = DisposeVerify.x; // 2";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 1);
             thisTest.Verify("v2", 2);
         }
@@ -144,7 +145,7 @@ m = 10;
 // test after assign the return value from foo, the ref count of that value is 1
 v2 = DisposeVerify.x; // 4
 }";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 3);
             thisTest.Verify("v2", 4);
         }
@@ -180,7 +181,7 @@ arr = null;
 v3 = DisposeVerify.x; // 7
 }
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 4);
             thisTest.Verify("v2", 4);
             thisTest.Verify("v3", 7);
@@ -216,7 +217,7 @@ arr = null;
 v3 = DisposeVerify.x; // 7
 }
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 4);
             thisTest.Verify("v2", 4);
             thisTest.Verify("v3", 7);
@@ -260,7 +261,7 @@ v6 = DisposeVerify.x; // 6
 a3 = null; 
 v7 = DisposeVerify.x; // 7
 }";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 1);
             thisTest.Verify("v2", 4);
             thisTest.Verify("v3", 4);
@@ -298,7 +299,7 @@ b = foo2(A.A());
 v5 = DisposeVerify.x; // 6
 c = foo( { A.A(), A.A(), A.A() } );
 v6 = DisposeVerify.x; // 9";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 1);
             thisTest.Verify("v2", 1);
             thisTest.Verify("v3", 2);
@@ -327,7 +328,7 @@ v1 = DisposeVerify.x; // 3
 m = null; 
 v2 = DisposeVerify.x; // 4
 }";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 3);
             thisTest.Verify("v2", 4);
         }
@@ -352,7 +353,7 @@ aa = A.A();
 bb = foo(aa);
 v1 = DisposeVerify.x; // 2
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 1);
         }
 
@@ -387,7 +388,7 @@ v1;
 	v1 = DisposeVerify.x;
 }
 v2 = DisposeVerify.x; // 4";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 5);
             thisTest.Verify("v2", 7);
         }
@@ -419,7 +420,7 @@ arrr = { { A.A(), A.A(), A.A() }, { A.A(), A.A(), A.A() }, { A.A(), A.A(), A.A()
 arrr2 = flatten(arrr);
 v1 = DisposeVerify.x; // 1
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 1);
         }
     }
