@@ -372,20 +372,21 @@ namespace ProtoCore.Utils
         }
 
         /// <summary>
-        /// Pull the heap element out of an array pointer
+        /// Pull the heap element out of a heap object
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="heapObject"></param>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static HeapElement GetHeapElement(StackValue array, Core core)
+        public static HeapElement GetHeapElement(StackValue heapObject, Core core)
         {
-            Validity.Assert(AddressType.ArrayPointer == array.optype || AddressType.String == array.optype);
-            if (array.optype != AddressType.ArrayPointer && array.optype != AddressType.String)
+            if (heapObject.optype != AddressType.ArrayPointer && 
+                heapObject.optype != AddressType.String &&
+                heapObject.optype != AddressType.Pointer)
             {
                 return null;
             }
 
-            return core.Heap.Heaplist[(int)array.opdata];
+            return core.Heap.Heaplist[(int)heapObject.opdata];
         }
 
         public static bool IsUniform(StackValue sv, Core core)
