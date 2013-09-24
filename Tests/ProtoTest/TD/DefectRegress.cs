@@ -9,7 +9,7 @@ namespace ProtoTest.TD
     {
         public ProtoCore.Core core;
         public TestFrameWork thisTest = new TestFrameWork();
-        string testCasePath = "..\\..\\..\\Scripts\\TD\\Regress\\";
+        string testCasePath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void Setup()
         {
