@@ -2479,7 +2479,7 @@ r2 = Print(arr2);";
         public void BIM23_LoadCSV()
         {
             String code =
-@"a = ""../../../Scripts/TD/testCSV/test.csv"";b = ImportFromCSV(a);";
+@"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test.csv"";b = ImportFromCSV(a);";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("b", new object[] { new object[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, new object[] { 2.0, 3.0, 4.0, 5.0, 6.0 }, new object[] { 3.0, 4.0, 5.0, 6.0, 7.0 } }
 );
@@ -2490,7 +2490,7 @@ r2 = Print(arr2);";
         public void BIM23_LoadCSV_2()
         {
             String code =
-@"a = ""../../../Scripts/TD/testCSV/test.csv"";b = ImportFromCSV(a);";
+@"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test.csv"";b = ImportFromCSV(a);";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("b", new object[] { new object[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, new object[] { 2.0, 3.0, 4.0, 5.0, 6.0 }, new object[] { 3.0, 4.0, 5.0, 6.0, 7.0 } }
 );
@@ -2501,7 +2501,7 @@ r2 = Print(arr2);";
         public void BIM23_LoadCSV_replicated_3()
         {
             String code =
-@"a = ""../../../Scripts/TD/testCSV/test.csv"";b = ""../../../Scripts/TD/testCSV/test2.csv"";c = { a, b };d = ImportFromCSV(c);";
+@"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test.csv"";b = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test2.csv"";c = { a, b };d = ImportFromCSV(c);";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("d", new object[] { new object[] { new object[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, new object[] { 2.0, 3.0, 4.0, 5.0, 6.0 }, new object[] { 3.0, 4.0, 5.0, 6.0, 7.0 } }, new object[] { new object[] { 11.0, 12.0, 13.0, 14.0, 15.0 }, new object[] { 12.0, 13.0, 14.0, 15.0, 16.0 }, new object[] { 13.0, 14.0, 15.0, 16.0, 17.0 } } }
 );
@@ -2512,7 +2512,7 @@ r2 = Print(arr2);";
         public void BIM23_LoadCSV_replicated_4()
         {
             String code =
-@"a = ""../../../Scripts/TD/testCSV/test.csv"";b = ""../../../Scripts/TD/testCSV/test2.csv"";c = { a, b };d = ImportFromCSV(c);";
+@"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test.csv"";b = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test2.csv"";c = { a, b };d = ImportFromCSV(c);";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("d", new object[] { new object[] { new object[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, new object[] { 2.0, 3.0, 4.0, 5.0, 6.0 }, new object[] { 3.0, 4.0, 5.0, 6.0, 7.0 } }, new object[] { new object[] { 11.0, 12.0, 13.0, 14.0, 15.0 }, new object[] { 12.0, 13.0, 14.0, 15.0, 16.0 }, new object[] { 13.0, 14.0, 15.0, 16.0, 17.0 } } }
 );
@@ -2523,7 +2523,7 @@ r2 = Print(arr2);";
         public void BIM23_LoadCSV_replicated_5()
         {
             String code =
-@"a = ""../../../Scripts/TD/testCSV/test.csv"";b = ""../../../Scripts/TD/testCSV/test2.csv"";c = { a, b };d = ImportFromCSV(c);";
+@"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test.csv"";b = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test2.csv"";c = { a, b };d = ImportFromCSV(c);";
             string err = "";
             string path = @"C:\designscript\autodeskresearch\trunk\DesignScript\Prototype\Scripts\TD\";
             ExecutionMirror mirror = thisTest.RunScriptSource(code, err, path);
@@ -2536,7 +2536,7 @@ r2 = Print(arr2);";
         public void BIM23_LoadCSV_imperative_5()
         {
             String code =
-@"d;[Imperative]{a = ""../../../Scripts/TD/testCSV/test.csv"";b = ""../../../Scripts/TD/testCSV/test2.csv"";c = { a, b };d = ImportFromCSV(c);}";
+@"d;[Imperative]{a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test.csv"";b = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test2.csv"";c = { a, b };d = ImportFromCSV(c);}";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("d", new object[] { new object[] { new object[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, new object[] { 2.0, 3.0, 4.0, 5.0, 6.0 }, new object[] { 3.0, 4.0, 5.0, 6.0, 7.0 } }, new object[] { new object[] { 11.0, 12.0, 13.0, 14.0, 15.0 }, new object[] { 12.0, 13.0, 14.0, 15.0, 16.0 }, new object[] { 13.0, 14.0, 15.0, 16.0, 17.0 } } }
 );
@@ -2547,7 +2547,7 @@ r2 = Print(arr2);";
         public void BIM23_LoadCSV_nested_imperative_6()
         {
             String code =
-@"d;[Associative]{[Imperative]{[Associative]{a = ""../../../Scripts/TD/testCSV/test.csv"";b = ""../../../Scripts/TD/testCSV/test2.csv"";c = { a, b };d = ImportFromCSV(c);}}}";
+@"d;[Associative]{[Imperative]{[Associative]{a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test.csv"";b = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\test2.csv"";c = { a, b };d = ImportFromCSV(c);}}}";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("d", new object[] { new object[] { new object[] { 1.0, 2.0, 3.0, 4.0, 5.0 }, new object[] { 2.0, 3.0, 4.0, 5.0, 6.0 }, new object[] { 3.0, 4.0, 5.0, 6.0, 7.0 } }, new object[] { new object[] { 11.0, 12.0, 13.0, 14.0, 15.0 }, new object[] { 12.0, 13.0, 14.0, 15.0, 16.0 }, new object[] { 13.0, 14.0, 15.0, 16.0, 17.0 } } }
 );
@@ -3588,7 +3588,7 @@ t8 = Math.Factorial(arr);
         public void T073_Defect_ImportFromCSV_1467579()
         {
             String code =
-@"a = ""..\..\..\Scripts\TD\testCSV\trailing_comma.csv"";b = ImportFromCSV(a);";
+@"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\trailing_comma.csv"";b = ImportFromCSV(a);";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("b", new object[] { new object[] { 10, 40 }, new object[] { 20.0, 50 }, new object[] { 30.0, 60.00 } }
 );
@@ -3743,7 +3743,7 @@ t8 = Math.Factorial(arr);
         public void Defect_ImportFromCSV_1467622()
         {
             String code =
-            @"a = ""../../../Scripts/TD/testCSV/nonuniform.csv"";            b = ImportFromCSV(a);            ";
+            @"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\nonuniform.csv"";            b = ImportFromCSV(a);            ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("b", new object[] { new object[] { 1.0, 2, 3, 4, 5, 6 }, new object[] { 2, 3.0, 4, 5, 6, 7, 8 } }
 );
@@ -3754,7 +3754,7 @@ t8 = Math.Factorial(arr);
         public void Defect_ImportFromCSV_1467622_2()
         {
             String code =
-            @"a = ""../../../Scripts/TD/testCSV/trailing_comma_nonuniform.csv"";            b = ImportFromCSV(a);            ";
+            @"a = ""..\..\..\Tests\ProtoTest\ImportFilesCSV\Set2\trailing_comma_nonuniform.csv"";            b = ImportFromCSV(a);            ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("b", new object[] { new object[] { 10, 20, 30, null }, new object[] { 40, 50, 60, 40, null } }
 );
