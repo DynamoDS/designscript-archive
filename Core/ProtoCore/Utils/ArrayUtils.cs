@@ -467,8 +467,8 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         public static int GetElementSize(StackValue array, Core core)
         {
-            Validity.Assert(StackUtils.IsArray(array));
-            if (!StackUtils.IsArray(array))
+            Validity.Assert(StackUtils.IsArray(array) || StackUtils.IsString(array));
+            if (!StackUtils.IsArray(array) && !StackUtils.IsString(array))
             {
                 return Constants.kInvalidIndex;
             }
