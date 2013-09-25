@@ -5345,7 +5345,27 @@ namespace ProtoAssociative
                 // Determine whether this still needs to be aligned to the actual 'classIndex' variable
                 // The factors that will affect this is whether the 2 function tables (compiler and callsite) need to be merged
                 int classIndexAtCallsite = globalClassIndex + 1;
-                core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
+                if (!core.FunctionTable.GlobalFuncTable.ContainsKey(classIndexAtCallsite))
+                {
+                    Dictionary<string, FunctionGroup> funcList = new Dictionary<string, FunctionGroup>();
+                    core.FunctionTable.GlobalFuncTable.Add(classIndexAtCallsite, funcList);
+                }
+
+                Dictionary<string, FunctionGroup> fgroup = core.FunctionTable.GlobalFuncTable[classIndexAtCallsite];
+                if (!fgroup.ContainsKey(funcDef.Name))
+                {
+                    // Create a new function group in this class
+                    ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
+                    funcGroup.FunctionEndPoints.Add(fep);
+
+                    // Add this group to the class function tables
+                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
+                }
+                else
+                {
+                    // Add this fep into the exisitng function group
+                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite][funcDef.Name].FunctionEndPoints.Add(fep);
+                }
 
                 int startpc = pc;
 
@@ -5736,44 +5756,96 @@ namespace ProtoAssociative
                 // Determine whether this still needs to be aligned to the actual 'classIndex' variable
                 // The factors that will affect this is whether the 2 function tables (compiler and callsite) need to be merged
                 int classIndexAtCallsite = globalClassIndex + 1;
-                FunctionGroup functionGroup = core.FunctionTable.GetFunctionGroup(classIndexAtCallsite, funcDef.Name);
-                if (functionGroup != null)
+                if (!core.FunctionTable.GlobalFuncTable.ContainsKey(classIndexAtCallsite))
                 {
-                    functionGroup.FunctionEndPoints.Add(fep);
+                    // Create a new table for the class as this class does not exist in the tables yet
+                    Dictionary<string, FunctionGroup> funcList = new Dictionary<string, FunctionGroup>();
+                    core.FunctionTable.GlobalFuncTable.Add(classIndexAtCallsite, funcList);
                 }
-                else
+
+                // Get the function group of the current class and see if the current function exists
+                Dictionary<string, FunctionGroup> fgroup = core.FunctionTable.GlobalFuncTable[classIndexAtCallsite];
+                if (!fgroup.ContainsKey(funcDef.Name))
                 {
                     // If any functions in the base class have the same name, append them here
-                    FunctionGroup basegroup = null;
-
                     int ci = classIndexAtCallsite - 1;
-                    if (ci != Constants.kInvalidIndex) 
+                    if (ProtoCore.DSASM.Constants.kInvalidIndex != ci)
                     {
                         ProtoCore.DSASM.ClassNode cnode = core.ClassTable.ClassNodes[ci];
                         if (cnode.baseList.Count > 0)
                         {
                             Validity.Assert(1 == cnode.baseList.Count, "We don't support multiple inheritance yet");
-                            basegroup = core.FunctionTable.GetFunctionGroup(cnode.baseList[0] + 1, funcDef.Name);
-                        }
-                    }
 
-                    if (basegroup == null)
-                    {
-                        core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, fep);
+                            ci = cnode.baseList[0];
+
+                            Dictionary<string, FunctionGroup> tgroup = new Dictionary<string, FunctionGroup>();
+                            int callsiteCI = ci + 1;
+                            bool bSucceed = core.FunctionTable.GlobalFuncTable.TryGetValue(callsiteCI, out tgroup);
+                            if (bSucceed)
+                            {
+                                if (tgroup.ContainsKey(funcDef.Name))
+                                {
+                                    // Get that base group - the group of function from the baseclass
+                                    FunctionGroup basegroup = new FunctionGroup();
+                                    bSucceed = tgroup.TryGetValue(funcDef.Name, out basegroup);
+                                    if (bSucceed)
+                                    {
+                                        // Copy all non-private feps from the basegroup into this the new group
+                                        FunctionGroup newGroup = new FunctionGroup();
+                                        newGroup.CopyVisible(basegroup.FunctionEndPoints);
+
+                                        // Append the new fep 
+                                        newGroup.FunctionEndPoints.Add(fep);
+
+                                        // Copy the new group to this class table
+                                        core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, newGroup);
+                                    }
+                                }
+                                else
+                                {
+                                    // Create a new function group in this class
+                                    ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
+                                    funcGroup.FunctionEndPoints.Add(fep);
+
+                                    // Add this group to the class function tables
+                                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
+                                }
+                            }
+                            else
+                            {
+                                // Create a new function group in this class
+                                ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
+                                funcGroup.FunctionEndPoints.Add(fep);
+
+                                // Add this group to the class function tables
+                                core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
+                            }
+                            cnode = core.ClassTable.ClassNodes[ci];
+                        }
+                        else
+                        {
+                            // Create a new function group in this class
+                            ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
+                            funcGroup.FunctionEndPoints.Add(fep);
+
+                            // Add this group to the class function tables
+                            core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
+                        }
                     }
                     else
                     {
-                        // Copy all non-private feps from the basegroup into this the new group
-                        FunctionGroup newGroup = new FunctionGroup();
-                        newGroup.CopyVisible(basegroup.FunctionEndPoints);
-                        newGroup.FunctionEndPoints.Add(fep);
+                        // Create a new function group in this class
+                        ProtoCore.FunctionGroup funcGroup = new ProtoCore.FunctionGroup();
+                        funcGroup.FunctionEndPoints.Add(fep);
 
-                        foreach (var newfep in newGroup.FunctionEndPoints)
-                        {
-                            core.FunctionTable.AddFunctionEndPointer(classIndexAtCallsite, funcDef.Name, newfep);
-                        }
-
+                        // Add this group to the class function tables
+                        core.FunctionTable.GlobalFuncTable[classIndexAtCallsite].Add(funcDef.Name, funcGroup);
                     }
+                }
+                else
+                {
+                    // Add this fep into the exisitng function group
+                    core.FunctionTable.GlobalFuncTable[classIndexAtCallsite][funcDef.Name].FunctionEndPoints.Add(fep);
                 }
 
                 if (!hasReturnStatement && !funcDef.IsExternLib)
@@ -6381,9 +6453,46 @@ namespace ProtoAssociative
             {
                 if (cnode.baseList.Count > 0)
                 {
+                    // Get the current class functiongroup
                     int ci = cnode.classId;
+                    Dictionary<string, FunctionGroup> groupList = new Dictionary<string, FunctionGroup>();
+                    if (!core.FunctionTable.GlobalFuncTable.TryGetValue(ci + 1, out groupList))
+                    {
+                        continue;
+                    }
+
+                    // If it has a baseclass, get its function group 'basegroup'
                     int baseCI = cnode.baseList[0];
-                    core.FunctionTable.CopyVisibleFunctionEndPointFromBase(ci, baseCI);
+                    Dictionary<string, FunctionGroup> baseGroupList = new Dictionary<string, FunctionGroup>();
+                    bool groupListExists = core.FunctionTable.GlobalFuncTable.TryGetValue(baseCI + 1, out baseGroupList);
+                    if (groupListExists)
+                    {
+                        // If it has a baseclass, get its list of function group 'basegrouplist'
+                        // for every group, check if this already exisits in the current class
+                        foreach (KeyValuePair<string, FunctionGroup> baseGroup in baseGroupList)
+                        {
+                           if (groupList.ContainsKey(baseGroup.Key))
+                           {
+                               // If this class has this function group, append the visible feps from the basegoup
+                               FunctionGroup currentGroup = new FunctionGroup();
+                               if (groupList.TryGetValue(baseGroup.Key, out currentGroup))
+                               {
+                                   // currentGroup is this class's current function group given the current name
+                                   currentGroup.CopyVisible(baseGroup.Value.FunctionEndPoints);
+                               }
+                           }
+                           else
+                           {
+                               // If this class doesnt have basegroup, create a new group and append the visible feps from the basegoup
+                               FunctionGroup newGroup = new FunctionGroup();
+                               newGroup.CopyVisible(baseGroup.Value.FunctionEndPoints);
+                               if (newGroup.FunctionEndPoints.Count > 0)
+                               {
+                                   groupList.Add(baseGroup.Key, newGroup);
+                               }
+                           }
+                        }
+                    }
                 }
             }
         }
