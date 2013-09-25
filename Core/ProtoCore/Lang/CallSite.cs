@@ -894,7 +894,15 @@ namespace ProtoCore
                     //if (StackUtils.IsArray(formalParameters[repIndex]))
                     //    throw new NotImplementedException("Replication Case not implemented - Jagged Arrays - Slow path: {8606D4AA-9225-4F34-BE53-74270B8D0A90}");
 
-                    StackValue[] subParameters = ArrayUtils.GetValues(formalParameters[repIndex], core);
+                    StackValue[] subParameters = null;
+                    if (StackUtils.IsArray(formalParameters[repIndex]))
+                    {
+                        subParameters = ArrayUtils.GetValues(formalParameters[repIndex], core);
+                    }
+                    else
+                    {
+                        subParameters = new StackValue[] { formalParameters[repIndex] };
+                    }
                     parameters.Add(subParameters);
                     retSize = Math.Min(retSize, subParameters.Length); //We need the smallest array
                 }
