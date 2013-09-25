@@ -147,7 +147,14 @@ namespace ProtoAssociative
             if (core.Options.IsDeltaExecution)
             {
                 codeBlock = GetDeltaCompileCodeBlock();
-                pc = core.deltaCompileStartPC;
+                if (core.Options.IsDeltaCompile)
+                {
+                    pc = codeBlock.instrStream.instrList.Count;
+                }
+                else
+                {
+                    pc = core.deltaCompileStartPC;
+                }
             }
             else
             {
@@ -2593,6 +2600,11 @@ namespace ProtoAssociative
                 InlineConditionalNode inlineCondition = node as InlineConditionalNode;
                 replicationGuides = null;
             }
+            else if (node is ExprListNode)
+            {
+                ExprListNode exprlistNode = node as ExprListNode;
+                replicationGuides = exprlistNode.ReplicationGuides;
+            }
             else
             {
                 // A parser error has occured if a replication guide gets attached to any AST besides"
@@ -3133,6 +3145,7 @@ namespace ProtoAssociative
                             {
                                 if (core.Options.GenerateExprID)
                                 {
+                                    //ssaID = core.StaticExpressionUID++;
                                     ssaID = core.ExpressionUID++;
                                 }
                                 else
@@ -3160,6 +3173,7 @@ namespace ProtoAssociative
                         {
                             if (core.Options.GenerateExprID)
                             {
+                                //bnode.exprUID = generatedUID = core.StaticExpressionUID++;
                                 bnode.exprUID = generatedUID = core.ExpressionUID++;
                             }
                             newAstList.Add(node);
@@ -3489,7 +3503,7 @@ namespace ProtoAssociative
             // This means that all import statments and its classes and functions have already been codegen'd
             if (compilePass == AssociativeCompilePass.kGlobalFuncBody)
             {
-                if (core.Options.IsDeltaExecution)
+                if (core.Options.IsDeltaExecution && !core.Options.IsDeltaCompile)
                 {
                     if (node is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode)
                     {

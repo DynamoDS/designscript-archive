@@ -315,7 +315,7 @@ namespace ProtoTest.DebugTests
         public void DebugEQBIM23_LoadCSV()
         {
             String code =
-                @"a = ""CSVTestCase\test1.csv"";b = LoadCSV(a);c = LoadCSV(a, false);d = LoadCSV(a, true);x = b[0][2];y = c[0][2];z = d[0][2];";
+                @"a = ""CSVTestCase/test1.csv"";b = LoadCSV(a);c = LoadCSV(a, false);d = LoadCSV(a, true);x = b[0][2];y = c[0][2];z = d[0][2];";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
@@ -5654,7 +5654,7 @@ namespace ProtoTest.DebugTests
         [Test]
         public void DebugEQT002_BasicImport_AbsoluteDirectory()
         {
-            string code = @"import (""..\..\..\Scripts\TD\MultiLanguage\Import\basicImport.ds"");a = {1.1,2.2};b = 2;c = Scale(a,b);";
+            string code = @"import (""..\..\..\Tests\ProtoTest\ImportFiles\basicImport.ds"");a = {1.1,2.2};b = 2;c = Scale(a,b);";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
