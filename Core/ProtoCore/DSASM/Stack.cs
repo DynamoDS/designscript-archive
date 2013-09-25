@@ -541,7 +541,7 @@ namespace ProtoCore.DSASM
         private static bool CompareStackValuesFromHeap(StackValue sv1, StackValue sv2, Core c1, Core c2, ProtoCore.Runtime.Context context)
         {
             HeapElement heap1 = ArrayUtils.GetHeapElement(sv1, c1); 
-            HeapElement heap2 = ArrayUtils.GetHeapElement(sv1, c2);
+            HeapElement heap2 = ArrayUtils.GetHeapElement(sv2, c2);
 
             if (heap1.Stack.Length != heap2.Stack.Length)
             {
