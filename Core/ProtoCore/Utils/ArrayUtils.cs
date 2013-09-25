@@ -954,7 +954,7 @@ namespace ProtoCore.Utils
             {
                 for (int i = 0; i < values.Length; ++i)
                 {
-                    GCUtils.GCRelease(values[i], core);
+                    GCUtils.GCRetain(values[i], core);
                 }
 
                 return HeapUtils.StoreArray(values, null, core);
