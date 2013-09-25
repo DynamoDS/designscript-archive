@@ -260,9 +260,9 @@ namespace ProtoTestFx.TD
             return testMirror;
         }
 
-        public ExecutionMirror VerifyRunScriptSource(string sourceCode, string errorstring)
+        public ExecutionMirror VerifyRunScriptSource(string sourceCode, string errorstring, string importPath = null)
         {
-                Assert.DoesNotThrow(() => testMirror = RunScriptSource(sourceCode, errorstring), errorstring);
+            Assert.DoesNotThrow(() => testMirror = RunScriptSource(sourceCode, errorstring, importPath), errorstring);
                 return testMirror;
         }
         public void createDSFile(string fileName,string path, string code )
