@@ -1209,6 +1209,12 @@ namespace ProtoCore.Utils
             return false;
         }
 
+        /// <summary>
+        /// Get an array's next key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public static StackValue GetNextKey(StackValue key, Core core)
         {
             if (StackUtils.IsNull(key) || 
