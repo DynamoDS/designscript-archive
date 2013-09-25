@@ -733,6 +733,403 @@ namespace ProtoTest.Associative
         }
 
         [Test]
+        public void TestDictionary01()
+        {
+            // Using string as a key
+            String code = @"
+a = {1, 2, 3};
+a[""x""] = 42;
+r = a [""x""];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary02()
+        {
+            // Double value can't be used as a key
+            String code = @"
+a = {1, 2, 3};
+a[1.234] = 42;
+r = a [1.3];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary03()
+        {
+            // Using boolean value as a key
+            String code = @"
+a = {};
+a[true] = 42;
+a[false] = 41;
+r1 = a [1 == 1];
+r2 = a [0 == 1];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", 42);
+            thisTest.Verify("r2", 41);
+        }
+
+        [Test]
+        public void TestDictionary04()
+        {
+            // Using character value as a key
+            String code = @"
+a = {};
+a['x'] = 42;
+r1 = a['x'];
+r2 = a[""x""];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", 42);
+            thisTest.Verify("r2", null);
+        }
+
+        [Test]
+        public void TestDictionary05()
+        {
+            // Using class instance as a key 
+            String code = @"
+class A
+{
+}
+a = A();
+arr = {};
+arr[a] = 41;
+arr[a] = 42;
+r = arr[a];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary06()
+        {
+            // Test replication on array indexing on LHS
+            // using character as a key
+            String code = @"
+strs = {""x"", true, 'b'};
+arr = {};
+arr[strs] = {11, 13, 17};
+r1 = arr[""x""];
+r2 = arr[true];
+r3 = arr['b'];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", 11);
+            thisTest.Verify("r2", 13);
+            thisTest.Verify("r3", 17);
+        }
+
+        [Test]
+        public void TestDictionary07()
+        {
+            // Test replication on array indexing on RHS
+            String code = @"
+strs = {""x"", true, 'b'};
+arr = {};
+arr[strs] = {11, 13, 17};
+values = arr[strs];
+r1 = values[0];
+r2 = values[1];
+r3 = values[2];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", 11);
+            thisTest.Verify("r2", 13);
+            thisTest.Verify("r3", 17);
+        }
+
+        [Test]
+        public void TestDictionary08()
+        {
+            // Test for 2D array
+            String code = @"
+arr = {{1, 2}, {3, 4}};
+arr[1][""xyz""] = 42;
+arr[1][true] = 42;
+r1 = arr[1][""xyzxyzxyz""];
+r2 = arr[1][true];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", null);
+            thisTest.Verify("r2", 42);
+        }
+
+        [Test]
+        public void TestDictionary09()
+        {
+            // Copy array should also copy key-value pairs
+            String code = @"
+a = {};
+a[""xyz""] = 42;
+b = a;
+r = b[""xyz""];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary10()
+        {
+            // Key-value shouldn't be disposed after scope
+            String code = @"
+a = [Imperative]
+{
+    b = {};
+    b[""xyz""] = 42;
+    return = b;
+}
+
+r = a[""xyz""];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary11()
+        {
+            // Copy array should also copy key-value pairs
+            String code = @"
+a = {};
+a[true] = 42;
+b = a;
+r = b[true];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary14()
+        {
+            // Copy array should also copy key-value pairs
+            String code = @"
+a = {};
+a[true] = 42;
+def foo(x: var[]..[])
+{
+    return = x[true];
+}
+r = foo(a);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary12()
+        {
+            // Type conversion applied to values as well
+            String code = @"
+a:int[] = {1.1, 2.2, 3.3};
+a[true] = 42.4;
+r = a[true];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary13()
+        {
+            // Type conversion applied to values as well
+            String code = @"
+a = {1.1, 2.2, 3.3};
+a[true] = 42.4;
+b:int[] = a;
+r = b[true];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary15()
+        {
+            // Test for-loop to get values
+            String code = @"
+a = {1, 2, 3};
+a[true] = 42;
+r = [Imperative]
+{
+    x = null;
+    for (v in a)
+    {
+        x = v;
+    }
+    return = x;
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary16()
+        {
+            // Test replication for function call
+            String code = @"
+a = {1, 2, 3};
+a[true] = 42;
+
+def foo(x) { return = x; }
+r1 = foo(a);
+r2 = r1[3];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r2", 42);
+        }
+
+        [Test]
+        public void TestDictionary17()
+        {
+            // Test replication for function call
+            String code = @"
+a = {1, 2, 3};
+a[true] = 21;
+b = {1, 2, 3};
+b[false] = 21;
+
+def foo(x, y) { return = x + y; }
+sum = foo(a, b);
+r = sum[3];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary18()
+        {
+            // Test replication for array indexing
+            String code = @"
+a = {1, 2, 3};
+a[true] = 42;
+b = {};
+b[a] = 1;
+b[42] = 42;
+c = b[a];
+r = c[3];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 42);
+        }
+
+        [Test]
+        public void TestDictionary19()
+        {
+            // Test builtin functions GetKeys() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r = Count(GetKeys(a));
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+        }
+
+        [Test]
+        public void TestDictionary20()
+        {
+            // Test builtin functions GetValues() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r = Count(GetValues(a));
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+        }
+
+        [Test]
+        public void TestDictionary21()
+        {
+            // Test builtin functions ContainsKey() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r1 = ContainsKey(a, ""x"");
+r2 = ContainsKey(a, true);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", true);
+        }
+
+        [Test]
+        public void TestDictionary22()
+        {
+            // Test builtin functions RemoveKey() for array
+            String code = @"
+        a = {1, 2, 3};
+a[true] = 41;
+a[""x""] = ""foo"";
+r1 = RemoveKey(a, ""x"");
+r2 = RemoveKey(a, true);
+r3 = ContainsKey(a, ""x"");
+r4 = ContainsKey(a, true);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", true);
+            thisTest.Verify("r3", false);
+            thisTest.Verify("r4", false);
+        }
+
+        [Test]
+        public void TestDictionary23()
+        {
+            // Test for-loop
+            String code = @"
+r = [Imperative]
+{
+    a = {1, 5, 7};
+    a[""x""] = 9;
+    a[true] = 11;
+    x = 0; 
+    for (v in a) 
+    {
+        x = x + v;
+    }
+    return = x;
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 33);
+        }
+
+        [Test]
+        public void TestDictionary24()
+        {
+            // Test for-loop
+            String code = @"
+r = [Imperative]
+{
+    a = {};
+    x = 0;
+    for (v in a) 
+    {
+        x = x + v;
+    }
+    return = x;
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 0);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
@@ -1141,7 +1538,7 @@ namespace ProtoTest.Associative
             String code =
                 @"                class A                {	                x : var;	                y : var;	                z : var[];		                constructor A()	                {		                x = B.B(20, 30);		                y = 10;		                z = { B.B(40, 50), B.B(60, 70), B.B(80, 90) };	                }                }                class B                {	                m : var;	                n : var;		                constructor B(_m : int, _n : int)	                {		                m = _m;		                n = _n;	                }                }	            a = A.A();	            b = B.B(1, 2);	            c = { B.B(-1, -2), B.B(-3, -4) };	            a.z[-2] = b;	            watch1 = a.z[-2].n; // 2	            a.z[-2].m = 3;	            watch2 = a.z[-2].m; // 3	            a.x = b;	            watch3 = a.x.m; // 3	            a.z = c;	            watch4 = a.z[-1].m; // -3                ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("watch1", 2);
+            thisTest.Verify("watch1", -2);
             thisTest.Verify("watch2", 3);
             thisTest.Verify("watch3", 3);
             thisTest.Verify("watch4", -3);

@@ -956,14 +956,6 @@ namespace ProtoCore.DSASM.Mirror
             return core.Heap.Heaplist[(int)obj.DsasmValue.opdata].Stack.Select(x => Unpack(x)).ToList();
         }
 
-        public int GetArrayElementCount(Obj obj)
-        {
-            if (obj == null || obj.DsasmValue.optype != AddressType.ArrayPointer)
-                return 0;
-
-            return core.Heap.Heaplist[(int)obj.DsasmValue.opdata].VisibleSize;
-        }
-
         public StackValue GetGlobalValue(string name, int startBlock = 0)
         {
             ProtoCore.DSASM.Executable exe = MirrorTarget.rmem.Executable;

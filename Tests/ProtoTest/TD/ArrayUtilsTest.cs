@@ -327,9 +327,9 @@ namespace ProtoTest.UtilsTests
             ProtoCore.DSASM.StackValue svA = mirror.GetRawFirstValue("a");
             ProtoCore.DSASM.StackValue svB = mirror.GetRawFirstValue("b");
             ProtoCore.DSASM.StackValue svC = mirror.GetRawFirstValue("c");
-            Assert.IsTrue(ProtoCore.Utils.ArrayUtils.IsArray(svA));
-            Assert.IsTrue(!ProtoCore.Utils.ArrayUtils.IsArray(svB));
-            Assert.IsTrue(ProtoCore.Utils.ArrayUtils.IsArray(svC));
+            Assert.IsTrue(StackUtils.IsArray(svA));
+            Assert.IsTrue(!StackUtils.IsArray(svB));
+            Assert.IsTrue(StackUtils.IsArray(svC));
         }
 
         [Test]
@@ -347,7 +347,9 @@ namespace ProtoTest.UtilsTests
             int rankB = ArrayUtils.GetMaxRankForArray(b, core);
             Assert.IsTrue(rankB == 2);
             int rankX = ArrayUtils.GetMaxRankForArray(x, core);
-            Assert.IsTrue(rankX == 2);            /*                         *                          */
+            Assert.IsTrue(rankX == 2);            /*
+                         * 
+                         */
         }
 
         [Test]

@@ -10,21 +10,21 @@ namespace ProtoCore.Utils
     {
 
         /// <summary>
-        /// Take an array of already allocated StackValues and push them into the heap
-        /// Returning the stack value that represents the array
+        /// Take an array of already allocated StackValues and push them into 
+        /// the heap and returning the stack value that represents the array
         /// </summary>
-        /// <param name="arrayElements"></param>
+        /// <param name="elements"></param>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static StackValue StoreArray(StackValue[] arrayElements, Core core)
+        public static StackValue StoreArray(StackValue[] elements, Dictionary<StackValue, StackValue> dict, Core core)
         {
             Heap heap = core.Heap;
 
             lock (heap.cslock)
             {
-                int ptr = heap.Allocate(arrayElements);
-                // ++heap.Heaplist[ptr].Refcount;
+                int ptr = heap.Allocate(elements);
                 StackValue overallSv = StackUtils.BuildArrayPointer(ptr);
+                heap.Heaplist[ptr].Dict = dict;
                 return overallSv;
             }
         }

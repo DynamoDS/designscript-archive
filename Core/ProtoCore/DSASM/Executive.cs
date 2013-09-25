@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using ProtoCore.Exceptions;
 using ProtoCore.Utils;
 using ProtoCore.Lang;
+using ProtoCore.RuntimeData;
 
 
 namespace ProtoCore.DSASM
@@ -458,7 +459,7 @@ namespace ProtoCore.DSASM
                 return sv;
             }
 
-            if (!ArrayUtils.IsArray(sv))
+            if (!StackUtils.IsArray(sv))
             {
                 sv = StackUtils.BuildNull();
             }
@@ -3358,7 +3359,7 @@ namespace ProtoCore.DSASM
 
                 if (t.UID == (int)PrimitiveType.kTypeVar && t.rank < 0)
                 {
-                    oldValue = ArrayUtils.SetDataAtIndices(value, dimlist, data, t, core);
+                    oldValue = ArrayUtils.SetValueForIndices(value, dimlist, data, t, core);
                 }
                 else
                 {
@@ -3391,7 +3392,7 @@ namespace ProtoCore.DSASM
                         }
                     }
 
-                    oldValue = ArrayUtils.SetDataAtIndices(value, dimlist, data, t, core);
+                    oldValue = ArrayUtils.SetValueForIndices(value, dimlist, data, t, core);
                 }
 
                 return oldValue;
@@ -3402,7 +3403,7 @@ namespace ProtoCore.DSASM
                 t.rank = 0;
                 t.IsIndexable = false;
 
-                return ArrayUtils.SetDataAtIndices(value, dimlist, data, t, core);
+                return ArrayUtils.SetValueForIndices(value, dimlist, data, t, core);
             }
             else
             {
@@ -3416,8 +3417,8 @@ namespace ProtoCore.DSASM
                     StackValue array = rmem.BuildNullArray(0);
                     GCRetain(array);
                     rmem.SetAtSymbol(symbolnode, array);
-                    ArrayUtils.SetDataAtIndex(array, 0, value, core);
-                    return ArrayUtils.SetDataAtIndices(array, dimlist, data, t, core);
+                    ArrayUtils.SetValueForIndex(array, 0, value, core);
+                    return ArrayUtils.SetValueForIndices(array, dimlist, data, t, core);
                 }
             }
         }
@@ -3476,7 +3477,7 @@ namespace ProtoCore.DSASM
 
                 }
 
-                ret = ArrayUtils.SetDataAtIndices(value, dimlist, data, t, core);
+                ret = ArrayUtils.SetValueForIndices(value, dimlist, data, t, core);
             }
             else if (value.optype == AddressType.String)
             {
@@ -3484,7 +3485,7 @@ namespace ProtoCore.DSASM
                 t.rank = 0;
                 t.IsIndexable = false;
 
-                ret = ArrayUtils.SetDataAtIndices(value, dimlist, data, t, core);
+                ret = ArrayUtils.SetValueForIndices(value, dimlist, data, t, core);
             }
             else
             {
@@ -3498,8 +3499,8 @@ namespace ProtoCore.DSASM
                     StackValue array = rmem.BuildNullArray(0);
                     GCRetain(array);
                     rmem.SetAtSymbol(symbolnode, array);
-                    ArrayUtils.SetDataAtIndex(array, 0, value, core);
-                    ret = ArrayUtils.SetDataAtIndices(array, dimlist, data, t, core);
+                    ArrayUtils.SetValueForIndex(array, 0, value, core);
+                    ret = ArrayUtils.SetValueForIndices(array, dimlist, data, t, core);
                 }
             }
 
@@ -3609,14 +3610,6 @@ namespace ProtoCore.DSASM
             }
         }
 
-        private void Nullify(ref StackValue op)
-        {
-            if (AddressType.Null == op.optype)
-            {
-                op.optype = AddressType.Null;
-            }
-        }
-
         private void Nullify(ref StackValue op1, ref StackValue op2)
         {
             if (AddressType.Null == op1.optype || AddressType.Null == op2.optype)
@@ -3631,201 +3624,6 @@ namespace ProtoCore.DSASM
             // TODO Jun: hook this up to a runtime error handler            
             if (!condition)
                 throw new ProtoCore.Exceptions.RuntimeException(msg);
-        }
-
-
-
-        public StackValue GetDotFinalPointer(StackValue lhsPtr, bool isCall = true)
-        {
-            int depth = 2;
-            bool isDotFunctionBody = isCall;
-
-
-            /////////////////////////////////////////////////////////////////////////////////
-
-            DSASM.RTSymbol[] rtSymbols = new DSASM.RTSymbol[depth];
-            bool isInvalidIdentList = false;
-
-            // Jun: Dont iterate till the last. the last willbe the lhs pointer
-            int stackPtr = rmem.Stack.Count - 1;
-            for (int i = depth - 1; i >= 0; --i)
-            {
-                // Get the symbol
-                rtSymbols[i].Sv = rmem.Stack[stackPtr--];//rmem.Pop();
-
-                AddressType optype = rtSymbols[i].Sv.optype;
-                if (!isDotFunctionBody
-                    && optype != AddressType.Pointer
-                    && optype != AddressType.ArrayPointer
-                    && optype != AddressType.Dynamic
-                    && optype != AddressType.ClassIndex)
-                {
-                    isInvalidIdentList = true;
-                }
-
-                if (isDotFunctionBody && i != 0)
-                {
-                    //StackValue dimSv = rmem.Pop();
-                    //dimSv.optype = AddressType.ArrayDim;
-                    //rmem.Push(dimSv);
-
-                    StackValue dimSv = rmem.Stack[stackPtr];
-                    dimSv.optype = AddressType.ArrayDim;
-                    rmem.Stack[stackPtr] = dimSv;
-                }
-
-                if (AddressType.ArrayDim == rmem.Stack[stackPtr].optype)
-                //if (AddressType.ArrayDim == rmem.stack[rmem.stack.Count - 1].optype)
-                {
-                    // Get the number of demension pushed
-                    StackValue svDim = rmem.Stack[stackPtr--]; //rmem.Pop();
-                    int dimensions = (int)svDim.opdata;
-
-                    if (dimensions > 0)
-                    {
-                        if (isDotFunctionBody && i != 0)
-                        {
-                            //push its dimension value
-                            StackValue dimValArraySv = rmem.Stack[stackPtr--]; //rmem.Pop();
-                            foreach (StackValue dimValSv in core.Heap.Heaplist[(int)dimValArraySv.opdata].Stack)
-                            {
-                                rmem.Push(dimValSv);
-                            }
-                        }
-                        // Pop off each dimension
-                        rtSymbols[i].Dimlist = new int[dimensions];
-                        for (int j = dimensions - 1; j >= 0; --j)
-                        {
-                            svDim = rmem.Pop();
-                            runtimeVerify(AddressType.Int == svDim.optype);
-                            rtSymbols[i].Dimlist[j] = (int)svDim.opdata;
-                        }
-                    }
-                    else if (isDotFunctionBody && i != 0)
-                    {
-                        //rmem.Pop(); //pop the rhsDimExprList (arrayPointer)
-                    }
-                }
-            }
-
-            rtSymbols[0].Sv = lhsPtr;
-
-            if (isInvalidIdentList)
-            {
-                return StackUtils.BuildNull();
-            }
-
-
-            if (isDotFunctionBody)
-            {
-                if (rtSymbols[0].Sv.optype == AddressType.Int) // static, class UID
-                {
-                    // if static, the opdata of rtSymbols[0] is not used, no need to bother that 
-                    int type = (int)rtSymbols[0].Sv.opdata;
-                    rtSymbols[0].Sv.metaData.type = type;
-                    rtSymbols[0].Sv.optype = AddressType.ClassIndex;
-                }
-                rtSymbols[1].Sv.optype = AddressType.Dynamic;
-            }
-
-
-            if (1 == depth)
-            {
-                return GetIndexedArray(rtSymbols[0].Sv, rtSymbols[0].Dimlist);
-            }
-
-            // Get first stackvalue of the first elemnt in the ident list
-            // Get its indexed value
-            rtSymbols[0].Sv = GetIndexedArray(rtSymbols[0].Sv, rtSymbols[0].Dimlist);
-
-            //If the value of the first identifier is null, return null stack value
-            if (rtSymbols[0].Sv.optype == AddressType.Null)
-            {
-                return rtSymbols[0].Sv;
-            }
-
-            int index = -1;
-            int ptr = (int)rtSymbols[0].Sv.opdata;
-
-            // Traverse the heap until the last pointer
-            int n;
-            int classsccope = (int)rtSymbols[0].Sv.metaData.type;
-            for (n = 1; n < rtSymbols.Length; ++n)
-            {
-                // Index into the current pointer
-                // 'index' is the index of the member variable
-
-                // class f {
-                //   x : var; y : var // index of x = 0, y = 1
-                // }
-
-                //resolve dynamic reference
-                if (AddressType.Dynamic == rtSymbols[n].Sv.optype)
-                {
-                    classsccope = (int)rtSymbols[n - 1].Sv.metaData.type;
-                    bool succeeded = ProcessDynamicVariable((rtSymbols[n].Dimlist != null), ref rtSymbols[n].Sv, classsccope);
-                    //if the identifier is unbounded. Push null
-                    if (!succeeded)
-                    {
-                        return StackUtils.BuildNull();
-                    }
-                }
-
-                if (rtSymbols[n].Sv.optype == AddressType.StaticMemVarIndex)
-                {
-                    StackValue op2 = new StackValue();
-                    op2.optype = AddressType.ClassIndex;
-                    op2.opdata = Constants.kInvalidIndex;
-
-                    rtSymbols[n].Sv = GetOperandData(0, rtSymbols[n].Sv, op2);
-                }
-                else
-                {
-                    index = (int)rtSymbols[n].Sv.opdata;
-                    rtSymbols[n].Sv = core.Heap.Heaplist[ptr].Stack[index];
-                }
-
-                // Once a pointer to the member is retrieved, get its indexed value
-                rtSymbols[n].Sv = GetIndexedArray(rtSymbols[n].Sv, rtSymbols[n].Dimlist);
-                ptr = (int)rtSymbols[n].Sv.opdata;
-            }
-
-            // Check the last pointer
-            StackValue opVal = rtSymbols[n - 1].Sv;
-            AddressType addrtype = opVal.optype;
-            if (AddressType.Pointer == addrtype || AddressType.Invalid == addrtype)
-            {
-                /*
-                  if lookahead is Not a pointer then
-                      move to that pointer and get its value at stack index 0 (or further if array)
-                      push that
-                  else 
-                      push the current ptr
-                  end
-                */
-
-                // Determine if we still need to move one more time on the heap
-                // Peek into the pointed data using nextPtr. 
-                // If nextPtr is not a pointer (a primitive) then return the data at nextPtr
-                int nextPtr = (int)opVal.opdata;
-                bool isActualData =
-                        AddressType.Pointer != core.Heap.Heaplist[nextPtr].Stack[0].optype
-                    && AddressType.ArrayPointer != core.Heap.Heaplist[nextPtr].Stack[0].optype
-                    && AddressType.Invalid != core.Heap.Heaplist[nextPtr].Stack[0].optype; // Invalid is an uninitialized member
-
-                if (isActualData)
-                {
-                    // Move one more and get the value at the first heapstack
-                    opVal = core.Heap.Heaplist[nextPtr].Stack[0];
-                }
-            }
-            return opVal;
-
-
-
-            /////////////////////////////////////////////////////////////////////////////////
-
-
         }
 
         private StackValue GetFinalPointer(int depth, bool isDotFunctionBody = false)
@@ -4074,44 +3872,9 @@ namespace ProtoCore.DSASM
             return sv;
         }
 
-        public StackValue GetIndexedArray(StackValue array, List<StackValue> dims)
+        public StackValue GetIndexedArray(StackValue array, List<StackValue> indices)
         {
-            if (dims.Count == 0)
-            {
-                return array;
-            }
-            else if (array.optype != AddressType.ArrayPointer)
-            {
-                core.RuntimeStatus.LogWarning(ProtoCore.RuntimeData.WarningID.kOverIndexing, RuntimeData.WarningMessage.kArrayOverIndexed);
-                return StackUtils.BuildNull();
-            }
-
-            int[][] zippedDims = ArrayUtils.GetZippedIndices(dims, core);
-            if (zippedDims == null || zippedDims.Length == 0)
-            {
-                return StackUtils.BuildNull();
-            }
-
-            StackValue[] values = new StackValue[zippedDims.Length];
-            for (int i = 0; i < zippedDims.Length; ++i)
-            {
-                values[i] = GetIndexedArray(array, zippedDims[i]);
-            }
-
-            if (zippedDims.Length > 1)
-            {
-                for (int i = 0; i < values.Length; ++i)
-                {
-                    GCRetain(values[i]);
-                }
-
-                StackValue ret = HeapUtils.StoreArray(values, core);
-                return ret;
-            }
-            else
-            {
-                return values[0];
-            }
+            return ArrayUtils.GetValueFromIndices(array, indices, core);
         }
 
         public StackValue GetIndexedArrayW(int dimensions, int blockId, StackValue op1, StackValue op2)
@@ -4149,7 +3912,7 @@ namespace ProtoCore.DSASM
 
             if (AddressType.ArrayPointer != thisArray.optype)
             {
-                if (varname.StartsWith(ProtoCore.DSASM.Constants.kStartOfAutogenForloopExprIdent))
+                if (varname.StartsWith(ProtoCore.DSASM.Constants.kForLoopExpression))
                 {
                     return thisArray;
                 }
@@ -4199,7 +3962,7 @@ namespace ProtoCore.DSASM
 
             if (AddressType.ArrayPointer != thisArray.optype)
             {
-                if (varname.StartsWith(ProtoCore.DSASM.Constants.kStartOfAutogenForloopExprIdent))
+                if (varname.StartsWith(ProtoCore.DSASM.Constants.kForLoopExpression))
                 {
                     return thisArray;
                 }
@@ -4335,7 +4098,7 @@ namespace ProtoCore.DSASM
             {
                 arglist = new List<Type>();
                 StackValue argArraySv = rmem.Pop();
-                for (int i = 0; i < core.Heap.Heaplist[(int)argArraySv.opdata].VisibleSize; ++i)
+                for (int i = 0; i < ArrayUtils.GetElementSize(argArraySv, core); ++i)
                 {
                     StackValue sv = core.Heap.Heaplist[(int)argArraySv.opdata].Stack[i];
                     argSvList.Add(sv); //actual arguments
@@ -5329,6 +5092,7 @@ namespace ProtoCore.DSASM
             ++pc;
             return;
         }
+
         private void PUSH_VARSIZE_Handler(Instruction instruction)
         {
             // TODO Jun: This is a temporary solution to retrieving the array size until lib files are implemented
@@ -5345,26 +5109,32 @@ namespace ProtoCore.DSASM
             runtimeVerify(null != snode);
 
             int stackindex = rmem.GetStackIndex(snode);
-            StackValue sv = rmem.GetAtRelative(snode);
+            StackValue array = rmem.GetAtRelative(snode);
 
-            int size = 1;
-            int ptr = (int)sv.opdata;
-            if (AddressType.ArrayPointer == sv.optype)
+            if (AddressType.ArrayPointer != array.optype && snode.datatype.IsIndexable)
             {
-                size = core.Heap.Heaplist[ptr].VisibleSize;
-            }
-            else if (AddressType.Null == sv.optype)
-            {
-                size = 0;
-            }
-            else if (snode.datatype.IsIndexable)
-            {
-                StackValue svArray = core.Heap.Heaplist[ptr].Stack[0];
-                ptr = (int)svArray.opdata;
-                size = core.Heap.Heaplist[ptr].VisibleSize;
+                array = core.Heap.Heaplist[(int)array.opdata].Stack[0];
             }
 
-            rmem.Push(StackUtils.BuildInt(size));
+            StackValue key = StackUtils.BuildNull();
+            HeapElement he = ArrayUtils.GetHeapElement(array, core);
+            if (he != null)
+            {
+                if (he.VisibleSize > 0 || (he.Dict != null && he.Dict.Count > 0))
+                {
+                    key = new StackValue();
+                    key.optype = AddressType.ArrayKey;
+                    key.opdata = 0;
+                    key.opdata_d = array.opdata;
+                }
+            }
+            else if (!StackUtils.IsNull(array))
+            {
+                key = new StackValue();
+                key.optype = AddressType.ArrayKey;
+                key.opdata = Constants.kInvalidIndex;
+            }
+            rmem.Push(key);
 
             ++pc;
             return;
@@ -5804,7 +5574,7 @@ namespace ProtoCore.DSASM
                 lock (core.Heap.cslock)
                 {
                     FX = svData;
-                    EX = ArrayUtils.SetDataAtIndices(svProperty, dimList, svData, targetType, core);
+                    EX = ArrayUtils.SetValueForIndices(svProperty, dimList, svData, targetType, core);
                     GCRelease(EX);
                 }
             }
@@ -6085,7 +5855,8 @@ namespace ProtoCore.DSASM
                 lock (core.Heap.cslock)
                 {
                     // Setting a pointer
-                    DX = core.Heap.Heaplist[(int)finalPointer.opdata].Stack[listInfo[0].Sv.opdata];
+                    int idx = (int)listInfo[0].Sv.opdata;
+                    DX = ArrayUtils.GetValueFromIndex(finalPointer, idx, core);
                     GCRelease(DX);
                     core.Heap.Heaplist[(int)finalPointer.opdata].Stack[listInfo[0].Sv.opdata] = data;
                 }
@@ -6193,6 +5964,7 @@ namespace ProtoCore.DSASM
             StackValue opdata1 = GetOperandData(instruction.op2);
             StackValue opdata2 = GetOperandData(instruction.op1);
 
+            // Need to optmize these if-elses to a table. 
             if ((AddressType.Int == opdata1.optype) && (AddressType.Int == opdata2.optype))
             {
                 opdata2 = StackUtils.BuildInt(opdata1.opdata + opdata2.opdata);
@@ -6235,6 +6007,17 @@ namespace ProtoCore.DSASM
                 else
                 {
                     opdata2 = StringUtils.ConcatString(opdata2, opdata1, rmem);
+                }
+            }
+            else if (opdata2.optype == AddressType.ArrayKey && opdata1.optype == AddressType.Int)
+            {
+                if (opdata1.opdata == 1)
+                {
+                    opdata2 = ArrayUtils.GetNextKey(opdata2, core);
+                }
+                else
+                {
+                    opdata2 = StackUtils.BuildNull();
                 }
             }
             else
@@ -6511,7 +6294,6 @@ namespace ProtoCore.DSASM
                 opdata1 = StackUtils.BuildNull();
             }
 
-            Nullify(ref opdata1);
             SetOperandData(instruction.op1, opdata1);
 
             ++pc;
@@ -6523,7 +6305,6 @@ namespace ProtoCore.DSASM
             opdata1.opdata = -opdata1.opdata;
             opdata1.opdata_d = -opdata1.opdata_d;
 
-            Nullify(ref opdata1);
             SetOperandData(instruction.op1, opdata1);
             ++pc;
             return;
@@ -7684,7 +7465,7 @@ namespace ProtoCore.DSASM
 
                 if (core.ContinuationStruct.Done)
                 {
-                    RX = HeapUtils.StoreArray(core.ContinuationStruct.RunningResult.ToArray(), core);
+                    RX = HeapUtils.StoreArray(core.ContinuationStruct.RunningResult.ToArray(), null, core);
                     GCUtils.GCRetain(RX, core);
 
                     core.ContinuationStruct.RunningResult.Clear();
@@ -8508,7 +8289,7 @@ namespace ProtoCore.DSASM
                         PUSHLIST_Handler(instruction);
                         return;
                     }
-                case OpCode.PUSH_VARSIZE:
+                case OpCode.PUSH_ARRAYKEY:
                     {
                         PUSH_VARSIZE_Handler(instruction);
                         return;

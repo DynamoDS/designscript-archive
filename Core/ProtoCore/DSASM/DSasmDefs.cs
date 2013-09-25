@@ -474,7 +474,8 @@ namespace ProtoCore.DSASM
         public const string kTempPropertyVar = "%tvar_property";
         public const string kTempExceptionVar = "%texp";
         public const string kTempLangBlock = "%tempLangBlock";
-        public const string kStartOfAutogenForloopExprIdent = "%autogen_forloop_exprident_";
+        public const string kForLoopExpression = "%forloop_expr_";
+        public const string kForLoopKey = "%forloop_key_";
         public const string kStartOfAutogenForloopIteration = "%autogen_forloop_iteration_";
         public const string kStartOfAutogenForloopCount = "%autogen_forloop_count_";
         public const string kFunctionPointerCall = "%FunctionPointerCall";
