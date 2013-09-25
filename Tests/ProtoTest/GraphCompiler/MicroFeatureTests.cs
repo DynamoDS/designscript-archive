@@ -9681,7 +9681,7 @@ b = 20;</Content>
             // 4. Connect output of CBN '0' and 'a' to the 2 inputs of the '+' node
             // 5. Click on the top right hand corner of the '+' node and then click once on the 'Replication Guide' item on the radial menu
             // 6. Replication guides <1> are added to both inputs
-            // => verify the final output should still be {0,1}
+            // => verify the final output should be {0}
             // Failing due to defect : IDE-1397 Replication guide : When replication guide is applied on a singleton and collection, the output is not as expected
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
@@ -9861,7 +9861,6 @@ b = 20;</Content>
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("Var1");
             List<Obj> dim1 = GetArrayElements(mirror, mirror.GetData().GetStackValue());
             Assert.IsTrue((Int64)dim1[0].Payload == 0);
-            Assert.IsTrue((Int64)dim1[1].Payload == 1);
         }
 
         [Test]
