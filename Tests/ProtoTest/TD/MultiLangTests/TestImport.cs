@@ -6,7 +6,7 @@ namespace ProtoTest.TD.MultiLangTests
     public class TestImport
     {
         public TestFrameWork thisTest = new TestFrameWork();
-        string testCasePath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Import\\";
+        string importPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void Setup()
         {
@@ -22,7 +22,7 @@ import (""basicImport.ds"");
 a = {1.1,2.2};
 b = 2;
 c = Scale(a,b);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object[] expectedC = { 2.2, 4.4 };
             thisTest.Verify("c", expectedC);
         }
@@ -37,7 +37,7 @@ a = {1.1,2.2};
 b = 2;
 c = Scale(a,b);
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object[] expectedC = { 2.2, 4.4 };
             thisTest.Verify("c", expectedC);
         }
@@ -55,11 +55,11 @@ c = Scale(a,b);
         public void T004_BasicImport_CurrentDirectoryWithDotAndSlash()
         {
             string code = @"
-import ("".\basicImport.ds"");
+import (""\basicImport.ds"");
 a = {1.1,2.2};
 b = 2;
 c = Scale(a,b);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object[] expectedC = { 2.2, 4.4 };
             thisTest.Verify("c", expectedC);
         }
@@ -69,11 +69,11 @@ c = Scale(a,b);";
         public void T005_BasicImport_RelativePath()
         {
             string code = @"
-import ("".\ExtraFolderToTestRelativePath\basicImport.ds"");
+import (""\ExtraFolderToTestRelativePath\basicImport.ds"");
 a = {1.1,2.2};
 b = 2;
 c = Scale(a,b);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object[] expectedC = { 2.2, 4.4 };
             thisTest.Verify("c", expectedC);
         }
@@ -89,7 +89,7 @@ b = 2;
 c = Scale(a,b);
 d = Sin(30.0);
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object expectedD = 0.500000;
             thisTest.Verify("d", expectedD);
         }
@@ -108,7 +108,7 @@ myPointX = myPoint.X;
 myPointY = myPoint.Y;
 myPointZ = myPoint.Z;
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object myPointX = 10.1;
             object myPointY = 20.2;
             object myPointZ = 30.3;
@@ -140,7 +140,7 @@ startPtZ = startPt.Z;
 endPtX = endPt.X;
 endPtY = endPt.Y;
 endPtZ = endPt.Z;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object startPtX = 10.1;
             object startPtY = 20.2;
             object startPtZ = 30.3;
@@ -166,7 +166,7 @@ y = 20.2;
 z = 30.3;
 myPoint = Point.ByCoordinates(10.1, 20.2, 30.3);
 midValue = myPoint.MidValue();";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object[] midValue = { 5.05, 10.1, 15.15 };
             thisTest.Verify("midValue", midValue);
         }
@@ -180,7 +180,7 @@ import (""BaseImportWithVariableClassInstance.ds"");
 c = a + b;
 myPointX = myPoint.X;
 arr = Scale(midValue, 4.0);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object a = 5;
             object b = 10;
             object c = 15;
@@ -206,7 +206,7 @@ c;
 {
 	c = 3 * b;
 }";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("a", 1);
             thisTest.Verify("b", 1);
@@ -223,7 +223,7 @@ c;
 a =10;
 b = 2 * a; 
 import (""BaseImportImperative.ds"");";
-                ExecutionMirror mirror = thisTest.RunScriptSource(code);
+                ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             });
         }
 
@@ -241,7 +241,7 @@ arr;
 	
 	arr =  Scale(midValue, 4.0);
 }";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object[] arr = { 20.2, 40.4, 60.6 };
             thisTest.Verify("arr", arr);
         }
@@ -262,7 +262,7 @@ z = 30.3;
 myPoint = Point.ByCoordinates(10.1, 20.2, 30.3);
 midValue = myPoint.MidValue();
 ";
-                ExecutionMirror mirror = thisTest.RunScriptSource(code);
+                ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             });
         }
 
@@ -274,7 +274,7 @@ midValue = myPoint.MidValue();
 import (""BaseImportAssociative.ds"");
 a = 10;
 b = 20;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("a", 10);
             thisTest.Verify("b", 20);
@@ -289,7 +289,7 @@ b = 20;";
 import (""BaseImportWithVariableClassInstance.ds"");
 c = a + b;
 a = 10;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
 
             thisTest.Verify("a", 10);
             thisTest.Verify("b", 20);
@@ -307,7 +307,7 @@ myPoint = Point.ByCoordinates(10.1, 20.2, 30.3);
 z = myPoint.Z;
 midValue = myPoint.MidValue();
 arr = Scale(midValue, 4.0);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             object z = 30.3;
             object[] arr = { 20.2, 40.4, 60.6 };
             thisTest.Verify("z", z);
@@ -327,7 +327,7 @@ myPoint = Point.ByCoordinates(10.1, 20.2, 30.3);
 z = myPoint.Z;
 midValue = myPoint.MidValue();
 arr = Scale(midValue, 4.0);";
-                ExecutionMirror mirror = thisTest.RunScriptSource(code);
+                ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             });
         }
 
@@ -341,7 +341,7 @@ import (""basicImport3.ds"");
 arr = { 1.0, 2.0, 3.0 };
 a1 = Scale( arr, 4.0 );
 b = a * 2;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             thisTest.Verify("b", 6, 0);
         }
 
@@ -355,7 +355,7 @@ b = a * 2;";
 import (""c:\wrongPath\test.ds"");
 a = 1;
 b = a * 2;";
-                ExecutionMirror mirror = thisTest.RunScriptSource(code);
+                ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             });
         }
 
@@ -369,7 +369,7 @@ b = a * 2;";
 import (""basicImport"");
 a = 1;
 b = a * 2;";
-                ExecutionMirror mirror = thisTest.RunScriptSource(code);
+                ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             });
         }
 
@@ -383,7 +383,7 @@ b = a * 2;";
 import (""basicImport12.ds"");
 a = 1;
 b = a * 2;";
-                ExecutionMirror mirror = thisTest.RunScriptSource(code);
+                ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             });
         }
 
@@ -398,7 +398,7 @@ arr1 = { 1, 3, 5 };
 temp = Scale( arr1, a );
 a = a;
 b = 2 * a;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             thisTest.Verify("b", 6, 0);
         }
     }

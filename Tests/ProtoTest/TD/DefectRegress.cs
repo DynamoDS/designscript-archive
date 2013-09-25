@@ -9,7 +9,7 @@ namespace ProtoTest.TD
     {
         public ProtoCore.Core core;
         public TestFrameWork thisTest = new TestFrameWork();
-        string testCasePath = "..\\..\\..\\Scripts\\TD\\Regress\\";
+        string importPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void Setup()
         {
@@ -101,7 +101,7 @@ namespace ProtoTest.TD
         public void Regress_1454980()
         {
             string code = @"import (""TestImport.ds"");class Math{                //external (""ffi_library"") def dc_sqrt : double (val : double );                //external (""ffi_library"") def dc_factorial : int (val : int );                           constructor GetInstance()                {}                                def Sqrt : double ( val : double )                {                                return = dc_sqrt(val);                }                def Factorial : int ( val : int )                {                                return = dc_factorial(val); //issue is here. the below line will pass                                //return = dc_factorial(10);                }}                math = Math.GetInstance();                result = math.Factorial(3);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             thisTest.Verify("result", 9);
         }
 
@@ -179,7 +179,7 @@ namespace ProtoTest.TD
         public void Regress_1457179()
         {
             string code = @"import (""TestImport.ds"");//external (""libmath"") def dc_sin : double (val : double);def Sin : double (val : double){    return = dc_sin(val);}result1 = Sin(90);result2 = Sin(90.0);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             //Verification
             object result1 = 180.0;
             object result2 = 180.0;
@@ -1005,7 +1005,7 @@ namespace ProtoTest.TD
         public void Regress_1457023_3()
         {
             string code = @"import ( ""testImport.ds"" );class Vector{    //external (""libmath"") def dc_sqrt : double (val : double);    public Length : var;        private def init : bool ()    {        Length = null;        return = true;            }        X : var;    Y : var;    Z : var;        public constructor ByCoordinates(x : double, y : double, z : double)    {        neglect = init();                X = x;        Y = y;        Z = z;    }        public def GetLength ()    {        return = [Imperative]        {            if( Length == null )            {                Length = dc_sqrt(X*X + Y*Y + Z*Z);            }            return = Length;        }    }    }vec =  Vector.ByCoordinates(3.0,4.0,0.0);vec_len = vec.GetLength();";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", importPath);
             thisTest.Verify("vec_len", 12.5, 0);
         }
 
