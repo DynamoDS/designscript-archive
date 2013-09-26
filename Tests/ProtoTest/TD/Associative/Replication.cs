@@ -2460,7 +2460,7 @@ c=2 * {{1},{2}};";
             Assert.IsTrue(mirror.GetValue("controlPolyB").Payload != v1);
             Assert.IsTrue(mirror.GetValue("controlPolyC").Payload != v1);
             Assert.IsTrue(mirror.GetValue("controlPolyD").Payload == v1);
-            Assert.IsTrue(mirror.GetValue("controlPolyE").Payload == v1);
+            Assert.IsTrue(mirror.GetValue("controlPolyE").Payload != v1);
             //thisTest.Verify("controlPolyA",v2);
         }
 
