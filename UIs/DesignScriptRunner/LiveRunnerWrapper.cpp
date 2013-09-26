@@ -54,6 +54,15 @@ DesignScriptObject* LiveRunnerWrapper::queryNodeValue(const wchar_t* nodeName)
     return new MirrorObjectWrapper(mirror);
 }
 
+DesignScriptObject* LiveRunnerWrapper::inspectNodeValue(const wchar_t* nodeName) 
+{
+    RuntimeMirror^ mirror = wrapper()->InspectNodeValue(WcharToString(nodeName));
+    if(nullptr == mirror)
+        return nullptr;
+
+    return new MirrorObjectWrapper(mirror);
+}
+
 void LiveRunnerWrapper::queryNodeValuesAsync(const std::list<unsigned int>& nodeIds)
 {
     System::Collections::Generic::List<unsigned int>^ list =
