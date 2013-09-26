@@ -425,7 +425,7 @@ namespace ProtoCore.Lang.Replication
                         StackValue target = basicList[index];
                         StackValue reducedSV = StackUtils.BuildNull();
 
-                        if (ArrayUtils.IsArray(target))
+                        if (StackUtils.IsArray(target))
                         {
 
                             //Array arr = formalParams[index].Payload as Array;
@@ -482,7 +482,7 @@ namespace ProtoCore.Lang.Replication
                     StackValue target = basicList[index];
                     StackValue reducedSV = StackUtils.BuildNull();
 
-                    if (ArrayUtils.IsArray(target))
+                    if (StackUtils.IsArray(target))
                     {
 
                         //Array arr = formalParams[index].Payload as Array;
@@ -566,7 +566,7 @@ namespace ProtoCore.Lang.Replication
                         StackValue target = reducedParamTypes[index];
                         StackValue reducedSV = StackUtils.BuildNull();
 
-                        if (ArrayUtils.IsArray(target))
+                        if (StackUtils.IsArray(target))
                         {
 
                             //Array arr = formalParams[index].Payload as Array;
@@ -602,7 +602,7 @@ namespace ProtoCore.Lang.Replication
                     StackValue target = reducedParamTypes[index];
                     StackValue reducedSV = new StackValue();
 
-                    if (ArrayUtils.IsArray(target))
+                    if (StackUtils.IsArray(target))
                     {
                         //ProtoCore.DSASM.Mirror.DsasmArray arr = formalParams[index].Payload as ProtoCore.DSASM.Mirror.DsasmArray;
                         HeapElement he = ArrayUtils.GetHeapElement(reducedParamTypes[index], core);
@@ -853,7 +853,7 @@ namespace ProtoCore.Lang.Replication
         public static int GetMaxReductionDepth(StackValue sv, Core core)
         {
             //PERF(Luke): Could be non-recursive
-            if (!ProtoCore.Utils.ArrayUtils.IsArray(sv))
+            if (!StackUtils.IsArray(sv))
                 return 0;
 
             int maxReduction = 0;
