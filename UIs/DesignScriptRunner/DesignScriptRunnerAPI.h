@@ -88,6 +88,11 @@ public:
     virtual DesignScriptObject* queryNodeValue(const wchar_t* nodeName) = 0;
 
     /// <summary>
+    /// Inspects the value of the given node/variable using it's name.
+    /// </summary>
+    virtual DesignScriptObject* inspectNodeValue(const wchar_t* nodeName) = 0;
+
+    /// <summary>
     /// Sets up asyncronous query for value of a list of nodes.
     /// </summary>
     virtual void queryNodeValuesAsync(const std::list<unsigned int>& nodeIds) = 0;
