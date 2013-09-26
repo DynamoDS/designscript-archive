@@ -16,7 +16,8 @@ public:
     virtual void importLibrary(const wchar_t* codesegment);
     virtual void updateGraphAsync(const wchar_t* codesegment);
     virtual void updateCLInterpreterAsync(const wchar_t* codesegment);
-    virtual DesignScriptObject* queryNodeValue(const wchar_t* nodeName);
+    virtual DesignScriptObject* queryNodeValue(const wchar_t* nodeName);    
+    virtual DesignScriptObject* inspectNodeValue(const wchar_t* nodeName);
     virtual void queryNodeValuesAsync(const std::list<unsigned int>& nodeIds);
     virtual DesignScriptObject* getCoreDump();
     virtual const wchar_t* getCoreDumpCmdLineREPL();

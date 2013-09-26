@@ -1540,8 +1540,18 @@ namespace ProtoCore
         // The unique subscript for SSA temporaries
         // TODO Jun: Organize these variables in core into proper enums/classes/struct
         public int SSASubscript { get; set; }
+
+        /// <summary> 
+        /// ExpressionUID is used as the unique id to identify an expression
+        /// It is incremented by 1 after mapping tis current value to an expression
+        /// </summary>
         public int ExpressionUID { get; set; }
+
+        /// <summary>
+        /// RuntimeExpressionUID is used by the associative engine at runtime to determine the current expression ID being executed
+        /// </summary>
         public int RuntimeExpressionUID = 0;
+
         public int ModifierBlockUID { get; set; }
         public int ModifierStateSubscript { get; set; }
 
