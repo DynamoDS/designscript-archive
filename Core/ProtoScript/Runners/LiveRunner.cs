@@ -443,7 +443,9 @@ namespace ProtoScript.Runners
         }
 
         /// <summary>
+        /// TODO: Deprecate - This will be replaced with the overload that takes in a Guid type
         /// Query for a node value. This will block until the value is available.
+        /// This uses the expression interpreter to evaluate a node variable's value.
         /// It will only serviced when all ASync calls have been completed
         /// </summary>
         /// <param name="nodeId"></param>
@@ -469,6 +471,13 @@ namespace ProtoScript.Runners
 
         }
 
+        /// <summary>
+        /// Query for a node value given its UID. This will block until the value is available.
+        /// This uses the expression interpreter to evaluate a node variable's value.
+        /// It will only serviced when all ASync calls have been completed
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
         public ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeGuid)
         {
             while (true)
@@ -490,8 +499,14 @@ namespace ProtoScript.Runners
 
         }
 
-        
 
+        /// <summary>
+        /// Query for a node value given its variable name. This will block until the value is available.
+        /// This uses the expression interpreter to evaluate a node variable's value.
+        /// It will only serviced when all ASync calls have been completed
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
         public ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName)
         {
             while (true)
@@ -513,6 +528,14 @@ namespace ProtoScript.Runners
 
         }
 
+        /// <summary>
+        /// Inspects the VM for the value of a node given its variable name. 
+        /// As opposed to QueryNodeValue, this does not use the Expression Interpreter
+        /// This will block until the value is available.
+        /// It will only serviced when all ASync calls have been completed
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
         public ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName)
         {
             while (true)
@@ -625,6 +648,10 @@ namespace ProtoScript.Runners
             
         }
 
+        /// <summary>
+        /// This API needs to be called for every delta AST execution
+        /// </summary>
+        /// <param name="syncData"></param>
         public void UpdateGraph(GraphSyncData syncData)
         {
             while (true)
@@ -643,6 +670,10 @@ namespace ProtoScript.Runners
             }
         }
 
+        /// <summary>
+        /// This api needs to be called by a command line REPL for each DS command/expression entered to be executed
+        /// </summary>
+        /// <param name="code"></param>
         public void UpdateCmdLineInterpreter(string code)
         {
             while (true)
@@ -792,6 +823,10 @@ namespace ProtoScript.Runners
             runnerCore.ResetForDeltaExecution();
         }
 
+        /// <summary>
+        /// Resets few states in the core to prepare the core for a new
+        /// delta code compilation and execution
+        /// </summary>
         private void ResetForDeltaASTExecution()
         {
             runnerCore.ResetForDeltaASTExecution();
@@ -807,7 +842,10 @@ namespace ProtoScript.Runners
 
         private void CompileAndExecuteForDeltaExecution(string code)
         {
-            System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
+            if (coreOptions.Verbose)
+            {
+                System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
+            }
 
             ResetForDeltaASTExecution();
             bool succeeded = CompileAndExecute(code);

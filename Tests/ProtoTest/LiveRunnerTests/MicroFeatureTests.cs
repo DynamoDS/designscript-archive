@@ -534,6 +534,92 @@ namespace ProtoTest.LiveRunner
 
             //o = liveRunner.GetCoreDump();
         }
+
+        [Test]
+        public void TestDeltaExpressionFFI_01()
+        {
+            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+
+            liveRunner.UpdateCmdLineInterpreter(@"import (""ProtoGeometry.dll"");");
+            liveRunner.UpdateCmdLineInterpreter("p = Point.ByCoordinates(10,10,10);");
+
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("p");
+
+            //==============================================
+            // Translate the point
+            // newPoint = p.Translate(1,2,3);
+            //==============================================
+            
+            liveRunner.UpdateCmdLineInterpreter("newPoint = p.Translate(1,2,3);");
+            mirror = liveRunner.InspectNodeValue("newPoint");
+
+            //==============================================
+            // Build a binary expression to retirieve the x property
+            // xval = newPoint.X
+            //==============================================
+            liveRunner.UpdateCmdLineInterpreter("xval = newPoint.X;");
+            mirror = liveRunner.InspectNodeValue("xval");
+
+            //==============================================
+            //
+            // import ("ProtoGeometry.dll");
+            // p = Point.Bycoordinates(10.0, 10.0, 10.0);
+            // newPoint = p.Translate(1.0,2.0,3.0);
+            // xval = newPoint.X;
+            //
+            //==============================================
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
+
+        }
+
+        [Test]
+        public void TestDeltaExpressionFFI_02()
+        {
+            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+
+            liveRunner.UpdateCmdLineInterpreter(@"import (""ProtoGeometry.dll"");");
+            liveRunner.UpdateCmdLineInterpreter("p = Point.ByCoordinates(10,10,10);");
+
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("p");
+
+            //==============================================
+            // Build a binary expression to retirieve the x property
+            // xval = newPoint.X
+            //==============================================
+            liveRunner.UpdateCmdLineInterpreter("xval = p.X;");
+            mirror = liveRunner.InspectNodeValue("xval");
+
+            //==============================================
+            //
+            // import ("ProtoGeometry.dll");
+            // p = Point.Bycoordinates(10.0, 10.0, 10.0);
+            // newPoint = p.Translate(1.0,2.0,3.0);
+            // xval = newPoint.X;
+            //
+            //==============================================
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10.0);
+
+            //==============================================
+            // Translate the point
+            // newPoint = p.Translate(1,2,3);
+            //==============================================
+
+            liveRunner.UpdateCmdLineInterpreter("p = p.Translate(1,2,3);");
+            mirror = liveRunner.InspectNodeValue("p");
+
+            mirror = liveRunner.InspectNodeValue("xval");
+
+            //==============================================
+            //
+            // import ("ProtoGeometry.dll");
+            // p = Point.Bycoordinates(10.0, 10.0, 10.0);
+            // newPoint = p.Translate(1.0,2.0,3.0);
+            // xval = newPoint.X;
+            //
+            //==============================================
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
+
+        }
     }
     
 }
