@@ -4371,7 +4371,7 @@ namespace ProtoCore.DSASM
         {
             foreach (ProtoCore.DSASM.SymbolNode sn in exe.runtimeSymbols[blockId].symbolList.Values)
             {
-                if (sn.classScope == classIndex && sn.functionIndex == functionIndex && !sn.name.Equals(Constants.kWatchResultVar) && !CoreUtils.IsSSATemp(sn.name))
+                if (sn.classScope == classIndex && sn.functionIndex == functionIndex && !sn.name.Equals(Constants.kWatchResultVar))
                 {
                     int offset = sn.index;
                     int n = offset;
@@ -4458,8 +4458,7 @@ namespace ProtoCore.DSASM
             foreach (SymbolNode symbol in st.symbolList.Values)
             {
                 if (symbol.functionIndex == functionIndex
-                    && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
-                    && !CoreUtils.IsSSATemp(symbol.name))
+                    && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar))
                 {
 
                     StackValue sv = rmem.GetAtRelative(symbol);
@@ -5199,10 +5198,8 @@ namespace ProtoCore.DSASM
                     //    %tSSA = %tvar;
                     blockId = core.RunningBlock;
                     string symbol = core.DSExecutable.runtimeSymbols[blockId].symbolList[(int)instruction.op1.opdata].name;
-                    if (!CoreUtils.IsSSATemp(symbol))
-                    {
-                        GCRetain(coercedValue);
-                    }
+                    GCRetain(coercedValue);
+                    
                 }
                 else
                 {
