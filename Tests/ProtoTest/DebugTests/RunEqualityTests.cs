@@ -2206,7 +2206,7 @@ namespace ProtoTest.DebugTests
         public void DebugEQTestReferenceCount59_GlobalFunctionReturnNewObject()
         {
             string code =
-                @"  class A{    static count : var = 0;    constructor A()    {        count = count + 1;    }    def _Dispose : int()    {        count = count - 1;        return = null;    } }class B{    static count : var = 0;    constructor B()    {        count = count + 1;    }    def _Dispose : int()    {        count = count - 1;        return = null;    }}class C{  static count : var = 0;    constructor C()    {        count = count + 1;    }    def _Dispose : int()    {        count = count - 1;        return = null;    }}def foo : A (b : B[]){    a = {A.A(),A.A(),A.A()};    return = a[0];}[Associative]{a1 = A.A();a2 = A.A();a3 = A.A();as = {a1, a2, a3};b1 = B.B();b2 = B.B();b3 = B.B();bs = {b1, b2, b3};c1 = C.C();c2 = C.C();c3 = C.C();cs = {c1, c2, c3};x = foo(bs);}aDispose = A.count;bDispose = B.count;cDispose = C.count;";
+                @"  class A{    static count : var = 0;    constructor A()    {        count = count + 1;    }    def _Dispose : int()    {        count = count - 1;        return = null;    } }class B{    static count : var = 0;    constructor B()    {        count = count + 1;    }    def _Dispose : int()    {        count = count - 1;        return = null;    }}class C{  static count : var = 0;    constructor C()    {        count = count + 1;    }    def _Dispose : int()    {        count = count - 1;        return = null;    }}def foo (){    a = A.A();    return = 1000;}[Associative]{a1 = A.A();a2 = A.A();a3 = A.A();as = {a1, a2, a3};b1 = B.B();b2 = B.B();b3 = B.B();bs = {b1, b2, b3};c1 = C.C();c2 = C.C();c3 = C.C();cs = {c1, c2, c3};x = foo();}aDispose = A.count;bDispose = B.count;cDispose = C.count;";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
@@ -12125,7 +12125,7 @@ namespace ProtoTest.DebugTests
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
-        [Test]
+        [Test, Ignore]
         public void DebugEQT40_Defect_1467057_Modifier_Stack_Cross_Update_Issue_3()
         {
             string code = @"a = {          1 => a1;          b1 + a1 => a2;                        };b = {          a2 + 2 => b1;                        };";
@@ -12153,7 +12153,7 @@ namespace ProtoTest.DebugTests
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
-        [Test]
+        [Test, Ignore]
         public void DebugEQT40_Defect_1467088_Modifier_Stack_Cross_Update_Issue_3()
         {
             string code = @"a = {          1 => a1;          b1 + a1 => a2;                        };[Associative]{	b = {		  a1 + 2 => b1;                    	    };}";
