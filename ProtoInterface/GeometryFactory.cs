@@ -274,5 +274,10 @@ namespace Autodesk.DesignScript.Geometry
         {
             throw new NotImplementedException("CaptureGeometry method is not implemented by PersistenceManager.");
         }
+
+        public virtual IPersistentObject FromObject(long ptr)
+        {
+            throw new NotImplementedException("FromObject method is not implemented by PersistenceManager.");
+        }
     }
 }
