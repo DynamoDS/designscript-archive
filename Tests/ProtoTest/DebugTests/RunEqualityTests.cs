@@ -12153,7 +12153,7 @@ namespace ProtoTest.DebugTests
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
-        [Test]
+        [Test, Ignore]
         public void DebugEQT40_Defect_1467088_Modifier_Stack_Cross_Update_Issue_3()
         {
             string code = @"a = {          1 => a1;          b1 + a1 => a2;                        };[Associative]{	b = {		  a1 + 2 => b1;                    	    };}";

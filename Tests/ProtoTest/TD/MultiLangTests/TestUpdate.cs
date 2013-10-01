@@ -3159,7 +3159,7 @@ b = {
             thisTest.Verify("a", 3);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("Update")]
         public void T40_Defect_1467057_Modifier_Stack_Cross_Update_Issue_3()
         {
@@ -3221,7 +3221,7 @@ a = {
              });
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("Update")]
         public void T40_Defect_1467088_Modifier_Stack_Cross_Update_Issue_3()
         {
