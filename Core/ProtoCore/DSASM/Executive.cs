@@ -4409,7 +4409,6 @@ namespace ProtoCore.DSASM
             foreach (ProtoCore.DSASM.SymbolNode sn in exe.runtimeSymbols[blockId].symbolList.Values)
             {
                 if (sn.classScope == classIndex && sn.functionIndex == functionIndex && !sn.name.Equals(Constants.kWatchResultVar) 
-
                     /*&& !CoreUtils.IsSSATemp(sn.name)*/)
                 {
                     int offset = sn.index;
