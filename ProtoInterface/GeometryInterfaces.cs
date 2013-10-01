@@ -172,6 +172,14 @@ namespace Autodesk.DesignScript.Interfaces
         /// </summary>
         /// <returns>Collection of captured IDesignScriptEntity</returns>
         IDesignScriptEntity[] CaptureGeometry();
+
+        /// <summary>
+        /// Create a DesignScript host entity based on the persisted object in
+        /// the application
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
+        IPersistentObject FromObject(long ptr);
     }
 
     [Browsable(false)]
