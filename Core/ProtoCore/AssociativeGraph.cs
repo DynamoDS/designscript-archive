@@ -749,7 +749,6 @@ namespace ProtoCore.AssociativeGraph
             {
                 return true;
             }
-
             else
             {
                 return false;

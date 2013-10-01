@@ -23683,7 +23683,7 @@ a2 = foo2(3);
             WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("WatchFx Tests")]
         public void DebugWatch686_T018_Inline_Using_Recursion()
         {
@@ -51483,7 +51483,7 @@ b = {
             WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("WatchFx Tests")]
         public void DebugWatch1666_T40_Defect_1467057_Modifier_Stack_Cross_Update_Issue_3()
         {
@@ -51554,7 +51554,7 @@ a = {
             WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("WatchFx Tests")]
         public void DebugWatch1670_T40_Defect_1467088_Modifier_Stack_Cross_Update_Issue_3()
         {
