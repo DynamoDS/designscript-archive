@@ -2986,10 +2986,11 @@ namespace ProtoAssociative
                         }
                     }
 
-                    if (bnode.isSSAFirstAssignment)
-                    {
-                        break;
-                    }
+
+                    //if (bnode.isSSAFirstAssignment)
+                    //{
+                    //    break;
+                    //}
                 }
 
 
