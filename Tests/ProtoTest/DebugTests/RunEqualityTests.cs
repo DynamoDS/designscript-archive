@@ -9855,7 +9855,46 @@ namespace ProtoTest.DebugTests
         [Test]
         public void DebugEQT18_TestMethodCallInExpr__2_()
         {
-            string code = @"[Associative]{	def mul : double ( n1 : int, n2 : int )    {      	return = n1 * n2;    }    def add : double( n1 : int, n2 : double )    {       	return = n1 + n2;    }    test0 = add (-1 , 7.5 ) ;    test1 = add (mul(1,2), 4.5 ) ;      test2 = add (mul(1,2.5), 4 ) ;     test3 = add (add(1.5,0.5), 4.5 ) ;      test4 = add (1+1, 4.5 ) ;    test5 = add ( add(1,1) + add(1,0.5), 3.0 ) ;}";
+            string code = @"
+[Associative]
+
+{
+
+	def mul : double ( n1 : int, n2 : int )
+
+    {
+
+      	return = n1 * n2;
+
+    }
+
+    def add : double( n1 : int, n2 : double )
+
+    {
+
+       	return = n1 + n2;
+
+    }
+
+
+
+    test0 = add (-1 , 7.5 ) ;
+
+    test1 = add (mul(1,2), 4.5 ) ;  
+
+    test2 = add (mul(1,2.5), 4 ) ; 
+
+    test3 = add (add(1.5,0.5), 4.5 ) ;  
+
+    test4 = add (1+1, 4.5 ) ;
+
+    test5 = add ( add(1,1) + add(1,0.5), 3.0 ) ;
+
+}
+
+
+
+";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
@@ -10322,7 +10361,42 @@ namespace ProtoTest.DebugTests
         [Test]
         public void DebugEQT23_Function_Call_As_Function_Call_Arguments()
         {
-            string code = @"[Associative]{	def foo : double ( a : double , b :double )	{		return = a + b ;		}		def foo2 : double ( a : double , b :double )	{		return = foo ( a , b ) + foo ( a, b );		}		a1 = 2;	b1 = 4;	c1 = foo2( foo (a1, b1 ), foo ( a1, foo (a1, b1 ) ) );	}";
+            string code = @"
+[Associative]
+
+{
+
+	def foo : double ( a : double , b :double )
+
+	{
+
+		return = a + b ;	
+
+	}
+
+	
+
+	def foo2 : double ( a : double , b :double )
+
+	{
+
+		return = foo ( a , b ) + foo ( a, b );	
+
+	}
+
+	
+
+	a1 = 2;
+
+	b1 = 4;
+
+	c1 = foo2( foo (a1, b1 ), foo ( a1, foo (a1, b1 ) ) );
+
+	
+
+}
+
+";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
@@ -14774,7 +14848,47 @@ namespace ProtoTest.DebugTests
         [Test]
         public void DebugEQTV40_Defect_1449956_3()
         {
-            string code = @"[Associative]{	def recursion  : int( a : int)	{		temp = [Imperative]		{			if ( a ==0 || a < 0)			{				return = 0;				}			return = a + recursion( a - 1 );		}		 		return = temp;	}	x = recursion( 4 );	y = recursion( -1 );}";
+            string code = @"
+[Associative]
+
+{
+
+
+
+	def recursion  : int( a : int)
+
+	{
+
+		temp = [Imperative]
+
+		{
+
+			if ( a ==0 || a < 0)
+
+			{
+
+				return = 0;	
+
+			}
+
+			return = a + recursion( a - 1 );
+
+		}		 
+
+		return = temp;
+
+	}
+
+
+
+	x = recursion( 4 );
+
+	y = recursion( -1 );
+
+
+
+}
+";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
@@ -15486,7 +15600,98 @@ namespace ProtoTest.DebugTests
         [Test]
         public void DebugEQTV93_Modifying_Global_Var_In_Func_Call_4()
         {
-            string code = @"class Point{    X : var;	Y: var;	Z: var;	constructor Point ( x, y, z )	{	    X = x;		Y = y;		Z = z;	}	def foo ( p: Point)	{	    return = Point.Point( (p.X+X), (p.Y+Y), (p.Z+Z) );	}}def UnionBox(combined : Point, arr : Point[], index : int) {    // Nothing changed for combined outside Unionbox()  combined = combined.foo(arr[index]);  [Imperative]  {	  if(index != 0 )	  {		  combined = UnionBox(combined, arr, index - 1);	  }	    }  return = null;}points = { Point.Point ( 0,0,0), Point.Point ( 1, 1, 1 ), Point.Point ( 2, 2, 2 ), Point.Point ( 3, 3, 3 ) };top_index = Count( points ) - 2;base_index = Count ( points ) -1;s = points[base_index];xx = s.X;yy = s.Y;zz = s.Z;s1 = UnionBox(s, points, top_index);";
+            string code = @"
+class Point
+
+{
+
+    X : var;
+
+	Y: var;
+
+	Z: var;
+
+	constructor Point ( x, y, z )
+
+	{
+
+	    X = x;
+
+		Y = y;
+
+		Z = z;
+
+	}
+
+	def foo ( p: Point)
+
+	{
+
+	    return = Point.Point( (p.X+X), (p.Y+Y), (p.Z+Z) );
+
+	}
+
+}
+
+
+
+def UnionBox(combined : Point, arr : Point[], index : int) {
+
+  
+
+  // Nothing changed for combined outside Unionbox()
+
+  combined = combined.foo(arr[index]);
+
+  [Imperative]
+
+  {
+
+	  if(index != 0 )
+
+	  {
+
+		  combined = UnionBox(combined, arr, index - 1);
+
+	  }	  
+
+  }
+
+  return = null;
+
+}
+
+
+
+points = { Point.Point ( 0,0,0), Point.Point ( 1, 1, 1 ), Point.Point ( 2, 2, 2 ), Point.Point ( 3, 3, 3 ) };
+
+
+
+top_index = Count( points ) - 2;
+
+base_index = Count ( points ) -1;
+
+
+
+s = points[base_index];
+
+xx = s.X;
+
+yy = s.Y;
+
+zz = s.Z;
+
+
+
+s1 = UnionBox(s, points, top_index);
+
+
+
+
+
+
+
+";
             DebugTestFx.CompareDebugAndRunResults(code);
         }
 
