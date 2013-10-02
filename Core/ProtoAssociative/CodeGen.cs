@@ -2431,12 +2431,16 @@ namespace ProtoAssociative
             bnode.isSSAFirstAssignment = true;
 
             IdentifierNode identNode = null;
+            ArrayNode arrayDimensions = null;
             if (node is IdentifierNode)
             {
                 identNode = node as IdentifierNode;
 
                 // Right node - Array indexing will be applied to this new identifier
                 bnode.RightNode = nodeBuilder.BuildIdentfier(identNode.Name);
+
+                // Get the array dimensions of this node
+                arrayDimensions = identNode.ArrayDimensions;
             }
             else if (node is FunctionCallNode)
             {
@@ -2452,6 +2456,9 @@ namespace ProtoAssociative
                 // The array indexing to this function will be applied downstream 
                 fcall.ArrayDimensions = null;
                 bnode.RightNode = fcall;
+
+                // Get the array dimensions of this node
+                arrayDimensions = identNode.ArrayDimensions;
             }
             else if (node is IdentifierListNode)
             {
@@ -2460,13 +2467,38 @@ namespace ProtoAssociative
                 IdentifierListNode identList = node as IdentifierListNode;
                 AssociativeNode rhsNode = identList.RightNode;
 
-                Validity.Assert(rhsNode is IdentifierNode);
-                identNode = rhsNode as IdentifierNode;
+                if (rhsNode is IdentifierNode)
+                {
+                    identNode = rhsNode as IdentifierNode;
 
-                // Replace the indexed identifier with a new ident with the same name
-                //      i.e. replace x[i] with x
-                AssociativeNode nonIndexedIdent = nodeBuilder.BuildIdentfier(identNode.Name);
-                identList.RightNode = nonIndexedIdent;
+                    // Replace the indexed identifier with a new ident with the same name
+                    //      i.e. replace x[i] with x
+                    AssociativeNode nonIndexedIdent = nodeBuilder.BuildIdentfier(identNode.Name);
+                    identList.RightNode = nonIndexedIdent;
+
+                    // Get the array dimensions of this node
+                    arrayDimensions = identNode.ArrayDimensions;
+                }
+                else if (rhsNode is FunctionCallNode)
+                {
+                    FunctionCallNode fcall = rhsNode as FunctionCallNode;
+                    identNode = fcall.Function as IdentifierNode;
+
+                    AssociativeNode newCall = nodeBuilder.BuildFunctionCall(identNode.Name, fcall.FormalArguments);
+
+                    // Assign the function array and guide properties to the new ident node
+                    identNode.ArrayDimensions = fcall.ArrayDimensions;
+                    identNode.ReplicationGuides = fcall.ReplicationGuides;
+
+                    identList.RightNode = newCall;
+
+                    // Get the array dimensions of this node
+                    arrayDimensions = identNode.ArrayDimensions;
+                }
+                else
+                {
+                    Validity.Assert(false, "This token is not indexable");
+                }
 
                 // Right node
                 bnode.RightNode = identList;
@@ -2484,7 +2516,7 @@ namespace ProtoAssociative
 
             // Traverse the array index
             //      t1 = i
-            DFSEmitSSA_AST(identNode.ArrayDimensions.Expr, ssaStack, ref astlist);
+            DFSEmitSSA_AST(arrayDimensions.Expr, ssaStack, ref astlist);
 
             //
             // Build the indexing statement
@@ -2533,9 +2565,9 @@ namespace ProtoAssociative
 
             // Traverse the next dimension
             //      [j]
-            if (null != identNode.ArrayDimensions.Type)
+            if (null != arrayDimensions.Type)
             {
-                DFSEmitSSA_AST(identNode.ArrayDimensions.Type, ssaStack, ref astlist);
+                DFSEmitSSA_AST(arrayDimensions.Type, ssaStack, ref astlist);
             }
 #endregion
         }
