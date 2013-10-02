@@ -8,8 +8,9 @@ using ProtoTest.TD;
 using ProtoTestFx.TD;
 namespace ProtoTest.Associative
 {
-    class SSATransformTest
+    public class SSATransformTest
     {
+
         public TestFrameWork thisTest = new TestFrameWork();
         [SetUp]
         public void Setup()
