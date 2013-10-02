@@ -2637,6 +2637,11 @@ namespace ProtoAssociative
                 ExprListNode exprlistNode = node as ExprListNode;
                 replicationGuides = exprlistNode.ReplicationGuides;
             }
+            else if (node is GroupExpressionNode)
+            {
+                GroupExpressionNode groupExprNode = node as GroupExpressionNode;
+                replicationGuides = groupExprNode.ReplicationGuides;
+            }
             else
             {
                 // A parser error has occured if a replication guide gets attached to any AST besides"
@@ -2874,7 +2879,8 @@ namespace ProtoAssociative
                         if (argNode is BinaryExpressionNode)
                         {
                             BinaryExpressionNode argBinaryExpr = argNode as BinaryExpressionNode;
-                            (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(argBinaryExpr.RightNode);
+                            //(argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(argBinaryExpr.RightNode);
+                            (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(arg);
                             
                             fcNode.FormalArguments[idx] = argBinaryExpr.LeftNode;
                         }
@@ -3075,6 +3081,46 @@ namespace ProtoAssociative
 
                 astlist.Add(bnode);
                 ssaStack.Push(bnode);
+            }
+            else if (node is GroupExpressionNode)
+            {
+                if (core.Options.FullSSA)
+                {
+                    GroupExpressionNode groupExpr = node as GroupExpressionNode;
+                    if (null == groupExpr.ArrayDimensions)
+                    {
+                        DFSEmitSSA_AST(groupExpr.Expression, ssaStack, ref astlist);
+
+
+                        BinaryExpressionNode bnode = new BinaryExpressionNode();
+                        bnode.Optr = ProtoCore.DSASM.Operator.assign;
+
+                        
+                        // Left node
+                        var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                        bnode.LeftNode = identNode;
+
+                        // Right node
+                        AssociativeNode groupExprBinaryStmt = ssaStack.Pop();
+                        Validity.Assert(groupExprBinaryStmt is BinaryExpressionNode);
+                        bnode.RightNode = (groupExprBinaryStmt as BinaryExpressionNode).LeftNode;
+
+                        bnode.isSSAAssignment = true;
+
+                        astlist.Add(bnode);
+                        ssaStack.Push(bnode);
+                    }
+                    else
+                    {
+                        EmitSSAArrayIndex(groupExpr, ssaStack, ref astlist);
+                    }
+                }
+                else
+                {
+                    // We never supported SSA on grouped expressions
+                    // Keep it that way if SSA flag is off
+                    ssaStack.Push(node);
+                }
             }
             else
             {
