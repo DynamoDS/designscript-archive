@@ -385,6 +385,17 @@ namespace ProtoFFITests
             InternalClass x = (InternalClass)y;
             return x.GetValue();
         }
+
+        public Dictionary<string, object> GetDictionary()
+        {
+            return new Dictionary<string, object>() 
+            {
+                {"color", "green"},
+                {"weight", 42},
+                {"ok", false},
+                {"nums", new int[] {101, 202}}
+            };
+        }
     }
     internal class InternalClass
     {
@@ -748,6 +759,17 @@ namespace ProtoFFITests
                 @" t = MethodOverloadingClass.MethodOverloadingClass();                   t1 = t.GetValue();                   t2 = t.foo(t1);                                     ";
             ValidationData[] data = { new ValidationData { ValueName = "t2", ExpectedValue = 0, BlockIndex = 0 } };
             Type dummy = Type.GetType("ProtoFFITests.MethodOverloadingClass");
+            code = string.Format("import(\"{0}\");\r\n{1}", dummy.AssemblyQualifiedName, code);
+            ExecuteAndVerify(code, data);
+        }
+
+        [Test]
+        public void Test_Dictionary()
+        {
+            string code =
+                @" t = TestData.TestData();                   d = t.GetDictionary();                     r1 = d[""weight""];";
+            ValidationData[] data = { new ValidationData { ValueName = "r1", ExpectedValue = 42, BlockIndex = 0 } };
+            Type dummy = Type.GetType("ProtoFFITests.TestData");
             code = string.Format("import(\"{0}\");\r\n{1}", dummy.AssemblyQualifiedName, code);
             ExecuteAndVerify(code, data);
         }
