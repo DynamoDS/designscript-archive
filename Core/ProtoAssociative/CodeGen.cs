@@ -2305,6 +2305,11 @@ namespace ProtoAssociative
                 }
 
             }
+            else if (node is ExprListNode)
+            {
+                //ExprListNode exprList = node as ExprListNode;
+                DFSEmitSSA_AST(node, ssaStack, ref astlist);
+            }
             else if (node is FunctionCallNode)
             {
                 FunctionCallNode fcall = node as FunctionCallNode;
