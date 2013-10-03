@@ -166,7 +166,7 @@ namespace ProtoCore
             DisableDisposeFunctionDebug = true;
             GenerateExprID = true;
             IsDeltaExecution = false;
-            ElementBasedArrayUpdate = true;
+            ElementBasedArrayUpdate = false;
 
             IsDeltaCompile = false;
 
@@ -1315,6 +1315,11 @@ namespace ProtoCore
 
             //
 
+            // Comment Jun:
+            // Disable SSA for the previous graphcompiler as it clashes with the way code recompilation behaves
+            // SSA is enabled for the new graph strategy of delta compilation and execution
+            Options.FullSSA = false;
+
 
             //Initialize the function pointer table
             FunctionPointerTable = new DSASM.FunctionPointerTable();
@@ -1341,7 +1346,7 @@ namespace ProtoCore
             }
             RuntimeStatus = new RuntimeStatus(this);
 
-            SSASubscript = 0;
+            //SSASubscript = 0;
             ExpressionUID = 0;
             ModifierBlockUID = 0;
             ModifierStateSubscript = 0;
