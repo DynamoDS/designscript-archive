@@ -1958,7 +1958,7 @@ namespace ProtoCore.DSASM
                         UpdateModifierBlockDependencyGraph(graphNode);
                     }
                     else if (allowSSADownstream
-                              || isSSAAssign
+                              /*|| isSSAAssign*/
                               || (exprUID != graphNode.exprUID
                                  && modBlkId == Constants.kInvalidIndex
                                  && graphNode.modBlkUID == Constants.kInvalidIndex)
