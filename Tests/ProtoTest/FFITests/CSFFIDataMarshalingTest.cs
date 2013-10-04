@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using System.Collections.Generic;
+using Autodesk.DesignScript.Runtime;
 namespace ProtoFFITests
 {
     public class TestData
@@ -386,6 +387,10 @@ namespace ProtoFFITests
             return x.GetValue();
         }
 
+        [MultiReturnAttribute("color", "string")]
+        [MultiReturnAttribute("weight", "int")]
+        [MultiReturnAttribute("ok", "boolean")]
+        [RuntimeRequirement(RequireTracing = true)]
         public Dictionary<string, object> GetDictionary()
         {
             return new Dictionary<string, object>() 
