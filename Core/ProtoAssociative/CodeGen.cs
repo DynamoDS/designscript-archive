@@ -89,6 +89,24 @@ namespace ProtoAssociative
         // This variable is used to keep track of the expression ID being traversed by the code generator
         private int currentExpressionID = ProtoCore.DSASM.Constants.kInvalidIndex;
 
+        //
+        // This dictionary maps the first pointer to all the SSA temps generated for the identifier list
+        // Given:
+        //      a = p.x.y
+        //
+        //      t0 = p
+        //      t1 = t0.x
+        //      t2 = t1.y
+        //      a = t2
+        //
+        //      The following SSA temps will map to the first pointer 'p'
+        //
+        //      <t0, p>
+        //      <t1, p>
+        //      <t2, p>
+        //
+        Dictionary<string, string> ssaTempToFirstPointerMap = new Dictionary<string, string>();
+
         
         // This constructor is only called for Preloading of assemblies and 
         // precompilation of CodeBlockNode nodes in GraphUI for global language blocks - pratapa
@@ -2429,23 +2447,36 @@ namespace ProtoAssociative
             bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
             // Left node
-            var tmpName = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+            string ssaTempName = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+            var tmpName = nodeBuilder.BuildIdentfier(ssaTempName);
             bnode.LeftNode = tmpName;
             bnode.isSSAAssignment = true;
             bnode.isSSAPointerAssignment = isSSAPointerAssignment;
             bnode.isSSAFirstAssignment = true;
 
+
             IdentifierNode identNode = null;
             ArrayNode arrayDimensions = null;
+            string firstVarName = string.Empty;
             if (node is IdentifierNode)
             {
                 identNode = node as IdentifierNode;
 
                 // Right node - Array indexing will be applied to this new identifier
-                bnode.RightNode = nodeBuilder.BuildIdentfier(identNode.Name);
+                firstVarName = identNode.Name;
+                bnode.RightNode = nodeBuilder.BuildIdentfier(firstVarName);
 
                 // Get the array dimensions of this node
                 arrayDimensions = identNode.ArrayDimensions;
+
+
+                // Associate the first pointer with each SSA temp
+                // It is acceptable to store firstVar even if it is not a pointer as ResolveFinalNodeRefs() will just ignore this entry 
+                // if this ssa temp is not treated as a pointer inside the function
+                if (!ssaTempToFirstPointerMap.ContainsKey(ssaTempName))
+                {
+                    ssaTempToFirstPointerMap.Add(ssaTempName, firstVarName);
+                }
             }
             else if (node is FunctionCallNode)
             {
@@ -2532,9 +2563,24 @@ namespace ProtoAssociative
 
             // Build the left node of the indexing statement
 #region SSA_INDEX_STMT_LEFT
-            AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+            ssaTempName = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+            AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ssaTempName);
             Validity.Assert(null != tmpIdent);
             indexedStmt.LeftNode = tmpIdent;
+
+
+
+            // Associate the first pointer with each SSA temp
+            // It is acceptable to store firstVar even if it is not a pointer as ResolveFinalNodeRefs() will just ignore this entry 
+            // if this ssa temp is not treated as a pointer inside the function
+            if (!string.IsNullOrEmpty(firstVarName))
+            {
+                if (!ssaTempToFirstPointerMap.ContainsKey(ssaTempName))
+                {
+                    ssaTempToFirstPointerMap.Add(ssaTempName, firstVarName);
+                }
+            }
+
 #endregion
 
             // Build the right node of the indexing statement
@@ -2828,13 +2874,15 @@ namespace ProtoAssociative
 
                 if (core.Options.FullSSA)
                 {
+                    string ssaTempName = string.Empty;
                     if (null == ident.ArrayDimensions)
                     {
                         BinaryExpressionNode bnode = new BinaryExpressionNode();
                         bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                         // Left node
-                        var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                        ssaTempName = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+                        var identNode = nodeBuilder.BuildIdentfier(ssaTempName);
                         bnode.LeftNode = identNode;
 
                         // Right node
@@ -2844,6 +2892,13 @@ namespace ProtoAssociative
 
                         astlist.Add(bnode);
                         ssaStack.Push(bnode);
+
+
+                        // Associate the first pointer with each SSA temp
+                        // It is acceptable to store firstVar even if it is not a pointer as ResolveFinalNodeRefs() will just ignore this entry 
+                        // if this ssa temp is not treated as a pointer inside the function
+                        string firstVar = ident.Name;
+                        ssaTempToFirstPointerMap.Add(ssaTempName, firstVar);
                     }
                     else
                     {
@@ -2945,21 +3000,43 @@ namespace ProtoAssociative
                     }
                 }
                 
+                
+                // Assign the first ssa assignment flag
+                BinaryExpressionNode firstBNode = astlist[0] as BinaryExpressionNode;
+                Validity.Assert(null != firstBNode);
+                Validity.Assert(firstBNode.Optr == Operator.assign);
+                firstBNode.isSSAFirstAssignment = true;
+
+
+                // Get the first pointer name
+                //Validity.Assert(firstBNode.RightNode is IdentifierNode);
+                //string firstPtrName = (firstBNode.RightNode as IdentifierNode).Name;
+
+                //=========================================================
                 //
-                // Backtrack and convert all identlist nodes to dot calls
-                // This can potentially be optimized by performing the dotcall transform in SSAIdentList
+                // 1. Backtrack and convert all identlist nodes to dot calls
+                //    This can potentially be optimized by performing the dotcall transform in SSAIdentList
                 //
-
-                ///////////////////////////
-
-                int x = 0;
-
+                // 2. Associate the first pointer with each SSA temp
+                //
+                //=========================================================
                 for (int n = lastIndex; n >= 0; --n)
                 {
                     lastNode = astlist[n];
 
                     BinaryExpressionNode bnode = lastNode as BinaryExpressionNode;
                     Validity.Assert(bnode.Optr == Operator.assign);
+
+                    // Get the ssa temp name
+                    Validity.Assert(bnode.LeftNode is IdentifierNode);
+                    string ssaTempName = (bnode.LeftNode as IdentifierNode).Name;
+                    Validity.Assert(CoreUtils.IsSSATemp(ssaTempName));
+
+                    //// Associate the first pointer with each SSA temp
+                    //if (!ssaTempToFirstPointerMap.ContainsKey(ssaTempName))
+                    //{
+                    //    ssaTempToFirstPointerMap.Add(ssaTempName, firstPtrName);
+                    //}
 
                     if (bnode.RightNode is IdentifierListNode)
                     {
@@ -7144,10 +7221,54 @@ namespace ProtoAssociative
                         // For every single arguments' modified statements
                         foreach (ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef in argNameModifiedStatementsPair.Value)
                         {
-                            ProtoCore.AssociativeGraph.UpdateNodeRef argNodeRef = new ProtoCore.AssociativeGraph.UpdateNodeRef();
-                            argNodeRef.PushUpdateNodeRef(graphNode.updatedArguments[n]);
-                            argNodeRef.PushUpdateNodeRef(nodeRef);
-                            graphNode.updateNodeRefList.Add(argNodeRef);
+                            if (core.Options.FullSSA)
+                            {
+                                //
+                                // We just trigger update from whichever statement is dependent on the first pointer associatied with this SSA stmt
+                                // Given:
+                                //      p = C.C();
+                                //      a = p.x;
+                                //      i = f(p);
+                                //
+                                //      %t0 = C.C()
+                                //      p = %t0
+                                //      %t1 = p
+                                //      %t2 = %t1.x
+                                //      a = %t2
+                                //      %t3 = p
+                                //      %t4 = f(%t3)    -> Assume that function 'f' modifies the property 'x' of its argument
+                                //                      -> The graph node of this stmt has 2 updatenoderefs 
+                                //                      ->  there are %t4 and p ('p' because it is the first pointer of %t3
+                                //      i = %t4
+                                //
+                                
+                                // Get the SSA first pointer associated with this argument
+                                string ssaTemp = graphNode.updatedArguments[n].nodeList[0].symbol.name;
+                                if (ssaTempToFirstPointerMap.ContainsKey(ssaTemp))
+                                {
+                                    string firstPtr = ssaTempToFirstPointerMap[ssaTemp];
+                                    bool isAccessible = false;
+                                    SymbolNode symbol = null;
+                                    bool isAllocated = VerifyAllocation(firstPtr, globalClassIndex, globalProcIndex, out symbol, out isAccessible);
+                                    if (isAllocated)
+                                    {
+                                        ProtoCore.AssociativeGraph.UpdateNode updateNode = new UpdateNode();
+                                        updateNode.symbol = symbol;
+                                        updateNode.nodeType = ProtoCore.AssociativeGraph.UpdateNodeType.kSymbol;
+
+                                        ProtoCore.AssociativeGraph.UpdateNodeRef argNodeRef = new ProtoCore.AssociativeGraph.UpdateNodeRef();
+                                        argNodeRef.PushUpdateNode(updateNode);
+                                        graphNode.updateNodeRefList.Add(argNodeRef);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                ProtoCore.AssociativeGraph.UpdateNodeRef argNodeRef = new ProtoCore.AssociativeGraph.UpdateNodeRef();
+                                argNodeRef.PushUpdateNodeRef(graphNode.updatedArguments[n]);
+                                argNodeRef.PushUpdateNodeRef(nodeRef);
+                                graphNode.updateNodeRefList.Add(argNodeRef);
+                            }
                         }
                         ++n;
                     }

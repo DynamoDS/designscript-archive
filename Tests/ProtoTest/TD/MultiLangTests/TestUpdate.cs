@@ -2624,14 +2624,13 @@ def foo ( x )
 	return = true;
 }
 y = B.B();
-y.b = 1;
+y.b = 1; // This is re-executed again as y.b is modified from inside foo
 z = y.b;
 test = foo ( y ) ;
 z2 = z;
 ";
             thisTest.VerifyRunScriptSource(code, err);
-            //Assert.Fail("1466076 - Sprint 22 : rev 2396 : Update issue : when an instance property is updated inside function/method scope, it does not update the outer associative scope variable ");
-            thisTest.Verify("z2", 2);
+            thisTest.Verify("z2", 1);
         }
 
         [Test]
