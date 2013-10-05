@@ -3334,7 +3334,6 @@ namespace ProtoAssociative
                         {
                             if (core.Options.GenerateExprID)
                             {
-                                //bnode.exprUID = generatedUID = core.StaticExpressionUID++;
                                 bnode.exprUID = generatedUID = core.ExpressionUID++;
                             }
                             newAstList.Add(node);
@@ -3388,31 +3387,72 @@ namespace ProtoAssociative
                     else if (node is ModifierStackNode)
                     {
                         ModifierStackNode modStack = node as ModifierStackNode;
-                        
-                        foreach (AssociativeNode modstackNode in modStack.ElementNodes)
+
+                        if (core.Options.FullSSA)
                         {
-                            // This code is temporarily commented out as we are creating temporaries for unnamed modifier 
-                            // block states such that a variable no longer can exist on both the lhs and rhs. In other words 
-                            // the modifier block has already been kinda SSA-d by now. We may re-use this SSA code later on however,
-                            // as this temporary variable creation for unnamed states might be, well, temporary - pratapa
-                            /*if (modstackNode is BinaryExpressionNode && (modstackNode as BinaryExpressionNode).IsModifier)
+                            List<AssociativeNode> modStackNewElements = new List<AssociativeNode>();
+
+
+                            bool ssaTranformAllModStackStmts = false;
+
+                            if (ssaTranformAllModStackStmts)
                             {
-                                Stack<AssociativeNode> ssaStack = new Stack<AssociativeNode>();
-                                List<AssociativeNode> elementList = new List<AssociativeNode>();
-
-                                DFSEmitSSA_AST(modstackNode, ssaStack, ref elementList);
-
-                                // Set the unique expression id for this range of SSA nodes
-                                foreach (AssociativeNode aNode in elementList)
+                                foreach (AssociativeNode modstackNode in modStack.ElementNodes)
                                 {
-                                    Debug.Assert(aNode is BinaryExpressionNode);
-                                    BinaryExpressionNode bnode = aNode as BinaryExpressionNode;
-                                    bnode.exprUID = core.ExpressionUID;
-                                    bnode.modBlkUID = core.ModifierBlockUID;
+                                    if (modstackNode is BinaryExpressionNode)
+                                    {
+                                        Stack<AssociativeNode> ssaStack = new Stack<AssociativeNode>();
+                                        List<AssociativeNode> elementList = new List<AssociativeNode>();
+
+                                        DFSEmitSSA_AST(modstackNode, ssaStack, ref elementList);
+
+                                        // Set the unique expression id for this range of SSA nodes
+                                        foreach (AssociativeNode aNode in elementList)
+                                        {
+                                            Debug.Assert(aNode is BinaryExpressionNode);
+                                            BinaryExpressionNode bnode = aNode as BinaryExpressionNode;
+                                            bnode.exprUID = core.ExpressionUID;
+                                            bnode.modBlkUID = core.ModifierBlockUID;
+                                        }
+
+                                        modStackNewElements.AddRange(elementList);
+
+                                    }
+
+                                    core.ExpressionUID++;
                                 }
-                                newAstList.AddRange(elementList);
+
+                                modStack.ElementNodes.Clear();
+                                modStack.ElementNodes.AddRange(modStackNewElements);
+
+                                newAstList.Add(node);
+                                core.ModifierBlockUID++;
                             }
-                            else*/
+                            else
+                            {
+                                // Transform all identlists into dot calls
+                                foreach (AssociativeNode modstackNode in modStack.ElementNodes)
+                                {
+                                    BinaryExpressionNode bnode = modstackNode as BinaryExpressionNode;
+                                    if (bnode != null)
+                                    {
+                                        if (core.Options.GenerateExprID)
+                                        {
+                                            bnode.exprUID = core.ExpressionUID;
+                                        }
+                                        bnode.modBlkUID = core.ModifierBlockUID;
+                                    }
+
+                                    core.ExpressionUID++;
+                                }
+
+                                newAstList.Add(node);
+                                core.ModifierBlockUID++;
+                            }
+                        }
+                        else
+                        {
+                            foreach (AssociativeNode modstackNode in modStack.ElementNodes)
                             {
                                 BinaryExpressionNode bnode = modstackNode as BinaryExpressionNode;
                                 if (bnode != null)
@@ -3424,11 +3464,13 @@ namespace ProtoAssociative
                                     bnode.modBlkUID = core.ModifierBlockUID;
                                     //newAstList.Add(bnode);
                                 }
+                                
+                                core.ExpressionUID++;
                             }
-                            core.ExpressionUID++;
+                            
+                            newAstList.Add(node);
+                            core.ModifierBlockUID++;
                         }
-                        newAstList.Add(node);
-                        core.ModifierBlockUID++;
                     }
                     else
                     {
@@ -3439,6 +3481,8 @@ namespace ProtoAssociative
             }
             return astList;
         }
+
+        //private DfsTransformIdentListToDotCall
 
 
         private AssociativeNode DFSEmitSplitAssign_AST(AssociativeNode node, ref List<AssociativeNode> astList)
