@@ -1767,7 +1767,7 @@ namespace ProtoTest.Associative
             thisTest.Verify("cDispose", 0);
         }
 
-        [Test, Ignore]
+        [Test]
         public void TestReferenceCount59_GlobalFunctionReturnNewObject()
         {
             string code =

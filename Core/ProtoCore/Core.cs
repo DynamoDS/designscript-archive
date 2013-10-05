@@ -127,7 +127,7 @@ namespace ProtoCore
             DumpByteCode = false;
             Verbose = false;
 
-            FullSSA = true;
+            FullSSA = false;
             DumpIL = false;
 
             DumpFunctionResolverLogic = false;
