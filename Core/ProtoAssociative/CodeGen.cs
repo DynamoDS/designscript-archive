@@ -3393,7 +3393,7 @@ namespace ProtoAssociative
                             List<AssociativeNode> modStackNewElements = new List<AssociativeNode>();
 
 
-                            bool ssaTranformAllModStackStmts = false;
+                            bool ssaTranformAllModStackStmts = true;
 
                             if (ssaTranformAllModStackStmts)
                             {
