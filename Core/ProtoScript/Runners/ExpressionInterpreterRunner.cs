@@ -65,6 +65,7 @@ namespace ProtoScript.Runners
 
         public ExecutionMirror Execute(string code)
         {
+            Core.Options.FullSSA = false;
             code = string.Format("{0} = {1};", Constants.kWatchResultVar, code);
 
             // TODO Jun: Move this initaliztion of the exe into a unified function
@@ -191,6 +192,8 @@ namespace ProtoScript.Runners
 
             // TODO: investigate why additional elements are added to the stack.
             Core.Rmem.RestoreStackForExprInterpreter();
+
+            Core.Options.FullSSA = true;
 
             return new ExecutionMirror(Core.CurrentExecutive.CurrentDSASMExec, Core);
         }
