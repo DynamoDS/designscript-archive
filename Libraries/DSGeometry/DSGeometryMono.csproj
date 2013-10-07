@@ -82,11 +82,11 @@
     <Compile Include="VertexHost.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ProtoGeometry\ProtoGeometry.csproj">
+    <ProjectReference Include="..\ProtoGeometry\ProtoGeometryMono.csproj">
       <Project>{038CF76A-8C0E-4680-8E05-1ED624496BF8}</Project>
       <Name>ProtoGeometry</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\ProtoInterface\ProtoInterface.csproj">
+    <ProjectReference Include="..\..\ProtoInterface\ProtoInterfaceMono.csproj">
       <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
       <Name>ProtoInterface</Name>
     </ProjectReference>

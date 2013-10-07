@@ -131,7 +131,7 @@
     <None Include="HostInterfaces.cd" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ProtoInterface\ProtoInterface.csproj">
+    <ProjectReference Include="..\..\ProtoInterface\ProtoInterfaceMono.csproj">
       <Project>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</Project>
       <Name>ProtoInterface</Name>
     </ProjectReference>
