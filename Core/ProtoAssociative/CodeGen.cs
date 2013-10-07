@@ -2215,7 +2215,7 @@ namespace ProtoAssociative
             bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
             // Left node
-            var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+            var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
             bnode.LeftNode = identNode;
 
             //Right node
@@ -2307,7 +2307,7 @@ namespace ProtoAssociative
                     bnode.isSSAPointerAssignment = true;
 
                     // Left node
-                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                     (identNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(ident);
                     bnode.LeftNode = identNode;
 
@@ -2340,7 +2340,7 @@ namespace ProtoAssociative
                     bnode.isSSAPointerAssignment = true;
 
                     // Left node
-                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                     (identNode as IdentifierNode).ReplicationGuides = fcall.ReplicationGuides;
                     bnode.LeftNode = identNode;
 
@@ -2403,7 +2403,7 @@ namespace ProtoAssociative
                 if (null == arrayDimension)
                 {
                     // New SSA expr for the current dot call
-                    string ssatemp = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+                    string ssatemp = ProtoCore.Utils.CoreUtils.BuildSSATemp(core);
                     var tmpIdent = nodeBuilder.BuildIdentfier(ssatemp);
                     BinaryExpressionNode bnode = new BinaryExpressionNode(tmpIdent, rhsIdentList, Operator.assign);
                     bnode.isSSAPointerAssignment = true;
@@ -2447,7 +2447,7 @@ namespace ProtoAssociative
             bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
             // Left node
-            string ssaTempName = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+            string ssaTempName = ProtoCore.Utils.CoreUtils.BuildSSATemp(core);
             var tmpName = nodeBuilder.BuildIdentfier(ssaTempName);
             bnode.LeftNode = tmpName;
             bnode.isSSAAssignment = true;
@@ -2563,7 +2563,7 @@ namespace ProtoAssociative
 
             // Build the left node of the indexing statement
 #region SSA_INDEX_STMT_LEFT
-            ssaTempName = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+            ssaTempName = ProtoCore.Utils.CoreUtils.BuildSSATemp(core);
             AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ssaTempName);
             Validity.Assert(null != tmpIdent);
             indexedStmt.LeftNode = tmpIdent;
@@ -2793,7 +2793,7 @@ namespace ProtoAssociative
                     bnode.Optr = ProtoCore.DSASM.Operator.assign; 
 
                     // Left node
-                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                     bnode.LeftNode = identNode;
 
                     // Right node
@@ -2813,7 +2813,7 @@ namespace ProtoAssociative
                 bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                 // Left node
-                AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                 Validity.Assert(null != tmpIdent);
                 bnode.LeftNode = tmpIdent;
 
@@ -2881,7 +2881,7 @@ namespace ProtoAssociative
                         bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                         // Left node
-                        ssaTempName = ProtoCore.Utils.CoreUtils.GetSSATemp(core);
+                        ssaTempName = ProtoCore.Utils.CoreUtils.BuildSSATemp(core);
                         var identNode = nodeBuilder.BuildIdentfier(ssaTempName);
                         bnode.LeftNode = identNode;
 
@@ -2911,7 +2911,7 @@ namespace ProtoAssociative
                     bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                     // Left node
-                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                    var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                     bnode.LeftNode = identNode;
 
                     // Right node
@@ -2955,7 +2955,7 @@ namespace ProtoAssociative
                 bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                 // Left node
-                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                 bnode.LeftNode = identNode;
 
                 // Store the replication guide from the function call to the temp
@@ -3092,7 +3092,7 @@ namespace ProtoAssociative
                 bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                 // Left node
-                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                 bnode.LeftNode = identNode;
 
                 //Right node
@@ -3122,7 +3122,7 @@ namespace ProtoAssociative
                 bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                 // Left node
-                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                 bnode.LeftNode = identNode;
 
                 //Right node
@@ -3155,7 +3155,7 @@ namespace ProtoAssociative
                 bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
                 // Left node
-                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                 bnode.LeftNode = identNode;
 
                 //Right node
@@ -3180,7 +3180,7 @@ namespace ProtoAssociative
 
                         
                         // Left node
-                        var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.GetSSATemp(core));
+                        var identNode = nodeBuilder.BuildIdentfier(ProtoCore.Utils.CoreUtils.BuildSSATemp(core));
                         bnode.LeftNode = identNode;
 
                         // Right node
