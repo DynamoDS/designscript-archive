@@ -547,7 +547,7 @@ namespace ProtoCore.Utils
             return name;
         }
 
-        public static string GetSSATemp(Core core)
+        public static string BuildSSATemp(Core core)
         {
             // Jun Comment: The current convention for auto generated SSA variables begin with '%'
             // This ensures that the variables is compiler generated as the '%' symbol cannot be used as an identifier and will fail compilation
