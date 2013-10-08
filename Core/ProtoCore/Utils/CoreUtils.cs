@@ -781,5 +781,16 @@ namespace ProtoCore.Utils
             bool areEqual = s1Root.Compare(s2Root);
             return areEqual;
         }
+
+
+        public static void CopyDebugData(ProtoCore.AST.Node nodeTo, ProtoCore.AST.Node nodeFrom)
+        {
+            Validity.Assert(null != nodeTo);
+            Validity.Assert(null != nodeFrom);
+            nodeTo.col = nodeFrom.col;
+            nodeTo.endCol = nodeFrom.endCol;
+            nodeTo.endLine = nodeFrom.endLine;
+            nodeTo.line = nodeFrom.line;
+        }
     }
 }

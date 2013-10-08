@@ -2220,6 +2220,8 @@ namespace ProtoAssociative
 
             //Right node
             bnode.RightNode = identList;
+            //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, identList);
+
             bnode.isSSAAssignment = true;
 
             return bnode;
@@ -2313,6 +2315,7 @@ namespace ProtoAssociative
 
                     // Right node
                     bnode.RightNode = ident;
+                    //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, node);
 
                     astlist.Add(bnode);
                     ssaStack.Push(bnode);
@@ -2346,6 +2349,7 @@ namespace ProtoAssociative
 
                     // Right node
                     bnode.RightNode = fcall;
+                    //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                     astlist.Add(bnode);
                     ssaStack.Push(bnode);
@@ -2465,6 +2469,7 @@ namespace ProtoAssociative
                 // Right node - Array indexing will be applied to this new identifier
                 firstVarName = identNode.Name;
                 bnode.RightNode = nodeBuilder.BuildIdentfier(firstVarName);
+                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 // Get the array dimensions of this node
                 arrayDimensions = identNode.ArrayDimensions;
@@ -2492,6 +2497,7 @@ namespace ProtoAssociative
                 // The array indexing to this function will be applied downstream 
                 fcall.ArrayDimensions = null;
                 bnode.RightNode = fcall;
+                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 // Get the array dimensions of this node
                 arrayDimensions = identNode.ArrayDimensions;
@@ -2538,6 +2544,7 @@ namespace ProtoAssociative
 
                 // Right node
                 bnode.RightNode = identList;
+                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 bnode.isSSAPointerAssignment = true;
             }
@@ -2567,6 +2574,7 @@ namespace ProtoAssociative
             AssociativeNode tmpIdent = nodeBuilder.BuildIdentfier(ssaTempName);
             Validity.Assert(null != tmpIdent);
             indexedStmt.LeftNode = tmpIdent;
+            //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, node);
 
 
 
@@ -2609,6 +2617,7 @@ namespace ProtoAssociative
 
             // Right node of the indexing statement
             indexedStmt.RightNode = rhsIdent;
+            //ProtoCore.Utils.CoreUtils.CopyDebugData(indexedStmt, prevSSAStmt);
 
             astlist.Add(indexedStmt);
             ssaStack.Push(indexedStmt);
@@ -2798,6 +2807,7 @@ namespace ProtoAssociative
 
                     // Right node
                     bnode.RightNode = tnode;
+                    //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                     bnode.isSSAAssignment = true;
                 }
@@ -2837,6 +2847,7 @@ namespace ProtoAssociative
                     (rhsIdent as IdentifierNode).ArrayDimensions = currentDimensionNode;
 
                     bnode.RightNode = rhsIdent;
+                    //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                     astlist.Add(bnode);
                     ssaStack.Push(bnode);
@@ -2887,6 +2898,7 @@ namespace ProtoAssociative
 
                         // Right node
                         bnode.RightNode = ident;
+                        //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                         bnode.isSSAAssignment = true;
 
@@ -2916,6 +2928,7 @@ namespace ProtoAssociative
 
                     // Right node
                     bnode.RightNode = ident;
+                    //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                     bnode.isSSAAssignment = true;
 
@@ -2964,6 +2977,7 @@ namespace ProtoAssociative
                 //Right node
                 bnode.RightNode = node;
                 bnode.isSSAAssignment = true;
+                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 astlist.Add(bnode);
                 ssaStack.Push(bnode);
@@ -3007,6 +3021,29 @@ namespace ProtoAssociative
                 Validity.Assert(firstBNode.Optr == Operator.assign);
                 firstBNode.isSSAFirstAssignment = true;
 
+                //
+                // The first pointer is the lhs of the next dotcall
+                //      a = x.y.z
+                //      t0 = x      -> 'x' is the lhs of the first dotcall (x.y)
+                //      t1 = t0.y
+                //      t2 = t1.z
+                //      a = t2
+                //
+
+                IdentifierNode lhsIdent = null;
+
+                if (firstBNode.RightNode is IdentifierNode)
+                {
+                    lhsIdent = (firstBNode.RightNode as IdentifierNode);
+                }
+                else if(firstBNode.RightNode is FunctionCallNode)
+                {
+                    lhsIdent = (firstBNode.RightNode as FunctionCallNode).Function as IdentifierNode;
+                }   
+                else
+                {
+                    lhsIdent = firstBNode.RightNode;
+                }
 
                 // Get the first pointer name
                 //Validity.Assert(firstBNode.RightNode is IdentifierNode);
@@ -3020,7 +3057,9 @@ namespace ProtoAssociative
                 // 2. Associate the first pointer with each SSA temp
                 //
                 //=========================================================
-                for (int n = lastIndex; n >= 0; --n)
+                
+                //for (int n = lastIndex; n >= 0; --n)
+                for (int n = 0; n <= lastIndex; n++)
                 {
                     lastNode = astlist[n];
 
@@ -3038,6 +3077,7 @@ namespace ProtoAssociative
                     //    ssaTempToFirstPointerMap.Add(ssaTempName, firstPtrName);
                     //}
 
+
                     if (bnode.RightNode is IdentifierListNode)
                     {
                         IdentifierListNode identList = bnode.RightNode as IdentifierListNode;
@@ -3049,18 +3089,44 @@ namespace ProtoAssociative
                             rcall.Function = new IdentifierNode(identNode);
                             rcall.Function.Name = ProtoCore.DSASM.Constants.kGetterPrefix + rcall.Function.Name;
 
+                            ProtoCore.Utils.CoreUtils.CopyDebugData(identList.LeftNode, lhsIdent);
                             FunctionDotCallNode dotCall = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, rcall, core);
                             dotCall.isLastSSAIdentListFactor = identList.isLastSSAIdentListFactor;
                             bnode.RightNode = dotCall;
 
+                            ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, lhsIdent);
+
+                            // Update the LHS of the next dotcall
+                            //      a = x.y.z
+                            //      t0 = x      
+                            //      t1 = t0.y   'y' is the lhs of the next dotcall (y.z)
+                            //      t2 = t1.z
+                            //      a = t2
+                            //
+                            Validity.Assert(rcall.Function is IdentifierNode);
+                            lhsIdent = rcall.Function as IdentifierNode;
                         }
                         else if (identList.RightNode is FunctionCallNode)
                         {
                             FunctionCallNode fCallNode = identList.RightNode as FunctionCallNode;
 
+
+                            ProtoCore.Utils.CoreUtils.CopyDebugData(identList.LeftNode, lhsIdent);
                             FunctionDotCallNode dotCall = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(identList.LeftNode, fCallNode, core);
                             dotCall.isLastSSAIdentListFactor = identList.isLastSSAIdentListFactor;
                             bnode.RightNode = dotCall;
+
+                            ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, lhsIdent);
+
+                            // Update the LHS of the next dotcall
+                            //      a = x.y.z
+                            //      t0 = x      
+                            //      t1 = t0.y   'y' is the lhs of the next dotcall (y.z)
+                            //      t2 = t1.z
+                            //      a = t2
+                            //
+                            Validity.Assert(fCallNode.Function is IdentifierNode);
+                            lhsIdent = fCallNode.Function as IdentifierNode;
                         }
                         else
                         {
@@ -3098,6 +3164,7 @@ namespace ProtoAssociative
                 //Right node
                 bnode.RightNode = exprList;
                 bnode.isSSAAssignment = true;
+                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 astlist.Add(bnode);
                 ssaStack.Push(bnode);
@@ -3128,6 +3195,7 @@ namespace ProtoAssociative
                 //Right node
                 bnode.RightNode = ilnode;
                 bnode.isSSAAssignment = true;
+                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 astlist.Add(bnode);
                 ssaStack.Push(bnode);
@@ -3161,6 +3229,7 @@ namespace ProtoAssociative
                 //Right node
                 bnode.RightNode = rangeNode;
                 bnode.isSSAAssignment = true;
+                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 astlist.Add(bnode);
                 ssaStack.Push(bnode);
@@ -3187,6 +3256,7 @@ namespace ProtoAssociative
                         AssociativeNode groupExprBinaryStmt = ssaStack.Pop();
                         Validity.Assert(groupExprBinaryStmt is BinaryExpressionNode);
                         bnode.RightNode = (groupExprBinaryStmt as BinaryExpressionNode).LeftNode;
+                        //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                         bnode.isSSAAssignment = true;
 
@@ -3413,6 +3483,7 @@ namespace ProtoAssociative
                                             BinaryExpressionNode bnode = aNode as BinaryExpressionNode;
                                             bnode.exprUID = core.ExpressionUID;
                                             bnode.modBlkUID = core.ModifierBlockUID;
+                                            ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, modstackNode);
                                         }
 
                                         modStackNewElements.AddRange(elementList);
@@ -6237,9 +6308,10 @@ namespace ProtoAssociative
                             name = ident.Value;
                         }
                         ci = core.ClassTable.IndexOf(name);
-
                         NodeUtils.SetNodeStartLocation(bnode, fnode.DotCall);
+                        //NodeUtils.SetNodeStartLocation(bnode, fnode);
                     }
+
                     // Check if the right node of the modifierNode is a FunctionCall node
                     else if (bnode.RightNode is FunctionCallNode && ci != Constants.kInvalidIndex)
                     {
