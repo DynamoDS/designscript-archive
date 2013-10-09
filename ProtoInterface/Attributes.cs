@@ -212,4 +212,11 @@ namespace Autodesk.DesignScript.Runtime
     {
         public bool RequireTracing { get; set; }
     }
+
+    /// <summary>
+    /// This attribute can be applied to methods that register callsite with
+    /// trace mechanism.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class RegisterForTraceAttribute: Attribute { }
 }
