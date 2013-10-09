@@ -1732,7 +1732,10 @@ namespace ProtoAssociative
 
                         if (null != graphNode)
                         {
-                            graphNode.updatedArguments.Add(argNodeRef);
+                            if (argNodeRef.nodeList.Count > 0)
+                            {
+                                graphNode.updatedArguments.Add(argNodeRef);
+                            }
                         }
                     }
 
@@ -2077,7 +2080,10 @@ namespace ProtoAssociative
 
                         if (null != graphNode)
                         {
-                            graphNode.updatedArguments.Add(argNodeRef);
+                            if (argNodeRef.nodeList.Count > 0)
+                            {
+                                graphNode.updatedArguments.Add(argNodeRef);
+                            }
                         }
                     }
 
