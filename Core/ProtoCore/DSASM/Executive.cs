@@ -7433,20 +7433,24 @@ namespace ProtoCore.DSASM
                 int currentScopeClass = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexClass).opdata;
                 int currentScopeFunction = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunction).opdata;
 
-                // Since there are execution states retrieved from the stack frame,
-                // this means that we must be returning to a function and not the global scope
-                Validity.Assert(currentScopeFunction != ProtoCore.DSASM.Constants.kGlobalScope); 
-
-                // Get the instruction stream where the current function resides in
-                StackValue svCurrentFunctionBlockDecl = rmem.GetAtRelative(rmem.GetStackIndex(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionBlock));
-                Validity.Assert(svCurrentFunctionBlockDecl.optype == AddressType.BlockIndex);
-                AssociativeGraph.DependencyGraph depgraph = exe.instrStreamList[(int)svCurrentFunctionBlockDecl.opdata].dependencyGraph;
-
-                List<AssociativeGraph.GraphNode> graphNodesInScope = depgraph.GetGraphNodesAtScope(currentScopeClass, currentScopeFunction);
-                Validity.Assert(execStateRestore.Count == graphNodesInScope.Count);
-                for (int n = 0; n < execStateRestore.Count; ++n)
+                bool isReturningFromRecursiveCall = procNode.procId == currentScopeFunction;
+                if (isReturningFromRecursiveCall)
                 {
-                    graphNodesInScope[n].isDirty = execStateRestore[n];
+                    // Since there are execution states retrieved from the stack frame,
+                    // this means that we must be returning to a function and not the global scope
+                    Validity.Assert(currentScopeFunction != ProtoCore.DSASM.Constants.kGlobalScope);
+
+                    // Get the instruction stream where the current function resides in
+                    StackValue svCurrentFunctionBlockDecl = rmem.GetAtRelative(rmem.GetStackIndex(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionBlock));
+                    Validity.Assert(svCurrentFunctionBlockDecl.optype == AddressType.BlockIndex);
+                    AssociativeGraph.DependencyGraph depgraph = exe.instrStreamList[(int)svCurrentFunctionBlockDecl.opdata].dependencyGraph;
+
+                    List<AssociativeGraph.GraphNode> graphNodesInScope = depgraph.GetGraphNodesAtScope(currentScopeClass, currentScopeFunction);
+                    Validity.Assert(execStateRestore.Count == graphNodesInScope.Count);
+                    for (int n = 0; n < execStateRestore.Count; ++n)
+                    {
+                        graphNodesInScope[n].isDirty = execStateRestore[n];
+                    }
                 }
             }
 
