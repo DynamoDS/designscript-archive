@@ -8,7 +8,7 @@ namespace ProtoTest.TD.Associative
     public class Assignment
     {
         public TestFrameWork thisTest = new TestFrameWork();
-        string testPath = "..\\..\\..\\Scripts\\TD\\Associative\\Assignment\\";
+        string testPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void Setup()
         {

@@ -4,10 +4,10 @@ using ProtoCore.DSASM.Mirror;
 using ProtoTestFx.TD;
 namespace ProtoTest.TD.MultiLangTests
 {
-    class Builtin_Functions
+    public class Builtin_Functions
     {
         public TestFrameWork thisTest = new TestFrameWork();
-        string testPath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Builtin_Functions\\";
+        string testPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void Setup()
         {

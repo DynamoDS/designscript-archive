@@ -358,7 +358,7 @@ str = a +b;";
             string code = @"a = ""a"";
 b = ""b"";
 r = a>b? a:b;
-r1 = a==b? ""Equal"":""!Equal"";"";";
+r1 = a==b? ""Equal"":""!Equal"";";
             thisTest.VerifyRunScriptSource(code, errmsg);
             Object[] v1 = new Object[] { "hello", "world" };
             thisTest.Verify("r", "b");

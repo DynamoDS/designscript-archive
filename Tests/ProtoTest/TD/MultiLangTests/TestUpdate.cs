@@ -5,12 +5,12 @@ using ProtoCore.DSASM.Mirror;
 using ProtoTestFx.TD;
 namespace ProtoTest.TD.MultiLangTests
 {
-    class TestUpdate
+    public class TestUpdate
     {
         readonly TestFrameWork thisTest = new TestFrameWork();
         ProtoCore.Core core;
         ProtoScript.Config.RunConfiguration runnerConfig;
-        string testPath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Update\\";
+        string testPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         ProtoScript.Runners.DebugRunner fsr;
         [SetUp]
         public void SetUp()
@@ -2368,7 +2368,7 @@ a =
 b = 0.0..a[0]..0.5;
 	
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
             Object[] v1 = new Object[] { };
             Object[] v2 = new Object[] { 0.1 };
             Object[] v3 = new Object[] { 1, 3, 5, 7, 9 };
@@ -2395,7 +2395,7 @@ a2 = 2;
 a = x > 2 ? a1: a2;
 a1 = 3;
 a2 = 4;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
             //Assert.Fail("1467191 - Sprint24: rev 3185 : REGRESSION: update on inline condition is not happening as expected");
 
             thisTest.Verify("a", 3);
@@ -2406,16 +2406,16 @@ a2 = 4;";
         public void T28_Update_With_Inline_Condition_2()
         {
             string errmsg = "";// "1467191 - Sprint24: rev 3185 : REGRESSION: update on inline condition is not happening as expected";
-            string code = @"a = {
-		  1 => a1;
-		  a1 + b1 => a2;		  		  
-    };
-b1 = 2;	
-  
-	  
-	
+            string code = @"x = 3;
+a1 = { 1, 2};
+a2 = 3;
+a = x > 2 ? a2: a1;
+
+a2 = 5;
+x = 1;
+a1[0] = 0;
 ";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, testPath);
             Object[] v1 = new Object[] { 0, 2 };
             thisTest.Verify("a", v1);
         }
@@ -4457,7 +4457,7 @@ i = 0;
         {
             String code = @"a = 1;b = 0;    b = a;[Imperative]{    [Associative]    {        a = b;    }}";
             string errmsg = "";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, testPath);
             thisTest.Verify("a", 1);
         }
 
@@ -4960,7 +4960,7 @@ i = 5;
         i = i + 1; // increment i
     }
 }";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
             thisTest.Verify("totalLength", 8.0);
         }
 

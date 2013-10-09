@@ -4309,6 +4309,7 @@ static def execute(b : A)
 arr = {A.A()};
 v = A.execute(arr);
 val = v[0];";
+
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("val", 100);
         }
@@ -4360,15 +4361,21 @@ v = A.execute(arr);
             string str = "DNL-1467475 Regression : Dot Operation using Replication on heterogenous array of instances is yielding wrong output";
             string code = @"class A
 {
-static def execute(b : A)
- { 
-  return = 100; 
- }
+	def execute()
+	{ 
+	  return = 100; 
+	}
 }
-arr = {A.A(), null, 3};
-v = A.execute(arr);
+class B extends A
+{
+	
+}
+
+arr = {B.B(), null, 3};
+v = arr.execute();
+
 ";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, str);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, str, testPath);
             Object n1 = null;
             thisTest.Verify("v", new Object[] { 100, n1, n1 });
         }

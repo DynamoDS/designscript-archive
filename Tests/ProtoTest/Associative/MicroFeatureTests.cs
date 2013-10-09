@@ -8,7 +8,7 @@ using ProtoTest.TD;
 using ProtoTestFx.TD;
 namespace ProtoTest.Associative
 {
-    class MicroFeatureTests
+    public class MicroFeatureTests
     {
         public TestFrameWork thisTest = new TestFrameWork();
         readonly string testCasePath = Path.GetFullPath(@"..\..\..\Scripts\Associative\MicroFeatureTests\");
@@ -1974,7 +1974,17 @@ a2 = Flatten(a);";
         [Test]
         public void TestStringConcatenation01()
         {
-            string src = @"";
+            string src = @"s1='a';
+s2=""bcd"";
+s3=s1+s2;
+
+s4=""abc"";
+s5='d';
+s6=s4+s5;
+
+s7=""ab"";
+s8=""cd"";
+s9=s7+s8;";
             ExecutionMirror mirror = thisTest.RunScriptSource(src);
             thisTest.Verify("s3", "abcd");
             thisTest.Verify("s6", "abcd");

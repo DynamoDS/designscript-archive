@@ -9,7 +9,7 @@ namespace ProtoTest.TD.MultiLangTests
     {
         public ProtoCore.Core core;
         public TestFrameWork thisTest = new TestFrameWork();
-        string testPath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Function\\";
+        string testPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         ProtoScript.Config.RunConfiguration runnerConfig;
         ProtoScript.Runners.DebugRunner fsr;
 
@@ -154,6 +154,40 @@ b = 3.5;
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 2);
             Assert.IsTrue((Int64)mirror.GetValue("b").Payload == 2);
+        }
+
+        [Test]
+        [Category("Smoke Test")]
+        public void T06_Function_Imp_Inside_Assoc()
+        {
+            string code = @"
+a;b;
+[Associative]
+{
+	def foo : int( a:int, b : int )
+	{
+		return = a * b;
+	}
+	a = 3.5;
+	b = 3.5;
+
+	[Imperative]
+	{
+		a = foo( 2, 1 );
+	}
+	b = 
+	[Imperative]
+	{
+		c = foo( 2, 1 );
+		return = c;
+	}
+}
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 2);
+            Assert.IsTrue((Int64)mirror.GetValue("b").Payload == 2);
+
         }
 
         [Test]
