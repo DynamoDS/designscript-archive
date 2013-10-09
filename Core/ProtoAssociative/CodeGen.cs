@@ -3031,18 +3031,22 @@ namespace ProtoAssociative
                 //
 
                 IdentifierNode lhsIdent = null;
-
                 if (firstBNode.RightNode is IdentifierNode)
                 {
+                    // In this case the rhs of the ident list is an ident
+                    // Get the ident name
                     lhsIdent = (firstBNode.RightNode as IdentifierNode);
                 }
                 else if(firstBNode.RightNode is FunctionCallNode)
                 {
+                    // In this case the rhs of the ident list is a function
+                    // Get the function name
                     lhsIdent = (firstBNode.RightNode as FunctionCallNode).Function as IdentifierNode;
                 }   
                 else
                 {
-                    lhsIdent = firstBNode.RightNode;
+
+                    lhsIdent = null;
                 }
 
                 // Get the first pointer name

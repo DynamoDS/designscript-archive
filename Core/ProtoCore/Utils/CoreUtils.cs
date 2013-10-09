@@ -785,12 +785,13 @@ namespace ProtoCore.Utils
 
         public static void CopyDebugData(ProtoCore.AST.Node nodeTo, ProtoCore.AST.Node nodeFrom)
         {
-            Validity.Assert(null != nodeTo);
-            Validity.Assert(null != nodeFrom);
-            nodeTo.col = nodeFrom.col;
-            nodeTo.endCol = nodeFrom.endCol;
-            nodeTo.endLine = nodeFrom.endLine;
-            nodeTo.line = nodeFrom.line;
+            if (null != nodeTo && null != nodeFrom)
+            {
+                nodeTo.col = nodeFrom.col;
+                nodeTo.endCol = nodeFrom.endCol;
+                nodeTo.endLine = nodeFrom.endLine;
+                nodeTo.line = nodeFrom.line;
+            }
         }
     }
 }
