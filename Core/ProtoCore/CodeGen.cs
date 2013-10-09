@@ -2791,13 +2791,18 @@ namespace ProtoCore
             {
                 ProtoCore.AST.AssociativeAST.IdentifierListNode identList = node as ProtoCore.AST.AssociativeAST.IdentifierListNode;
                 Validity.Assert(identList.LeftNode is ProtoCore.AST.AssociativeAST.IdentifierNode);
-                Validity.Assert(!string.IsNullOrEmpty(staticClass));
-                identList.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode(staticClass);
 
-                staticClass = null;
-                resolveStatic = false;
+                ProtoCore.AST.AssociativeAST.IdentifierNode leftNode = identList.LeftNode as ProtoCore.AST.AssociativeAST.IdentifierNode;
+                if (leftNode.Name != ProtoCore.DSDefinitions.Keyword.This)
+                {
+                    Validity.Assert(!string.IsNullOrEmpty(staticClass));
+                    identList.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode(staticClass);
 
-                ssaPointerList.Clear();
+                    staticClass = null;
+                    resolveStatic = false;
+
+                    ssaPointerList.Clear();
+                }
             }
 
             BuildSSADependency(node, graphNode);

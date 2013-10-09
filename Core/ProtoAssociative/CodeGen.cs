@@ -2398,9 +2398,30 @@ namespace ProtoAssociative
                 }
                 else if (identList.RightNode is FunctionCallNode)
                 {
-                    FunctionCallNode fCallNode = identList.RightNode as FunctionCallNode;
-                    arrayDimension = fCallNode.ArrayDimensions;
-                    rnode = fCallNode;
+                    FunctionCallNode fcNode = identList.RightNode as FunctionCallNode;
+                    arrayDimension = fcNode.ArrayDimensions;
+
+                    for (int idx = 0; idx < fcNode.FormalArguments.Count; idx++)
+                    {
+                        AssociativeNode arg = fcNode.FormalArguments[idx];
+                        DFSEmitSSA_AST(arg, ssaStack, ref astlist);
+                        AssociativeNode argNode = ssaStack.Pop();
+
+                        if (argNode is BinaryExpressionNode)
+                        {
+                            BinaryExpressionNode argBinaryExpr = argNode as BinaryExpressionNode;
+                            (argBinaryExpr.LeftNode as IdentifierNode).ReplicationGuides = GetReplicationGuidesFromASTNode(arg);
+
+                            fcNode.FormalArguments[idx] = argBinaryExpr.LeftNode;
+                        }
+                        else
+                        {
+                            fcNode.FormalArguments[idx] = argNode;
+                        }
+                    }
+
+
+                    rnode = fcNode;
                 }
                 else
                 {
