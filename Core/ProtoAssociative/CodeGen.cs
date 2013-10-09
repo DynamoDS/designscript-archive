@@ -7369,25 +7369,28 @@ namespace ProtoAssociative
                                 //      i = %t4
                                 //
                                 
-                                // Get the SSA first pointer associated with this argument
-                                string ssaTemp = graphNode.updatedArguments[n].nodeList[0].symbol.name;
-                                if (ssaTempToFirstPointerMap.ContainsKey(ssaTemp))
+                                // Get the modified property name 
+                                string argname = graphNode.updatedArguments[n].nodeList[0].symbol.name;
+                                if (ProtoCore.Utils.CoreUtils.IsSSATemp(argname) && ssaTempToFirstPointerMap.ContainsKey(argname))
                                 {
-                                    string firstPtr = ssaTempToFirstPointerMap[ssaTemp];
-                                    bool isAccessible = false;
-                                    SymbolNode symbol = null;
-                                    bool isAllocated = VerifyAllocation(firstPtr, globalClassIndex, globalProcIndex, out symbol, out isAccessible);
-                                    if (isAllocated)
-                                    {
-                                        ProtoCore.AssociativeGraph.UpdateNode updateNode = new UpdateNode();
-                                        updateNode.symbol = symbol;
-                                        updateNode.nodeType = ProtoCore.AssociativeGraph.UpdateNodeType.kSymbol;
-
-                                        ProtoCore.AssociativeGraph.UpdateNodeRef argNodeRef = new ProtoCore.AssociativeGraph.UpdateNodeRef();
-                                        argNodeRef.PushUpdateNode(updateNode);
-                                        graphNode.updateNodeRefList.Add(argNodeRef);
-                                    }
+                                    // The property is an SSA temp, Get the SSA first pointer associated with this temp
+                                    argname = ssaTempToFirstPointerMap[argname];
                                 }
+
+                                bool isAccessible = false;
+                                SymbolNode symbol = null;
+                                bool isAllocated = VerifyAllocation(argname, globalClassIndex, globalProcIndex, out symbol, out isAccessible);
+                                if (isAllocated)
+                                {
+                                    ProtoCore.AssociativeGraph.UpdateNode updateNode = new UpdateNode();
+                                    updateNode.symbol = symbol;
+                                    updateNode.nodeType = ProtoCore.AssociativeGraph.UpdateNodeType.kSymbol;
+
+                                    ProtoCore.AssociativeGraph.UpdateNodeRef argNodeRef = new ProtoCore.AssociativeGraph.UpdateNodeRef();
+                                    argNodeRef.PushUpdateNode(updateNode);
+                                    graphNode.updateNodeRefList.Add(argNodeRef);
+                                }
+                                
                             }
                             else
                             {
