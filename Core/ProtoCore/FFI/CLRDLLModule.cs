@@ -516,18 +516,6 @@ namespace ProtoFFI
             return true;
         }
 
-        private bool AllowsRankReduction(MethodInfo method)
-        {
-            object[] atts = method.GetCustomAttributes(false);
-            foreach (var item in atts)
-            {
-                if (item is AllowRankReductionAttribute)
-                    return true;
-            }
-
-            return false;
-        }
-
         private ProtoCore.AST.AssociativeAST.VarDeclNode ParseFieldDeclaration(FieldInfo f)
         {
             if (null == f || !IsBrowsable(f))
@@ -577,12 +565,14 @@ namespace ProtoFFI
             }
 
             //Need to hide property accessor from design script users, prefix with %
+            FFIMethodAttributes mattrs = new FFIMethodAttributes(method);
+
             string prefix = propaccessor ? "%" : "";
             ProtoCore.AST.AssociativeAST.FunctionDefinitionNode func = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
             func.Name = string.Format("{0}{1}", prefix, method.Name);
             func.Pattern = null;
             func.Singnature = ParseArgumentSignature(method);
-            if (retype.IsIndexable && AllowsRankReduction(method))
+            if (retype.IsIndexable && mattrs.AllowRankReduction)
                 retype.rank = -1;
             func.ReturnType = retype;
             func.FunctionBody = null;
@@ -591,6 +581,7 @@ namespace ProtoFFI
             func.IsExternLib = true;
             func.ExternLibName = Module.Name;
             func.IsStatic = method.IsStatic;
+            func.MethodAttributes = mattrs;
 
             return func;
         }
@@ -987,6 +978,40 @@ namespace ProtoFFI
         public override FFIObjectMarshler GetMarshaller(ProtoCore.Core core)
         {
             return CLRObjectMarshler.GetInstance(core);
+        }
+    }
+
+    public class FFIMethodAttributes
+    {
+        public bool AllowRankReduction { get; private set; }
+        public bool RequireTracing { get; private set; }
+        public Dictionary<string, string> MutilReturnMap { get; private set; }
+
+        public FFIMethodAttributes(MethodInfo method)
+        {
+            MutilReturnMap = new Dictionary<string, string>();
+            if (method == null)
+            {
+                return;
+            }
+
+            object[] attrs = method.GetCustomAttributes(false);
+            foreach (var attr in attrs)
+            {
+                if (attr is AllowRankReductionAttribute)
+                {
+                    AllowRankReduction = true;
+                }
+                else if (attr is RuntimeRequirementAttribute)
+                {
+                    RequireTracing = (attr as RuntimeRequirementAttribute).RequireTracing;
+                }
+                else if (attr is MultiReturnAttribute)
+                {
+                    var nameTypePair = (attr as MultiReturnAttribute);
+                    MutilReturnMap.Add(nameTypePair.Name, nameTypePair.Type);
+                }
+            }
         }
     }
 }
