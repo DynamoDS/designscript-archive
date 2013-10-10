@@ -3102,6 +3102,7 @@ namespace ProtoAssociative
                 //=========================================================
                 
                 //for (int n = lastIndex; n >= 0; --n)
+                AssociativeNode prevNode = null;
                 for (int n = 0; n <= lastIndex; n++)
                 {
                     lastNode = astlist[n];
@@ -3113,12 +3114,6 @@ namespace ProtoAssociative
                     Validity.Assert(bnode.LeftNode is IdentifierNode);
                     string ssaTempName = (bnode.LeftNode as IdentifierNode).Name;
                     Validity.Assert(CoreUtils.IsSSATemp(ssaTempName));
-
-                    //// Associate the first pointer with each SSA temp
-                    //if (!ssaTempToFirstPointerMap.ContainsKey(ssaTempName))
-                    //{
-                    //    ssaTempToFirstPointerMap.Add(ssaTempName, firstPtrName);
-                    //}
 
 
                     if (bnode.RightNode is IdentifierListNode)
@@ -3139,9 +3134,17 @@ namespace ProtoAssociative
 
                             ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, lhsIdent);
 
-
+                            //
                             // Set the real lhs (first pointer) of this dot call
-                            dotCall.staticLHSIdent = firstPointer;
+                            // Do this only if the lhs of the ident list was an identifier
+                            //      A.b -> prev was 'A'. It is an identifier
+                            //      {A}.b -> prev was '{A}'. It is not an identifier
+                            //      A().b -> prev was 'A()'. It is not an identifier
+                            bool wasPreviousNodeAnIdentifier = prevNode is IdentifierNode;
+                            if (wasPreviousNodeAnIdentifier)
+                            {
+                                dotCall.staticLHSIdent = firstPointer;
+                            }
                             firstPointer = null;
 
                             // Update the LHS of the next dotcall
@@ -3186,12 +3189,7 @@ namespace ProtoAssociative
                             Validity.Assert(false);
                         }
                     }
-
-
-                    //if (bnode.isSSAFirstAssignment)
-                    //{
-                    //    break;
-                    //}
+                    prevNode = bnode.RightNode;
                 }
 
 
