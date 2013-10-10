@@ -2420,6 +2420,8 @@ namespace ProtoAssociative
                         {
                             fcNode.FormalArguments[idx] = argNode;
                         }
+                        astlist.AddRange(astlistArgs);
+                        astlistArgs.Clear();
                     }
 
                     astlist.AddRange(astlistArgs);
