@@ -2401,12 +2401,14 @@ namespace ProtoAssociative
                     FunctionCallNode fcNode = identList.RightNode as FunctionCallNode;
                     arrayDimension = fcNode.ArrayDimensions;
 
+                    List<AssociativeNode> astlistArgs = new List<AssociativeNode>();
                     for (int idx = 0; idx < fcNode.FormalArguments.Count; idx++)
                     {
                         AssociativeNode arg = fcNode.FormalArguments[idx];
-                        DFSEmitSSA_AST(arg, ssaStack, ref astlist);
-                        AssociativeNode argNode = ssaStack.Pop();
 
+                        DFSEmitSSA_AST(arg, ssaStack, ref astlistArgs);
+
+                        AssociativeNode argNode = ssaStack.Pop();
                         if (argNode is BinaryExpressionNode)
                         {
                             BinaryExpressionNode argBinaryExpr = argNode as BinaryExpressionNode;
@@ -2420,7 +2422,7 @@ namespace ProtoAssociative
                         }
                     }
 
-
+                    astlist.AddRange(astlistArgs);
                     rnode = fcNode;
                 }
                 else
@@ -2970,10 +2972,13 @@ namespace ProtoAssociative
                 {
                     fcNode = node as FunctionCallNode;
 
+
+                    List<AssociativeNode> astlistArgs = new List<AssociativeNode>();
+
                     for (int idx = 0; idx < fcNode.FormalArguments.Count; idx++)
                     {
                         AssociativeNode arg = fcNode.FormalArguments[idx];
-                        DFSEmitSSA_AST(arg, ssaStack, ref astlist);
+                        DFSEmitSSA_AST(arg, ssaStack, ref astlistArgs);
                         AssociativeNode argNode = ssaStack.Pop();
 
                         if (argNode is BinaryExpressionNode)
@@ -2988,6 +2993,9 @@ namespace ProtoAssociative
                         {
                             fcNode.FormalArguments[idx] = argNode;
                         }
+
+                        astlist.AddRange(astlistArgs);
+                        astlistArgs.Clear();
                     }
                 }
 
@@ -3076,6 +3084,8 @@ namespace ProtoAssociative
                     lhsIdent = null;
                 }
 
+                IdentifierNode firstPointer = lhsIdent;
+
                 // Get the first pointer name
                 //Validity.Assert(firstBNode.RightNode is IdentifierNode);
                 //string firstPtrName = (firstBNode.RightNode as IdentifierNode).Name;
@@ -3127,6 +3137,11 @@ namespace ProtoAssociative
 
                             ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, lhsIdent);
 
+
+                            // Set the real lhs (first pointer) of this dot call
+                            dotCall.staticLHSIdent = firstPointer;
+                            firstPointer = null;
+
                             // Update the LHS of the next dotcall
                             //      a = x.y.z
                             //      t0 = x      
@@ -3148,6 +3163,11 @@ namespace ProtoAssociative
                             bnode.RightNode = dotCall;
 
                             ProtoCore.Utils.CoreUtils.CopyDebugData(bnode, lhsIdent);
+
+                            // Set the real lhs (first pointer) of this dot call
+                            dotCall.staticLHSIdent = firstPointer;
+                            firstPointer = null;
+
 
                             // Update the LHS of the next dotcall
                             //      a = x.y.z
@@ -3902,6 +3922,7 @@ namespace ProtoAssociative
                     if (NodeUtils.IsReturnExpressionNode(node))
                         hasReturnStatement = true;
                 }
+
                 if (compilePass == ProtoCore.DSASM.AssociativeCompilePass.kGlobalScope && !hasReturnStatement)
                 {
                     EmitReturnNull();
@@ -6224,20 +6245,31 @@ namespace ProtoAssociative
                     }
                 }
 
-                if (resolveStatic)
+                //if (resolveStatic)
                 {
                     if (node is FunctionDotCallNode)
                     {
                         FunctionDotCallNode dotcall = node as FunctionDotCallNode;
                         Validity.Assert(null != dotcall.DotCall);
 
-                        Validity.Assert(!string.IsNullOrEmpty(staticClass));
-                        dotcall.DotCall.FormalArguments[0] = nodeBuilder.BuildIdentfier(staticClass);
+                        if (null != dotcall.staticLHSIdent)
+                        {
+                            
+                            //Validity.Assert(!string.IsNullOrEmpty(staticClass));
+                            //dotcall.DotCall.FormalArguments[0] = nodeBuilder.BuildIdentfier(staticClass);
 
-                        staticClass = null;
-                        resolveStatic = false;
+                            if (core.ClassTable.DoesExist(dotcall.staticLHSIdent.Name))
+                            {
+                                ssaPointerList.Clear();
 
-                        ssaPointerList.Clear();
+                                dotcall.DotCall.FormalArguments[0] = dotcall.staticLHSIdent;
+
+                                staticClass = null;
+                                resolveStatic = false;
+
+                                ssaPointerList.Clear();
+                            }
+                        }
                     }
                 }
             }
