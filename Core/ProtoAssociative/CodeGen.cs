@@ -4468,7 +4468,10 @@ namespace ProtoAssociative
                 {
                     ProtoCore.AssociativeGraph.GraphNode dependentNode = new ProtoCore.AssociativeGraph.GraphNode();
                     dependentNode.PushSymbolReference(symbolnode);
-                    graphNode.PushDependent(dependentNode);
+                    if (!ProtoCore.Utils.CoreUtils.IsPropertyTemp(symbolnode.name))
+                    {
+                        graphNode.PushDependent(dependentNode);
+                    }
                 }
 
                 bool emitReplicationGuideFlag = emitReplicationGuide;
