@@ -565,6 +565,12 @@ namespace ProtoCore.Utils
             return ssaVar.StartsWith(ProtoCore.DSASM.Constants.kSSATempPrefix);
         }
 
+        public static bool IsTempVarProperty(string varname)
+        {
+            Validity.Assert(null != varname);
+            Validity.Assert(varname.Length > 0);
+            return varname.StartsWith(ProtoCore.DSASM.Constants.kTempPropertyVar);
+        }
 
         public static bool IsCompilerGenerated(string varname)
         {
