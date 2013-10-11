@@ -3224,17 +3224,30 @@ namespace ProtoAssociative
             {
                 InlineConditionalNode ilnode = node as InlineConditionalNode;
 
-                DFSEmitSSA_AST(ilnode.ConditionExpression, ssaStack, ref astlist);
+                List<AssociativeNode> inlineExpressionASTList = new List<AssociativeNode>();
+
+                // Emit the boolean condition
+                DFSEmitSSA_AST(ilnode.ConditionExpression, ssaStack, ref inlineExpressionASTList);
                 AssociativeNode cexpr = ssaStack.Pop();
                 ilnode.ConditionExpression = cexpr is BinaryExpressionNode ? (cexpr as BinaryExpressionNode).LeftNode : cexpr;
+                astlist.AddRange(inlineExpressionASTList);
+                inlineExpressionASTList.Clear();
 
-                DFSEmitSSA_AST(ilnode.TrueExpression, ssaStack, ref astlist);
+
+                // Emit the True exprssion
+                DFSEmitSSA_AST(ilnode.TrueExpression, ssaStack, ref inlineExpressionASTList);
                 AssociativeNode trueExpr = ssaStack.Pop();
                 ilnode.TrueExpression = trueExpr is BinaryExpressionNode ? (trueExpr as BinaryExpressionNode).LeftNode : trueExpr;
+                astlist.AddRange(inlineExpressionASTList);
+                inlineExpressionASTList.Clear();
 
-                DFSEmitSSA_AST(ilnode.FalseExpression, ssaStack, ref astlist);
+
+                // Emit the True exprssion
+                DFSEmitSSA_AST(ilnode.FalseExpression, ssaStack, ref inlineExpressionASTList);
                 AssociativeNode falseExpr = ssaStack.Pop();
                 ilnode.FalseExpression = falseExpr is BinaryExpressionNode ? (falseExpr as BinaryExpressionNode).LeftNode : falseExpr;
+                astlist.AddRange(inlineExpressionASTList);
+                inlineExpressionASTList.Clear();
 
                 BinaryExpressionNode bnode = new BinaryExpressionNode();
                 bnode.Optr = ProtoCore.DSASM.Operator.assign;
