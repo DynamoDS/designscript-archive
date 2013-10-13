@@ -7788,9 +7788,9 @@ namespace ProtoAssociative
             if (!isTempExpression)
             {
                 // Only set startpc if isn't temporary assignment expression
-                if (core.Options.IsDeltaExecution)
+                /*if (core.Options.IsDeltaExecution)
                     graphNode.updateBlock.startpc = startpc;
-                else
+                else*/
                     graphNode.updateBlock.startpc = pc;
             }
 
