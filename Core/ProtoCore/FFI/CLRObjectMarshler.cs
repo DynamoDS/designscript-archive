@@ -138,6 +138,32 @@ namespace ProtoFFI
             return retVal;
         }
 
+        public static StackValue ConvertDictionaryToDSArray(FFIObjectMarshler marshaler, System.Collections.IDictionary dictionary, ProtoCore.Runtime.Context context, Interpreter dsi, ProtoCore.Type type)
+        {
+            var core = dsi.runtime.Core;
+
+            var array = dsi.runtime.rmem.BuildArray(new StackValue[] {});
+            HeapElement ho = ArrayUtils.GetHeapElement(array, core);
+            ho.Dict = new Dictionary<StackValue, StackValue>(new StackValueComparer(core));
+
+            foreach (var key in dictionary.Keys)
+            {
+                var value = dictionary[key];
+
+                ProtoCore.Type keyType = CLRObjectMarshler.GetProtoCoreType(key.GetType());
+                StackValue dsKey = marshaler.Marshal(key, context, dsi, keyType);
+                GCUtils.GCRetain(dsKey, core);
+
+                ProtoCore.Type valueType = CLRObjectMarshler.GetProtoCoreType(value.GetType());
+                StackValue dsValue = marshaler.Marshal(dictionary[key], context, dsi, valueType);
+                GCUtils.GCRetain(dsValue, core);
+                
+                ho.Dict[dsKey] = dsValue;
+            }
+
+            return array;
+        }
+
         #endregion
 
         #region DS_ARRAY_TO_CS_ARRAY
@@ -396,7 +422,12 @@ namespace ProtoFFI
             Type objType = obj.GetType();
             if (type.IsIndexable)
             {
-                if (obj is System.Collections.ICollection)
+                if (obj is System.Collections.IDictionary)
+                {
+                    System.Collections.IDictionary dict = obj as System.Collections.IDictionary;
+                    return PrimitiveMarshler.ConvertDictionaryToDSArray(this, dict, context, dsi, type);
+                }
+                else if (obj is System.Collections.ICollection)
                 {
                     System.Collections.ICollection collection = obj as System.Collections.ICollection;
                     object[] array = new object[collection.Count];
@@ -576,6 +607,11 @@ namespace ProtoFFI
                 protoCoreType.rank += type.GetArrayRank(); //set the rank.
                 protoCoreType.IsIndexable = true;
             }
+            else if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
+            {
+                protoCoreType.rank = Constants.kUndefinedRank;
+                protoCoreType.IsIndexable = true;
+            }
             else if (type.IsInterface && (typeof(ICollection).IsAssignableFrom(type) || typeof(IEnumerable).IsAssignableFrom(type)))
             {
                 protoCoreType.rank += 1;
@@ -624,7 +660,7 @@ namespace ProtoFFI
         /// <returns></returns>
         public static bool IsMarshaledAsNativeType(Type type)
         {
-            if (type.IsPrimitive || type.IsArray || type == typeof(string) || type == typeof(object) || type == typeof(void))
+            if (type.IsPrimitive || type.IsArray || typeof(System.Collections.IDictionary).IsAssignableFrom(type) || type == typeof(string) || type == typeof(object) || type == typeof(void))
                 return true;
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
                 return true;
