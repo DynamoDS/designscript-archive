@@ -2590,7 +2590,10 @@ namespace ProtoAssociative
 
             // Traverse the array index
             //      t1 = i
-            DFSEmitSSA_AST(arrayDimensions.Expr, ssaStack, ref astlist);
+            List<AssociativeNode> arrayDimASTList = new List<AssociativeNode>();
+            DFSEmitSSA_AST(arrayDimensions.Expr, ssaStack, ref arrayDimASTList);
+            astlist.AddRange(arrayDimASTList);
+            arrayDimASTList.Clear();
 
             //
             // Build the indexing statement
@@ -2658,7 +2661,9 @@ namespace ProtoAssociative
             //      [j]
             if (null != arrayDimensions.Type)
             {
-                DFSEmitSSA_AST(arrayDimensions.Type, ssaStack, ref astlist);
+                DFSEmitSSA_AST(arrayDimensions.Type, ssaStack, ref arrayDimASTList);
+                astlist.AddRange(arrayDimASTList);
+                arrayDimASTList.Clear();
             }
 #endregion
         }
