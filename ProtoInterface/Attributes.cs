@@ -184,4 +184,39 @@ namespace Autodesk.DesignScript.Runtime
             return false;
         }
     }
+
+    /// <summary>
+    /// This attribute can be applied to method which returns a dictionary. It
+    /// describles key and the corresponding DesignScript type of value, so that
+    /// DesignScript runtime can return values from dictionary.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public sealed class MultiReturnAttribute: Attribute
+    {
+        public string Name { get; set;}
+        public string Type { get; set;}
+
+        public MultiReturnAttribute(string name, string type)
+        {
+            Name = name;
+            Type = type;
+        }
+    }
+
+    /// <summary>
+    /// This attribute can be applied to method which requires some runtime 
+    /// support from DesignScript, e.g., tracing. 
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class RuntimeRequirementAttribute: Attribute
+    {
+        public bool RequireTracing { get; set; }
+    }
+
+    /// <summary>
+    /// This attribute can be applied to methods that register callsite with
+    /// trace mechanism.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class RegisterForTraceAttribute: Attribute { }
 }
