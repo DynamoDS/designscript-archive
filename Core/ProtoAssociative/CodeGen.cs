@@ -2579,6 +2579,13 @@ namespace ProtoAssociative
 
                 bnode.isSSAPointerAssignment = true;
             }
+            else if (node is GroupExpressionNode)
+            {
+                GroupExpressionNode groupExpr = node as GroupExpressionNode;
+                DFSEmitSSA_AST(groupExpr.Expression, ssaStack, ref astlist);
+
+                arrayDimensions = groupExpr.ArrayDimensions;
+            }
             else
             {
                 Validity.Assert(false);
@@ -3317,7 +3324,6 @@ namespace ProtoAssociative
                     {
                         DFSEmitSSA_AST(groupExpr.Expression, ssaStack, ref astlist);
 
-
                         BinaryExpressionNode bnode = new BinaryExpressionNode();
                         bnode.Optr = ProtoCore.DSASM.Operator.assign;
 
@@ -3330,7 +3336,6 @@ namespace ProtoAssociative
                         AssociativeNode groupExprBinaryStmt = ssaStack.Pop();
                         Validity.Assert(groupExprBinaryStmt is BinaryExpressionNode);
                         bnode.RightNode = (groupExprBinaryStmt as BinaryExpressionNode).LeftNode;
-                        //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                         bnode.isSSAAssignment = true;
 
