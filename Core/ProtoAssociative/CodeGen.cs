@@ -3205,7 +3205,12 @@ namespace ProtoAssociative
                 ExprListNode exprList = node as ExprListNode;
                 for (int n = 0; n < exprList.list.Count; n++)
                 {
-                    DFSEmitSSA_AST(exprList.list[n], ssaStack, ref astlist);
+                    List<AssociativeNode> currentElementASTList = new List<AssociativeNode>();
+                    DFSEmitSSA_AST(exprList.list[n], ssaStack, ref currentElementASTList);
+
+                    astlist.AddRange(currentElementASTList);
+                    currentElementASTList.Clear();
+
                     AssociativeNode argNode = ssaStack.Pop();
                     exprList.list[n] = argNode is BinaryExpressionNode ? (argNode as BinaryExpressionNode).LeftNode : argNode;
                 }
