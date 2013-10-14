@@ -1653,7 +1653,14 @@ namespace ProtoCore.DSASM
 
             if (Properties.executingGraphNode != null)
             {
+                // Remove this condition when full SSA is enabled
                 bool isssa = (!Properties.executingGraphNode.IsSSANode() && Properties.executingGraphNode.DependsOnTempSSA());
+
+                if (core.Options.FullSSA)
+                {
+                    isssa = Properties.executingGraphNode.IsSSANode();
+                }
+
                 if (!isssa)
                 {
                     for (int n = 0; n < istream.dependencyGraph.GraphList.Count; ++n)
@@ -2072,6 +2079,7 @@ namespace ProtoCore.DSASM
                 {
                     return;
                 }
+                
             }
 
             //if (executingNode.dependentList.Count > 0)

@@ -4900,12 +4900,12 @@ i = 0;
         [Category("SmokeTest")]
         public void T86_variableupdate()
         {
-            String code = @"             x = 1;             a = x;             b = a;             a = a + 1;              x = 3;            ";
+            String code = @"             x = 1;             a = x;             b = a;             a = a + 1; // Redefinition 'a' no longer depends on 'x'             x = 3;            ";
             string errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
             thisTest.Verify("x", 3);
-            thisTest.Verify("a", 4);
-            thisTest.Verify("b", 4);
+            thisTest.Verify("a", 2);
+            thisTest.Verify("b", 2);
         }
 
         [Test]

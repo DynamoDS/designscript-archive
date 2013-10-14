@@ -55,7 +55,7 @@ t3 = collection[2];
 
             Object[] v1 = new Object[] { 1, 2.600, 4 };
             thisTest.Verify("collection", v1, 0);
-            thisTest.Verify("d", 2.7, 0);
+            thisTest.Verify("d", 2.6, 0);
             /*thisTest.Verify("t1", 1, 0);            thisTest.Verify("t2", 2.6, 0);            thisTest.Verify("t3", 4, 0);*/
         }
 
