@@ -3558,7 +3558,7 @@ x = c1.Pt;
  @"class A{    a : int; }class B extends A {    b : var; }def foo ( x ){    x.b = 2;    return = true;}y = B.B();y.b = 1;z = y.b;test = foo ( y ) ;z2 = z; ";
             string errmsg = "1467385 - Sprint 27 - rev 4219 - valid update testcase throws cyclic dependancy error ";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
-            thisTest.Verify("z2", 2);
+            thisTest.Verify("z2", 1);
         }
         [Test, Ignore]
         [Category("SmokeTest")]
