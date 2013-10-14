@@ -3240,7 +3240,7 @@ b;
 ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             Object n1 = null;
-            thisTest.Verify("a", n1);
+            thisTest.Verify("a", 4);
             thisTest.Verify("b", 3);
         }
 
@@ -3555,7 +3555,7 @@ x = c1.Pt;
         public void T50_Defect_1466076()
         {
             String code =
- @"class A{    a : int; }class B extends A {    b : var; }def foo ( x ){    x.b = 2;    return = true;}y = B.B();y.b = 1;z = y.b;test = foo ( y ) ;z2 = z; // expected 2; received 1";
+ @"class A{    a : int; }class B extends A {    b : var; }def foo ( x ){    x.b = 2;    return = true;}y = B.B();y.b = 1;z = y.b;test = foo ( y ) ;z2 = z; ";
             string errmsg = "1467385 - Sprint 27 - rev 4219 - valid update testcase throws cyclic dependancy error ";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
             thisTest.Verify("z2", 2);
