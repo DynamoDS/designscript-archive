@@ -1625,7 +1625,14 @@ namespace ProtoCore.DSASM
                     int exprUID = node.exprUID;
                     int modBlkId = node.modBlkUID;
                     bool isSSAAssign = node.IsSSANode();
-                    UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, node, true);
+                    if (core.Options.FullSSA)
+                    {
+                        UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, node.lastGraphNode, true);
+                    }
+                    else
+                    {
+                        UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, node, true);
+                    }
                     node.propertyChanged = false;
                 }
             }
@@ -1634,7 +1641,13 @@ namespace ProtoCore.DSASM
 
         private void UpdateGraph(int exprUID, int modBlkId, bool isSSAAssign)
         {
-            UpdatePropertyChangedGraphNode();
+            if (null != Properties.executingGraphNode)
+            {
+                if (!Properties.executingGraphNode.IsSSANode())
+                {
+                    UpdatePropertyChangedGraphNode();
+                }
+            }
 
             UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, Properties.executingGraphNode);
 
@@ -1880,6 +1893,13 @@ namespace ProtoCore.DSASM
                 if (core.Options.FullSSA)
                 {
                     allowUpdateWithinSSA = true;
+
+                    // Do not update if its a property change and the current graphnode is the same expression
+                    if (propertyChanged && graphNode.exprUID == Properties.executingGraphNode.exprUID)
+                    {
+                        continue;
+                    }
+                    
                 }
                 else
                 {
@@ -1887,6 +1907,7 @@ namespace ProtoCore.DSASM
                     bool withinSSAStatement = graphNode.UID == executingGraphNode.UID;
                     allowUpdateWithinSSA = !withinSSAStatement;
                 }
+
 
                 if (!allowUpdateWithinSSA || (propertyChanged && graphNode == Properties.executingGraphNode))
                 {

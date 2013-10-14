@@ -8547,6 +8547,27 @@ namespace ProtoAssociative
                         }
                     }
 
+
+                    // Backtrack and assign the this last final assignment graphnode to its associated SSA graphnodes
+                    if (core.Options.FullSSA)
+                    {
+                        if (!graphNode.IsSSANode())
+                        {
+                            for (int n = codeBlock.instrStream.dependencyGraph.GraphList.Count - 1; n >= 0; --n)
+                            {
+                                GraphNode currentNode = codeBlock.instrStream.dependencyGraph.GraphList[n];
+                                if (currentNode.exprUID == graphNode.exprUID)
+                                {
+                                    codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode = graphNode;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     graphNode.ResolveLHSArrayIndex();
                     graphNode.updateBlock.endpc = pc - 1;
                     codeBlock.instrStream.dependencyGraph.Push(graphNode);
