@@ -6364,7 +6364,11 @@ namespace ProtoAssociative
         private void EmitModifierStackNode(AssociativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone)
         {
             if (!IsParsingGlobal() && !IsParsingGlobalFunctionBody() && !IsParsingMemberFunctionBody())
+            {
                 return;
+            }
+
+            AssociativeNode prevElement = null;
 
             //core.Options.EmitBreakpoints = false;
             ModifierStackNode m = node as ModifierStackNode;
@@ -6374,13 +6378,21 @@ namespace ProtoAssociative
             {
                 bool emitBreakpointForPop = false;
                 AssociativeNode modifierNode = m.ElementNodes[i];
+
                 
                 // Convert Function call nodes into function dot call nodes 
                 if (modifierNode is BinaryExpressionNode)
                 {
                     BinaryExpressionNode bnode = modifierNode as BinaryExpressionNode;
                     if (bnode.LeftNode.Name.StartsWith(ProtoCore.DSASM.Constants.kTempModifierStateNamePrefix))
+                    {
                         emitBreakpointForPop = true;
+                    }
+
+                    if (!ProtoCore.Utils.CoreUtils.IsSSATemp(bnode.LeftNode.Name))
+                    {
+                        prevElement = bnode;
+                    }
 
                     // Get class index from function call node if it is constructor call
                     if (bnode.RightNode is FunctionDotCallNode)
@@ -6420,7 +6432,18 @@ namespace ProtoAssociative
                             if (procCallNode != null)
                             {
                                 ////////////////////////////////                        
-                                BinaryExpressionNode previousElementNode = m.ElementNodes[i - 1] as BinaryExpressionNode;
+                                BinaryExpressionNode previousElementNode = null;
+                                if (core.Options.FullSSA)
+                                {
+                                    Validity.Assert(null != prevElement && prevElement is BinaryExpressionNode);
+                                    previousElementNode = prevElement as BinaryExpressionNode; 
+                                }
+                                else
+                                {
+                                    previousElementNode = m.ElementNodes[i - 1] as BinaryExpressionNode;
+                                }
+                                Validity.Assert(null != previousElementNode);
+
                                 AssociativeNode lhs = previousElementNode.LeftNode;
                                 bnode.RightNode = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(lhs, rnode, core);
 
