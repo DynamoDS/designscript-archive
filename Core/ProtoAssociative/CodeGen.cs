@@ -6392,9 +6392,18 @@ namespace ProtoAssociative
                         {
                             name = ident.Value;
                         }
+
+                        if (core.Options.FullSSA)
+                        {
+                            // For SSA'd ident lists, the lhs (class name) is stored in fnode.staticLHSIdent
+                            if (null != fnode.staticLHSIdent)
+                            {
+                                name = fnode.staticLHSIdent.Name;
+                            }
+                        }
+
                         ci = core.ClassTable.IndexOf(name);
                         NodeUtils.SetNodeStartLocation(bnode, fnode.DotCall);
-                        //NodeUtils.SetNodeStartLocation(bnode, fnode);
                     }
 
                     // Check if the right node of the modifierNode is a FunctionCall node
