@@ -148,6 +148,7 @@ namespace ProtoCore.AssociativeGraph
         public bool propertyChanged { get; set; }       // The property of ffi object that created in this graph node is changed
         public bool forPropertyChanged { get; set; }    // The graph node is marked as dirty because of property changed event
 
+        public GraphNode lastGraphNode { get; set; }    // This is the last graphnode of an SSA'd statement
 
         public List<ProtoCore.AssociativeGraph.UpdateNodeRef> updatedArguments { get; set; }
 
@@ -186,6 +187,7 @@ namespace ProtoCore.AssociativeGraph
             updateDimensions = new List<StackValue>();
             propertyChanged = false;
             forPropertyChanged = false;
+            lastGraphNode = null;
 
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
             ArrayPointer = ProtoCore.DSASM.StackUtils.BuildNull();
