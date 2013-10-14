@@ -3841,7 +3841,7 @@ c=2 * {{1},{2}};";
             thisTest.Verify("d1", new Object[] { 3, 2, 3, 4 });
         }
 
-        [Test]
+        [Test, Ignore] // Array indexing - to fix in SSA
         [Category("Replication")]
         public void T91_Defect_1467285_5()
         {

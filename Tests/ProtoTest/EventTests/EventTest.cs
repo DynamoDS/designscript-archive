@@ -181,10 +181,10 @@ namespace ProtoTest.EventTests
         public void RunPropertyChangedNegative()
         {
             string code =
-@"import (Foo from ""ProtoTest.dll"");foo = Foo.GetInstance();              foo.ID = 17;id = foo.ID;id = bar.ID; // This will NOT re-execute after 'Foo.SetID(foo, 41)' because it has already been marked cleanFoo.SetID(foo, 41);               ";
+@"import (Foo from ""ProtoTest.dll"");foo = Foo.GetInstance();              foo.ID = 17;id = foo.ID;id = bar.ID;        // RedefinitionFoo.SetID(foo, 41);               ";
             var testRunner = new TestFrameWork();
             testRunner.RunScriptSource(code);
-            testRunner.Verify("id", 41);
+            testRunner.Verify("id", null);
         }
         class PropertyChangedVerifier
         {
