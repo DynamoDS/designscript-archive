@@ -288,6 +288,14 @@ namespace Autodesk.DesignScript.Geometry
             InitGeometry(persist);
         }
 
+        public static Geometry FromObject(long ptr)
+        {
+            IPersistentObject obj = HostFactory.PersistenceManager.FromObject(ptr);
+            Geometry geom = Geometry.ToGeometry(obj.Geometry);
+            geom.mPersistent = obj;
+            return geom;
+        }
+
         private void InitGeometry(bool persist)
         {
             mDisplayAttributes = null;
