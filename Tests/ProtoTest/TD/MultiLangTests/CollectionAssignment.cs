@@ -4164,7 +4164,7 @@ test = A.foo().x;
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("x", new object[] { 5, 6 });
+            thisTest.Verify("r", new object[] { 5, 6 });
 
         }
         [Test]
@@ -4180,7 +4180,7 @@ test = A.foo().x;
     i =0;
     while (i<5)
     {
-        a["" + i] = i;
+        a["""" + i] = i;
         i = i + 1;
     }
 }
@@ -4204,7 +4204,7 @@ r5 = a[""5""];
 
         }
         [Test]
-        public void T70_DictionaryImeperativeFor()
+        public void T71_DictionaryImeperativeFor()
         {
 
             String code =
@@ -4270,7 +4270,7 @@ r2 = a[1];
             });
         }*/
         [Test]
-        public void T70_Dictionarytypeconversion()
+        public void T72_Dictionarytypeconversion()
         {
 
             String code =
@@ -4286,12 +4286,12 @@ r2 = a[1];
                 return =a1;
             }
             z1 = foo(a, b);
+            x = z1[b];
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("r0", "x");
-            thisTest.Verify("r1", true);
-            thisTest.Verify("r2", 1);
+            thisTest.Verify("x", new object []{true,true});
+            
 
 
         }
