@@ -6284,11 +6284,12 @@ namespace ProtoAssociative
 
                         if (null != dotcall.staticLHSIdent)
                         {
-                            
-                            //Validity.Assert(!string.IsNullOrEmpty(staticClass));
-                            //dotcall.DotCall.FormalArguments[0] = nodeBuilder.BuildIdentfier(staticClass);
-
-                            if (core.ClassTable.DoesExist(dotcall.staticLHSIdent.Name))
+                            string identName = dotcall.staticLHSIdent.Name;
+                            ProtoCore.DSASM.SymbolNode symbolnode = null;
+                            bool isAccessible = false;
+                            bool isAllocatedVariable = VerifyAllocation(identName, globalClassIndex, globalProcIndex, out symbolnode, out isAccessible);
+                            bool isClassName = core.ClassTable.DoesExist(identName);
+                            if (isClassName && !isAllocatedVariable)
                             {
                                 ssaPointerList.Clear();
 
@@ -8043,7 +8044,11 @@ namespace ProtoAssociative
                         if (bnode.RightNode is IdentifierNode)
                         {
                             string identName = (bnode.RightNode as IdentifierNode).Name;
-                            if (core.ClassTable.DoesExist(identName))
+                            ProtoCore.DSASM.SymbolNode symbolnode = null;
+                            bool isAccessible = false;
+                            bool isAllocatedVariable = VerifyAllocation(identName, globalClassIndex, globalProcIndex, out symbolnode, out isAccessible);
+                            bool isClassName = core.ClassTable.DoesExist(identName);
+                            if (isClassName && !isAllocatedVariable)
                             {
                                 ssaPointerList.Clear();
                                 staticClass = identName;
