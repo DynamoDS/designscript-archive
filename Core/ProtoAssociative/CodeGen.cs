@@ -6286,20 +6286,38 @@ namespace ProtoAssociative
                         if (null != dotcall.staticLHSIdent)
                         {
                             string identName = dotcall.staticLHSIdent.Name;
-                            ProtoCore.DSASM.SymbolNode symbolnode = null;
-                            bool isAccessible = false;
-                            bool isAllocatedVariable = VerifyAllocation(identName, globalClassIndex, globalProcIndex, out symbolnode, out isAccessible);
                             bool isClassName = core.ClassTable.DoesExist(identName);
-                            if (isClassName && !isAllocatedVariable)
+                            if (isClassName)
                             {
-                                ssaPointerList.Clear();
+                                ProtoCore.DSASM.SymbolNode symbolnode = null;
+                                bool isAccessible = false;
+                                bool isLHSAllocatedVariable = VerifyAllocation(identName, globalClassIndex, globalProcIndex, out symbolnode, out isAccessible);
 
-                                dotcall.DotCall.FormalArguments[0] = dotcall.staticLHSIdent;
+                                bool isRHSConstructor = false;
+                                int classIndex = core.ClassTable.IndexOf(identName);
+                                if (classIndex != ProtoCore.DSASM.Constants.kInvalidIndex)
+                                {
 
-                                staticClass = null;
-                                resolveStatic = false;
+                                    string functionName = dotcall.FunctionCall.Function.Name;
+                                    ProcedureNode callNode = core.ClassTable.ClassNodes[classIndex].GetFirstMemberFunction(functionName);
+                                    if (null != callNode)
+                                    {
+                                        isRHSConstructor = callNode.isConstructor;
+                                    }
+                                }
 
-                                ssaPointerList.Clear();
+                                bool isFunctionCallOnAllocatedClassName = isLHSAllocatedVariable && !isRHSConstructor;
+                                if (!isFunctionCallOnAllocatedClassName || isRHSConstructor)
+                                {
+                                    ssaPointerList.Clear();
+
+                                    dotcall.DotCall.FormalArguments[0] = dotcall.staticLHSIdent;
+
+                                    staticClass = null;
+                                    resolveStatic = false;
+
+                                    ssaPointerList.Clear();
+                                }
                             }
                         }
                     }
@@ -8042,19 +8060,27 @@ namespace ProtoAssociative
                                end	
                            end
                         */
+
                         if (bnode.RightNode is IdentifierNode)
                         {
+                            // This is the first ssa statement of the transformed identifier list call
+                            // The rhs is either a pointer or a classname
                             string identName = (bnode.RightNode as IdentifierNode).Name;
-                            ProtoCore.DSASM.SymbolNode symbolnode = null;
-                            bool isAccessible = false;
-                            bool isAllocatedVariable = VerifyAllocation(identName, globalClassIndex, globalProcIndex, out symbolnode, out isAccessible);
                             bool isClassName = core.ClassTable.DoesExist(identName);
-                            if (isClassName && !isAllocatedVariable)
+                            if (isClassName)
                             {
-                                ssaPointerList.Clear();
-                                staticClass = identName;
-                                resolveStatic = true;
-                                return;
+                                ProtoCore.DSASM.SymbolNode symbolnode = null;
+                                bool isAccessible = false;
+                                bool isAllocatedVariable = VerifyAllocation(identName, globalClassIndex, globalProcIndex, out symbolnode, out isAccessible);
+
+                                // If the identifier is non-allocated then it is a constructor call
+                                if (!isAllocatedVariable)
+                                {
+                                    ssaPointerList.Clear();
+                                    staticClass = identName;
+                                    resolveStatic = true;
+                                    return;
+                                }
                             }
                         }
 
