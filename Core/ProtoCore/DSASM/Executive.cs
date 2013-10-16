@@ -2191,6 +2191,8 @@ namespace ProtoCore.DSASM
 
         private void XLangUpdateDependencyGraph(int currentLangBlock)
         {
+            int classScope = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexClass).opdata;
+            int functionScope = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunction).opdata;
             List<ProtoCore.AssociativeGraph.UpdateNodeRef> upadatedList = new List<AssociativeGraph.UpdateNodeRef>();
 
             // For every instruction list in the executable
@@ -2202,6 +2204,12 @@ namespace ProtoCore.DSASM
                     // For every graphnode in the dependency list
                     foreach (ProtoCore.AssociativeGraph.GraphNode graphNode in xInstrStream.dependencyGraph.GraphList)
                     {
+                        if (graphNode.classIndex != classScope || graphNode.procIndex != functionScope)
+                        {
+                            continue;
+                        }
+
+
                         // To deal with the case
                         // 
                         // a;
