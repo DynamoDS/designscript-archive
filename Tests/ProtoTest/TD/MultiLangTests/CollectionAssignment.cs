@@ -4023,7 +4023,7 @@ test = A.foo().x;
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("r", 5);
+            thisTest.Verify("x", 5);
 
         }
        
@@ -4034,24 +4034,34 @@ test = A.foo().x;
             String code =
             @"
                
-          class test
-            {
-                a = { 1, 2, 3 };
-                b = ""x"";
-                def foo(c:int)
+          
+            class test
                 {
-                    a[b] = c;
-                    return =a;
+                    a = { 1, 2, 3 };
+                    b = ""x"";
+                    def foo(c:int)
+                    {
+                        a[b] = c;
+                        return =a;
+                    }
+                }
+            class mytest extends test
+            {
+                def foo1(d : int)
+                {
+                    a[b] = d;
+
+                    return = this.a;
                 }
             }
-            class mytest
-            z = test.test();
-            y = z.foo(5);
+            z = mytest.mytest();
+            y = z.foo1(5);
+
             x = y[z.b];
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("r", 5);
+            thisTest.Verify("x", 5);
 
         }
         [Test]
