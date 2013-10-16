@@ -4305,5 +4305,66 @@ r2 = a[1];
 
 
         }
+        [Test]
+        public void T73_Dictionaryrepguideszip()
+        {
+
+            String code =
+            @"
+               
+            a = { { 1 }, { 2 }, { 3 } };
+            b = {""x"",""y""};
+                
+                def foo(a1 : var[], b1 : var)
+                            {
+
+                                a1[b1] = true;
+                                return =a1;
+                            }
+                            z1 = foo(a<1>, b<1>);
+                x = z1[0][b];
+                x2 = z1[1][b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new object[] { true, null });
+            thisTest.Verify("x2", new object[] { null, true });
+
+
+
+        }
+        [Test]
+        public void T74_Dictionaryrepguidescartesian()
+        {
+
+            String code =
+            @"
+               
+            a = { { 1 }, { 2 }, { 3 } };
+            b = {""x"",""y""};
+                
+            def foo(a1 : var[], b1 : var)
+                        {
+
+                            a1[b1] = true;
+                            return =a1;
+                        }
+                        z1 = foo(a<1>, b<2>);
+            x = z1[0][0][b]; //true,null
+            x1 = z1[0][1][b]; //null ,true
+            x2 = z1[1][0][b];//true ,null
+            x3 = z1[0][1][b];//null,true
+
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new object[] { true, null });
+            thisTest.Verify("x1", new object[] { null, true });
+            thisTest.Verify("x2", new object[] { true,null });
+            thisTest.Verify("x3", new object[] { null, true });
+
+
+
+        }
     }
 }
