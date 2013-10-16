@@ -306,7 +306,10 @@ class coll
 ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             object[] expectedResultc = { new object[] { 1 }, 2, 3 };
-            object[] expectedResultd = {new object[] {new object[] {1}, 2, 3},                                 new object[] {new object[] {1}, 5, 6}        };
+            object[] expectedResultd = {new object[] {new object[] {1}, 2, 3},
+                     
+            new object[] {new object[] {1}, 5, 6}
+        };
             thisTest.Verify("c", expectedResultc, 0);
             thisTest.Verify("d", expectedResultd, 0);
 
@@ -1147,7 +1150,14 @@ b1=foo(cy);
         }
 
         /*   
-[Test]           public void T24_Dynamic_Array_Function_1465706()           {               ExecutionMirror mirror = thisTest.RunScript(filePath, "T24_Dynamic_Array_Function_1465706.ds");               Object[] test = new Object[] { 0, 1 };               thisTest.Verify("test", test);                   }*/
+[Test]
+           public void T24_Dynamic_Array_Function_1465706()
+           {
+               ExecutionMirror mirror = thisTest.RunScript(filePath, "T24_Dynamic_Array_Function_1465706.ds");
+               Object[] test = new Object[] { 0, 1 };
+               thisTest.Verify("test", test);
+        
+           }*/
 
 
 
@@ -2136,7 +2146,15 @@ aa;aa1;
             thisTest.Verify("aa1", aa1);
         }
         /* 
-[Test]         [Category ("SmokeTest")]  public void T27_defect_1464429_DynamicArray_function()         {             ExecutionMirror mirror = thisTest.RunScript(filePath, "T27_defect_1464429_DynamicArray_function.ds");             Object[] t1 = new Object[] { -2, -1 };                         thisTest.Verify("t2", t2);         }*/
+[Test]
+         [Category ("SmokeTest")]
+  public void T27_defect_1464429_DynamicArray_function()
+         {
+             ExecutionMirror mirror = thisTest.RunScript(filePath, "T27_defect_1464429_DynamicArray_function.ds");
+             Object[] t1 = new Object[] { -2, -1 };
+            
+             thisTest.Verify("t2", t2);
+         }*/
 
 
         [Test]
@@ -2341,8 +2359,23 @@ y = x;
             thisTest.Verify("y", y);
         }
         /* 
-[Test]         public void T40_Index_DynamicArray_1467064_5()         {             Assert.Throws(typeof(ProtoCore.Exceptions.CompileErrorsOccured), () =>             {                 ExecutionMirror mirror = thisTest.RunScript(filePath, "T40_Index_DynamicArray_byarray_1467064_5.ds");             });         }         
-[Test]         public void T40_Index_DynamicArray_1467064_6()         {             Assert.Throws(typeof(ProtoCore.Exceptions.CompileErrorsOccured), () =>             {                 ExecutionMirror mirror = thisTest.RunScript(filePath, "T40_Index_DynamicArray_byarray_1467064_6.ds");             });         }*/
+[Test]
+         public void T40_Index_DynamicArray_1467064_5()
+         {
+             Assert.Throws(typeof(ProtoCore.Exceptions.CompileErrorsOccured), () =>
+             {
+                 ExecutionMirror mirror = thisTest.RunScript(filePath, "T40_Index_DynamicArray_byarray_1467064_5.ds");
+             });
+         }
+         
+[Test]
+         public void T40_Index_DynamicArray_1467064_6()
+         {
+             Assert.Throws(typeof(ProtoCore.Exceptions.CompileErrorsOccured), () =>
+             {
+                 ExecutionMirror mirror = thisTest.RunScript(filePath, "T40_Index_DynamicArray_byarray_1467064_6.ds");
+             });
+         }*/
 
         [Test]
         [Category("SmokeTest")]
@@ -3143,7 +3176,10 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T43_Defect_1467234_negative_indexing()
         {
             String code =
-@"a = { };a[-1] = 1;b = a;";
+@"a = { };
+a[-1] = 1;
+b = a;
+";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("a", new Object[] { 1 });
         }
@@ -3153,7 +3189,17 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T44_Defect_1467264()
         {
             String code =
-@"class A{    X : var[];    constructor  A ( t1 : var[] )    {        X = t1;    }}a1 = { A.A(1..2), A.A(2..3) };a = a1[0].X[0][1];";
+@"class A
+{
+    X : var[];
+    constructor  A ( t1 : var[] )
+    {
+        X = t1;
+    }
+}
+a1 = { A.A(1..2), A.A(2..3) };
+a = a1[0].X[0][1];
+";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             Object n1 = null;
             thisTest.Verify("a", n1);
@@ -3164,7 +3210,22 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T45_Defect_1467393()
         {
             String code =
-@"arr = { { } };[Imperative]{    numRings = 3;        for(i in(0..(numRings-1)))    {        [Associative]        {            x = 0..i..#numRings;            arr[i] = x;        }           }}test = arr;a= 1;";
+@"arr = { { } };
+[Imperative]
+{
+    numRings = 3;    
+    for(i in(0..(numRings-1)))
+    {
+        [Associative]
+        {
+            x = 0..i..#numRings;
+            arr[i] = x;
+        }       
+    }
+}
+test = arr;
+a= 1;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3179,7 +3240,23 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T45_Defect_1467393_2()
         {
             String code =
-@"arr = { { } };[Imperative]{    numRings = 3;        for(i in(0..(numRings-1)))    {        s = Print(i);        [Associative]        {            x = 0..i;            arr[i] = x;        }           }}test = arr;a= 1;";
+@"arr = { { } };
+[Imperative]
+{
+    numRings = 3;    
+    for(i in(0..(numRings-1)))
+    {
+        s = Print(i);
+        [Associative]
+        {
+            x = 0..i;
+            arr[i] = x;
+        }       
+    }
+}
+test = arr;
+a= 1;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3192,7 +3269,27 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T45_Defect_1467393_3()
         {
             String code =
-@"def foo (){    arr = { { } };    [Imperative]    {        numRings = 3;            for(i in(0..(numRings-1)))        {            s = Print(i);            [Associative]            {                x = 0..i;                arr[i] = x;            }               }    }    return = arr;}test = foo();";
+@"
+def foo ()
+{
+    arr = { { } };
+    [Imperative]
+    {
+        numRings = 3;    
+        for(i in(0..(numRings-1)))
+        {
+            s = Print(i);
+            [Associative]
+            {
+                x = 0..i;
+                arr[i] = x;
+            }       
+        }
+    }
+    return = arr;
+}
+test = foo();
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3205,7 +3302,25 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T45_Defect_1467393_4()
         {
             String code =
-@"def foo (){    arr = { { } };    [Imperative]    {        x = {0, 1};        for(i in x)        {            [Associative]            {                arr[i] = 0..i;            }               }    }    return = arr;}test = foo();";
+@"
+def foo ()
+{
+    arr = { { } };
+    [Imperative]
+    {
+        x = {0, 1};
+        for(i in x)
+        {
+            [Associative]
+            {
+                arr[i] = 0..i;
+            }       
+        }
+    }
+    return = arr;
+}
+test = foo();
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3218,7 +3333,21 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_1()
         {
             String code =
-@"//arr; //  declaring arr here workstest = [Imperative]{    arr; //  declaring arr here does not work.    //arr = { }; //  declaring arr with = {} works        // create arr    for(i in (0..1))    {        arr[i] = i;    }    return = arr;}";
+@"
+//arr; //  declaring arr here works
+test = [Imperative]
+{
+    arr; //  declaring arr here does not work.
+    //arr = { }; //  declaring arr with = {} works
+    
+    // create arr
+    for(i in (0..1))
+    {
+        arr[i] = i;
+    }
+    return = arr;
+}
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3231,7 +3360,18 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_2()
         {
             String code =
-@"arr; //  declaring arr here workstest = [Imperative]{    // create arr    for(i in (0..1))    {        arr[i] = i;    }   }test = arr;";
+@"
+arr; //  declaring arr here works
+test = [Imperative]
+{
+    // create arr
+    for(i in (0..1))
+    {
+        arr[i] = i;
+    }   
+}
+test = arr;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3244,7 +3384,18 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_3()
         {
             String code =
-@"arr = { }; test = [Imperative]{    // create arr    for(i in (0..1))    {        arr[i] = i;    }   }test = arr;";
+@"
+arr = { }; 
+test = [Imperative]
+{
+    // create arr
+    for(i in (0..1))
+    {
+        arr[i] = i;
+    }   
+}
+test = arr;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3257,7 +3408,18 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_4()
         {
             String code =
-@"test = [Imperative]{    arr = { } ;    // create arr    for(i in (0..1))    {        arr[i] = i;    }      return= arr; }";
+@"
+test = [Imperative]
+{
+    arr = { } ;
+    // create arr
+    for(i in (0..1))
+    {
+        arr[i] = i;
+    }  
+    return= arr; 
+}
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3270,7 +3432,17 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_5()
         {
             String code =
-@"test = [Imperative]{    arr = { } ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }";
+@"
+test = [Imperative]
+{
+    arr = { } ;    
+    for(i in (0..1))
+    {
+        arr[i][i] = i;
+    }
+    return = arr;   
+}
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3284,7 +3456,17 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_6()
         {
             String code =
-@"test = [Imperative]{    arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }";
+@"
+test = [Imperative]
+{
+    arr = null ;    
+    for(i in (0..1))
+    {
+        arr[i][i] = i;
+    }
+    return = arr;   
+}
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3298,7 +3480,19 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_7()
         {
             String code =
-@"arr;[Imperative]{    //arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    //return = arr;   }test = arr;";
+@"
+arr;
+[Imperative]
+{
+    //arr = null ;    
+    for(i in (0..1))
+    {
+        arr[i][i] = i;
+    }
+    //return = arr;   
+}
+test = arr;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3312,7 +3506,18 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_8()
         {
             String code =
-@"arr = { };test = [Imperative]{    //arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }";
+@"
+arr = { };
+test = [Imperative]
+{
+    //arr = null ;    
+    for(i in (0..1))
+    {
+        arr[i][i] = i;
+    }
+    return = arr;   
+}
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3326,7 +3531,19 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_9()
         {
             String code =
-@"arr = { {}, {}};[Imperative]{    //arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }test = arr;";
+@"
+arr = { {}, {}};
+[Imperative]
+{
+    //arr = null ;    
+    for(i in (0..1))
+    {
+        arr[i][i] = i;
+    }
+    return = arr;   
+}
+test = arr;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3340,7 +3557,23 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_9_1()
         {
             String code =
-@"//arr = { {}, {}};def foo (){    t = [Imperative]    {        arr = null ;            for(i in (0..1))        {            arr[i][i] = i;        }        return = arr;       }    return = t;}test = foo();";
+@"
+//arr = { {}, {}};
+def foo ()
+{
+    t = [Imperative]
+    {
+        arr = null ;    
+        for(i in (0..1))
+        {
+            arr[i][i] = i;
+        }
+        return = arr;   
+    }
+    return = t;
+}
+test = foo();
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3354,7 +3587,25 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_9_2()
         {
             String code =
-@"class A{    static def foo ()    {        t = [Imperative]        {            arr  ;                for(i in (0..1))            {                arr[i][i] = i;            }            return = arr;           }        return = t;    }}test = A.foo();";
+@"
+class A
+{
+    static def foo ()
+    {
+        t = [Imperative]
+        {
+            arr  ;    
+            for(i in (0..1))
+            {
+                arr[i][i] = i;
+            }
+            return = arr;   
+        }
+        return = t;
+    }
+}
+test = A.foo();
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3368,7 +3619,23 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_9_3()
         {
             String code =
-@"arr = { {}, {}};def foo (){    t = [Imperative]    {        //arr = null ;            for(i in (0..1))        {            arr[i][i] = i;        }        return = arr;       }    return = t;}test = foo();";
+@"
+arr = { {}, {}};
+def foo ()
+{
+    t = [Imperative]
+    {
+        //arr = null ;    
+        for(i in (0..1))
+        {
+            arr[i][i] = i;
+        }
+        return = arr;   
+    }
+    return = t;
+}
+test = foo();
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3382,7 +3649,26 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_9_4()
         {
             String code =
-@"arr;class A{    static def foo ()    {        t = [Imperative]        {            //arr  ;                for(i in (0..1))            {                arr[i][i] = i;            }            return = arr;           }        return = t;    }}test = A.foo();";
+@"
+arr;
+class A
+{
+    static def foo ()
+    {
+        t = [Imperative]
+        {
+            //arr  ;    
+            for(i in (0..1))
+            {
+                arr[i][i] = i;
+            }
+            return = arr;   
+        }
+        return = t;
+    }
+}
+test = A.foo();
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3396,7 +3682,27 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_9_5()
         {
             String code =
-@"class B{    x : int = 0;}arr = { {}, {}};def foo (){    t = [Imperative]    {        //arr = null ;            for(i in (0..1))        {            arr[i][i] = B.B();        }        return = arr;       }    return = t;}test = foo().x;";
+@"
+class B
+{
+    x : int = 0;
+}
+arr = { {}, {}};
+def foo ()
+{
+    t = [Imperative]
+    {
+        //arr = null ;    
+        for(i in (0..1))
+        {
+            arr[i][i] = B.B();
+        }
+        return = arr;   
+    }
+    return = t;
+}
+test = foo().x;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3410,7 +3716,30 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T46_Defect_1467502_9_6()
         {
             String code =
-@"//arr;class B{    x : int = 0;}class A{    static def foo ()    {        t = [Imperative]        {            arr  ;                for(i in (0..1))            {                arr[i][i] = B.B();            }            return = arr;           }        return = t;    }}test = A.foo().x;";
+@"
+//arr;
+class B
+{
+    x : int = 0;
+}
+class A
+{
+    static def foo ()
+    {
+        t = [Imperative]
+        {
+            arr  ;    
+            for(i in (0..1))
+            {
+                arr[i][i] = B.B();
+            }
+            return = arr;   
+        }
+        return = t;
+    }
+}
+test = A.foo().x;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3424,7 +3753,33 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T47_Defect_1467561_1()
         {
             String code =
-@"//arr;class B{    x : int = 0;}class A{    static def foo ()    {        t = [Imperative]        {            arr  ;                for(i in (0..1))            {                if ( i < 3 )                {                    arr[i][i] = B.B();                }            }            return = arr;           }        return = t;    }}test = A.foo().x;";
+@"
+//arr;
+class B
+{
+    x : int = 0;
+}
+class A
+{
+    static def foo ()
+    {
+        t = [Imperative]
+        {
+            arr  ;    
+            for(i in (0..1))
+            {
+                if ( i < 3 )
+                {
+                    arr[i][i] = B.B();
+                }
+            }
+            return = arr;   
+        }
+        return = t;
+    }
+}
+test = A.foo().x;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3437,7 +3792,33 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T47_Defect_1467561_2()
         {
             String code =
-@"class B{    x : int = 0;}class A{    def foo ()    {        t = [Imperative]        {            arr = {} ;                for(i in (0..1))            {                if ( i < 3 )                {                    arr[i][i] = B.B();                }            }            return = arr;           }        return = t;    }}aa = A.A();test = aa.foo().x;";
+@"
+class B
+{
+    x : int = 0;
+}
+class A
+{
+    def foo ()
+    {
+        t = [Imperative]
+        {
+            arr = {} ;    
+            for(i in (0..1))
+            {
+                if ( i < 3 )
+                {
+                    arr[i][i] = B.B();
+                }
+            }
+            return = arr;   
+        }
+        return = t;
+    }
+}
+aa = A.A();
+test = aa.foo().x;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3450,13 +3831,469 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T47_Defect_1467561_3()
         {
             String code =
-@"arr;class B{    x : int = 0;}class A{    static def foo ()    {        t = [Imperative]        {            for(i in (0..1))            {                if ( i < 3 )                {                    arr[i][i] = B.B();                }            }            return = arr;           }        return = t;    }}test = A.foo().x;";
+@"
+arr;
+class B
+{
+    x : int = 0;
+}
+class A
+{
+    static def foo ()
+    {
+        t = [Imperative]
+        {
+            for(i in (0..1))
+            {
+                if ( i < 3 )
+                {
+                    arr[i][i] = B.B();
+                }
+            }
+            return = arr;   
+        }
+        return = t;
+    }
+}
+test = A.foo().x;
+";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
             Object n1 = null;
             Object[] v1 = new Object[] { new Object[] { 0 }, new Object[] { n1, 0 } };
             thisTest.Verify("test", v1);
+        }
+        // For Unit tests of Dictionary pls refere Microfeaturetests.cs
+        [Test]
+        public void T48_Dictionaryvariableaskey()
+        {
+            String code =
+            @"
+                a = {1, 2, 3};
+                b=""x"";
+                a[b] = 4;
+                r = a [b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 4);
+        }
+        [Test]
+        public void T49_DictionaryvariableArray()
+        {
+            String code =
+            @"
+                a = {1, 2, 3};
+                b={""x"",""y""};
+                a[b] = {4,7};
+                r = a [b[0]];
+                r1 = a [b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 4);
+            thisTest.Verify("r1", new object[] {4,7 });
+        }
+        [Test]
+        public void T50_DictionaryInline()
+        {
+            String code =
+            @"
+                a = {1, 2, 3};
+                b=""x"";
+                a[b] =(b!=null)?4:-4;
+                r = a [b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 4);
+        }
+        [Test]
+        public void T51_DictionaryInline_2()
+        {
+            String code =
+            @"
+                a = {1, 2, 3};
+                b={1,-1};
+                a[b] =(b>0)?4:-4;
+                r = a [b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", new object[] {4,-4});
+        }
+        [Test]
+        public void T52_DictionaryKeynull()
+        {
+            // as per spec this is null as key is supported
+            String code =
+            @"
+                a = {1, 2, 3};
+                b=null;
+                a[b] =4;
+                r = a [b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 4);
+        }
+        [Test]
+        public void T53_DictionaryKeyUpdate()
+        {
+           
+            String code =
+            @"
+                a = {1, 2, 3};
+                 b=""x"";
+                 a[b] =4;
+                r = a[b];
+                b = ""y"";
+                a[b] = 10;
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 10);
+        }
+        [Test]
+        public void T54_DictionaryKeyUpdate_2()
+        {
+           
+            String code =
+            @"
+               a = {1, 2, 3};
+                 b=true;
+                 a[b] =4;
+                r = a[b];
+                b = 1;
+                a[b] = 10;
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 10);
+        }
+        [Test]
+        public void T55_DictionaryKeyinClass()
+        {
+           
+            String code =
+            @"
+               
+            class test
+                {
+                    a = { 1, 2, 3 };
+                    b = ""x"";
+                    def foo(c:int)
+                    {
+                        a[b] = c;
+                        return =a;
+                    }
+                }
+
+            z = test.test();
+            y = z.foo(5);
+            r=y[""x""];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+
+        }
+        [Test]
+        public void T56_DictionaryKeyinClass_2()
+        {
+            
+            String code =
+            @"
+               
+          class test
+            {
+                a = { 1, 2, 3 };
+                b = ""x"";
+                def foo(c:int)
+                {
+                    a[b] = c;
+                    return =a;
+                }
+            }
+
+            z = test.test();
+            y = z.foo(5);
+            x = y[z.b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+
+        }
+       
+        [Test]
+        public void T57_DictionaryKeyinClass_inheritance()
+        {
+           
+            String code =
+            @"
+               
+          class test
+            {
+                a = { 1, 2, 3 };
+                b = ""x"";
+                def foo(c:int)
+                {
+                    a[b] = c;
+                    return =a;
+                }
+            }
+            class mytest
+            z = test.test();
+            y = z.foo(5);
+            x = y[z.b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+
+        }
+        [Test]
+        public void T58_DictionaryKeyinClass_inheritance2()
+        {
+            
+            String code =
+            @"
+               
+          class test
+                {
+                    a = { 1, 2, 3 };
+                    b = ""x"";
+                    def foo(c:int)
+                    {
+                        a[b] = c;
+                        return =a;
+                    }
+                }
+            class mytest extends test
+            {
+                e = ""y"";
+                def foo1(d : int)
+                {
+                    a[b] = d;
+                    a[e] = d + 1;
+                    return = this.a;
+                }
+            }
+            z = mytest.mytest();
+            y = z.foo1(5);
+
+            x1 = y[z.b];
+            x2 = y[z.e];
+
+
+
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x1", 5);
+            thisTest.Verify("x2", 6);
+
+        }
+        [Test]
+        public void T59_DotOperator()
+        {
+
+            String code =
+            @"
+           class test
+                {
+                    a = { 1, 2, 3 };
+                    b = ""x"";
+                    constructor test(c:int)
+                    {
+                        a[b] = c;
+                    }
+                }
+            z = test.test(5);
+
+            r=z.a[""x""];
+            ";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r", 5);
+        }
+        [Test]
+        public void T60_DictionaryDotOperator()
+        {
+
+            String code =
+            @"
+               
+          class test
+            {
+                a = { 1, 2, 3 };
+                b = {""x"",""y""};
+                def foo(c:int)
+                {
+                    a[b[0]] = c;
+                    a[b[1]] = c+1;
+                    return =a;
+                }
+            }
+
+            z = test.test();
+            y = z.foo(5);
+            x = y[z.b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new object [] {5,6});
+
+        }
+        [Test]
+        public void T69_DictionaryDynamicArray()
+        {
+
+            String code =
+            @"
+               
+          
+                a = { };
+                b = {""x"",""y""};
+                a[b[0]] = 5;
+                a[b[1]] = 6;
+                a[0]=1;
+                a[1]=2;
+                r = a[b];
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new object[] { 5, 6 });
+
+        }
+        [Test]
+        public void T70_DictionaryImeperativeWhile()
+        {
+
+            String code =
+            @"
+               
+            a={};                
+[Imperative]
+{
+    i =0;
+    while (i<5)
+    {
+        a["" + i] = i;
+        i = i + 1;
+    }
+}
+r0 = a[""0""];
+r1 = a[""1""];
+r2 = a[""2""];
+r3 = a[""3""];
+r4 = a[""4""];
+r5 = a[""5""];
+
+                
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r0",0);
+            thisTest.Verify("r1", 1);
+            thisTest.Verify("r2", 2);
+            thisTest.Verify("r3", 3);
+            thisTest.Verify("r4", 4);
+            thisTest.Verify("r5", null);
+
+        }
+        [Test]
+        public void T70_DictionaryImeperativeFor()
+        {
+
+            String code =
+            @"
+               
+a={};                
+[Imperative]
+{
+    i = 0;
+    b = { ""x"",true,1};
+    for(i in b)
+    {
+        a[i] = i;
+    }
+}
+r0 = a[""x""];
+r1 = a[true];
+r2 = a[1];
+                
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r0", "x");
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", 1);
+            
+
+        }
+     /*   [Test]
+        public void T60_Dictionarytemp()
+        {
+             Assert.Throws(typeof(ProtoCore.Exceptions.RuntimeException), () =>
+            {
+            String code =
+            @"
+               
+          class test
+            {
+                static a = { 1, 2, 3 };
+                static b = {""x"",""y""};
+                static def foo(c:int)
+                {
+                    a[b[0]] = c;
+                    a[b[1]] = c+1;
+                    return =a;
+                }
+            }
+            def foo(z:test)
+            {
+
+                y = z.foo(5);
+                x = y[z.b];
+                return =x;
+            }
+            z1 = foo(test.test());
+                
+
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
+            thisTest.Verify("z1", new object[] { 5, 6 });
+            });
+        }*/
+        [Test]
+        public void T70_Dictionarytypeconversion()
+        {
+
+            String code =
+            @"
+               
+            a = { 1, 2, 3 };
+            b = {""x"",""y""};
+                
+            def foo(a1 : var[], b1 : var[])
+            {
+
+                a1[b1] = true;
+                return =a1;
+            }
+            z1 = foo(a, b);
+            ";
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r0", "x");
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", 1);
+
+
         }
     }
 }
