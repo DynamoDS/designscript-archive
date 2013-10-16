@@ -148,6 +148,12 @@ namespace ProtoCore.AssociativeGraph
         public bool propertyChanged { get; set; }       // The property of ffi object that created in this graph node is changed
         public bool forPropertyChanged { get; set; }    // The graph node is marked as dirty because of property changed event
 
+        /// <summary>
+        /// Flag determines if a graph node is active or not. If inactive, the graph node is invalid
+        /// this is especially used in the LiveRunner to mark modified/deleted nodes inactive so that they are not executed
+        /// </summary>
+        public bool isActive { get; set; }
+
 
         public List<ProtoCore.AssociativeGraph.UpdateNodeRef> updatedArguments { get; set; }
 
@@ -186,6 +192,7 @@ namespace ProtoCore.AssociativeGraph
             updateDimensions = new List<StackValue>();
             propertyChanged = false;
             forPropertyChanged = false;
+            isActive = true;
 
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
             ArrayPointer = ProtoCore.DSASM.StackUtils.BuildNull();
