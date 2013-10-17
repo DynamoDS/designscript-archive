@@ -95,7 +95,8 @@ namespace ProtoScript.Runners
         void BeginQueryNodeValue(Guid nodeGuid);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
         void BeginQueryNodeValue(List<Guid> nodeGuid);
-        void ResetVMAndResyncGraph(List<string> libraries, GraphSyncData syncData = null);
+        void ResetVMAndResyncGraph(List<string> libraries);
+        void ReInitializeLiveRunner();
         
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
@@ -988,7 +989,7 @@ namespace ProtoScript.Runners
             return code;
         }
 
-        private void ReInitializeLiveRunner()
+        public void ReInitializeLiveRunner()
         {
             runner = new ProtoScriptTestRunner();
 
@@ -1011,7 +1012,7 @@ namespace ProtoScript.Runners
         /// </summary>
         /// <param name="libraries"></param>
         /// <param name="syncData"></param>
-        public void ResetVMAndResyncGraph(List<string> libraries, GraphSyncData syncData = null)
+        public void ResetVMAndResyncGraph(List<string> libraries)
         {
             // Reset VM
             ReInitializeLiveRunner();
@@ -1028,9 +1029,7 @@ namespace ProtoScript.Runners
             ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(importNodes);
             string code = codeGen.GenerateCode();
 
-            SynchronizeInternal(code);
-
-            
+            UpdateCmdLineInterpreter(code);            
         }
 
         private void SynchronizeInternal(GraphSyncData syncData)

@@ -607,10 +607,6 @@ namespace ProtoTest.LiveRunner
             inode = new ProtoCore.AST.AssociativeAST.IdentifierNode(className);
 
             dotCall = ProtoCore.Utils.CoreUtils.GenerateCallDotNode(inode, constructorCall, liveRunner.Core);
-            //==============================================
-            // Build the binary expression 
-            // p = Point.ByCoordinates(10,10,10)
-            //==============================================
             stmt1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
                 new ProtoCore.AST.AssociativeAST.IdentifierNode("m"),
                 dotCall,
@@ -732,7 +728,6 @@ namespace ProtoTest.LiveRunner
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
-
 
         }
 
