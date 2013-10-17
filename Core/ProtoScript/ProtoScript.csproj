@@ -123,10 +123,6 @@
       <Project>{0D3D43DC-BD7E-46F0-93F7-1C6A6CC79948}</Project>
       <Name>ProtoImperative</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ProtoLanguage\ProtoLanguage.csproj">
-      <Project>{52F2A9C0-C4F4-4E0E-A6EE-7BCAFFB5C4B5}</Project>
-      <Name>ProtoLanguage</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
