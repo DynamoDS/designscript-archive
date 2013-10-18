@@ -8622,8 +8622,8 @@ namespace ProtoAssociative
 
                             if (expressionSSATempSymbolList.Count > 0)
                             {
-                                SymbolNode symnode = expressionSSATempSymbolList.Peek();
-                                symnode.isAnonymous = false;
+                                //SymbolNode symnode = expressionSSATempSymbolList.Peek();
+                                //symnode.isAnonymous = true;
                             }
 
                             // Add the list of node within the same expression ID to this last graphnode in the expression

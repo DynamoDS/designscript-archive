@@ -1002,6 +1002,8 @@ namespace ProtoCore.DSASM
                     //      2. In the return instruction
                     //
                     Properties.functionCallArguments = arguments;
+
+                    //Properties.functionCallArguments = runtimeContext.coercedArgs;
                     Properties.functionCallDotCallDimensions = dotCallDimensions;
 
                     explicitCall = true;
@@ -7321,6 +7323,16 @@ namespace ProtoCore.DSASM
             blockId = (int)svBlockDecl.opdata;
 
             ProcedureNode procNode = GetProcedureNode(blockId, ci, fi);
+
+            // GC anonymous variables in the return stmt
+            if (core.Options.FullSSA)
+            {
+                if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
+                {
+                    GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                }
+            }
+
 
             pc = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexReturnAddress).opdata;
             executingBlock = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionCallerBlock).opdata;
