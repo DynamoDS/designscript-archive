@@ -142,6 +142,28 @@ namespace ProtoCore.DSASM
         public int codeBlockId = ProtoCore.DSASM.Constants.kInvalidIndex;
         public string ExternLib = "";
 
+        /// <summary>
+        /// Flags to determine if an SSA'd variable is anoymous in the context of the its usage in the script
+        /// 
+        /// Where:
+        ///     a = b.c().d
+        ///     
+        ///     t0 = b
+        ///     t1 = t0.c() -> This graphnode is anonymous
+        ///                 -> t0.c() returns a pointer but only its property is retrieved in the downstream operation
+        ///     t2 = t1.d
+        ///     a = t2
+        ///     
+        /// </summary>
+        public bool isAnonymous { get; set; }
+
+
+        /// <summary>
+        /// A symbol is dirty if it needs to be garbage collected at runtime
+        /// </summary>
+        public bool isDirty { get; set; }
+
+
         public SymbolNode()
         {
             isArray         = false;
@@ -153,6 +175,9 @@ namespace ProtoCore.DSASM
             absoluteFunctionIndex = ProtoCore.DSASM.Constants.kGlobalScope;
             isStatic        = false;
             isTemp          = false;
+
+            isAnonymous     = false;
+            isDirty =       true;
         }
 
         public SymbolNode(

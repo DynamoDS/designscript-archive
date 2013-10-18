@@ -2039,6 +2039,22 @@ namespace ProtoCore.DSASM
                                 UpdateDimensionsForGraphNode(graphNode, matchingNode, executingGraphNode);
                             }
                             graphNode.isDirty = true;
+
+                            if (core.Options.FullSSA)
+                            {
+                                if (graphNode.IsSSANode())
+                                {
+                                    // Update the temporary symbol as dirty so it can be GC'd downstream
+                                    SymbolNode symbol = graphNode.updateNodeRefList[0].nodeList[0].symbol;
+                                    Validity.Assert(graphNode.updateNodeRefList.Count > 0);
+                                    Validity.Assert(null != symbol);
+                                    if (symbol.isAnonymous)
+                                    {
+                                        symbol.isDirty = true;
+                                    }
+                                }
+                            }
+
                             graphNode.forPropertyChanged = propertyChanged;
                             nodesMarkedDirty++;
                         }
@@ -4408,8 +4424,12 @@ namespace ProtoCore.DSASM
         {
             foreach (ProtoCore.DSASM.SymbolNode sn in exe.runtimeSymbols[blockId].symbolList.Values)
             {
-                if (sn.classScope == classIndex && sn.functionIndex == functionIndex && !sn.name.Equals(Constants.kWatchResultVar) 
-                    /*&& !CoreUtils.IsSSATemp(sn.name)*/)
+                if (sn.classScope == classIndex 
+                    && sn.functionIndex == functionIndex 
+                    && !sn.name.Equals(Constants.kWatchResultVar) 
+                    /*&& !CoreUtils.IsSSATemp(sn.name)*/
+                    && !sn.isAnonymous
+                    )
                 {
                     int offset = sn.index;
                     int n = offset;
@@ -4438,45 +4458,31 @@ namespace ProtoCore.DSASM
             }
         }
 
-        //public bool IsReferedBy(StackValue sv1, StackValue sv2)
-        //{
-        //    if ((sv1.optype != AddressType.ArrayPointer && sv1.optype != AddressType.Pointer) ||
-        //        (sv2.optype != AddressType.Pointer && sv2.optype != AddressType.ArrayPointer))
-        //        return false;
+        public void GCAnonymousSymbols(List<SymbolNode> symbolList)
+        {
+            symbolList.Reverse();
+            foreach (SymbolNode symbol in symbolList)
+            {
+                if (symbol.isDirty && symbol.isAnonymous)
+                {
+                    int offset = symbol.index;
+                    int n = offset;
+                    if (symbol.absoluteFunctionIndex != DSASM.Constants.kGlobalScope)
+                    {
 
-        //    if (sv1.opdata == sv2.opdata)
-        //        return true;
+                        // Comment Jun: We only want the relative offset if a variable is in a function
+                        n = rmem.GetRelative(rmem.GetStackIndex(offset));
+                    }
 
-        //    if (sv1.optype == AddressType.ArrayPointer)
-        //    {
-        //        foreach (StackValue sv in core.heap.heaplist[(int)sv1.opdata].stack)
-        //        {
-        //            if (IsReferedBy(sv, sv2))
-        //                return true;
-        //        }
-        //    }
-        //    return false;
-        //}
-        //public List<int> GetChildenConstructBlock(int blockId)
-        //{
-        //    ProtoCore.DSASM.CodeBlock cb = core.CompleteCodeBlockList[blockId];
-        //    return cb.children.Where(x => x.blockType == CodeBlockType.kConstruct).Select(x => x.codeBlockId).ToList();
-        //}
-        //public ProtoCore.DSASM.CodeBlock GetCodeBlockById(int blockId, ProtoCore.DSASM.CodeBlock root)
-        //{
-        //    ProtoCore.DSASM.CodeBlock result = null;
-        //    if (root.codeBlockId == blockId)
-        //        return root;
+                    if (n >= 0)
+                    {
+                        GCRelease(rmem.Stack[n]);
+                    }
+                    symbol.isDirty = false;
+                }
+            }
+        }
 
-        //    foreach (ProtoCore.DSASM.CodeBlock cb in root.children)
-        //    {
-        //        result = GetCodeBlockById(blockId, cb);
-        //        if (result != null)
-        //            break;
-        //    }
-
-        //    return result;
-        //}
         public void ReturnSiteGC(int blockId, int classIndex, int functionIndex)
         {
             ProcedureNode pn = null;
@@ -4497,7 +4503,9 @@ namespace ProtoCore.DSASM
             {
                 if (symbol.functionIndex == functionIndex
                     && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
-                    /*&& !CoreUtils.IsSSATemp(symbol.name)*/)
+                    /*&& !CoreUtils.IsSSATemp(symbol.name)*/
+                    && !symbol.isAnonymous
+                    )
                 {
 
                     StackValue sv = rmem.GetAtRelative(symbol);
@@ -4514,45 +4522,6 @@ namespace ProtoCore.DSASM
                     GCCodeBlock(cb.codeBlockId, functionIndex, classIndex);
             }
 
-            /////////////////////////////////////////////////////////
-
-            //ProcedureNode pn = null;
-            //if (DSASM.Constants.kInvalidIndex == classIndex)
-            //{
-            //    pn = exe.procedureTable[blockId].procList[functionIndex];
-            //}
-            //else
-            //{
-            //    pn = exe.classTable.list[classIndex].vtable.procList[functionIndex];
-            //}
-
-            //int first, last;
-            //if (pn.firstLocal != null)
-            //{
-            //    // if the function has local variables 
-            //    first = pn.firstLocal.Value;
-            //    last = pn.firstLocal.Value - pn.localCount - pn.argInfoList.Count;
-            //}
-            //else
-            //{
-            //    // if the function does not has local variables 
-            //    first = -1 - Constants.kStackFrameSize;
-            //    last = first - pn.argInfoList.Count;
-            //}
-            //List<StackValue> ptrList = new List<StackValue>();
-            //for (int n = first; n > last; --n)
-            //{
-            //    StackValue sv = rmem.GetAtRelative(n);
-            //    if (AddressType.Pointer == sv.optype || AddressType.ArrayPointer == sv.optype)
-            //    {
-            //        // this check if for the local variable inside a language block which is inside this function
-            //        // these variables have already been gced, hence there is no need to add them again
-            //        // TODO(Jiong): Try to find a better way to check this, are there any flags in the symbol node we can check 
-            //        if (rmem.heap.heaplist[(int)sv.opdata].refcount > 0)
-            //            ptrList.Add(sv);
-            //    }
-
-            //}
 
             if (ptrList.Count > 0)
             {
@@ -7949,6 +7918,15 @@ namespace ProtoCore.DSASM
                         istream.xUpdateList.Add(Properties.executingGraphNode.updateNodeRefList[0]);
                     }
                 }
+
+                if (core.Options.FullSSA)
+                {
+                    if (!Properties.executingGraphNode.IsSSANode())
+                    {
+                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                    }
+                }
+
             }
 
             // TODO Jun: Whats the main diff again on non-delta execution???
@@ -7978,6 +7956,7 @@ namespace ProtoCore.DSASM
             // Get the next graph to be executed
             SetupNextExecutableGraph(fi, ci);
 
+            
             return;
         }
 
