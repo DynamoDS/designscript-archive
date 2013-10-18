@@ -107,6 +107,8 @@ namespace ProtoAssociative
         //
         Dictionary<string, string> ssaTempToFirstPointerMap = new Dictionary<string, string>();
 
+        private Stack<SymbolNode> expressionSSATempSymbolList = null;
+
         
         // This constructor is only called for Preloading of assemblies and 
         // precompilation of CodeBlockNode nodes in GraphUI for global language blocks - pratapa
@@ -145,6 +147,7 @@ namespace ProtoAssociative
 
             nodeBuilder = new NodeBuilder(core);
             unPopulatedClasses = new Dictionary<int, ClassDeclNode>();
+            expressionSSATempSymbolList = new Stack<SymbolNode>();
         }
 
         public CodeGen(Core coreObj, ProtoCore.DSASM.CodeBlock parentBlock = null) : base(coreObj, parentBlock)
@@ -226,6 +229,7 @@ namespace ProtoAssociative
                 context = core.assocCodegen.context;
             }
             */
+            expressionSSATempSymbolList = new Stack<SymbolNode>();
         }
 
         private ProtoCore.DSASM.CodeBlock GetDeltaCompileCodeBlock()
@@ -8589,11 +8593,21 @@ namespace ProtoAssociative
                     }
 
 
-                    // Backtrack and assign the this last final assignment graphnode to its associated SSA graphnodes
                     if (core.Options.FullSSA)
                     {
-                        if (!graphNode.IsSSANode())
+                        if (graphNode.IsSSANode())
                         {
+                            SymbolNode symnode = graphNode.updateNodeRefList[0].nodeList[0].symbol;
+                            if (null != symnode)
+                            {
+                                symnode.isAnonymous = true;
+                                expressionSSATempSymbolList.Push(symnode);
+                            }
+                        }
+                        else
+                        {
+                            // This is the last expression in the SSA'd expression
+                            // Backtrack and assign the this last final assignment graphnode to its associated SSA graphnodes
                             for (int n = codeBlock.instrStream.dependencyGraph.GraphList.Count - 1; n >= 0; --n)
                             {
                                 GraphNode currentNode = codeBlock.instrStream.dependencyGraph.GraphList[n];
@@ -8606,6 +8620,16 @@ namespace ProtoAssociative
                                     break;
                                 }
                             }
+
+                            if (expressionSSATempSymbolList.Count > 0)
+                            {
+                                SymbolNode symnode = expressionSSATempSymbolList.Peek();
+                                symnode.isAnonymous = false;
+                            }
+
+                            // Add the list of node within the same expression ID to this last graphnode in the expression
+                            graphNode.symbolListWithinExpression.AddRange(expressionSSATempSymbolList);
+                            expressionSSATempSymbolList.Clear();
                         }
                     }
 

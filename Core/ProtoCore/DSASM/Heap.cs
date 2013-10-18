@@ -447,7 +447,6 @@ namespace ProtoCore.DSASM
 
             int ptr = (int)sv.opdata;
 
-            //Validity.Assert(this.Heaplist[ptr].Refcount > 0);
             if (this.Heaplist[ptr].Refcount > 0)
             {
                 this.Heaplist[ptr].Refcount--;

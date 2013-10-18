@@ -16731,7 +16731,7 @@ r3H = r3.H;
             WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("WatchFx Tests")]
         public void DebugWatch456_T016_FFI_Transform_GetTuples()
         {

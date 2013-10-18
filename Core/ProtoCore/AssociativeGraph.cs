@@ -152,6 +152,22 @@ namespace ProtoCore.AssociativeGraph
 
         public List<ProtoCore.AssociativeGraph.UpdateNodeRef> updatedArguments { get; set; }
 
+
+        /// <summary>
+        /// This is the list of lhs symbols in the same expression ID
+        /// It is applicable for expressions transformed to SSA where each ssa temp in the same expression is in this list
+        /// This list is only populated on the last SSA assignment as such:
+        ///     
+        /// Given
+        ///     a = b.c.d
+        ///     
+        ///     [0] t0 = b      -> List empty
+        ///     [1] t1 = t0.b   -> List empty
+        ///     [2] t2 = t1.c   -> List empty
+        ///     [3] a = t2      -> This is the last SSA stmt, its graphnode contains a list of graphnodes {t0,t1,t2}
+        ///     
+        /// </summary>
+        public List<SymbolNode> symbolListWithinExpression { get; set; }
         
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
         public StackValue ArrayPointer { get; set; }
@@ -192,6 +208,7 @@ namespace ProtoCore.AssociativeGraph
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
             ArrayPointer = ProtoCore.DSASM.StackUtils.BuildNull();
 #endif
+            symbolListWithinExpression = new List<SymbolNode>();
         }
 
 
