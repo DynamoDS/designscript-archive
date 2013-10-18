@@ -95,8 +95,9 @@ namespace ProtoScript.Runners
         void BeginQueryNodeValue(Guid nodeGuid);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
         void BeginQueryNodeValue(List<Guid> nodeGuid);
-        void ResetVMAndResyncGraph(List<string> libraries, GraphSyncData syncData = null);
-        
+        void ResetVMAndResyncGraph(List<string> libraries);
+        void ReInitializeLiveRunner();
+
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
         event NodesToCodeCompletedEventHandler NodesToCodeCompleted;
@@ -270,7 +271,7 @@ namespace ProtoScript.Runners
             coreOptions.GenerateExprID = true;
             coreOptions.IsDeltaExecution = true;
             coreOptions.BuildOptErrorAsWarning = true;
-            
+
             coreOptions.WebRunner = false;
             coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             //coreOptions.DumpByteCode = true;
@@ -589,7 +590,7 @@ namespace ProtoScript.Runners
 
         /// <summary>
         /// VM Debugging API for general Debugging purposes 
-        /// temporarily used by Cmmand Line REPL in FormitDesktop
+        /// temporarily used by Cmmand Line REPL
         /// </summary>
         /// <returns></returns>
         public string GetCoreDump()
@@ -672,7 +673,6 @@ namespace ProtoScript.Runners
                 }
                 Thread.Sleep(0);
             }
-            
         }
 
         /// <summary>
@@ -832,7 +832,7 @@ namespace ProtoScript.Runners
             // Initialize the runtime context and pass it the execution delta list from the graph compiler
             ProtoCore.Runtime.Context runtimeContext = new ProtoCore.Runtime.Context();
 
-            if(graphCompiler != null)
+            if (graphCompiler != null)
                 runtimeContext.execFlagList = graphCompiler.ExecutionFlagList;
 
             runner.Execute(runnerCore, runtimeContext);
@@ -892,7 +892,7 @@ namespace ProtoScript.Runners
         /// </summary>
         private void RetainVMStatesForDeltaExecution()
         {
-            runnerCore.CompleteCodeBlockList.Clear();            
+            runnerCore.CompleteCodeBlockList.Clear();
         }
 
         /// <summary>
@@ -932,7 +932,6 @@ namespace ProtoScript.Runners
             }
         }
 
-       
 
         /// <summary>
         /// Takes in a Subtree to delete or modify and marks the corresponding gragh nodes in DS inactive.
@@ -952,15 +951,15 @@ namespace ProtoScript.Runners
             {
                 return astNodeList;
             }
-                
+
             foreach (var node in st.AstNodes)
             {
                 BinaryExpressionNode bNode = node as BinaryExpressionNode;
-                if(bNode != null)
+                if (bNode != null)
                 {
                     // TODO: Aparajit - this can be made more efficient by maintaining a map in core of 
                     // graphnode vs expression UID 
-                    foreach (var gnode in runnerCore.DSExecutable.instrStreamList[0].dependencyGraph.GraphList)                
+                    foreach (var gnode in runnerCore.DSExecutable.instrStreamList[0].dependencyGraph.GraphList)
                     {
                         if (gnode.exprUID == bNode.exprUID)
                         {
@@ -971,7 +970,7 @@ namespace ProtoScript.Runners
                     astNodeList.Add(bNode);
                 }
             }
-            
+
             return astNodeList;
         }
 
@@ -988,7 +987,7 @@ namespace ProtoScript.Runners
             return code;
         }
 
-        private void ReInitializeLiveRunner()
+        public void ReInitializeLiveRunner()
         {
             runner = new ProtoScriptTestRunner();
 
@@ -998,7 +997,7 @@ namespace ProtoScript.Runners
             coreOptions = null;
             InitOptions();
             InitCore();
-            
+
             staticContext = new ProtoCore.CompileTime.Context();
 
             currentSubTreeList = new Dictionary<Guid, Subtree>();
@@ -1011,13 +1010,13 @@ namespace ProtoScript.Runners
         /// </summary>
         /// <param name="libraries"></param>
         /// <param name="syncData"></param>
-        public void ResetVMAndResyncGraph(List<string> libraries, GraphSyncData syncData = null)
+        public void ResetVMAndResyncGraph(List<string> libraries)
         {
             // Reset VM
             ReInitializeLiveRunner();
 
             // generate import node for each library in input list
-            List<AssociativeNode> importNodes = new List<AssociativeNode>();            
+            List<AssociativeNode> importNodes = new List<AssociativeNode>();
             foreach (string lib in libraries)
             {
                 ProtoCore.AST.AssociativeAST.ImportNode importNode = new ProtoCore.AST.AssociativeAST.ImportNode();
@@ -1028,9 +1027,7 @@ namespace ProtoScript.Runners
             ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(importNodes);
             string code = codeGen.GenerateCode();
 
-            SynchronizeInternal(code);
-
-            
+            UpdateCmdLineInterpreter(code);
         }
 
         private void SynchronizeInternal(GraphSyncData syncData)
@@ -1075,7 +1072,7 @@ namespace ProtoScript.Runners
                 foreach (var st in syncData.ModifiedSubtrees)
                 {
                     Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
-                    
+
                     var nullNodes = MarkGraphNodesInactive(st);
                     if (nullNodes.Count > 0)
                         deltaAstList.AddRange(nullNodes);
@@ -1135,7 +1132,7 @@ namespace ProtoScript.Runners
             if (string.IsNullOrEmpty(code))
             {
                 code = "";
-                
+
                 ResetForDeltaASTExecution();
                 return;
             }
