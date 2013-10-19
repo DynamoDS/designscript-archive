@@ -1353,6 +1353,11 @@ namespace ProtoCore.DSASM
                     {
                         graphNode.isDirty = false;
 
+                        if (core.Options.FullSSA)
+                        {
+                            ProtoCore.AssociativeEngine.Utils.SetFinalGraphNodeRuntimeDependents(graphNode);
+                        }
+
                         // In function calls, the first graphnode in the function is executed first and was not marked 
                         // If this is the case, just move on to the next graphnode
                         if (pc == graphNode.updateBlock.endpc)
@@ -2134,6 +2139,7 @@ namespace ProtoCore.DSASM
         {
             int setentry = entry;
             bool isFirstGraphSet = false;
+            ProtoCore.AssociativeGraph.GraphNode entryNode = null;
             foreach (ProtoCore.AssociativeGraph.GraphNode graphNode in istream.dependencyGraph.GraphList)
             {
                 graphNode.isDirty = true;
@@ -2142,6 +2148,7 @@ namespace ProtoCore.DSASM
                     // Setting the first graph of this function to be in executed (not dirty) state
                     isFirstGraphSet = true;
                     graphNode.isDirty = false;
+                    entryNode = graphNode;
                 }
 
                 if (DSASM.Constants.kInvalidIndex == setentry)
@@ -2149,16 +2156,23 @@ namespace ProtoCore.DSASM
                     // Set the entry point as this graph and mark this graph as executed 
                     setentry = graphNode.updateBlock.startpc;
                     graphNode.isDirty = false;
+                    entryNode = graphNode;
                 }
             }
+
+            if (core.Options.FullSSA)
+            {
+                ProtoCore.AssociativeEngine.Utils.SetFinalGraphNodeRuntimeDependents(entryNode);
+            }
+
             pc = setentry;
         }
-
 
         private void UpdateMethodDependencyGraph(int entry, int procIndex, int classIndex)
         {
             int setentry = entry;
             bool isFirstGraphSet = false;
+            ProtoCore.AssociativeGraph.GraphNode entryNode = null;
 
             List<AssociativeGraph.GraphNode> graphNodes = istream.dependencyGraph.GetGraphNodesAtScope(classIndex, procIndex);
             if (graphNodes != null)
@@ -2171,6 +2185,7 @@ namespace ProtoCore.DSASM
                         // Setting the first graph of this function to be in executed (not dirty) state
                         isFirstGraphSet = true;
                         graphNode.isDirty = false;
+                        entryNode = graphNode;
                     }
 
                     if (DSASM.Constants.kInvalidIndex == setentry)
@@ -2178,8 +2193,14 @@ namespace ProtoCore.DSASM
                         // Set the entry point as this graph and mark this graph as executed 
                         setentry = graphNode.updateBlock.startpc;
                         graphNode.isDirty = false;
+                        entryNode = graphNode;
                     }
                 }
+            }
+
+            if (core.Options.FullSSA)
+            {
+                ProtoCore.AssociativeEngine.Utils.SetFinalGraphNodeRuntimeDependents(entryNode);
             }
             pc = setentry;
         }
@@ -4450,7 +4471,7 @@ namespace ProtoCore.DSASM
                 if (sn.classScope == classIndex 
                     && sn.functionIndex == functionIndex 
                     && !sn.name.Equals(Constants.kWatchResultVar) 
-                    /*&& !CoreUtils.IsSSATemp(sn.name)*/
+                    && !CoreUtils.IsSSATemp(sn.name)
                     /*&& !sn.isAnonymous*/
                     )
                 {
@@ -4545,7 +4566,7 @@ namespace ProtoCore.DSASM
             {
                 if (symbol.functionIndex == functionIndex
                     && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
-                    /*&& !CoreUtils.IsSSATemp(symbol.name)*/
+                    && !CoreUtils.IsSSATemp(symbol.name)
                     /*&& !symbol.isAnonymous*/
                     )
                 {
@@ -7363,14 +7384,15 @@ namespace ProtoCore.DSASM
 
             ProcedureNode procNode = GetProcedureNode(blockId, ci, fi);
 
-            //// GC anonymous variables in the return stmt
-            //if (core.Options.FullSSA)
-            //{
-            //    if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
-            //    {
-            //        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
-            //    }
-            //}
+            // GC anonymous variables in the return stmt
+            if (core.Options.FullSSA)
+            {
+                if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
+                {
+                    GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                    Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                }
+            }
 
 
             pc = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexReturnAddress).opdata;
@@ -7970,13 +7992,15 @@ namespace ProtoCore.DSASM
                     }
                 }
 
-                //if (core.Options.FullSSA)
-                //{
-                //    if (!Properties.executingGraphNode.IsSSANode())
-                //    {
-                //        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
-                //    }
-                //}
+                if (core.Options.FullSSA)
+                {
+                    if (!Properties.executingGraphNode.IsSSANode())
+                    {
+                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                        Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                        
+                    }
+                }
 
                 if (core.Options.FullSSA)
                 {

@@ -14,6 +14,24 @@ namespace ProtoCore.AssociativeEngine
         kPropertyChangedUpdate
     }
 
+    public class Utils
+    {
+        /// <summary>
+        /// This function sets the modified temp graphnodes to the last graphnode in a statement
+        /// </summary>
+        /// <param name="graphnode"></param>
+        public static void SetFinalGraphNodeRuntimeDependents(AssociativeGraph.GraphNode graphnode)
+        {
+            if (null != graphnode && graphnode.IsSSANode())
+            {
+                if (null != graphnode.lastGraphNode)
+                {
+                    graphnode.lastGraphNode.symbolListWithinExpression.Add(graphnode.updateNodeRefList[0].nodeList[0].symbol);
+                }
+            }
+        }
+    }
+
     public class ArrayUpdate
     {
         /// <summary>
@@ -168,6 +186,7 @@ namespace ProtoCore.AssociativeGraph
         ///     
         /// </summary>
         public List<SymbolNode> symbolListWithinExpression { get; set; }
+
         
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
         public StackValue ArrayPointer { get; set; }
