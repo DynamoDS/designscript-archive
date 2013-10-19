@@ -1942,7 +1942,7 @@ namespace ProtoCore.DSASM
                     // Jun: only allow update to other expr id's (other statements) if this is the final SSA assignment
                     if (core.Options.FullSSA && !propertyChanged)
                     {
-                        if (Properties.executingGraphNode.IsSSANode())
+                        if (null != Properties.executingGraphNode && Properties.executingGraphNode.IsSSANode())
                         {
                             // This is still an SSA statement, if a node of another statement depends on it, ignore it
                             if (graphNode.exprUID != Properties.executingGraphNode.exprUID)
