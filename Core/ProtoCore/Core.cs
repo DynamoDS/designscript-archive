@@ -127,8 +127,8 @@ namespace ProtoCore
             DumpByteCode = false;
             Verbose = false;
 
-            FullSSA = false;
-            DumpIL = false;
+            FullSSA = true;
+            DumpIL = true;
 
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
@@ -445,6 +445,7 @@ namespace ProtoCore
         public int StepOutReturnPC { get; set; }
         public Stack<bool> FRStack { get; set; }
         public AssociativeGraph.GraphNode executingGraphNode { get; set; }
+        public List<AssociativeGraph.GraphNode> deferedGraphnodes { get; set; }
         public List<Instruction> ActiveBreakPoints { get; set; }
 
         public List<Instruction> AllbreakPoints { get; set; }
