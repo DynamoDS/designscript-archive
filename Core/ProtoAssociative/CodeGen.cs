@@ -8621,17 +8621,35 @@ namespace ProtoAssociative
                                 }
                             }
 
-                            if (expressionSSATempSymbolList.Count > 0)
-                            {
-                                //SymbolNode symnode = expressionSSATempSymbolList.Peek();
-                                //symnode.isAnonymous = true;
-                            }
+                            //if (expressionSSATempSymbolList.Count > 0)
+                            //{
+                            //    SymbolNode symnode = expressionSSATempSymbolList.Pop();
+                            //    symnode.isAnonymous = true;
+                            //}
 
                             // Add the list of node within the same expression ID to this last graphnode in the expression
                             graphNode.symbolListWithinExpression.AddRange(expressionSSATempSymbolList);
                             expressionSSATempSymbolList.Clear();
                         }
                     }
+
+                    //if (core.Options.FullSSA)
+                    //{
+                    //    // This is the last expression in the SSA'd expression
+                    //    // Backtrack and assign the this last final assignment graphnode to its associated SSA graphnodes
+                    //    for (int n = codeBlock.instrStream.dependencyGraph.GraphList.Count - 1; n >= 0; --n)
+                    //    {
+                    //        GraphNode currentNode = codeBlock.instrStream.dependencyGraph.GraphList[n];
+                    //        if (currentNode.exprUID == graphNode.exprUID)
+                    //        {
+                    //            codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode = graphNode;
+                    //        }
+                    //        else
+                    //        {
+                    //            break;
+                    //        }
+                    //    }
+                    //}
 
                     graphNode.ResolveLHSArrayIndex();
                     graphNode.updateBlock.endpc = pc - 1;

@@ -80,6 +80,8 @@ namespace ProtoCore.DSASM
 
         public bool isExplicitCall { get; set; }
 
+        private List<AssociativeGraph.GraphNode> deferedGraphNodes = new List<AssociativeGraph.GraphNode>();
+
 
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
         /// <summary>
@@ -1931,6 +1933,22 @@ namespace ProtoCore.DSASM
                         continue;
                     }
 
+
+                    // Jun: only allow update to other expr id's (other statements) if this is the final SSA assignment
+                    if (core.Options.FullSSA && !propertyChanged)
+                    {
+                        if (Properties.executingGraphNode.IsSSANode())
+                        {
+                            // This is still an SSA statement, if a node of another statement depends on it, ignore it
+                            if (graphNode.exprUID != Properties.executingGraphNode.exprUID)
+                            {
+                                // Defer this update until the final non-ssa node
+                                deferedGraphNodes.Add(graphNode);
+                                continue;
+                            }
+                        }
+                    }
+
                     // @keyu: if we are modifying an object's property, e.g.,
                     // 
                     //    foo.id = 42;
@@ -2042,20 +2060,20 @@ namespace ProtoCore.DSASM
                             }
                             graphNode.isDirty = true;
 
-                            if (core.Options.FullSSA)
-                            {
-                                if (graphNode.IsSSANode())
-                                {
-                                    // Update the temporary symbol as dirty so it can be GC'd downstream
-                                    SymbolNode symbol = graphNode.updateNodeRefList[0].nodeList[0].symbol;
-                                    Validity.Assert(graphNode.updateNodeRefList.Count > 0);
-                                    Validity.Assert(null != symbol);
-                                    if (symbol.isAnonymous)
-                                    {
-                                        symbol.isDirty = true;
-                                    }
-                                }
-                            }
+                            //if (core.Options.FullSSA)
+                            //{
+                            //    if (graphNode.IsSSANode())
+                            //    {
+                            //        // Update the temporary symbol as dirty so it can be GC'd downstream
+                            //        SymbolNode symbol = graphNode.updateNodeRefList[0].nodeList[0].symbol;
+                            //        Validity.Assert(graphNode.updateNodeRefList.Count > 0);
+                            //        Validity.Assert(null != symbol);
+                            //        if (symbol.isAnonymous)
+                            //        {
+                            //            symbol.isDirty = true;
+                            //        }
+                            //    }
+                            //}
 
                             graphNode.forPropertyChanged = propertyChanged;
                             nodesMarkedDirty++;
@@ -2836,6 +2854,8 @@ namespace ProtoCore.DSASM
 
                 Properties = PopInterpreterProps();
                 Properties.executingGraphNode = core.DebugProps.executingGraphNode;
+                deferedGraphNodes = core.DebugProps.deferedGraphnodes;
+
             }
             else
             {
@@ -2931,6 +2951,7 @@ namespace ProtoCore.DSASM
                     core.DebugProps.isResume = true;
                     core.DebugProps.FRStack = fepRunStack;
                     core.DebugProps.executingGraphNode = Properties.executingGraphNode;
+                    core.DebugProps.deferedGraphnodes = deferedGraphNodes;
 
                     if (core.DebugProps.RunMode == Runmode.StepNext)
                     {
@@ -2947,7 +2968,7 @@ namespace ProtoCore.DSASM
                     {
                         core.DebugProps.FirstStackFrame = null;
                     }
-                    throw new ProtoCore.Exceptions.DebugHalting();
+                    throw new ProtoCore.Exceptions.DebugHalting(); 
                 }
             }
             return terminateExec;
@@ -4430,7 +4451,7 @@ namespace ProtoCore.DSASM
                     && sn.functionIndex == functionIndex 
                     && !sn.name.Equals(Constants.kWatchResultVar) 
                     /*&& !CoreUtils.IsSSATemp(sn.name)*/
-                    && !sn.isAnonymous
+                    /*&& !sn.isAnonymous*/
                     )
                 {
                     int offset = sn.index;
@@ -4442,12 +4463,32 @@ namespace ProtoCore.DSASM
                     }
                     if (n >= 0)
                     {
-                        // if this block is not the outer most one, gc all the local variables 
-                        // if this block is the outer most one, gc the temp variables only
-                        if (blockId != 0)
-                            GCRelease(rmem.Stack[n]);
-                        else if (sn.isTemp)
-                            GCRelease(rmem.Stack[n]);
+                        if (core.Options.FullSSA)
+                        { 
+                            // if this block is not the outer most one, gc all the local variables 
+                            // if this block is the outer most one, gc the temp variables only
+                            if (blockId != 0)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                            else if (sn.isTemp)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                        }
+                        else
+                        {
+                            // if this block is not the outer most one, gc all the local variables 
+                            // if this block is the outer most one, gc the temp variables only
+                            if (blockId != 0)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                            else if (sn.isTemp)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                        }
 
                         if (blockId != 0)
                         {
@@ -4465,13 +4506,12 @@ namespace ProtoCore.DSASM
             symbolList.Reverse();
             foreach (SymbolNode symbol in symbolList)
             {
-                if (symbol.isDirty && symbol.isAnonymous)
+                if (/*symbol.isDirty && */symbol.isAnonymous)
                 {
                     int offset = symbol.index;
                     int n = offset;
                     if (symbol.absoluteFunctionIndex != DSASM.Constants.kGlobalScope)
                     {
-
                         // Comment Jun: We only want the relative offset if a variable is in a function
                         n = rmem.GetRelative(rmem.GetStackIndex(offset));
                     }
@@ -4506,10 +4546,9 @@ namespace ProtoCore.DSASM
                 if (symbol.functionIndex == functionIndex
                     && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
                     /*&& !CoreUtils.IsSSATemp(symbol.name)*/
-                    && !symbol.isAnonymous
+                    /*&& !symbol.isAnonymous*/
                     )
                 {
-
                     StackValue sv = rmem.GetAtRelative(symbol);
                     if (AddressType.Pointer == sv.optype || AddressType.ArrayPointer == sv.optype)
                     {
@@ -7324,14 +7363,14 @@ namespace ProtoCore.DSASM
 
             ProcedureNode procNode = GetProcedureNode(blockId, ci, fi);
 
-            // GC anonymous variables in the return stmt
-            if (core.Options.FullSSA)
-            {
-                if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
-                {
-                    GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
-                }
-            }
+            //// GC anonymous variables in the return stmt
+            //if (core.Options.FullSSA)
+            //{
+            //    if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
+            //    {
+            //        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+            //    }
+            //}
 
 
             pc = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexReturnAddress).opdata;
@@ -7931,14 +7970,25 @@ namespace ProtoCore.DSASM
                     }
                 }
 
+                //if (core.Options.FullSSA)
+                //{
+                //    if (!Properties.executingGraphNode.IsSSANode())
+                //    {
+                //        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                //    }
+                //}
+
                 if (core.Options.FullSSA)
                 {
                     if (!Properties.executingGraphNode.IsSSANode())
                     {
-                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                        foreach (AssociativeGraph.GraphNode gnode in deferedGraphNodes)
+                        {
+                            gnode.isDirty = true;
+                        }
+                        deferedGraphNodes.Clear();
                     }
                 }
-
             }
 
             // TODO Jun: Whats the main diff again on non-delta execution???
