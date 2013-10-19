@@ -2065,21 +2065,6 @@ namespace ProtoCore.DSASM
                             }
                             graphNode.isDirty = true;
 
-                            //if (core.Options.FullSSA)
-                            //{
-                            //    if (graphNode.IsSSANode())
-                            //    {
-                            //        // Update the temporary symbol as dirty so it can be GC'd downstream
-                            //        SymbolNode symbol = graphNode.updateNodeRefList[0].nodeList[0].symbol;
-                            //        Validity.Assert(graphNode.updateNodeRefList.Count > 0);
-                            //        Validity.Assert(null != symbol);
-                            //        if (symbol.isAnonymous)
-                            //        {
-                            //            symbol.isDirty = true;
-                            //        }
-                            //    }
-                            //}
-
                             graphNode.forPropertyChanged = propertyChanged;
                             nodesMarkedDirty++;
                         }
@@ -4527,21 +4512,17 @@ namespace ProtoCore.DSASM
             symbolList.Reverse();
             foreach (SymbolNode symbol in symbolList)
             {
-                if (/*symbol.isDirty && */symbol.isAnonymous)
+                int offset = symbol.index;
+                int n = offset;
+                if (symbol.absoluteFunctionIndex != DSASM.Constants.kGlobalScope)
                 {
-                    int offset = symbol.index;
-                    int n = offset;
-                    if (symbol.absoluteFunctionIndex != DSASM.Constants.kGlobalScope)
-                    {
-                        // Comment Jun: We only want the relative offset if a variable is in a function
-                        n = rmem.GetRelative(rmem.GetStackIndex(offset));
-                    }
+                    // Comment Jun: We only want the relative offset if a variable is in a function
+                    n = rmem.GetRelative(rmem.GetStackIndex(offset));
+                }
 
-                    if (n >= 0)
-                    {
-                        GCRelease(rmem.Stack[n]);
-                    }
-                    symbol.isDirty = false;
+                if (n >= 0)
+                {
+                    GCRelease(rmem.Stack[n]);
                 }
             }
         }
@@ -4567,7 +4548,6 @@ namespace ProtoCore.DSASM
                 if (symbol.functionIndex == functionIndex
                     && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
                     && !CoreUtils.IsSSATemp(symbol.name)
-                    /*&& !symbol.isAnonymous*/
                     )
                 {
                     StackValue sv = rmem.GetAtRelative(symbol);
