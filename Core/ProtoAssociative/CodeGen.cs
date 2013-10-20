@@ -8628,7 +8628,10 @@ namespace ProtoAssociative
                                 bool isWithinSameExpressionID = currentNode.exprUID == graphNode.exprUID;
                                 if (isWithinSameScope && isWithinSameExpressionID)
                                 {
-                                    codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode = graphNode;
+                                    if (null == codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode)
+                                    {
+                                        codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode = graphNode;
+                                    }
                                 }
                             }
                         }
