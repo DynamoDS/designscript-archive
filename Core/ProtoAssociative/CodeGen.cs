@@ -7833,6 +7833,28 @@ namespace ProtoAssociative
                     EmitDependency(binaryExpr.exprUID, binaryExpr.modBlkUID, false);
                 }
 
+
+                if (core.Options.FullSSA)
+                {
+                    if (!graphNode.IsSSANode())
+                    {
+                        // This is the last expression in the SSA'd expression
+                        // Backtrack and assign the this last final assignment graphnode to its associated SSA graphnodes
+                        for (int n = codeBlock.instrStream.dependencyGraph.GraphList.Count - 1; n >= 0; --n)
+                        {
+                            GraphNode currentNode = codeBlock.instrStream.dependencyGraph.GraphList[n];
+                            bool isWithinSameScope = currentNode.classIndex == graphNode.classIndex
+                                && currentNode.procIndex == graphNode.procIndex;
+                            bool isWithinSameExpressionID = currentNode.exprUID == graphNode.exprUID;
+                            if (isWithinSameScope && isWithinSameExpressionID)
+                            {
+                                codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode = graphNode;
+                            }
+                        }
+                    }
+                }
+
+
                 // Assign the end pc to this graph node's update block
                 // Dependency graph construction is complete for this expression
                 graphNode.updateBlock.endpc = pc - 1;
@@ -8594,18 +8616,20 @@ namespace ProtoAssociative
 
                     if (core.Options.FullSSA)
                     {
-                        // This is the last expression in the SSA'd expression
-                        // Backtrack and assign the this last final assignment graphnode to its associated SSA graphnodes
-                        for (int n = codeBlock.instrStream.dependencyGraph.GraphList.Count - 1; n >= 0; --n)
+                        if (!graphNode.IsSSANode())
                         {
-                            GraphNode currentNode = codeBlock.instrStream.dependencyGraph.GraphList[n];
-                            if (currentNode.exprUID == graphNode.exprUID)
+                            // This is the last expression in the SSA'd expression
+                            // Backtrack and assign the this last final assignment graphnode to its associated SSA graphnodes
+                            for (int n = codeBlock.instrStream.dependencyGraph.GraphList.Count - 1; n >= 0; --n)
                             {
-                                codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode = graphNode;
-                            }
-                            else
-                            {
-                                break;
+                                GraphNode currentNode = codeBlock.instrStream.dependencyGraph.GraphList[n];
+                                bool isWithinSameScope = currentNode.classIndex == graphNode.classIndex
+                                    && currentNode.procIndex == graphNode.procIndex;
+                                bool isWithinSameExpressionID = currentNode.exprUID == graphNode.exprUID;
+                                if (isWithinSameScope && isWithinSameExpressionID)
+                                {
+                                    codeBlock.instrStream.dependencyGraph.GraphList[n].lastGraphNode = graphNode;
+                                }
                             }
                         }
                     }
