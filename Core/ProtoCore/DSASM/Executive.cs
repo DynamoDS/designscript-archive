@@ -4507,11 +4507,24 @@ namespace ProtoCore.DSASM
             }
         }
 
-        public void GCAnonymousSymbols(List<SymbolNode> symbolList)
+        public void GCAnonymousSymbols(List<SymbolNode> symbolList, bool isLastNodeSetter = false)
         {
-            symbolList.Reverse();
-            foreach (SymbolNode symbol in symbolList)
+            //foreach (SymbolNode symbol in symbolList)
+            for(int i = 0; i < symbolList.Count; ++i)
             {
+                //
+                // Comment Jun: We want to prevent GC of temp var if it is being assigned to a property
+                // This is a current issue of property setters where a GCRetain is not called on the RHS 
+                // i.e. 
+                //  a.b = p -> GCRetain is not called when p is popped to a.b
+                //
+                if (isLastNodeSetter && i == symbolList.Count - 1)
+                {
+                    break;
+                }
+
+                SymbolNode symbol = symbolList[i];
+
                 int offset = symbol.index;
                 int n = offset;
                 if (symbol.absoluteFunctionIndex != DSASM.Constants.kGlobalScope)
@@ -7976,12 +7989,13 @@ namespace ProtoCore.DSASM
                 {
                     if (!Properties.executingGraphNode.IsSSANode())
                     {
-                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
-                        Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                        bool isSetter = Properties.executingGraphNode.updateNodeRefList[0].nodeList.Count > 1;
                         
+                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression, isSetter);
+                        Properties.executingGraphNode.symbolListWithinExpression.Clear();
                     }
                 }
-
+                
                 if (core.Options.FullSSA)
                 {
                     if (!Properties.executingGraphNode.IsSSANode())
