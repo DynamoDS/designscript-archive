@@ -4452,13 +4452,24 @@ namespace ProtoCore.DSASM
         public void GCCodeBlock(int blockId, int functionIndex = DSASM.Constants.kGlobalScope, int classIndex = DSASM.Constants.kInvalidIndex)
         {
             foreach (ProtoCore.DSASM.SymbolNode sn in exe.runtimeSymbols[blockId].symbolList.Values)
-            {
-                if (sn.classScope == classIndex 
+            {   
+                bool allowGC = sn.classScope == classIndex 
                     && sn.functionIndex == functionIndex 
-                    && !sn.name.Equals(Constants.kWatchResultVar) 
-                    && !CoreUtils.IsSSATemp(sn.name)
-                    /*&& !sn.isAnonymous*/
-                    )
+                    && !sn.name.Equals(Constants.kWatchResultVar);
+                    /*&& !CoreUtils.IsSSATemp(sn.name)*/
+
+                if (core.Options.GCTempVarsOnDebug && core.Options.FullSSA)
+                {
+                    if (core.Options.IDEDebugMode)
+                    {
+                        allowGC = sn.classScope == classIndex 
+                            && sn.functionIndex == functionIndex 
+                            && !sn.name.Equals(Constants.kWatchResultVar)
+                            && !CoreUtils.IsSSATemp(sn.name);
+                    }
+                }
+
+                if (allowGC)
                 {
                     int offset = sn.index;
                     int n = offset;
@@ -4558,10 +4569,20 @@ namespace ProtoCore.DSASM
 
             foreach (SymbolNode symbol in st.symbolList.Values)
             {
-                if (symbol.functionIndex == functionIndex
-                    && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
-                    && !CoreUtils.IsSSATemp(symbol.name)
-                    )
+                bool allowGC = symbol.functionIndex == functionIndex
+                    && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar);
+
+                if (core.Options.GCTempVarsOnDebug && core.Options.FullSSA)
+                {
+                    if (core.Options.IDEDebugMode)
+                    {
+                        allowGC = symbol.functionIndex == functionIndex
+                            && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
+                            && !CoreUtils.IsSSATemp(symbol.name);
+                    }
+                }
+
+                if (allowGC)
                 {
                     StackValue sv = rmem.GetAtRelative(symbol);
                     if (AddressType.Pointer == sv.optype || AddressType.ArrayPointer == sv.optype)
@@ -7377,13 +7398,16 @@ namespace ProtoCore.DSASM
 
             ProcedureNode procNode = GetProcedureNode(blockId, ci, fi);
 
-            // GC anonymous variables in the return stmt
             if (core.Options.FullSSA)
             {
-                if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
+                if (core.Options.GCTempVarsOnDebug && core.Options.IDEDebugMode)
                 {
-                    GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
-                    Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                    // GC anonymous variables in the return stmt
+                    if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
+                    {
+                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                        Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                    }
                 }
             }
 
@@ -7987,12 +8011,15 @@ namespace ProtoCore.DSASM
 
                 if (core.Options.FullSSA)
                 {
-                    if (!Properties.executingGraphNode.IsSSANode())
+                    if (core.Options.GCTempVarsOnDebug && core.Options.IDEDebugMode)
                     {
-                        bool isSetter = Properties.executingGraphNode.updateNodeRefList[0].nodeList.Count > 1;
-                        
-                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression, isSetter);
-                        Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                        if (!Properties.executingGraphNode.IsSSANode())
+                        {
+                            bool isSetter = Properties.executingGraphNode.updateNodeRefList[0].nodeList.Count > 1;
+
+                            GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression, isSetter);
+                            Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                        }
                     }
                 }
                 
