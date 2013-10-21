@@ -129,6 +129,7 @@ namespace ProtoCore
 
             FullSSA = true;
             DumpIL = true;
+            GCTempVarsOnDebug = true;
 
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
@@ -175,6 +176,7 @@ namespace ProtoCore
         public bool DumpByteCode { get; set; }
         public bool DumpIL { get; private set; }
         public bool FullSSA { get; set; }
+        public bool GCTempVarsOnDebug { get; set; }
         public bool Verbose { get; set; }
         public bool DumpOperatorToMethodByteCode { get; set; }
         public bool SuppressBuildOutput { get; set; }
