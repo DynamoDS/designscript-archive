@@ -306,10 +306,14 @@ class coll
 ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             object[] expectedResultc = { new object[] { 1 }, 2, 3 };
+<<<<<<< HEAD
+            object[] expectedResultd = {new object[] {new object[] {1}, 2, 3},                                 new object[] {new object[] {1}, 5, 6}        };
+=======
             object[] expectedResultd = {new object[] {new object[] {1}, 2, 3},
                      
             new object[] {new object[] {1}, 5, 6}
         };
+>>>>>>> upstream/StableBranchWithTestcases
             thisTest.Verify("c", expectedResultc, 0);
             thisTest.Verify("d", expectedResultd, 0);
 
@@ -1149,6 +1153,10 @@ b1=foo(cy);
 
         }
 
+<<<<<<< HEAD
+        /*   
+[Test]           public void T24_Dynamic_Array_Function_1465706()           {               ExecutionMirror mirror = thisTest.RunScript(filePath, "T24_Dynamic_Array_Function_1465706.ds");               Object[] test = new Object[] { 0, 1 };               thisTest.Verify("test", test);                   }*/
+=======
         /*   
 [Test]
            public void T24_Dynamic_Array_Function_1465706()
@@ -1158,6 +1166,7 @@ b1=foo(cy);
                thisTest.Verify("test", test);
         
            }*/
+>>>>>>> upstream/StableBranchWithTestcases
 
 
 
@@ -2145,6 +2154,10 @@ aa;aa1;
             thisTest.Verify("aa", aa);
             thisTest.Verify("aa1", aa1);
         }
+<<<<<<< HEAD
+        /* 
+[Test]         [Category ("SmokeTest")]  public void T27_defect_1464429_DynamicArray_function()         {             ExecutionMirror mirror = thisTest.RunScript(filePath, "T27_defect_1464429_DynamicArray_function.ds");             Object[] t1 = new Object[] { -2, -1 };                         thisTest.Verify("t2", t2);         }*/
+=======
         /* 
 [Test]
          [Category ("SmokeTest")]
@@ -2155,6 +2168,7 @@ aa;aa1;
             
              thisTest.Verify("t2", t2);
          }*/
+>>>>>>> upstream/StableBranchWithTestcases
 
 
         [Test]
@@ -2358,6 +2372,11 @@ y = x;
             thisTest.Verify("x", x);
             thisTest.Verify("y", y);
         }
+<<<<<<< HEAD
+        /* 
+[Test]         public void T40_Index_DynamicArray_1467064_5()         {             Assert.Throws(typeof(ProtoCore.Exceptions.CompileErrorsOccured), () =>             {                 ExecutionMirror mirror = thisTest.RunScript(filePath, "T40_Index_DynamicArray_byarray_1467064_5.ds");             });         }         
+[Test]         public void T40_Index_DynamicArray_1467064_6()         {             Assert.Throws(typeof(ProtoCore.Exceptions.CompileErrorsOccured), () =>             {                 ExecutionMirror mirror = thisTest.RunScript(filePath, "T40_Index_DynamicArray_byarray_1467064_6.ds");             });         }*/
+=======
         /* 
 [Test]
          public void T40_Index_DynamicArray_1467064_5()
@@ -2376,6 +2395,7 @@ y = x;
                  ExecutionMirror mirror = thisTest.RunScript(filePath, "T40_Index_DynamicArray_byarray_1467064_6.ds");
              });
          }*/
+>>>>>>> upstream/StableBranchWithTestcases
 
         [Test]
         [Category("SmokeTest")]
@@ -3176,10 +3196,14 @@ test = a[0]; //= 10� i.e. a change in �b� causes a change to �a�
         public void T43_Defect_1467234_negative_indexing()
         {
             String code =
+<<<<<<< HEAD
+@"a = { };a[-1] = 1;b = a;";
+=======
 @"a = { };
 a[-1] = 1;
 b = a;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("a", new Object[] { 1 });
         }
@@ -3189,6 +3213,9 @@ b = a;
         public void T44_Defect_1467264()
         {
             String code =
+<<<<<<< HEAD
+@"class A{    X : var[];    constructor  A ( t1 : var[] )    {        X = t1;    }}a1 = { A.A(1..2), A.A(2..3) };a = a1[0].X[0][1];";
+=======
 @"class A
 {
     X : var[];
@@ -3200,6 +3227,7 @@ b = a;
 a1 = { A.A(1..2), A.A(2..3) };
 a = a1[0].X[0][1];
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             Object n1 = null;
             thisTest.Verify("a", n1);
@@ -3210,6 +3238,9 @@ a = a1[0].X[0][1];
         public void T45_Defect_1467393()
         {
             String code =
+<<<<<<< HEAD
+@"arr = { { } };[Imperative]{    numRings = 3;        for(i in(0..(numRings-1)))    {        [Associative]        {            x = 0..i..#numRings;            arr[i] = x;        }           }}test = arr;a= 1;";
+=======
 @"arr = { { } };
 [Imperative]
 {
@@ -3226,6 +3257,7 @@ a = a1[0].X[0][1];
 test = arr;
 a= 1;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3240,6 +3272,9 @@ a= 1;
         public void T45_Defect_1467393_2()
         {
             String code =
+<<<<<<< HEAD
+@"arr = { { } };[Imperative]{    numRings = 3;        for(i in(0..(numRings-1)))    {        s = Print(i);        [Associative]        {            x = 0..i;            arr[i] = x;        }           }}test = arr;a= 1;";
+=======
 @"arr = { { } };
 [Imperative]
 {
@@ -3257,6 +3292,7 @@ a= 1;
 test = arr;
 a= 1;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3269,6 +3305,9 @@ a= 1;
         public void T45_Defect_1467393_3()
         {
             String code =
+<<<<<<< HEAD
+@"def foo (){    arr = { { } };    [Imperative]    {        numRings = 3;            for(i in(0..(numRings-1)))        {            s = Print(i);            [Associative]            {                x = 0..i;                arr[i] = x;            }               }    }    return = arr;}test = foo();";
+=======
 @"
 def foo ()
 {
@@ -3290,6 +3329,7 @@ def foo ()
 }
 test = foo();
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3302,6 +3342,9 @@ test = foo();
         public void T45_Defect_1467393_4()
         {
             String code =
+<<<<<<< HEAD
+@"def foo (){    arr = { { } };    [Imperative]    {        x = {0, 1};        for(i in x)        {            [Associative]            {                arr[i] = 0..i;            }               }    }    return = arr;}test = foo();";
+=======
 @"
 def foo ()
 {
@@ -3321,6 +3364,7 @@ def foo ()
 }
 test = foo();
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3333,6 +3377,9 @@ test = foo();
         public void T46_Defect_1467502_1()
         {
             String code =
+<<<<<<< HEAD
+@"//arr; //  declaring arr here workstest = [Imperative]{    arr; //  declaring arr here does not work.    //arr = { }; //  declaring arr with = {} works        // create arr    for(i in (0..1))    {        arr[i] = i;    }    return = arr;}";
+=======
 @"
 //arr; //  declaring arr here works
 test = [Imperative]
@@ -3348,6 +3395,7 @@ test = [Imperative]
     return = arr;
 }
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3360,6 +3408,9 @@ test = [Imperative]
         public void T46_Defect_1467502_2()
         {
             String code =
+<<<<<<< HEAD
+@"arr; //  declaring arr here workstest = [Imperative]{    // create arr    for(i in (0..1))    {        arr[i] = i;    }   }test = arr;";
+=======
 @"
 arr; //  declaring arr here works
 test = [Imperative]
@@ -3372,6 +3423,7 @@ test = [Imperative]
 }
 test = arr;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3384,6 +3436,9 @@ test = arr;
         public void T46_Defect_1467502_3()
         {
             String code =
+<<<<<<< HEAD
+@"arr = { }; test = [Imperative]{    // create arr    for(i in (0..1))    {        arr[i] = i;    }   }test = arr;";
+=======
 @"
 arr = { }; 
 test = [Imperative]
@@ -3396,6 +3451,7 @@ test = [Imperative]
 }
 test = arr;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3408,6 +3464,9 @@ test = arr;
         public void T46_Defect_1467502_4()
         {
             String code =
+<<<<<<< HEAD
+@"test = [Imperative]{    arr = { } ;    // create arr    for(i in (0..1))    {        arr[i] = i;    }      return= arr; }";
+=======
 @"
 test = [Imperative]
 {
@@ -3420,6 +3479,7 @@ test = [Imperative]
     return= arr; 
 }
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3432,6 +3492,9 @@ test = [Imperative]
         public void T46_Defect_1467502_5()
         {
             String code =
+<<<<<<< HEAD
+@"test = [Imperative]{    arr = { } ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }";
+=======
 @"
 test = [Imperative]
 {
@@ -3443,6 +3506,7 @@ test = [Imperative]
     return = arr;   
 }
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3456,6 +3520,9 @@ test = [Imperative]
         public void T46_Defect_1467502_6()
         {
             String code =
+<<<<<<< HEAD
+@"test = [Imperative]{    arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }";
+=======
 @"
 test = [Imperative]
 {
@@ -3467,6 +3534,7 @@ test = [Imperative]
     return = arr;   
 }
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3480,6 +3548,9 @@ test = [Imperative]
         public void T46_Defect_1467502_7()
         {
             String code =
+<<<<<<< HEAD
+@"arr;[Imperative]{    //arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    //return = arr;   }test = arr;";
+=======
 @"
 arr;
 [Imperative]
@@ -3493,6 +3564,7 @@ arr;
 }
 test = arr;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3506,6 +3578,9 @@ test = arr;
         public void T46_Defect_1467502_8()
         {
             String code =
+<<<<<<< HEAD
+@"arr = { };test = [Imperative]{    //arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }";
+=======
 @"
 arr = { };
 test = [Imperative]
@@ -3518,6 +3593,7 @@ test = [Imperative]
     return = arr;   
 }
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3531,6 +3607,9 @@ test = [Imperative]
         public void T46_Defect_1467502_9()
         {
             String code =
+<<<<<<< HEAD
+@"arr = { {}, {}};[Imperative]{    //arr = null ;        for(i in (0..1))    {        arr[i][i] = i;    }    return = arr;   }test = arr;";
+=======
 @"
 arr = { {}, {}};
 [Imperative]
@@ -3544,6 +3623,7 @@ arr = { {}, {}};
 }
 test = arr;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3557,6 +3637,9 @@ test = arr;
         public void T46_Defect_1467502_9_1()
         {
             String code =
+<<<<<<< HEAD
+@"//arr = { {}, {}};def foo (){    t = [Imperative]    {        arr = null ;            for(i in (0..1))        {            arr[i][i] = i;        }        return = arr;       }    return = t;}test = foo();";
+=======
 @"
 //arr = { {}, {}};
 def foo ()
@@ -3574,6 +3657,7 @@ def foo ()
 }
 test = foo();
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3587,6 +3671,9 @@ test = foo();
         public void T46_Defect_1467502_9_2()
         {
             String code =
+<<<<<<< HEAD
+@"class A{    static def foo ()    {        t = [Imperative]        {            arr  ;                for(i in (0..1))            {                arr[i][i] = i;            }            return = arr;           }        return = t;    }}test = A.foo();";
+=======
 @"
 class A
 {
@@ -3606,6 +3693,7 @@ class A
 }
 test = A.foo();
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3619,6 +3707,9 @@ test = A.foo();
         public void T46_Defect_1467502_9_3()
         {
             String code =
+<<<<<<< HEAD
+@"arr = { {}, {}};def foo (){    t = [Imperative]    {        //arr = null ;            for(i in (0..1))        {            arr[i][i] = i;        }        return = arr;       }    return = t;}test = foo();";
+=======
 @"
 arr = { {}, {}};
 def foo ()
@@ -3636,6 +3727,7 @@ def foo ()
 }
 test = foo();
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3649,6 +3741,9 @@ test = foo();
         public void T46_Defect_1467502_9_4()
         {
             String code =
+<<<<<<< HEAD
+@"arr;class A{    static def foo ()    {        t = [Imperative]        {            //arr  ;                for(i in (0..1))            {                arr[i][i] = i;            }            return = arr;           }        return = t;    }}test = A.foo();";
+=======
 @"
 arr;
 class A
@@ -3669,6 +3764,7 @@ class A
 }
 test = A.foo();
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3682,6 +3778,9 @@ test = A.foo();
         public void T46_Defect_1467502_9_5()
         {
             String code =
+<<<<<<< HEAD
+@"class B{    x : int = 0;}arr = { {}, {}};def foo (){    t = [Imperative]    {        //arr = null ;            for(i in (0..1))        {            arr[i][i] = B.B();        }        return = arr;       }    return = t;}test = foo().x;";
+=======
 @"
 class B
 {
@@ -3703,6 +3802,7 @@ def foo ()
 }
 test = foo().x;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3716,6 +3816,9 @@ test = foo().x;
         public void T46_Defect_1467502_9_6()
         {
             String code =
+<<<<<<< HEAD
+@"//arr;class B{    x : int = 0;}class A{    static def foo ()    {        t = [Imperative]        {            arr  ;                for(i in (0..1))            {                arr[i][i] = B.B();            }            return = arr;           }        return = t;    }}test = A.foo().x;";
+=======
 @"
 //arr;
 class B
@@ -3740,6 +3843,7 @@ class A
 }
 test = A.foo().x;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3753,6 +3857,9 @@ test = A.foo().x;
         public void T47_Defect_1467561_1()
         {
             String code =
+<<<<<<< HEAD
+@"//arr;class B{    x : int = 0;}class A{    static def foo ()    {        t = [Imperative]        {            arr  ;                for(i in (0..1))            {                if ( i < 3 )                {                    arr[i][i] = B.B();                }            }            return = arr;           }        return = t;    }}test = A.foo().x;";
+=======
 @"
 //arr;
 class B
@@ -3780,6 +3887,7 @@ class A
 }
 test = A.foo().x;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3792,6 +3900,9 @@ test = A.foo().x;
         public void T47_Defect_1467561_2()
         {
             String code =
+<<<<<<< HEAD
+@"class B{    x : int = 0;}class A{    def foo ()    {        t = [Imperative]        {            arr = {} ;                for(i in (0..1))            {                if ( i < 3 )                {                    arr[i][i] = B.B();                }            }            return = arr;           }        return = t;    }}aa = A.A();test = aa.foo().x;";
+=======
 @"
 class B
 {
@@ -3819,6 +3930,7 @@ class A
 aa = A.A();
 test = aa.foo().x;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3831,6 +3943,9 @@ test = aa.foo().x;
         public void T47_Defect_1467561_3()
         {
             String code =
+<<<<<<< HEAD
+@"arr;class B{    x : int = 0;}class A{    static def foo ()    {        t = [Imperative]        {            for(i in (0..1))            {                if ( i < 3 )                {                    arr[i][i] = B.B();                }            }            return = arr;           }        return = t;    }}test = A.foo().x;";
+=======
 @"
 arr;
 class B
@@ -3857,6 +3972,7 @@ class A
 }
 test = A.foo().x;
 ";
+>>>>>>> upstream/StableBranchWithTestcases
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
@@ -3864,6 +3980,8 @@ test = A.foo().x;
             Object[] v1 = new Object[] { new Object[] { 0 }, new Object[] { n1, 0 } };
             thisTest.Verify("test", v1);
         }
+<<<<<<< HEAD
+=======
         // For Unit tests of Dictionary pls refere Microfeaturetests.cs
         [Test]
         public void T48_Dictionaryvariableaskey()
@@ -4366,5 +4484,6 @@ r2 = a[1];
 
 
         }
+>>>>>>> upstream/StableBranchWithTestcases
     }
 }

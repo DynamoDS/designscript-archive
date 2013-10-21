@@ -1872,11 +1872,14 @@ namespace ProtoCore.DSASM
 
             foreach (var graphNode in graphNodes)
             {
+<<<<<<< HEAD
+=======
                 // If the graphnode is inactive then it is no longer executed
                 if (!graphNode.isActive)
                 {
                     continue;
                 }
+>>>>>>> upstream/StableBranchWithTestcases
                 //
                 // Comment Jun: 
                 //      This is clarifying the intention that if the graphnode is within the same SSA expression, we still allow update

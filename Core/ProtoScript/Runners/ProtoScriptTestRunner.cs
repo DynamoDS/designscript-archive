@@ -111,7 +111,10 @@ namespace ProtoScript.Runners
 
                 //passing the global Assoc wrapper block to the compiler
                 ProtoCore.CompileTime.Context context = new ProtoCore.CompileTime.Context();
+<<<<<<< HEAD
+=======
                 context.SetData(string.Empty, new Dictionary<string, object>(), null);
+>>>>>>> upstream/StableBranchWithTestcases
                 ProtoCore.Language id = globalBlock.language;
 
                 

@@ -278,6 +278,8 @@ namespace ProtoCore.DSASM.Mirror
             }
         }
 
+<<<<<<< HEAD
+=======
         private string GetPointerTrace(int ptr, Heap heap, int langblock, HashSet<int> pointers, bool forPrint)
         {
             if (pointers.Contains(ptr))
@@ -299,6 +301,7 @@ namespace ProtoCore.DSASM.Mirror
             }
         }
 
+>>>>>>> upstream/StableBranchWithTestcases
         private string GetArrayTrace(int pointer, Heap heap, int langblock, HashSet<int> pointers, bool forPrint)
         {
             if (!formatParams.ContinueOutputTrace())
@@ -315,8 +318,11 @@ namespace ProtoCore.DSASM.Mirror
                     halfArraySize = (int)Math.Floor(formatParams.MaxArraySize * 0.5);
             }
 
+<<<<<<< HEAD
+=======
             int totalElementCount = hs.VisibleSize + (hs.Dict == null ? 0 : hs.Dict.Count());
 
+>>>>>>> upstream/StableBranchWithTestcases
             for (int n = 0; n < hs.VisibleSize; ++n)
             {
                 // As we try to output the next element in the array, there 
@@ -330,7 +336,21 @@ namespace ProtoCore.DSASM.Mirror
                 StackValue sv = hs.Stack[n];
                 if (sv.optype == AddressType.ArrayPointer)
                 {
+<<<<<<< HEAD
+                    int ptr = (int)sv.opdata;
+                    if (pointers.Contains(ptr))
+                        arrayElements.Append("{ ... }");
+                    else
+                    {
+                        pointers.Add(ptr);
+                        if (forPrint)
+                            arrayElements.Append("{" + GetArrayTrace(ptr, heap, langblock, pointers, forPrint) + "}");
+                        else
+                            arrayElements.Append("{ " + GetArrayTrace(ptr, heap, langblock, pointers, forPrint) + " }");
+                    }
+=======
                     arrayElements.Append(GetPointerTrace((int)sv.opdata, heap, langblock, pointers, forPrint));
+>>>>>>> upstream/StableBranchWithTestcases
                 }
                 else
                 {
@@ -343,6 +363,9 @@ namespace ProtoCore.DSASM.Mirror
                 if (halfArraySize > 0 && (n == halfArraySize - 1))
                 {
                     arrayElements.Append(", ...");
+<<<<<<< HEAD
+                    n = hs.VisibleSize - halfArraySize - 1;
+=======
                     n = totalElementCount - halfArraySize - 1;
                 }
             }
@@ -394,6 +417,7 @@ namespace ProtoCore.DSASM.Mirror
                     {
                         arrayElements.Append(GetStringValue(value, heap, langblock, forPrint));
                     }
+>>>>>>> upstream/StableBranchWithTestcases
                 }
             }
 

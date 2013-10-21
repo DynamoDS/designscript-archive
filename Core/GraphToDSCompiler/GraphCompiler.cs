@@ -7,6 +7,10 @@ using System.Text;
 using System.IO;
 using System.Collections;
 using ProtoCore.Utils;
+<<<<<<< HEAD
+using System.Diagnostics;
+=======
+>>>>>>> upstream/StableBranchWithTestcases
 
 namespace GraphToDSCompiler
 {
@@ -1291,6 +1295,28 @@ namespace GraphToDSCompiler
             */
             UpdateAddedNodesInModifiedNameList();
 
+<<<<<<< HEAD
+            for (int i=0; i<result.Count; i++)
+            {
+                Debug.WriteLine("Node " + i+":");
+                SnapshotNode ssn = result[i];
+                Debug.WriteLine("\tId: " + ssn.Id);
+                Debug.WriteLine("\tType: " + ssn.Type);
+                Debug.WriteLine("\tContent: " + ssn.Content);
+                Debug.WriteLine("\tInput List: ");
+                foreach (Connection inCnt in ssn.InputList)
+                {
+                    Debug.WriteLine("\t\t{0}, {1}, {2}, {3}", inCnt.OtherNode, inCnt.LocalIndex, inCnt.OtherIndex, inCnt.LocalName); 
+                }
+                Debug.WriteLine("\tOutput List: ");
+                foreach (Connection outCnt in ssn.OutputList)
+                {
+                    Debug.WriteLine("\t\t{0}, {1}, {2}, {3}", outCnt.OtherNode, outCnt.LocalIndex, outCnt.OtherIndex, outCnt.LocalName);
+                }
+            }
+
+=======
+>>>>>>> upstream/StableBranchWithTestcases
             return result;
         }
 

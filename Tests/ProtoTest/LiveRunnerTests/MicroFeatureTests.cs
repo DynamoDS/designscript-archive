@@ -733,7 +733,6 @@ namespace ProtoTest.LiveRunner
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
 
-
         }
 
         [Test]

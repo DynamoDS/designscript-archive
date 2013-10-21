@@ -19,7 +19,8 @@ namespace DesignScriptStudio.Tests.UnitTests
             string code = "a=1;";
             Dictionary<int, List<VariableLine>> unboundIdentifiers = null;
             List<ProtoCore.AST.Node> astNodes = null;
-            GraphUtilities.ParseCodeBlockNodeStatements(code, unboundIdentifiers, out astNodes);
+            ProtoCore.BuildStatus buildStatus;
+            GraphUtilities.ParseCodeBlockNodeStatements(code, out unboundIdentifiers, out astNodes, out buildStatus);
 
             Ui.Statement statement = new Ui.Statement(astNodes[0]);
 
@@ -38,7 +39,8 @@ namespace DesignScriptStudio.Tests.UnitTests
             string code = "a=b;";
             Dictionary<int, List<VariableLine>> unboundIdentifiers = null;
             List<ProtoCore.AST.Node> astNodes = null;
-            GraphUtilities.ParseCodeBlockNodeStatements(code, unboundIdentifiers, out astNodes);
+            ProtoCore.BuildStatus buildStatus;
+            GraphUtilities.ParseCodeBlockNodeStatements(code, out unboundIdentifiers, out astNodes, out buildStatus);
 
             Ui.Statement statement = new Ui.Statement(astNodes[0]);
 
@@ -60,7 +62,8 @@ namespace DesignScriptStudio.Tests.UnitTests
             string code = "a[1][2] = 1;";
             Dictionary<int, List<VariableLine>> unboundIdentifiers = null;
             List<ProtoCore.AST.Node> astNodes = null;
-            GraphUtilities.ParseCodeBlockNodeStatements(code, unboundIdentifiers, out astNodes);
+            ProtoCore.BuildStatus buildStatus;
+            GraphUtilities.ParseCodeBlockNodeStatements(code, out unboundIdentifiers, out astNodes, out buildStatus);
 
             Ui.Statement statement = new Ui.Statement(astNodes[0]);
 
@@ -79,7 +82,8 @@ namespace DesignScriptStudio.Tests.UnitTests
             string code = "a=1;";
             Dictionary<int, List<VariableLine>> unboundIdentifiers = null;
             List<ProtoCore.AST.Node> astNodes = null;
-            GraphUtilities.ParseCodeBlockNodeStatements(code, unboundIdentifiers, out astNodes);
+            ProtoCore.BuildStatus buildStatus;
+            GraphUtilities.ParseCodeBlockNodeStatements(code, out unboundIdentifiers, out astNodes, out buildStatus);
 
             Ui.Statement statement = new Ui.Statement(astNodes[0]);
 
@@ -104,7 +108,8 @@ namespace DesignScriptStudio.Tests.UnitTests
             string code = "a=b;";
             Dictionary<int, List<VariableLine>> unboundIdentifiers = null;
             List<ProtoCore.AST.Node> astNodes = null;
-            GraphUtilities.ParseCodeBlockNodeStatements(code, unboundIdentifiers, out astNodes);
+            ProtoCore.BuildStatus buildStatus;
+            GraphUtilities.ParseCodeBlockNodeStatements(code, out unboundIdentifiers, out astNodes, out buildStatus);
 
             Ui.Statement statement = new Ui.Statement(astNodes[0]);
 
