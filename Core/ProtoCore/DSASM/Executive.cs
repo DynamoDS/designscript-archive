@@ -1658,6 +1658,7 @@ namespace ProtoCore.DSASM
                 }
             }
 
+            // Find and mark dependent graphnodes as dirty
             UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, Properties.executingGraphNode);
 
             if (Properties.executingGraphNode != null)
@@ -1676,8 +1677,26 @@ namespace ProtoCore.DSASM
                     {
                         ProtoCore.AssociativeGraph.GraphNode graphNode = istream.dependencyGraph.GraphList[n];
 
-                        // Update redefinition that this grapnnode may have cauased
-                        UpdateGraphNodeDependency(graphNode, Properties.executingGraphNode);
+                        bool allowRedefine = true;
+
+                        SymbolNode symbol = Properties.executingGraphNode.updateNodeRefList[0].nodeList[0].symbol;
+                        bool isMember = symbol.classScope != ProtoCore.DSASM.Constants.kInvalidIndex
+                            && symbol.functionIndex == ProtoCore.DSASM.Constants.kInvalidIndex;
+
+                        if (isMember)
+                        {
+                            // For member vars, do not allow if not in the same scope
+                            if (symbol.classScope != graphNode.classIndex || symbol.functionIndex != graphNode.procIndex)
+                            {
+                                allowRedefine = false;
+                            }
+                        }
+
+                        if (allowRedefine)
+                        {
+                            // Update redefinition that this graphnode may have cauased
+                            UpdateGraphNodeDependency(graphNode, Properties.executingGraphNode);
+                        }
                     }
                 }
             }
@@ -2182,6 +2201,8 @@ namespace ProtoCore.DSASM
                     }
                 }
             }
+
+            Properties.executingGraphNode = entryNode;
 
             if (core.Options.FullSSA)
             {
