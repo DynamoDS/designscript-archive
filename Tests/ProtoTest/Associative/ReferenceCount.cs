@@ -1997,7 +1997,7 @@ namespace ProtoTest.Associative
             string code = @"class A{    x;    static s_dispose = 0;    constructor A(i)    {        x = i;    }    def _Dispose()    {        s_dispose = s_dispose + 1;        return = null;    }    def foo()    {        return = null;    }}class B{    def CreateA(i)    {        return = A.A(i);    }}b = B.B();r = b.CreateA(0..1).foo();t = A.s_dispose;";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             // SSA'd transforms will not GC the temps until end of block
-            // However, they must be GC's after every line when in debug setp over
+            // However, they must be GC's after every line when in debug step over
             thisTest.Verify("t", 0);
         }
 
