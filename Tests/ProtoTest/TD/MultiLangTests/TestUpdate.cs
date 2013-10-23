@@ -1274,7 +1274,7 @@ def foo ( x1 : A)
     return = x1;
 }
 a1 = A.A();
-a1.a = {1,2};
+a1.a = {1,2}; // Having this line means not testing the property modification in foo. This is because this line will get re-executed as a1.a is modified in foo
 b = a1.a;
 a1 = foo ( a1);
 ";
@@ -1299,7 +1299,7 @@ def foo ( x1 : A)
     return = true;
 }
 a1 = A.A();
-a1.a = {1,2};
+// a1.a = {1,2}; // Having this line means not testing the property modification in foo. This is because this line will get re-executed as a1.a is modified in foo
 b = a1.a;
 dummy = foo ( a1);
 ";
