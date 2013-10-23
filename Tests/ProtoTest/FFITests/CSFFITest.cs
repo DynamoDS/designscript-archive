@@ -801,10 +801,13 @@ namespace ProtoFFITests
         [Test]
         public void DisposeOnFFITest006()
         {
+            // SSA'd transforms will not GC the temps until end of block
+            // However, they must be GC's after every line when in debug step over
+            // Here 'dv' will not be GC'd until end of block
             string code = @"                            dv = DisposeVerify.CreateObject();                            m = dv.SetValue(2);                            a1 = A.CreateObject(3);                            a2 = A.CreateObject(4);                            a2 = a1;                            b = { B.CreateObject(1), B.CreateObject(2), B.CreateObject(3) };                            b = a1;                                v = dv.GetValue();                            ";
             code = string.Format("{0}\r\n{1}\r\n{2}\r\n{3}", "import(DisposeVerify from \"ProtoTest.dll\");",
                 "import(A from \"ProtoTest.dll\");", "import(B from \"ProtoTest.dll\");", code);
-            ValidationData[] data = { new ValidationData { ValueName = "v", ExpectedValue = 10, BlockIndex = 0 } };
+            ValidationData[] data = { new ValidationData { ValueName = "v", ExpectedValue = 2, BlockIndex = 0 } };
             ExecuteAndVerify(code, data);
         }
 
