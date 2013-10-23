@@ -376,9 +376,9 @@ c = [Imperative]
 f = c + 1;";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
 
+            // There is no cycle as 'a' is only modified to a different value once
             thisTest.Verify("b", 12, 0);
-            thisTest.Verify("f", null, 0);
-            thisTest.VerifyRuntimeWarningCount(1);
+            thisTest.Verify("f", 16, 0);
         }
 
         [Test]
