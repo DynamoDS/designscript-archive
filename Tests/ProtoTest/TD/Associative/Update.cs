@@ -1836,8 +1836,21 @@ x2;
 @"class A{    b : int[] = { 0, 1, 2, 3 };        def foo (i:int )     {        b[i] = b[i] + 1;        return = b;    }}i = 1..2;e1 = A.A().foo(i);i = 0..2;";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
-            thisTest.Verify("e1", new Object[] { new Object[] { 1, 1, 2, 3 }, new Object[] { 1, 2, 2, 3 }, new Object[] { 1, 2, 3, 3 } });
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg); 
+            
+            //
+            // SSA will transform 
+            //      e1 = A.A().foo(i);
+            //
+            //      to
+            //
+            //      t0 = A.A()
+            //      t1 = i
+            //      t2 = t0.foo(t1)
+            //
+            // This means that the initial value of 'b' will be preserved as class A will not be re-initialed after the update
+            //
+            thisTest.Verify("e1", new Object[] { new Object[] { 1, 2, 3, 3 }, new Object[] { 1, 3, 3, 3 }, new Object[] { 1, 3, 4, 3 } });
         }
 
         [Test]
@@ -1849,7 +1862,20 @@ x2;
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
-            thisTest.Verify("e1", new Object[] { new Object[] { 1, 1, 2, 3 }, new Object[] { 1, 2, 2, 3 }, new Object[] { 1, 2, 3, 3 } });
+
+            //
+            // SSA will transform 
+            //      e1 = A.A().foo(i);
+            //
+            //      to
+            //
+            //      t0 = A.A()
+            //      t1 = i
+            //      t2 = t0.foo(t1)
+            //
+            // This means that the initial value of 'b' will be preserved as class A will not be re-initialed after the update
+            //
+            thisTest.Verify("e1", new Object[] { new Object[] { 1, 2, 3, 3 }, new Object[] { 1, 3, 3, 3 }, new Object[] { 1, 3, 4, 3 } });
         }
 
         [Test]
