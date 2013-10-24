@@ -1609,7 +1609,8 @@ namespace ProtoCore.DSASM
 
         private ProtoCore.AssociativeGraph.GraphNode GetFirstSSAGraphnode(int index, int exprID)
         {
-            while (istream.dependencyGraph.GraphList[index].exprUID == exprID)
+            //while (istream.dependencyGraph.GraphList[index].exprUID == exprID)
+            while (istream.dependencyGraph.GraphList[index].IsSSANode())
             {
                 --index;
                 if (index < 0)
@@ -1617,6 +1618,17 @@ namespace ProtoCore.DSASM
                     // In this case, the first SSA statemnt is the first graphnode
                     break;
                 }
+
+                //// This check will be deprecated on full SSA
+                //if (core.Options.FullSSA)
+                //{
+                //    if (!istream.dependencyGraph.GraphList[index].IsSSANode())
+                //    {
+                //        // The next graphnode is nolonger part of the current statement 
+                //        break;
+                //    }
+                //}
+
                 Validity.Assert(index >= 0);
             }
             return istream.dependencyGraph.GraphList[index + 1];
@@ -1918,8 +1930,10 @@ namespace ProtoCore.DSASM
                 return nodesMarkedDirty;
             }
 
-            foreach (var graphNode in graphNodes)
+            //foreach (var graphNode in graphNodes)
+            for (int i = 0; i < graphNodes.Count; ++i)
             {
+                var graphNode = graphNodes[i];
                 //
                 // Comment Jun: 
                 //      This is clarifying the intention that if the graphnode is within the same SSA expression, we still allow update
@@ -2083,9 +2097,36 @@ namespace ProtoCore.DSASM
                                 UpdateDimensionsForGraphNode(graphNode, matchingNode, executingGraphNode);
                             }
                             graphNode.isDirty = true;
-
                             graphNode.forPropertyChanged = propertyChanged;
                             nodesMarkedDirty++;
+
+                            
+                            // On debug mode:
+                            //      we want to mark all ssa statements dirty for an if the lhs pointer is a new instance.
+                            //      In this case, the entire line must be re-executed
+                            //      
+                            //  Given:
+                            //      x = 1
+                            //      p = p.f(x) 
+                            //      x = 2
+                            //
+                            //  To SSA:
+                            //
+                            //      x = 1
+                            //      t0 = p -> we want to execute from here of member function 'f' returned a new instance of 'p'
+                            //      t1 = x
+                            //      t2 = t0.f(t1)
+                            //      p = t2
+                            //      x = 2
+                            if (null != executingGraphNode.lastGraphNode && executingGraphNode.lastGraphNode.reExecuteExpression)
+                            {
+                                executingGraphNode.lastGraphNode.reExecuteExpression = false;
+                                //if (core.Options.GCTempVarsOnDebug && core.Options.IDEDebugMode)
+                                {
+                                    var firstGraphNode = GetFirstSSAGraphnode(i - 1, graphNode.exprUID);
+                                    firstGraphNode.isDirty = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -5318,10 +5359,29 @@ namespace ProtoCore.DSASM
                 FX = coercedValue;
                 tempSvData = coercedValue;
                 EX = PopTo(blockId, instruction.op1, instruction.op2, coercedValue);
+
+                if (core.Options.FullSSA)
+                {
+                    if (!isSSANode)
+                    {
+                        if (EX.optype == AddressType.Pointer && coercedValue.optype == AddressType.Pointer)
+                        {
+                            if (EX.opdata != coercedValue.opdata)
+                            {
+                                if (null != Properties.executingGraphNode)
+                                {
+                                    Properties.executingGraphNode.reExecuteExpression = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (!isSSANode && instruction.op1.optype != AddressType.Register)
                 {
                     GCRelease(EX);
                 }
+
             }
             else
             {

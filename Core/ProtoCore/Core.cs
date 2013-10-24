@@ -497,7 +497,7 @@ namespace ProtoCore
             return false;
         }
 
-        private int FindEndPCForAssocGraphNode(int tempPC, InstructionStream istream, ProcedureNode fNode, AssociativeGraph.GraphNode graphNode)
+        private int FindEndPCForAssocGraphNode(int tempPC, InstructionStream istream, ProcedureNode fNode, AssociativeGraph.GraphNode graphNode, bool handleSSATemps)
         {
             int limit = Constants.kInvalidIndex;
             //AssociativeGraph.GraphNode currentGraphNode = executingGraphNode;
@@ -514,8 +514,8 @@ namespace ProtoCore
 
                 int i = currentGraphNode.dependencyGraphListID;
                 AssociativeGraph.GraphNode nextGraphNode = currentGraphNode;
-                while (currentGraphNode.exprUID != ProtoCore.DSASM.Constants.kInvalidIndex &&
-                        currentGraphNode.exprUID == nextGraphNode.exprUID)
+                while (currentGraphNode.exprUID != ProtoCore.DSASM.Constants.kInvalidIndex 
+                        && currentGraphNode.exprUID == nextGraphNode.exprUID)
                 {
                     limit = nextGraphNode.updateBlock.endpc;
                     if (++i < istream.dependencyGraph.GraphList.Count)
@@ -525,6 +525,20 @@ namespace ProtoCore
                     else
                     {
                         break;
+                    }
+
+                    // Is it the next statement 
+                    // This check will be deprecated on full SSA
+                    if (handleSSATemps)
+                    {
+                        if (!nextGraphNode.IsSSANode())
+                        {
+                            // The next graphnode is nolonger part of the current statement 
+                            // This is the end pc needed to run until
+                            nextGraphNode = istream.dependencyGraph.GraphList[i];
+                            limit = nextGraphNode.updateBlock.endpc;
+                            break;
+                        }
                     }
                 }
             }
@@ -652,7 +666,7 @@ namespace ProtoCore
                     core.DebugProps.InlineConditionOptions.isInlineConditional = true;
                     core.DebugProps.InlineConditionOptions.startPc = pc;
                     
-                    core.DebugProps.InlineConditionOptions.endPc = FindEndPCForAssocGraphNode(pc, istream, fNode, exec.Properties.executingGraphNode);
+                    core.DebugProps.InlineConditionOptions.endPc = FindEndPCForAssocGraphNode(pc, istream, fNode, exec.Properties.executingGraphNode, core.Options.FullSSA);
                     //Validity.Assert(core.DebugProps.InlineConditionOptions.endPc != DSASM.Constants.kInvalidIndex);
 
                     core.DebugProps.InlineConditionOptions.instructionStream = core.RunningBlock;
@@ -812,7 +826,7 @@ namespace ProtoCore
                 istream = core.DSExecutable.instrStreamList[core.RunningBlock];
                 if (istream.language == Language.kAssociative)
                 {
-                    limit = FindEndPCForAssocGraphNode(pc, istream, fNode, graphNode);
+                    limit = FindEndPCForAssocGraphNode(pc, istream, fNode, graphNode, core.Options.FullSSA);
                     //Validity.Assert(limit != ProtoCore.DSASM.Constants.kInvalidIndex);
                 }
                 else if (istream.language == Language.kImperative)
