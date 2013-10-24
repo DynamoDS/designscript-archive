@@ -187,6 +187,8 @@ namespace ProtoCore.AssociativeGraph
         /// </summary>
         public List<SymbolNode> symbolListWithinExpression { get; set; }
 
+        public bool reExecuteExpression { get; set; }
+
         
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
         public StackValue ArrayPointer { get; set; }
@@ -228,6 +230,7 @@ namespace ProtoCore.AssociativeGraph
             ArrayPointer = ProtoCore.DSASM.StackUtils.BuildNull();
 #endif
             symbolListWithinExpression = new List<SymbolNode>();
+            reExecuteExpression = false;
         }
 
 

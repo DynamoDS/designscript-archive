@@ -27,6 +27,7 @@ namespace ProtoTest.DebugTests
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
             options.kDynamicCycleThreshold = 5;
+            options.DumpByteCode = false;
 
             core = new ProtoCore.Core(options);
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
@@ -6910,7 +6911,7 @@ x=4;
 
             Assert.IsTrue(type == "A");
             Assert.IsTrue(os.Count == 1);
-            Assert.IsTrue((Int64)os["a"].Payload == 7);
+            Assert.IsTrue((Int64)os["a"].Payload == 5);
 
             vms = fsr.Step();
             o = vms.mirror.GetDebugValue("x");
@@ -6927,7 +6928,7 @@ x=4;
 
             Assert.IsTrue(type == "A");
             Assert.IsTrue(os.Count == 1);
-            Assert.IsTrue((Int64)os["a"].Payload == 6);
+            Assert.IsTrue((Int64)os["a"].Payload == 1);
         }
 
         [Test]
