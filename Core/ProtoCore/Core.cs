@@ -128,7 +128,7 @@ namespace ProtoCore
             Verbose = false;
 
             FullSSA = true;
-            DumpIL = true;
+            DumpIL = FullSSA;
             GCTempVarsOnDebug = true;
 
             DumpFunctionResolverLogic = false;

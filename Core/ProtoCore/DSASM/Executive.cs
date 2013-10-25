@@ -1942,6 +1942,7 @@ namespace ProtoCore.DSASM
                 if (core.Options.FullSSA)
                 {
                     allowUpdateWithinSSA = true;
+                    isSSAAssign = false; // Remove references to this when ssa flag is removed
 
                     // Do not update if its a property change and the current graphnode is the same expression
                     if (propertyChanged && graphNode.exprUID == Properties.executingGraphNode.exprUID)
@@ -2044,7 +2045,7 @@ namespace ProtoCore.DSASM
                         UpdateModifierBlockDependencyGraph(graphNode);
                     }
                     else if (allowSSADownstream
-                              /*|| isSSAAssign*/
+                              || isSSAAssign
                               || (exprUID != graphNode.exprUID
                                  && modBlkId == Constants.kInvalidIndex
                                  && graphNode.modBlkUID == Constants.kInvalidIndex)
