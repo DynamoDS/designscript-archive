@@ -65,6 +65,7 @@ namespace ProtoScript.Runners
 
         public ExecutionMirror Execute(string code)
         {
+            bool ssastate = Core.Options.FullSSA;
             Core.Options.FullSSA = false;
             code = string.Format("{0} = {1};", Constants.kWatchResultVar, code);
 
@@ -193,7 +194,7 @@ namespace ProtoScript.Runners
             // TODO: investigate why additional elements are added to the stack.
             Core.Rmem.RestoreStackForExprInterpreter();
 
-            Core.Options.FullSSA = true;
+            Core.Options.FullSSA = ssastate;
 
             return new ExecutionMirror(Core.CurrentExecutive.CurrentDSASMExec, Core);
         }
