@@ -1558,9 +1558,9 @@ r = [Imperative]
         public void TestUpdate02()
         {
             String code =
-                @"                    a = 1;                    b = 2;                    b = b + a;                    a = 10;                ";
+                @"                    a = 1;                    b = b + a;                    b = 2;                    a = 10;                ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            Assert.IsTrue((Int64)mirror.GetValue("b").Payload == 12);
+            Assert.IsTrue((Int64)mirror.GetValue("b").Payload == 2);
         }
 
         [Test]
