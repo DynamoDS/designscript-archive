@@ -1308,7 +1308,7 @@ namespace GraphToDSCompiler
             return p.root;
         }
 
-        public static bool Parse(string code, List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
+        public static bool Parse(string code, out List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
                 List<String> unboundIdentifiers)
         {
             try
