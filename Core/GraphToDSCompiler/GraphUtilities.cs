@@ -1319,7 +1319,7 @@ namespace GraphToDSCompiler
                 string codeToParse = "";
                 for (int i = 0; i < compiledCode.Count; i++)
                 {
-                    string tempVariableName = "temp" + System.Guid.NewGuid();
+                    string tempVariableName = "temp" + System.Guid.NewGuid().ToString().Replace("-", "_");
                     string singleExpression = compiledCode[i];
                     singleExpression = singleExpression.Replace("%t", tempVariableName);
                     codeToParse += singleExpression;
