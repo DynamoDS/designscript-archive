@@ -10,7 +10,6 @@ namespace ProtoTest.Associative
 {
     public class SSATransformTest
     {
-
         public TestFrameWork thisTest = new TestFrameWork();
         [SetUp]
         public void Setup()

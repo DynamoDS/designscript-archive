@@ -1016,7 +1016,7 @@ namespace GraphToDSCompiler
         /// <param name="astNodes"></param>
         /// <returns>Returns true if compilation succeeded, or false otherwise. Returning true may still 
         /// result in warnings, which suggests that the compilation was successful with warning.</returns>             
-        
+
 
 
         public static List<SynchronizeData> GetSDList(string filepath)

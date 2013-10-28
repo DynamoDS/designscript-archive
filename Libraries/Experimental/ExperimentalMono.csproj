@@ -11,6 +11,10 @@
     <RootNamespace>Experimental</RootNamespace>
     <AssemblyName>Experimental</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+	<OutputPath Condition=" '$(OutputPath)' == '' ">..\..\bin\$(Platform)\$(Configuration)</OutputPath>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  
     <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\bin\$(Platform)\$(Configuration)</OutputPath>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

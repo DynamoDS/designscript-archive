@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
+  <TopNode>[0-9676]C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoTest.dll</TopNode>
+  <SelectedNode>[0-4191]ProtoTest.Associative.MethodsFocusTeam</SelectedNode>
+  <ExcludeCategories>false</ExcludeCategories>
+  <Nodes>
+    <Node UniqueName="[0-9676]C:\jun\AutodeskResearch\git\designscript\bin\x64\Debug\ProtoTest.dll" Expanded="true" />
+    <Node UniqueName="[0-9691]ProtoFFITests" Expanded="true" />
+    <Node UniqueName="[0-9677]ProtoTest" Expanded="true" />
+    <Node UniqueName="[0-9683]ProtoTest.Associative" Expanded="true" />
+    <Node UniqueName="[0-9689]ProtoTest.CallsiteState" Expanded="true" />
+    <Node UniqueName="[0-9685]ProtoTest.DebugTests" Expanded="true" />
+    <Node UniqueName="[0-9688]ProtoTest.DSASM" Expanded="true" />
+    <Node UniqueName="[0-9693]ProtoTest.EventTests" Expanded="true" />
+    <Node UniqueName="[0-9687]ProtoTest.GraphCompiler" Expanded="true" />
+    <Node UniqueName="[0-9696]ProtoTest.Imperative" Expanded="true" />
+    <Node UniqueName="[0-9695]ProtoTest.LiveRunner" Expanded="true" />
+    <Node UniqueName="[0-9684]ProtoTest.MultiLangTests" Expanded="true" />
+    <Node UniqueName="[0-9682]ProtoTest.RegressionTests" Expanded="true" />
+    <Node UniqueName="[0-9678]ProtoTest.TD" Expanded="true" />
+    <Node UniqueName="[0-9692]ProtoTest.TD.Associative" Expanded="true" />
+    <Node UniqueName="[0-9690]ProtoTest.TD.DocTests" Expanded="true" />
+    <Node UniqueName="[0-9686]ProtoTest.TD.FFI" Expanded="true" />
+    <Node UniqueName="[0-9680]ProtoTest.TD.Imperative" Expanded="true" />
+    <Node UniqueName="[0-9679]ProtoTest.TD.MultiLangTests" Expanded="true" />
+    <Node UniqueName="[0-9694]ProtoTest.TD.OtherMiscTests" Expanded="true" />
+    <Node UniqueName="[0-9681]ProtoTest.UtilsTests" Expanded="true" />
+  </Nodes>
+</VisualState>

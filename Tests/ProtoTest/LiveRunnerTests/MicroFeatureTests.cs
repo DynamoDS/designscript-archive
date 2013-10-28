@@ -19,7 +19,7 @@ namespace ProtoTest.LiveRunner
         public void Setup()
         {
         }
-        
+
 
         [Test]
         public void GraphILTest_Assign01()
@@ -40,7 +40,7 @@ namespace ProtoTest.LiveRunner
             // emit the DS code from the AST tree
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
-            
+
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
         }
@@ -157,7 +157,7 @@ namespace ProtoTest.LiveRunner
                     new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
                     ProtoCore.DSASM.Operator.add),
                 ProtoCore.DSASM.Operator.assign);
-            
+
             astList.Add(assign3);
             addedList.Add(new Subtree(astList, System.Guid.NewGuid()));
 
@@ -223,7 +223,7 @@ namespace ProtoTest.LiveRunner
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
             mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
-            
+
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign3 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
                 new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
@@ -393,9 +393,9 @@ namespace ProtoTest.LiveRunner
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 78);
-            
+
             mirror = liveRunner.InspectNodeValue("d");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);            
+            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
 
             // Build the AST trees
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
@@ -419,7 +419,7 @@ namespace ProtoTest.LiveRunner
             syncData = new GraphSyncData(null, addedList, null);
             // emit the DS code from the AST tree
             liveRunner.UpdateGraph(syncData);
-            
+
             mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
             mirror = liveRunner.InspectNodeValue("b");
@@ -445,13 +445,13 @@ namespace ProtoTest.LiveRunner
 
             mirror = liveRunner.InspectNodeValue("a");
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
-            
+
             mirror = liveRunner.InspectNodeValue("b");
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
 
             mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 78);
-            
+
             mirror = liveRunner.InspectNodeValue("d");
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
         }
@@ -524,10 +524,10 @@ namespace ProtoTest.LiveRunner
             GraphSyncData syncData = new GraphSyncData(null, addedList, null);
 
             // emit the DS code from the AST tree
-            
+
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");            
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10.0);
 
 
@@ -588,7 +588,7 @@ namespace ProtoTest.LiveRunner
             syncData = new GraphSyncData(null, addedList, null);
 
             liveRunner.UpdateGraph(syncData);
-            
+
 
             mirror = liveRunner.InspectNodeValue("xval");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10.0);
@@ -600,7 +600,7 @@ namespace ProtoTest.LiveRunner
             constructorCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode("Sin");
             listArgs = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             listArgs.Add(new ProtoCore.AST.AssociativeAST.DoubleNode("90.0"));
-            
+
             constructorCall.FormalArguments = listArgs;
 
             className = "Math";
@@ -740,7 +740,7 @@ namespace ProtoTest.LiveRunner
         public void TestDeltaExpression_01()
         {
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
-            
+
             // emit the DS code from the AST tree
             liveRunner.UpdateCmdLineInterpreter("a=10;");
 
@@ -755,7 +755,7 @@ namespace ProtoTest.LiveRunner
             mirror = liveRunner.InspectNodeValue("c");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);            
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
 
             //string o = liveRunner.GetCoreDump();
 
@@ -830,7 +830,7 @@ namespace ProtoTest.LiveRunner
             // Translate the point
             // newPoint = p.Translate(1,2,3);
             //==============================================
-            
+
             liveRunner.UpdateCmdLineInterpreter("newPoint = p.Translate(1,2,3);");
             mirror = liveRunner.InspectNodeValue("newPoint");
 
@@ -858,6 +858,9 @@ namespace ProtoTest.LiveRunner
         {
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
 
+            //string code = @"class Point{ X : double; constructor ByCoordinates(x : double, y : double, z : double){X = x;} def Translate(x : double, y : double, z : double){return = Point.ByCoordinates(11,12,13);} }";
+
+            //liveRunner.UpdateCmdLineInterpreter(code);
             liveRunner.UpdateCmdLineInterpreter(@"import (""ProtoGeometry.dll"");");
             liveRunner.UpdateCmdLineInterpreter("p = Point.ByCoordinates(10,10,10);");
 
@@ -886,6 +889,7 @@ namespace ProtoTest.LiveRunner
             //==============================================
 
             liveRunner.UpdateCmdLineInterpreter("p = p.Translate(1,2,3);");
+
             mirror = liveRunner.InspectNodeValue("p");
 
             mirror = liveRunner.InspectNodeValue("xval");
@@ -902,5 +906,5 @@ namespace ProtoTest.LiveRunner
 
         }
     }
-    
+
 }

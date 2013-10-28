@@ -516,6 +516,18 @@ namespace ProtoFFI
             return true;
         }
 
+        private bool AllowsRankReduction(MethodInfo method)
+        {
+            object[] atts = method.GetCustomAttributes(false);
+            foreach (var item in atts)
+            {
+                if (item is AllowRankReductionAttribute)
+                    return true;
+            }
+
+            return false;
+        }
+
         private ProtoCore.AST.AssociativeAST.VarDeclNode ParseFieldDeclaration(FieldInfo f)
         {
             if (null == f || !IsBrowsable(f))
@@ -565,6 +577,7 @@ namespace ProtoFFI
             }
 
             //Need to hide property accessor from design script users, prefix with %
+
             FFIMethodAttributes mattrs = new FFIMethodAttributes(method);
 
             string prefix = propaccessor ? "%" : "";
@@ -572,6 +585,7 @@ namespace ProtoFFI
             func.Name = string.Format("{0}{1}", prefix, method.Name);
             func.Pattern = null;
             func.Singnature = ParseArgumentSignature(method);
+
             if (retype.IsIndexable && mattrs.AllowRankReduction)
                 retype.rank = -1;
             func.ReturnType = retype;

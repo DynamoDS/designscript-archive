@@ -61,8 +61,8 @@ namespace ProtoTest.EventTests
             var options = new ProtoCore.Options();
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
-            options.DumpByteCode = true;
-            options.Verbose = true;
+            options.DumpByteCode = false;
+            options.Verbose = false;
             core_ = new ProtoCore.Core(options);
             core_.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core_));
             core_.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core_));
@@ -181,7 +181,7 @@ namespace ProtoTest.EventTests
         public void RunPropertyChangedNegative()
         {
             string code =
-@"import (Foo from ""ProtoTest.dll"");foo = Foo.GetInstance();              foo.ID = 17;id = foo.ID;id = bar.ID;Foo.SetID(foo, 41);               ";
+@"import (Foo from ""ProtoTest.dll"");foo = Foo.GetInstance();              foo.ID = 17;id = foo.ID;id = bar.ID;        // RedefinitionFoo.SetID(foo, 41);               ";
             var testRunner = new TestFrameWork();
             testRunner.RunScriptSource(code);
             testRunner.Verify("id", null);

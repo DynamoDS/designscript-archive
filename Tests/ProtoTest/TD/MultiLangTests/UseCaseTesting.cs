@@ -435,7 +435,7 @@ projectedCurve = testCurves.Project(surf,projectVector); //V0
 test = projectedCurve.P1[0].X;
 surfLength = 35; 
 projectVector = Vector.ByCoordinates(5.0,0,-1);";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
             //Assert.Fail("1467186 - sprint24 : rev 3172 : Cyclic dependency detected in update cases");
             thisTest.Verify("test", new Object[] { -30.0, 1.0, 5.0 });
         }
@@ -451,7 +451,7 @@ line1.Color = 0.0;
 t1= line1.Color;
 line2.Color = 1.0; // can't assign to a writable property if it is collection.. is this a replication issue?
 t2= line2.Color;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
             //Assert.Fail("1467186 - sprint24 : rev 3172 : Cyclic dependency detected in update cases");
             thisTest.Verify("t1", 0.0);
             thisTest.Verify("t2", new Object[] { 1.0, 1.0 });
@@ -497,7 +497,7 @@ i = 5;
 		i = i + 1; // increment i
 	}
 }";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, testPath);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
 
             thisTest.Verify("i", 8);
             thisTest.Verify("totalLength", 12.0);

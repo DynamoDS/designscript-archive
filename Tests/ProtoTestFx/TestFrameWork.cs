@@ -612,7 +612,9 @@ namespace ProtoTestFx.TD
 
         public void VerifyFFIObjectStillInScope(string dsVariable, int startBlock = 1, int arrayIndex = -1)
         {
-            Assert.IsFalse(string.IsNullOrEmpty(GetFFIObjectStringValue(dsVariable, startBlock, arrayIndex)), string.Format("\"{0}\" is null, arrayIndex = {1}", dsVariable, arrayIndex));
+            string str = GetFFIObjectStringValue(dsVariable, startBlock, arrayIndex);
+            Assert.IsFalse(string.IsNullOrEmpty(str), string.Format("\"{0}\" is null, arrayIndex = {1}", dsVariable, arrayIndex));
+
         }
     }
 }

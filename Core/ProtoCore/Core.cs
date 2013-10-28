@@ -124,11 +124,11 @@ namespace ProtoCore
     {
         public Options()
         {
-            DumpByteCode = false;
-            Verbose = false;
-
-            FullSSA = false;
-            DumpIL = false;
+            DumpByteCode = true;
+            Verbose = true;
+            FullSSA = true;
+            DumpIL = true;
+            GCTempVarsOnDebug = true;
 
             DumpFunctionResolverLogic = false;
             DumpOperatorToMethodByteCode = false;
@@ -166,7 +166,7 @@ namespace ProtoCore
             DisableDisposeFunctionDebug = true;
             GenerateExprID = true;
             IsDeltaExecution = false;
-            ElementBasedArrayUpdate = true;
+            ElementBasedArrayUpdate = false;
 
             IsDeltaCompile = false;
 
@@ -175,6 +175,7 @@ namespace ProtoCore
         public bool DumpByteCode { get; set; }
         public bool DumpIL { get; private set; }
         public bool FullSSA { get; set; }
+        public bool GCTempVarsOnDebug { get; set; }
         public bool Verbose { get; set; }
         public bool DumpOperatorToMethodByteCode { get; set; }
         public bool SuppressBuildOutput { get; set; }
@@ -445,6 +446,7 @@ namespace ProtoCore
         public int StepOutReturnPC { get; set; }
         public Stack<bool> FRStack { get; set; }
         public AssociativeGraph.GraphNode executingGraphNode { get; set; }
+        public List<AssociativeGraph.GraphNode> deferedGraphnodes { get; set; }
         public List<Instruction> ActiveBreakPoints { get; set; }
 
         public List<Instruction> AllbreakPoints { get; set; }
@@ -489,7 +491,7 @@ namespace ProtoCore
             return false;
         }
 
-        private int FindEndPCForAssocGraphNode(int tempPC, InstructionStream istream, ProcedureNode fNode, AssociativeGraph.GraphNode graphNode)
+        private int FindEndPCForAssocGraphNode(int tempPC, InstructionStream istream, ProcedureNode fNode, AssociativeGraph.GraphNode graphNode, bool handleSSATemps)
         {
             int limit = Constants.kInvalidIndex;
             //AssociativeGraph.GraphNode currentGraphNode = executingGraphNode;
@@ -506,8 +508,9 @@ namespace ProtoCore
 
                 int i = currentGraphNode.dependencyGraphListID;
                 AssociativeGraph.GraphNode nextGraphNode = currentGraphNode;
-                while (currentGraphNode.exprUID != ProtoCore.DSASM.Constants.kInvalidIndex &&
-                        currentGraphNode.exprUID == nextGraphNode.exprUID)
+                while (currentGraphNode.exprUID != ProtoCore.DSASM.Constants.kInvalidIndex 
+                        && currentGraphNode.exprUID == nextGraphNode.exprUID)
+
                 {
                     limit = nextGraphNode.updateBlock.endpc;
                     if (++i < istream.dependencyGraph.GraphList.Count)
@@ -517,6 +520,20 @@ namespace ProtoCore
                     else
                     {
                         break;
+                    }
+
+                    // Is it the next statement 
+                    // This check will be deprecated on full SSA
+                    if (handleSSATemps)
+                    {
+                        if (!nextGraphNode.IsSSANode())
+                        {
+                            // The next graphnode is nolonger part of the current statement 
+                            // This is the end pc needed to run until
+                            nextGraphNode = istream.dependencyGraph.GraphList[i];
+                            limit = nextGraphNode.updateBlock.endpc;
+                            break;
+                        }
                     }
                 }
             }
@@ -644,8 +661,8 @@ namespace ProtoCore
                     core.DebugProps.InlineConditionOptions.isInlineConditional = true;
                     core.DebugProps.InlineConditionOptions.startPc = pc;
                     
-                    core.DebugProps.InlineConditionOptions.endPc = FindEndPCForAssocGraphNode(pc, istream, fNode, exec.Properties.executingGraphNode);
-                    //Validity.Assert(core.DebugProps.InlineConditionOptions.endPc != DSASM.Constants.kInvalidIndex);
+                    core.DebugProps.InlineConditionOptions.endPc = FindEndPCForAssocGraphNode(pc, istream, fNode, exec.Properties.executingGraphNode, core.Options.FullSSA);
+
 
                     core.DebugProps.InlineConditionOptions.instructionStream = core.RunningBlock;
                     debugFrame.IsInlineConditional = true;
@@ -804,7 +821,7 @@ namespace ProtoCore
                 istream = core.DSExecutable.instrStreamList[core.RunningBlock];
                 if (istream.language == Language.kAssociative)
                 {
-                    limit = FindEndPCForAssocGraphNode(pc, istream, fNode, graphNode);
+                    limit = FindEndPCForAssocGraphNode(pc, istream, fNode, graphNode, core.Options.FullSSA);
                     //Validity.Assert(limit != ProtoCore.DSASM.Constants.kInvalidIndex);
                 }
                 else if (istream.language == Language.kImperative)
@@ -1315,6 +1332,11 @@ namespace ProtoCore
 
             //
 
+            // Comment Jun:
+            // Disable SSA for the previous graphcompiler as it clashes with the way code recompilation behaves
+            // SSA is enabled for the new graph strategy of delta compilation and execution
+            Options.FullSSA = false;
+
 
             //Initialize the function pointer table
             FunctionPointerTable = new DSASM.FunctionPointerTable();
@@ -1341,7 +1363,7 @@ namespace ProtoCore
             }
             RuntimeStatus = new RuntimeStatus(this);
 
-            SSASubscript = 0;
+            //SSASubscript = 0;
             ExpressionUID = 0;
             ModifierBlockUID = 0;
             ModifierStateSubscript = 0;
@@ -1540,7 +1562,6 @@ namespace ProtoCore
         // The unique subscript for SSA temporaries
         // TODO Jun: Organize these variables in core into proper enums/classes/struct
         public int SSASubscript { get; set; }
-
         /// <summary> 
         /// ExpressionUID is used as the unique id to identify an expression
         /// It is incremented by 1 after mapping tis current value to an expression

@@ -5953,7 +5953,6 @@ b = 20;</Content>
             Assert.IsTrue((Int64)dim1[0].Payload == 5);
             Assert.IsTrue((Int64)dim1[1].Payload == 6);
         }
-
         [Test]
         public void T007_TestReplicationGuideFromRadialMenuUsingMathFunctionWithEdit()
         {
@@ -6271,7 +6270,6 @@ b = 20;</Content>
             Assert.IsTrue((Int64)dim2[0].Payload == 2);
             Assert.IsTrue((Int64)dim2[1].Payload == 4);
         }
-
         [Test]
         public void T008_TestReplicationGuideFromRadialMenuUsingMathFunctionWithEditAndUndo()
         {

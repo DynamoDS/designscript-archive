@@ -80,6 +80,8 @@ namespace ProtoCore.DSASM
 
         public bool isExplicitCall { get; set; }
 
+        private List<AssociativeGraph.GraphNode> deferedGraphNodes = new List<AssociativeGraph.GraphNode>();
+
 
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
         /// <summary>
@@ -1002,6 +1004,7 @@ namespace ProtoCore.DSASM
                     //      2. In the return instruction
                     //
                     Properties.functionCallArguments = arguments;
+
                     Properties.functionCallDotCallDimensions = dotCallDimensions;
 
                     explicitCall = true;
@@ -1348,6 +1351,10 @@ namespace ProtoCore.DSASM
                     if (graphNode.isReturn || graphNode.updateNodeRefList[0].nodeList.Count > 0)
                     {
                         graphNode.isDirty = false;
+                        if (core.Options.FullSSA)
+                        {
+                            ProtoCore.AssociativeEngine.Utils.SetFinalGraphNodeRuntimeDependents(graphNode);
+                        }
 
                         // In function calls, the first graphnode in the function is executed first and was not marked 
                         // If this is the case, just move on to the next graphnode
@@ -1600,7 +1607,8 @@ namespace ProtoCore.DSASM
 
         private ProtoCore.AssociativeGraph.GraphNode GetFirstSSAGraphnode(int index, int exprID)
         {
-            while (istream.dependencyGraph.GraphList[index].exprUID == exprID)
+            //while (istream.dependencyGraph.GraphList[index].exprUID == exprID)
+            while (istream.dependencyGraph.GraphList[index].IsSSANode())
             {
                 --index;
                 if (index < 0)
@@ -1608,6 +1616,17 @@ namespace ProtoCore.DSASM
                     // In this case, the first SSA statemnt is the first graphnode
                     break;
                 }
+
+                //// This check will be deprecated on full SSA
+                //if (core.Options.FullSSA)
+                //{
+                //    if (!istream.dependencyGraph.GraphList[index].IsSSANode())
+                //    {
+                //        // The next graphnode is nolonger part of the current statement 
+                //        break;
+                //    }
+                //}
+
                 Validity.Assert(index >= 0);
             }
             return istream.dependencyGraph.GraphList[index + 1];
@@ -1625,7 +1644,14 @@ namespace ProtoCore.DSASM
                     int exprUID = node.exprUID;
                     int modBlkId = node.modBlkUID;
                     bool isSSAAssign = node.IsSSANode();
-                    UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, node, true);
+                    if (core.Options.FullSSA)
+                    {
+                        UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, node.lastGraphNode, true);
+                    }
+                    else
+                    {
+                        UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, node, true);
+                    }
                     node.propertyChanged = false;
                 }
             }
@@ -1634,21 +1660,50 @@ namespace ProtoCore.DSASM
 
         private void UpdateGraph(int exprUID, int modBlkId, bool isSSAAssign)
         {
-            UpdatePropertyChangedGraphNode();
-
+            if (null != Properties.executingGraphNode)
+            {
+                if (!Properties.executingGraphNode.IsSSANode())
+                {
+                    UpdatePropertyChangedGraphNode();
+                }
+            }
             UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, Properties.executingGraphNode);
 
             if (Properties.executingGraphNode != null)
             {
+                // Remove this condition when full SSA is enabled
                 bool isssa = (!Properties.executingGraphNode.IsSSANode() && Properties.executingGraphNode.DependsOnTempSSA());
+
+                if (core.Options.FullSSA)
+                {
+                    isssa = Properties.executingGraphNode.IsSSANode();
+                }
                 if (!isssa)
                 {
                     for (int n = 0; n < istream.dependencyGraph.GraphList.Count; ++n)
                     {
                         ProtoCore.AssociativeGraph.GraphNode graphNode = istream.dependencyGraph.GraphList[n];
 
-                        // Update redefinition that this grapnnode may have cauased
-                        UpdateGraphNodeDependency(graphNode, Properties.executingGraphNode);
+                        bool allowRedefine = true;
+
+                        SymbolNode symbol = Properties.executingGraphNode.updateNodeRefList[0].nodeList[0].symbol;
+                        bool isMember = symbol.classScope != ProtoCore.DSASM.Constants.kInvalidIndex
+                            && symbol.functionIndex == ProtoCore.DSASM.Constants.kInvalidIndex;
+
+                        if (isMember)
+                        {
+                            // For member vars, do not allow if not in the same scope
+                            if (symbol.classScope != graphNode.classIndex || symbol.functionIndex != graphNode.procIndex)
+                            {
+                                allowRedefine = false;
+                            }
+                        }
+
+                        if (allowRedefine)
+                        {
+                            // Update redefinition that this graphnode may have cauased
+                            UpdateGraphNodeDependency(graphNode, Properties.executingGraphNode);
+                        }
                     }
                 }
             }
@@ -1870,8 +1925,11 @@ namespace ProtoCore.DSASM
                 return nodesMarkedDirty;
             }
 
-            foreach (var graphNode in graphNodes)
+            //foreach (var graphNode in graphNodes)
+            for (int i = 0; i < graphNodes.Count; ++i)
             {
+                var graphNode = graphNodes[i];
+
                 // If the graphnode is inactive then it is no longer executed
                 if (!graphNode.isActive)
                 {
@@ -1885,6 +1943,13 @@ namespace ProtoCore.DSASM
                 if (core.Options.FullSSA)
                 {
                     allowUpdateWithinSSA = true;
+                    isSSAAssign = false; // Remove references to this when ssa flag is removed
+
+                    // Do not update if its a property change and the current graphnode is the same expression
+                    if (propertyChanged && graphNode.exprUID == Properties.executingGraphNode.exprUID)
+                    {
+                        continue;
+                    }
                 }
                 else
                 {
@@ -1904,6 +1969,21 @@ namespace ProtoCore.DSASM
                     if (!graphNode.DependsOn(noderef, ref matchingNode))
                     {
                         continue;
+                    }
+
+                    // Jun: only allow update to other expr id's (other statements) if this is the final SSA assignment
+                    if (core.Options.FullSSA && !propertyChanged)
+                    {
+                        if (null != Properties.executingGraphNode && Properties.executingGraphNode.IsSSANode())
+                        {
+                            // This is still an SSA statement, if a node of another statement depends on it, ignore it
+                            if (graphNode.exprUID != Properties.executingGraphNode.exprUID)
+                            {
+                                // Defer this update until the final non-ssa node
+                                deferedGraphNodes.Add(graphNode);
+                                continue;
+                            }
+                        }
                     }
 
                     // @keyu: if we are modifying an object's property, e.g.,
@@ -2018,6 +2098,33 @@ namespace ProtoCore.DSASM
                             graphNode.isDirty = true;
                             graphNode.forPropertyChanged = propertyChanged;
                             nodesMarkedDirty++;
+                            
+                            // On debug mode:
+                            //      we want to mark all ssa statements dirty for an if the lhs pointer is a new instance.
+                            //      In this case, the entire line must be re-executed
+                            //      
+                            //  Given:
+                            //      x = 1
+                            //      p = p.f(x) 
+                            //      x = 2
+                            //
+                            //  To SSA:
+                            //
+                            //      x = 1
+                            //      t0 = p -> we want to execute from here of member function 'f' returned a new instance of 'p'
+                            //      t1 = x
+                            //      t2 = t0.f(t1)
+                            //      p = t2
+                            //      x = 2
+                            if (null != executingGraphNode.lastGraphNode && executingGraphNode.lastGraphNode.reExecuteExpression)
+                            {
+                                executingGraphNode.lastGraphNode.reExecuteExpression = false;
+                                //if (core.Options.GCTempVarsOnDebug && core.Options.IDEDebugMode)
+                                {
+                                    var firstGraphNode = GetFirstSSAGraphnode(i - 1, graphNode.exprUID);
+                                    firstGraphNode.isDirty = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -2074,6 +2181,7 @@ namespace ProtoCore.DSASM
         {
             int setentry = entry;
             bool isFirstGraphSet = false;
+            ProtoCore.AssociativeGraph.GraphNode entryNode = null;
             foreach (ProtoCore.AssociativeGraph.GraphNode graphNode in istream.dependencyGraph.GraphList)
             {
                 graphNode.isDirty = true;
@@ -2082,6 +2190,7 @@ namespace ProtoCore.DSASM
                     // Setting the first graph of this function to be in executed (not dirty) state
                     isFirstGraphSet = true;
                     graphNode.isDirty = false;
+                    entryNode = graphNode;
                 }
 
                 if (DSASM.Constants.kInvalidIndex == setentry)
@@ -2089,16 +2198,23 @@ namespace ProtoCore.DSASM
                     // Set the entry point as this graph and mark this graph as executed 
                     setentry = graphNode.updateBlock.startpc;
                     graphNode.isDirty = false;
+                    entryNode = graphNode;
                 }
             }
+
+            if (core.Options.FullSSA)
+            {
+                ProtoCore.AssociativeEngine.Utils.SetFinalGraphNodeRuntimeDependents(entryNode);
+            }
+
             pc = setentry;
         }
-
 
         private void UpdateMethodDependencyGraph(int entry, int procIndex, int classIndex)
         {
             int setentry = entry;
             bool isFirstGraphSet = false;
+            ProtoCore.AssociativeGraph.GraphNode entryNode = null;
 
             List<AssociativeGraph.GraphNode> graphNodes = istream.dependencyGraph.GetGraphNodesAtScope(classIndex, procIndex);
             if (graphNodes != null)
@@ -2111,6 +2227,7 @@ namespace ProtoCore.DSASM
                         // Setting the first graph of this function to be in executed (not dirty) state
                         isFirstGraphSet = true;
                         graphNode.isDirty = false;
+                        entryNode = graphNode;
                     }
 
                     if (DSASM.Constants.kInvalidIndex == setentry)
@@ -2118,8 +2235,16 @@ namespace ProtoCore.DSASM
                         // Set the entry point as this graph and mark this graph as executed 
                         setentry = graphNode.updateBlock.startpc;
                         graphNode.isDirty = false;
+                        entryNode = graphNode;
                     }
                 }
+            }
+
+            Properties.executingGraphNode = entryNode;
+
+            if (core.Options.FullSSA)
+            {
+                ProtoCore.AssociativeEngine.Utils.SetFinalGraphNodeRuntimeDependents(entryNode);
             }
             pc = setentry;
         }
@@ -2167,6 +2292,9 @@ namespace ProtoCore.DSASM
 
         private void XLangUpdateDependencyGraph(int currentLangBlock)
         {
+            int classScope = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexClass).opdata;
+            int functionScope = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunction).opdata;
+
             List<ProtoCore.AssociativeGraph.UpdateNodeRef> upadatedList = new List<AssociativeGraph.UpdateNodeRef>();
 
             // For every instruction list in the executable
@@ -2178,6 +2306,11 @@ namespace ProtoCore.DSASM
                     // For every graphnode in the dependency list
                     foreach (ProtoCore.AssociativeGraph.GraphNode graphNode in xInstrStream.dependencyGraph.GraphList)
                     {
+                        if (graphNode.classIndex != classScope || graphNode.procIndex != functionScope)
+                        {
+                            continue;
+                        }
+
                         // To deal with the case
                         // 
                         // a;
@@ -2786,6 +2919,8 @@ namespace ProtoCore.DSASM
 
                 Properties = PopInterpreterProps();
                 Properties.executingGraphNode = core.DebugProps.executingGraphNode;
+                deferedGraphNodes = core.DebugProps.deferedGraphnodes;
+
             }
             else
             {
@@ -2881,6 +3016,7 @@ namespace ProtoCore.DSASM
                     core.DebugProps.isResume = true;
                     core.DebugProps.FRStack = fepRunStack;
                     core.DebugProps.executingGraphNode = Properties.executingGraphNode;
+                    core.DebugProps.deferedGraphnodes = deferedGraphNodes;
 
                     if (core.DebugProps.RunMode == Runmode.StepNext)
                     {
@@ -2897,7 +3033,7 @@ namespace ProtoCore.DSASM
                     {
                         core.DebugProps.FirstStackFrame = null;
                     }
-                    throw new ProtoCore.Exceptions.DebugHalting();
+                    throw new ProtoCore.Exceptions.DebugHalting(); 
                 }
             }
             return terminateExec;
@@ -4375,8 +4511,24 @@ namespace ProtoCore.DSASM
         public void GCCodeBlock(int blockId, int functionIndex = DSASM.Constants.kGlobalScope, int classIndex = DSASM.Constants.kInvalidIndex)
         {
             foreach (ProtoCore.DSASM.SymbolNode sn in exe.runtimeSymbols[blockId].symbolList.Values)
-            {
-                if (sn.classScope == classIndex && sn.functionIndex == functionIndex && !sn.name.Equals(Constants.kWatchResultVar) && !CoreUtils.IsSSATemp(sn.name))
+            {   
+                bool allowGC = sn.classScope == classIndex 
+                    && sn.functionIndex == functionIndex 
+                    && !sn.name.Equals(Constants.kWatchResultVar);
+                    /*&& !CoreUtils.IsSSATemp(sn.name)*/
+
+                if (core.Options.GCTempVarsOnDebug && core.Options.FullSSA)
+                {
+                    if (core.Options.IDEDebugMode)
+                    {
+                        allowGC = sn.classScope == classIndex 
+                            && sn.functionIndex == functionIndex 
+                            && !sn.name.Equals(Constants.kWatchResultVar)
+                            && !CoreUtils.IsSSATemp(sn.name);
+                    }
+                }
+
+                if (allowGC)
                 {
                     int offset = sn.index;
                     int n = offset;
@@ -4387,12 +4539,32 @@ namespace ProtoCore.DSASM
                     }
                     if (n >= 0)
                     {
-                        // if this block is not the outer most one, gc all the local variables 
-                        // if this block is the outer most one, gc the temp variables only
-                        if (blockId != 0)
-                            GCRelease(rmem.Stack[n]);
-                        else if (sn.isTemp)
-                            GCRelease(rmem.Stack[n]);
+                        if (core.Options.FullSSA)
+                        { 
+                            // if this block is not the outer most one, gc all the local variables 
+                            // if this block is the outer most one, gc the temp variables only
+                            if (blockId != 0)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                            else if (sn.isTemp)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                        }
+                        else
+                        {
+                            // if this block is not the outer most one, gc all the local variables 
+                            // if this block is the outer most one, gc the temp variables only
+                            if (blockId != 0)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                            else if (sn.isTemp)
+                            {
+                                GCRelease(rmem.Stack[n]);
+                            }
+                        }
 
                         if (blockId != 0)
                         {
@@ -4405,45 +4577,39 @@ namespace ProtoCore.DSASM
             }
         }
 
-        //public bool IsReferedBy(StackValue sv1, StackValue sv2)
-        //{
-        //    if ((sv1.optype != AddressType.ArrayPointer && sv1.optype != AddressType.Pointer) ||
-        //        (sv2.optype != AddressType.Pointer && sv2.optype != AddressType.ArrayPointer))
-        //        return false;
+        public void GCAnonymousSymbols(List<SymbolNode> symbolList, bool isLastNodeSetter = false)
+        {
+            //foreach (SymbolNode symbol in symbolList)
+            for(int i = 0; i < symbolList.Count; ++i)
+            {
+                //
+                // Comment Jun: We want to prevent GC of temp var if it is being assigned to a property
+                // This is a current issue of property setters where a GCRetain is not called on the RHS 
+                // i.e. 
+                //  a.b = p -> GCRetain is not called when p is popped to a.b
+                //
+                if (isLastNodeSetter && i == symbolList.Count - 1)
+                {
+                    break;
+                }
 
-        //    if (sv1.opdata == sv2.opdata)
-        //        return true;
+                SymbolNode symbol = symbolList[i];
 
-        //    if (sv1.optype == AddressType.ArrayPointer)
-        //    {
-        //        foreach (StackValue sv in core.heap.heaplist[(int)sv1.opdata].stack)
-        //        {
-        //            if (IsReferedBy(sv, sv2))
-        //                return true;
-        //        }
-        //    }
-        //    return false;
-        //}
-        //public List<int> GetChildenConstructBlock(int blockId)
-        //{
-        //    ProtoCore.DSASM.CodeBlock cb = core.CompleteCodeBlockList[blockId];
-        //    return cb.children.Where(x => x.blockType == CodeBlockType.kConstruct).Select(x => x.codeBlockId).ToList();
-        //}
-        //public ProtoCore.DSASM.CodeBlock GetCodeBlockById(int blockId, ProtoCore.DSASM.CodeBlock root)
-        //{
-        //    ProtoCore.DSASM.CodeBlock result = null;
-        //    if (root.codeBlockId == blockId)
-        //        return root;
+                int offset = symbol.index;
+                int n = offset;
+                if (symbol.absoluteFunctionIndex != DSASM.Constants.kGlobalScope)
+                {
+                    // Comment Jun: We only want the relative offset if a variable is in a function
+                    n = rmem.GetRelative(rmem.GetStackIndex(offset));
+                }
 
-        //    foreach (ProtoCore.DSASM.CodeBlock cb in root.children)
-        //    {
-        //        result = GetCodeBlockById(blockId, cb);
-        //        if (result != null)
-        //            break;
-        //    }
+                if (n >= 0)
+                {
+                    GCRelease(rmem.Stack[n]);
+                }
+            }
+        }
 
-        //    return result;
-        //}
         public void ReturnSiteGC(int blockId, int classIndex, int functionIndex)
         {
             ProcedureNode pn = null;
@@ -4462,11 +4628,21 @@ namespace ProtoCore.DSASM
 
             foreach (SymbolNode symbol in st.symbolList.Values)
             {
-                if (symbol.functionIndex == functionIndex
-                    && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
-                    && !CoreUtils.IsSSATemp(symbol.name))
-                {
+                bool allowGC = symbol.functionIndex == functionIndex
+                    && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar);
 
+                if (core.Options.GCTempVarsOnDebug && core.Options.FullSSA)
+                {
+                    if (core.Options.IDEDebugMode)
+                    {
+                        allowGC = symbol.functionIndex == functionIndex
+                            && !symbol.name.Equals(ProtoCore.DSASM.Constants.kWatchResultVar)
+                            && !CoreUtils.IsSSATemp(symbol.name);
+                    }
+                }
+
+                if (allowGC)
+                {
                     StackValue sv = rmem.GetAtRelative(symbol);
                     if (AddressType.Pointer == sv.optype || AddressType.ArrayPointer == sv.optype)
                     {
@@ -4481,45 +4657,6 @@ namespace ProtoCore.DSASM
                     GCCodeBlock(cb.codeBlockId, functionIndex, classIndex);
             }
 
-            /////////////////////////////////////////////////////////
-
-            //ProcedureNode pn = null;
-            //if (DSASM.Constants.kInvalidIndex == classIndex)
-            //{
-            //    pn = exe.procedureTable[blockId].procList[functionIndex];
-            //}
-            //else
-            //{
-            //    pn = exe.classTable.list[classIndex].vtable.procList[functionIndex];
-            //}
-
-            //int first, last;
-            //if (pn.firstLocal != null)
-            //{
-            //    // if the function has local variables 
-            //    first = pn.firstLocal.Value;
-            //    last = pn.firstLocal.Value - pn.localCount - pn.argInfoList.Count;
-            //}
-            //else
-            //{
-            //    // if the function does not has local variables 
-            //    first = -1 - Constants.kStackFrameSize;
-            //    last = first - pn.argInfoList.Count;
-            //}
-            //List<StackValue> ptrList = new List<StackValue>();
-            //for (int n = first; n > last; --n)
-            //{
-            //    StackValue sv = rmem.GetAtRelative(n);
-            //    if (AddressType.Pointer == sv.optype || AddressType.ArrayPointer == sv.optype)
-            //    {
-            //        // this check if for the local variable inside a language block which is inside this function
-            //        // these variables have already been gced, hence there is no need to add them again
-            //        // TODO(Jiong): Try to find a better way to check this, are there any flags in the symbol node we can check 
-            //        if (rmem.heap.heaplist[(int)sv.opdata].refcount > 0)
-            //            ptrList.Add(sv);
-            //    }
-
-            //}
 
             if (ptrList.Count > 0)
             {
@@ -5204,7 +5341,8 @@ namespace ProtoCore.DSASM
                     //    %tSSA = %tvar;
                     blockId = core.RunningBlock;
                     string symbol = core.DSExecutable.runtimeSymbols[blockId].symbolList[(int)instruction.op1.opdata].name;
-                    if (!CoreUtils.IsSSATemp(symbol))
+
+                    //if (!CoreUtils.IsSSATemp(symbol))
                     {
                         GCRetain(coercedValue);
                     }
@@ -5218,10 +5356,29 @@ namespace ProtoCore.DSASM
                 FX = coercedValue;
                 tempSvData = coercedValue;
                 EX = PopTo(blockId, instruction.op1, instruction.op2, coercedValue);
+
+                if (core.Options.FullSSA)
+                {
+                    if (!isSSANode)
+                    {
+                        if (EX.optype == AddressType.Pointer && coercedValue.optype == AddressType.Pointer)
+                        {
+                            if (EX.opdata != coercedValue.opdata)
+                            {
+                                if (null != Properties.executingGraphNode)
+                                {
+                                    Properties.executingGraphNode.reExecuteExpression = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (!isSSANode && instruction.op1.optype != AddressType.Register)
                 {
                     GCRelease(EX);
                 }
+
             }
             else
             {
@@ -7180,7 +7337,10 @@ namespace ProtoCore.DSASM
                 core.Rmem.PopConstructBlockId();
             }
 
-            GCCodeBlock(core.RunningBlock);
+            if (!core.Options.IsDeltaExecution || (core.Options.IsDeltaExecution && 0 != core.RunningBlock))
+            {
+                GCCodeBlock(core.RunningBlock);
+            }
 
             if (ProtoCore.DSASM.CallingConvention.BounceType.kExplicit == bounceType)
             {
@@ -7319,6 +7479,19 @@ namespace ProtoCore.DSASM
 
             ProcedureNode procNode = GetProcedureNode(blockId, ci, fi);
 
+            if (core.Options.FullSSA)
+            {
+                if (core.Options.GCTempVarsOnDebug && core.Options.IDEDebugMode)
+                {
+                    // GC anonymous variables in the return stmt
+                    if (null != Properties.executingGraphNode && !Properties.executingGraphNode.IsSSANode())
+                    {
+                        GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression);
+                        Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                    }
+                }
+            }
+
             pc = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexReturnAddress).opdata;
             executingBlock = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionCallerBlock).opdata;
 
@@ -7436,20 +7609,24 @@ namespace ProtoCore.DSASM
                 int currentScopeClass = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexClass).opdata;
                 int currentScopeFunction = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunction).opdata;
 
-                // Since there are execution states retrieved from the stack frame,
-                // this means that we must be returning to a function and not the global scope
-                Validity.Assert(currentScopeFunction != ProtoCore.DSASM.Constants.kGlobalScope); 
-
-                // Get the instruction stream where the current function resides in
-                StackValue svCurrentFunctionBlockDecl = rmem.GetAtRelative(rmem.GetStackIndex(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionBlock));
-                Validity.Assert(svCurrentFunctionBlockDecl.optype == AddressType.BlockIndex);
-                AssociativeGraph.DependencyGraph depgraph = exe.instrStreamList[(int)svCurrentFunctionBlockDecl.opdata].dependencyGraph;
-
-                List<AssociativeGraph.GraphNode> graphNodesInScope = depgraph.GetGraphNodesAtScope(currentScopeClass, currentScopeFunction);
-                Validity.Assert(execStateRestore.Count == graphNodesInScope.Count);
-                for (int n = 0; n < execStateRestore.Count; ++n)
+                bool isReturningFromRecursiveCall = procNode.procId == currentScopeFunction;
+                if (isReturningFromRecursiveCall)
                 {
-                    graphNodesInScope[n].isDirty = execStateRestore[n];
+                    // Since there are execution states retrieved from the stack frame,
+                    // this means that we must be returning to a function and not the global scope
+                    Validity.Assert(currentScopeFunction != ProtoCore.DSASM.Constants.kGlobalScope);
+
+                    // Get the instruction stream where the current function resides in
+                    StackValue svCurrentFunctionBlockDecl = rmem.GetAtRelative(rmem.GetStackIndex(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionBlock));
+                    Validity.Assert(svCurrentFunctionBlockDecl.optype == AddressType.BlockIndex);
+                    AssociativeGraph.DependencyGraph depgraph = exe.instrStreamList[(int)svCurrentFunctionBlockDecl.opdata].dependencyGraph;
+
+                    List<AssociativeGraph.GraphNode> graphNodesInScope = depgraph.GetGraphNodesAtScope(currentScopeClass, currentScopeFunction);
+                    Validity.Assert(execStateRestore.Count == graphNodesInScope.Count);
+                    for (int n = 0; n < execStateRestore.Count; ++n)
+                    {
+                        graphNodesInScope[n].isDirty = execStateRestore[n];
+                    }
                 }
             }
 
@@ -7911,6 +8088,31 @@ namespace ProtoCore.DSASM
                         istream.xUpdateList.Add(Properties.executingGraphNode.updateNodeRefList[0]);
                     }
                 }
+                if (core.Options.FullSSA)
+                {
+                    if (core.Options.GCTempVarsOnDebug && core.Options.IDEDebugMode)
+                    {
+                        if (!Properties.executingGraphNode.IsSSANode())
+                        {
+                            bool isSetter = Properties.executingGraphNode.updateNodeRefList[0].nodeList.Count > 1;
+
+                            GCAnonymousSymbols(Properties.executingGraphNode.symbolListWithinExpression, isSetter);
+                            Properties.executingGraphNode.symbolListWithinExpression.Clear();
+                        }
+                    }
+                }
+                
+                if (core.Options.FullSSA)
+                {
+                    if (!Properties.executingGraphNode.IsSSANode())
+                    {
+                        foreach (AssociativeGraph.GraphNode gnode in deferedGraphNodes)
+                        {
+                            gnode.isDirty = true;
+                        }
+                        deferedGraphNodes.Clear();
+                    }
+                }
             }
 
             // TODO Jun: Whats the main diff again on non-delta execution???
@@ -7939,6 +8141,7 @@ namespace ProtoCore.DSASM
 
             // Get the next graph to be executed
             SetupNextExecutableGraph(fi, ci);
+
 
             return;
         }

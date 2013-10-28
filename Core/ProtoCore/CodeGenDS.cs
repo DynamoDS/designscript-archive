@@ -139,7 +139,10 @@ namespace ProtoCore
             {
                 EmitExprListNode(node as ProtoCore.AST.AssociativeAST.ExprListNode);
             }
-
+            else if (node is ProtoCore.AST.AssociativeAST.ModifierStackNode)
+            {
+                EmitModifierStackNode(node as ProtoCore.AST.AssociativeAST.ModifierStackNode);
+            }
         }
 
 
@@ -161,6 +164,16 @@ namespace ProtoCore
             EmitCode("}");
         }
 
+        private void EmitModifierStackNode(AST.AssociativeAST.ModifierStackNode modifierStackNode)
+        {
+            EmitCode("{");
+            foreach (AST.AssociativeAST.AssociativeNode node in modifierStackNode.ElementNodes)
+            {
+                DFSTraverse(node);
+                EmitCode(";");
+            }
+            EmitCode("}");
+        }
         private void EmitArrayNode(AST.AssociativeAST.ArrayNode arrayNode)
         {
             if (null != arrayNode)

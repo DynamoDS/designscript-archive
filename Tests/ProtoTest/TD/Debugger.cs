@@ -76,7 +76,7 @@ namespace ProtoTest.TD
         [Test]
         public void Defect_1467570_Crash_In_Debug_Mode()
         {
-            string src = @" class Test {       IntArray : int[];         constructor FirstApproach(intArray : int[])     {         IntArray = intArray;     }         def Transform(adjust : int)     {         return = Test.FirstApproach(this.IntArray + adjust);     }         } myTest = Test.FirstApproach({ 1, 2 }); myNeTwst = myTest.Transform(1); ";
+            string src = @" class Test {       IntArray : int[];         constructor FirstApproach(intArray : int[])     {         IntArray = intArray;     }         def Transform(adjust : int)     {         return = Test.FirstApproach(this.IntArray + adjust);     }         } myTest = Test.FirstApproach({ 1, 2 }); myNeTwst = myTest.Transform(1); ";
             fsr.PreStart(src, runnerConfig);
             DebugRunner.VMState vms = fsr.Step();   // myTest = Test.FirstApproach({ 1, 2 }); 
             ProtoCore.CodeModel.CodePoint cp = new ProtoCore.CodeModel.CodePoint

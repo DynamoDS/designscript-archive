@@ -3893,7 +3893,7 @@ test = A.foo().x;
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("r", 4);
-            thisTest.Verify("r1", new object[] {4,7 });
+            thisTest.Verify("r1", new object[] { 4, 7 });
         }
         [Test]
         public void T50_DictionaryInline()
@@ -3921,7 +3921,7 @@ test = A.foo().x;
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("r", new object[] {4,-4});
+            thisTest.Verify("r", new object[] { 4, -4 });
         }
         [Test]
         public void T52_DictionaryKeynull()
@@ -3941,7 +3941,7 @@ test = A.foo().x;
         [Test]
         public void T53_DictionaryKeyUpdate()
         {
-           
+
             String code =
             @"
                 a = {1, 2, 3};
@@ -3958,7 +3958,7 @@ test = A.foo().x;
         [Test]
         public void T54_DictionaryKeyUpdate_2()
         {
-           
+
             String code =
             @"
                a = {1, 2, 3};
@@ -3975,7 +3975,7 @@ test = A.foo().x;
         [Test]
         public void T55_DictionaryKeyinClass()
         {
-           
+
             String code =
             @"
                
@@ -4002,7 +4002,7 @@ test = A.foo().x;
         [Test]
         public void T56_DictionaryKeyinClass_2()
         {
-            
+
             String code =
             @"
                
@@ -4026,11 +4026,11 @@ test = A.foo().x;
             thisTest.Verify("x", 5);
 
         }
-       
+
         [Test]
         public void T57_DictionaryKeyinClass_inheritance()
         {
-           
+
             String code =
             @"
                
@@ -4067,7 +4067,7 @@ test = A.foo().x;
         [Test]
         public void T58_DictionaryKeyinClass_inheritance2()
         {
-            
+
             String code =
             @"
                
@@ -4153,7 +4153,7 @@ test = A.foo().x;
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("x", new object [] {5,6});
+            thisTest.Verify("x", new object[] { 5, 6 });
 
         }
         [Test]
@@ -4205,7 +4205,7 @@ r5 = a[""5""];
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("r0",0);
+            thisTest.Verify("r0", 0);
             thisTest.Verify("r1", 1);
             thisTest.Verify("r2", 2);
             thisTest.Verify("r3", 3);
@@ -4240,45 +4240,45 @@ r2 = a[1];
             thisTest.Verify("r0", "x");
             thisTest.Verify("r1", true);
             thisTest.Verify("r2", 1);
-            
+
 
         }
-     /*   [Test]
-        public void T60_Dictionarytemp()
-        {
-             Assert.Throws(typeof(ProtoCore.Exceptions.RuntimeException), () =>
-            {
-            String code =
-            @"
+        /*   [Test]
+           public void T60_Dictionarytemp()
+           {
+                Assert.Throws(typeof(ProtoCore.Exceptions.RuntimeException), () =>
+               {
+               String code =
+               @"
                
-          class test
-            {
-                static a = { 1, 2, 3 };
-                static b = {""x"",""y""};
-                static def foo(c:int)
-                {
-                    a[b[0]] = c;
-                    a[b[1]] = c+1;
-                    return =a;
-                }
-            }
-            def foo(z:test)
-            {
+             class test
+               {
+                   static a = { 1, 2, 3 };
+                   static b = {""x"",""y""};
+                   static def foo(c:int)
+                   {
+                       a[b[0]] = c;
+                       a[b[1]] = c+1;
+                       return =a;
+                   }
+               }
+               def foo(z:test)
+               {
 
-                y = z.foo(5);
-                x = y[z.b];
-                return =x;
-            }
-            z1 = foo(test.test());
+                   y = z.foo(5);
+                   x = y[z.b];
+                   return =x;
+               }
+               z1 = foo(test.test());
                 
 
-            ";
+               ";
 
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+               ExecutionMirror mirror = thisTest.RunScriptSource(code);
 
-            thisTest.Verify("z1", new object[] { 5, 6 });
-            });
-        }*/
+               thisTest.Verify("z1", new object[] { 5, 6 });
+               });
+           }*/
         [Test]
         public void T72_Dictionarytypeconversion()
         {
@@ -4300,8 +4300,8 @@ r2 = a[1];
             ";
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            thisTest.Verify("x", new object []{true,true});
-            
+            thisTest.Verify("x", new object[] { true, true });
+
 
 
         }
@@ -4360,7 +4360,7 @@ r2 = a[1];
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("x", new object[] { true, null });
             thisTest.Verify("x1", new object[] { null, true });
-            thisTest.Verify("x2", new object[] { true,null });
+            thisTest.Verify("x2", new object[] { true, null });
             thisTest.Verify("x3", new object[] { null, true });
 
 
