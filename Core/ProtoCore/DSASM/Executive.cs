@@ -7337,7 +7337,10 @@ namespace ProtoCore.DSASM
                 core.Rmem.PopConstructBlockId();
             }
 
-            GCCodeBlock(core.RunningBlock);
+            if (!core.Options.IsDeltaExecution || (core.Options.IsDeltaExecution && 0 != core.RunningBlock))
+            {
+                GCCodeBlock(core.RunningBlock);
+            }
 
             if (ProtoCore.DSASM.CallingConvention.BounceType.kExplicit == bounceType)
             {
