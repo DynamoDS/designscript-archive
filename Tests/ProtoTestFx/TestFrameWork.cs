@@ -614,6 +614,7 @@ namespace ProtoTestFx.TD
         {
             string str = GetFFIObjectStringValue(dsVariable, startBlock, arrayIndex);
             Assert.IsFalse(string.IsNullOrEmpty(str), string.Format("\"{0}\" is null, arrayIndex = {1}", dsVariable, arrayIndex));
+
         }
     }
 }

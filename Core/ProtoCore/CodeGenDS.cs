@@ -174,7 +174,6 @@ namespace ProtoCore
             }
             EmitCode("}");
         }
-
         private void EmitArrayNode(AST.AssociativeAST.ArrayNode arrayNode)
         {
             if (null != arrayNode)

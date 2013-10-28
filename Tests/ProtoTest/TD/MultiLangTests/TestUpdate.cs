@@ -5,12 +5,12 @@ using ProtoCore.DSASM.Mirror;
 using ProtoTestFx.TD;
 namespace ProtoTest.TD.MultiLangTests
 {
-    class TestUpdate
+    public class TestUpdate
     {
         readonly TestFrameWork thisTest = new TestFrameWork();
         ProtoCore.Core core;
         ProtoScript.Config.RunConfiguration runnerConfig;
-        string testPath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\Update\\";
+        string testPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         ProtoScript.Runners.DebugRunner fsr;
         [SetUp]
         public void SetUp()
@@ -2416,6 +2416,7 @@ b1 = 2;
 	
 ";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+
             Object[] v1 = new Object[] { 0, 2 };
             thisTest.Verify("a", v1);
         }
@@ -2625,12 +2626,14 @@ def foo ( x )
 }
 y = B.B();
 y.b = 1; // This is re-executed again as y.b is modified from inside foo
+
 z = y.b;
 test = foo ( y ) ;
 z2 = z;
 ";
             thisTest.VerifyRunScriptSource(code, err);
             thisTest.Verify("z2", 1);
+
         }
 
         [Test]

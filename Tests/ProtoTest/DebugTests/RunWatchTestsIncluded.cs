@@ -2985,7 +2985,7 @@ pow2 = array_pow(arr, 4.0);
 
         [Test]
         [Category("WatchFx Tests")]
-        public void debugwatch065()
+        public void DebugWatch65_file_1467252()
         {
             Dictionary<int, List<string>> map = new Dictionary<int, List<string>>();
             string src = @"
@@ -2996,7 +2996,7 @@ WCS = CoordinateSystem.Identity();";
 
         [Test]
         [Category("WatchFx Tests")]
-        public void debugwatch066()
+        public void DebugWatch66_file_1467252_master()
         {
             Dictionary<int, List<string>> map = new Dictionary<int, List<string>>();
             string src = @" import(""ProtoGeometry.dll"");

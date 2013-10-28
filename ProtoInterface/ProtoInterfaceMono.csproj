@@ -7,6 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{9EC0521F-84DA-4196-B0BC-34E4049E50BD}</ProjectGuid>
     <OutputType>Library</OutputType>
+	<OutputPath Condition=" '$(OutputPath)' == '' ">..\..\bin\$(Platform)\$(Configuration)</OutputPath>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ProtoInterface</RootNamespace>
     <AssemblyName>ProtoInterface</AssemblyName>

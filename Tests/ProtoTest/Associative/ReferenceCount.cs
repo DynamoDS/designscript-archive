@@ -1767,7 +1767,7 @@ namespace ProtoTest.Associative
             thisTest.Verify("cDispose", 0);
         }
 
-        [Test, Ignore]
+        [Test]
         public void TestReferenceCount59_GlobalFunctionReturnNewObject()
         {
             string code =
@@ -2005,7 +2005,6 @@ namespace ProtoTest.Associative
         public void TestReferenceCount67_DID1467277_02()
         {
             string code = @"class A{    x;    static s_dispose = 0;    constructor A(i)    {        x = i;    }    def _Dispose()    {        s_dispose = s_dispose + 1;        return = null;    }    def foo()    {        return = null;    }}r = A.A(0..1).foo();t = A.s_dispose;";
-
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             // SSA'd transforms will not GC the temps until end of block
             // However, they must be GC's after every line when in debug setp over

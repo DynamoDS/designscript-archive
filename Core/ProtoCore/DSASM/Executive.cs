@@ -1005,7 +1005,6 @@ namespace ProtoCore.DSASM
                     //
                     Properties.functionCallArguments = arguments;
 
-                    //Properties.functionCallArguments = runtimeContext.coercedArgs;
                     Properties.functionCallDotCallDimensions = dotCallDimensions;
 
                     explicitCall = true;
@@ -1352,7 +1351,6 @@ namespace ProtoCore.DSASM
                     if (graphNode.isReturn || graphNode.updateNodeRefList[0].nodeList.Count > 0)
                     {
                         graphNode.isDirty = false;
-
                         if (core.Options.FullSSA)
                         {
                             ProtoCore.AssociativeEngine.Utils.SetFinalGraphNodeRuntimeDependents(graphNode);
@@ -1669,8 +1667,6 @@ namespace ProtoCore.DSASM
                     UpdatePropertyChangedGraphNode();
                 }
             }
-
-            // Find and mark dependent graphnodes as dirty
             UpdateDependencyGraph(exprUID, modBlkId, isSSAAssign, Properties.executingGraphNode);
 
             if (Properties.executingGraphNode != null)
@@ -1682,7 +1678,6 @@ namespace ProtoCore.DSASM
                 {
                     isssa = Properties.executingGraphNode.IsSSANode();
                 }
-
                 if (!isssa)
                 {
                     for (int n = 0; n < istream.dependencyGraph.GraphList.Count; ++n)
@@ -1934,6 +1929,12 @@ namespace ProtoCore.DSASM
             for (int i = 0; i < graphNodes.Count; ++i)
             {
                 var graphNode = graphNodes[i];
+
+                // If the graphnode is inactive then it is no longer executed
+                if (!graphNode.isActive)
+                {
+                    continue;
+                }
                 //
                 // Comment Jun: 
                 //      This is clarifying the intention that if the graphnode is within the same SSA expression, we still allow update
@@ -1949,7 +1950,6 @@ namespace ProtoCore.DSASM
                     {
                         continue;
                     }
-                    
                 }
                 else
                 {
@@ -1957,7 +1957,6 @@ namespace ProtoCore.DSASM
                     bool withinSSAStatement = graphNode.UID == executingGraphNode.UID;
                     allowUpdateWithinSSA = !withinSSAStatement;
                 }
-
 
                 if (!allowUpdateWithinSSA || (propertyChanged && graphNode == Properties.executingGraphNode))
                 {
@@ -1971,7 +1970,6 @@ namespace ProtoCore.DSASM
                     {
                         continue;
                     }
-
 
                     // Jun: only allow update to other expr id's (other statements) if this is the final SSA assignment
                     if (core.Options.FullSSA && !propertyChanged)
@@ -2100,7 +2098,6 @@ namespace ProtoCore.DSASM
                             graphNode.isDirty = true;
                             graphNode.forPropertyChanged = propertyChanged;
                             nodesMarkedDirty++;
-
                             
                             // On debug mode:
                             //      we want to mark all ssa statements dirty for an if the lhs pointer is a new instance.
@@ -2166,7 +2163,6 @@ namespace ProtoCore.DSASM
                 {
                     return;
                 }
-                
             }
 
             //if (executingNode.dependentList.Count > 0)
@@ -2298,6 +2294,7 @@ namespace ProtoCore.DSASM
         {
             int classScope = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexClass).opdata;
             int functionScope = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunction).opdata;
+
             List<ProtoCore.AssociativeGraph.UpdateNodeRef> upadatedList = new List<AssociativeGraph.UpdateNodeRef>();
 
             // For every instruction list in the executable
@@ -2313,7 +2310,6 @@ namespace ProtoCore.DSASM
                         {
                             continue;
                         }
-
 
                         // To deal with the case
                         // 
@@ -7493,7 +7489,6 @@ namespace ProtoCore.DSASM
                 }
             }
 
-
             pc = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexReturnAddress).opdata;
             executingBlock = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexFunctionCallerBlock).opdata;
 
@@ -8090,7 +8085,6 @@ namespace ProtoCore.DSASM
                         istream.xUpdateList.Add(Properties.executingGraphNode.updateNodeRefList[0]);
                     }
                 }
-
                 if (core.Options.FullSSA)
                 {
                     if (core.Options.GCTempVarsOnDebug && core.Options.IDEDebugMode)
@@ -8145,7 +8139,7 @@ namespace ProtoCore.DSASM
             // Get the next graph to be executed
             SetupNextExecutableGraph(fi, ci);
 
-            
+
             return;
         }
 

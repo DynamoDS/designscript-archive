@@ -788,7 +788,6 @@ namespace ProtoCore.Utils
             return areEqual;
         }
 
-
         public static void CopyDebugData(ProtoCore.AST.Node nodeTo, ProtoCore.AST.Node nodeFrom)
         {
             if (null != nodeTo && null != nodeFrom)

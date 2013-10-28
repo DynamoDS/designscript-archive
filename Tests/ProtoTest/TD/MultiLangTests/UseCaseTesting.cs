@@ -4,10 +4,10 @@ using ProtoCore.DSASM.Mirror;
 using ProtoTestFx.TD;
 namespace ProtoTest.TD.MultiLangTests
 {
-    class UseCaseTesting
+    public class UseCaseTesting
     {
         readonly TestFrameWork thisTest = new TestFrameWork();
-        string testPath = "..\\..\\..\\Scripts\\TD\\MultiLanguage\\UseCaseTesting\\";
+        string testPath = "..\\..\\..\\Tests\\ProtoTest\\ImportFiles\\";
         [SetUp]
         public void SetUp()
         {

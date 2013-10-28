@@ -115,6 +115,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesignScriptStudio.App", "U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "String", "Libraries\String\String.csproj", "{C7A2F2EF-57FE-4C52-BA46-BDBE9E48A76A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoTestExe", "Core\ProtoTestExe2\ProtoTestExe.csproj", "{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9427360D-A039-4FB1-97FF-9218D71FD260}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\jun.ds = Scripts\jun.ds
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -477,6 +484,18 @@ Global
 		{C7A2F2EF-57FE-4C52-BA46-BDBE9E48A76A}.Release|x64.Build.0 = Release|x64
 		{C7A2F2EF-57FE-4C52-BA46-BDBE9E48A76A}.Release|x86.ActiveCfg = Release|x86
 		{C7A2F2EF-57FE-4C52-BA46-BDBE9E48A76A}.Release|x86.Build.0 = Release|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Debug|Win32.ActiveCfg = Debug|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Debug|x64.ActiveCfg = Debug|x64
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Debug|x64.Build.0 = Debug|x64
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Debug|x86.ActiveCfg = Debug|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Debug|x86.Build.0 = Debug|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Release|Any CPU.ActiveCfg = Release|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Release|Win32.ActiveCfg = Release|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Release|x64.ActiveCfg = Release|x64
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Release|x64.Build.0 = Release|x64
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Release|x86.ActiveCfg = Release|x86
+		{672BF8EC-1116-49F6-B253-DFCE5CF7D4C9}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

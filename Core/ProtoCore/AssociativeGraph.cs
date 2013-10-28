@@ -31,7 +31,6 @@ namespace ProtoCore.AssociativeEngine
             }
         }
     }
-
     public class ArrayUpdate
     {
         /// <summary>
@@ -188,6 +187,13 @@ namespace ProtoCore.AssociativeGraph
         public List<SymbolNode> symbolListWithinExpression { get; set; }
 
         public bool reExecuteExpression { get; set; }
+        /// <summary>
+        /// Flag determines if a graph node is active or not. If inactive, the graph node is invalid
+        /// this is especially used in the LiveRunner to mark modified/deleted nodes inactive so that they are not executed
+        /// </summary>
+        public bool isActive { get; set; }
+
+
 
         
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
@@ -225,6 +231,7 @@ namespace ProtoCore.AssociativeGraph
             propertyChanged = false;
             forPropertyChanged = false;
             lastGraphNode = null;
+            isActive = true;
 
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
             ArrayPointer = ProtoCore.DSASM.StackUtils.BuildNull();

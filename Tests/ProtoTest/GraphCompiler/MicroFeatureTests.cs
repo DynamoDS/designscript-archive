@@ -5953,8 +5953,7 @@ b = 20;</Content>
             Assert.IsTrue((Int64)dim1[0].Payload == 5);
             Assert.IsTrue((Int64)dim1[1].Payload == 6);
         }
-
-        [Test, Ignore]
+        [Test]
         public void T007_TestReplicationGuideFromRadialMenuUsingMathFunctionWithEdit()
         {
             // 1. Create a CBN : a = {1,2};
@@ -6271,8 +6270,7 @@ b = 20;</Content>
             Assert.IsTrue((Int64)dim2[0].Payload == 2);
             Assert.IsTrue((Int64)dim2[1].Payload == 4);
         }
-
-        [Test, Ignore]
+        [Test]
         public void T008_TestReplicationGuideFromRadialMenuUsingMathFunctionWithEditAndUndo()
         {
             // 1. Create a CBN : a = {1,2};
@@ -8834,7 +8832,7 @@ b = 20;</Content>
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
         }
 
-        [Test, Ignore]
+        [Test]
         public void T016_TestReplicationGuideFromRadialMenuUsingMathFunctionWithEditUndoRedo()
         {
             // 1. Create a range node {0,1,2};
@@ -9375,7 +9373,7 @@ b = 20;</Content>
             Assert.IsTrue((Int64)dim2[3].Payload == 5);
         }
 
-        [Test, Ignore]
+        [Test]
         public void T017_TestReplicationGuideFromRadialMenuUsingMathFunctionWithInvalidGuidesAndUndoRedo()
         {
             // 1. Create a CBN : a = 1..2;
@@ -10838,7 +10836,7 @@ b = 20;</Content>
             Assert.IsTrue((Int64)dim2[1].Payload == 3);
         }
 
-        [Test, Ignore]
+        [Test]
         public void T021_TestFunctionNodeValueWithEdits_TestCaseDefect_DNL_1467667()
         {
             //Failing due to defect :DNL-1467667 Replication on heterogeneous array causes unintended type conversion
@@ -28504,7 +28502,7 @@ b = 20;</Content>
             Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
         }
 
-        [Test, Ignore]
+        [Test]
         public void T082_IDE_1553_Defect_Open()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1553

@@ -692,7 +692,7 @@ namespace GraphToDSCompiler
         /// <param name="errors"></param>
         public static void CompileExpression(string expression, out List<string> compiled)
         {
-            //expression = expression.Replace("\r\n", "\n");
+            expression = expression.Replace("\r\n", "\n");
             int oldIndex = 0;
             compiled = new List<string>();
 
@@ -1016,41 +1016,7 @@ namespace GraphToDSCompiler
         /// <param name="astNodes"></param>
         /// <returns>Returns true if compilation succeeded, or false otherwise. Returning true may still 
         /// result in warnings, which suggests that the compilation was successful with warning.</returns>             
-        public static bool ParseCodeBlockNodeStatements(string compilableText, Dictionary<int, List<VariableLine>> unboundIdentifiers, out List<ProtoCore.AST.Node> astNodes)
-        {
-            List<ProtoCore.BuildData.WarningEntry> warnings = null;
 
-            if (string.IsNullOrEmpty(compilableText))
-                throw new ArgumentNullException("code", "8686D4A8");
-
-            if (null != unboundIdentifiers)
-                unboundIdentifiers.Clear();
-            try
-            {
-                BuildCore(true);
-                int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-                ProtoCore.BuildStatus status = PreCompile(compilableText, core, out blockId);
-
-                if (status.Errors.Count > 0)
-                {
-                    astNodes = null;
-                    return false;
-                }
-
-                warnings = status.Warnings;
-
-                if (null != unboundIdentifiers)
-                    GetInputLines(compilableText, warnings, unboundIdentifiers);
-
-                astNodes = core.AstNodeList;
-                return true;
-            }
-            catch (Exception exception)
-            {
-                astNodes = null;
-                return false;
-            }
-        }
 
 
         public static List<SynchronizeData> GetSDList(string filepath)
@@ -1342,6 +1308,58 @@ namespace GraphToDSCompiler
             return p.root;
         }
 
+        public static bool Parse(string code, out List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
+                List<String> unboundIdentifiers)
+        {
+            try
+            {
+                List<String> compiledCode = new List<String>();
+                CompileExpression(code, out compiledCode);
+
+                string codeToParse = "";
+                for (int i = 0; i < compiledCode.Count; i++)
+                {
+                    string tempVariableName = "temp" + System.Guid.NewGuid().ToString().Replace("-", "_");
+                    string singleExpression = compiledCode[i];
+                    singleExpression = singleExpression.Replace("%t", tempVariableName);
+                    codeToParse += singleExpression;
+                }
+
+                ProtoCore.BuildStatus buildStatus;
+
+                Dictionary<int, List<VariableLine>> tempUnboundIdentifiers = new Dictionary<int, List<VariableLine>>();
+
+                ParseCodeBlockNodeStatements(codeToParse, out tempUnboundIdentifiers, out resultNodes, out buildStatus);
+                //Dictionary<int, List<GraphToDSCompiler.VariableLine>> unboundIdentifiers;
+                //unboundIdentifiers = new Dictionary<int, List<GraphToDSCompiler.VariableLine>>();
+                //List<ProtoCore.AST.Node> resultNodes;
+
+                errors = buildStatus.Errors;
+                warnings = buildStatus.Warnings;
+
+                //unboundIdentifiers = new List<string>();
+                foreach (KeyValuePair<int, List<VariableLine>> kvp in tempUnboundIdentifiers)
+                {
+                    foreach (VariableLine vl in kvp.Value)
+                    {
+                        if (!unboundIdentifiers.Contains(vl.variable))
+                        {
+                            unboundIdentifiers.Add(vl.variable);
+                        }
+                    }
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                resultNodes = null;
+                errors = null;
+                warnings = null;
+                unboundIdentifiers = null;
+                return false;
+            }
+        }
+
         public static List<ProtoCore.AST.Node> ParseCodeBlock(string code)
         {
             Validity.Assert(code != null);
@@ -1378,7 +1396,47 @@ namespace GraphToDSCompiler
 
         // TODO: To Deprecate: Currently used in GetInputOutputInfo() overload used in ProtoTest.GraphCompiler.MicroFeatureTests
         // 
-        
+
+        public static bool ParseCodeBlockNodeStatements(string compilableText,
+            out Dictionary<int, List<VariableLine>> unboundIdentifiers, out List<ProtoCore.AST.Node> astNodes, out ProtoCore.BuildStatus buildStatus)
+        {
+            unboundIdentifiers = new Dictionary<int, List<VariableLine>>();
+            List<ProtoCore.BuildData.WarningEntry> warnings = null;
+
+            if (string.IsNullOrEmpty(compilableText))
+                throw new ArgumentNullException("code", "8686D4A8");
+
+            if (null != unboundIdentifiers)
+                unboundIdentifiers.Clear();
+            try
+            {
+                BuildCore(true);
+                int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+                //ProtoCore.BuildStatus status = PreCompile(compilableText, core, out blockId);
+                buildStatus = PreCompile(compilableText, core, out blockId);
+
+                if (buildStatus.Errors.Count > 0)
+                {
+                    astNodes = null;
+                    return false;
+                }
+
+                warnings = buildStatus.Warnings;
+
+                if (null != unboundIdentifiers)
+                    GetInputLines(compilableText, warnings, unboundIdentifiers);
+
+                astNodes = core.AstNodeList;
+                return true;
+            }
+            catch (Exception exception)
+            {
+                astNodes = null;
+                buildStatus = null;
+                return false;
+            }
+        }
+
         private static void GetOutputLines(string code, ProtoCore.Core core, Dictionary<int, string> outputLines)
         {
             Validity.Assert(code != null);

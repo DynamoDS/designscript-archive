@@ -993,7 +993,6 @@ public Node root { get; set; }
 		ProtoCore.AST.AssociativeAST.AssociativeNode rightNode = null;
 		 
 		Associative_Expression(out rightNode);
-
         bool allowIdentList = core.Options.FullSSA && rightNode is ProtoCore.AST.AssociativeAST.IdentifierListNode;
         
 

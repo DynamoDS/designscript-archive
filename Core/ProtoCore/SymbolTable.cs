@@ -142,8 +142,6 @@ namespace ProtoCore.DSASM
         public int codeBlockId = ProtoCore.DSASM.Constants.kInvalidIndex;
         public string ExternLib = "";
 
-
-
         public SymbolNode()
         {
             isArray         = false;

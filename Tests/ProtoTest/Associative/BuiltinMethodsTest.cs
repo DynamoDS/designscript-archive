@@ -5,7 +5,7 @@ using ProtoTest.TD;
 using ProtoTestFx.TD;
 namespace ProtoTest.Associative
 {
-    class BuiltinMethodsTest
+    public class BuiltinMethodsTest
     {
         public TestFrameWork thisTest = new TestFrameWork();
         [SetUp]

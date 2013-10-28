@@ -4309,6 +4309,7 @@ static def execute(b : A)
 arr = {A.A()};
 v = A.execute(arr);
 val = v[0];";
+
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("val", 100);
         }

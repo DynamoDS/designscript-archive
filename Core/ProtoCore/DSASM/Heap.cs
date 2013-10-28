@@ -446,7 +446,6 @@ namespace ProtoCore.DSASM
             }
 
             int ptr = (int)sv.opdata;
-
             if (this.Heaplist[ptr].Refcount > 0)
             {
                 this.Heaplist[ptr].Refcount--;
@@ -484,7 +483,6 @@ namespace ProtoCore.DSASM
                 }
 
                 // TODO Jun: If its a pointer to a primitive then dont decrease its refcount, just free it
-                // Validity.Assert(hs.refcount >= 0);
                 if (hs.Refcount == 0)
                 {
                     // if it is of class type, first call its destructor before clean its members
