@@ -51554,7 +51554,7 @@ a = {
             WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
-        [Test, Ignore]
+        [Test]
         [Category("WatchFx Tests")]
         public void DebugWatch1670_T40_Defect_1467088_Modifier_Stack_Cross_Update_Issue_3()
         {
