@@ -3004,7 +3004,7 @@ WCS = CoordinateSystem.Identity();";
  WCS = CoordinateSystem.Identity();
  newCS = WCS.Translate(Vector.ByCoordinates(0, 1, 0));";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
         [Test]
@@ -23683,7 +23683,7 @@ a2 = foo2(3);
             WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("WatchFx Tests")]
         public void DebugWatch686_T018_Inline_Using_Recursion()
         {
@@ -44079,7 +44079,7 @@ z = myPoint.Z;
 midValue = myPoint.MidValue();
 arr = Scale(midValue, 4.0);";
             WatchTestFx.GeneratePrintStatements(src, ref map);
-            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(importpath, src, map);
+            WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
         [Test]
@@ -51483,7 +51483,7 @@ b = {
             WatchTestFx fx = new WatchTestFx(); fx.CompareRunAndWatchResults(null, src, map);
         }
 
-        [Test]
+        [Test, Ignore]
         [Category("WatchFx Tests")]
         public void DebugWatch1666_T40_Defect_1467057_Modifier_Stack_Cross_Update_Issue_3()
         {

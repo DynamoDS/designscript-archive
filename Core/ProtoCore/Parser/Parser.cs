@@ -1,4 +1,3 @@
-
 //#define ENABLE_INC_DEC_FIX
 using System;
 using System.Collections.Generic;
@@ -993,8 +992,12 @@ public Node root { get; set; }
 		ProtoCore.AST.AssociativeAST.AssociativeNode rightNode = null;
 		 
 		Associative_Expression(out rightNode);
-		if (rightNode is ProtoCore.AST.AssociativeAST.FunctionDotCallNode ||
-		   rightNode is ProtoCore.AST.AssociativeAST.FunctionCallNode )
+        bool allowIdentList = core.Options.FullSSA && rightNode is ProtoCore.AST.AssociativeAST.IdentifierListNode;
+        
+
+		if (rightNode is ProtoCore.AST.AssociativeAST.FunctionDotCallNode 
+            || rightNode is ProtoCore.AST.AssociativeAST.FunctionCallNode
+            || allowIdentList)
 		{
 			ProtoCore.AST.AssociativeAST.BinaryExpressionNode expressionNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode();
 			ProtoCore.AST.AssociativeAST.IdentifierNode leftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode();

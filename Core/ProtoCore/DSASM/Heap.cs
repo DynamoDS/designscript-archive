@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using ProtoCore.Utils;
@@ -49,7 +49,7 @@ namespace ProtoCore.DSASM
 
         private int GetNewSize(int size)
         {
-            Debug.Assert(size > AllocSize);
+            Validity.Assert(size > AllocSize);
             int nextSize = kInitialSize;
             if (size > kInitialSize)
             {
@@ -86,12 +86,12 @@ namespace ProtoCore.DSASM
             }
             
             AllocSize = newAllocatedSize;
-            Debug.Assert(size <= AllocSize);
+            Validity.Assert(size <= AllocSize);
         }
 
         public void RightShiftElements(int size)
         {
-            Debug.Assert(VisibleSize + size <= AllocSize);
+            Validity.Assert(VisibleSize + size <= AllocSize);
             if (size <= 0)
             {
                 return;
@@ -446,9 +446,13 @@ namespace ProtoCore.DSASM
             }
 
             int ptr = (int)sv.opdata;
-
-            Debug.Assert(this.Heaplist[ptr].Refcount > 0);
-            this.Heaplist[ptr].Refcount--;
+            if (this.Heaplist[ptr].Refcount > 0)
+            {
+                this.Heaplist[ptr].Refcount--;
+            }
+            else
+            {
+            }
         }
 
         public void GCRelease(StackValue[] ptrList, Executive exe)
@@ -479,7 +483,6 @@ namespace ProtoCore.DSASM
                 }
 
                 // TODO Jun: If its a pointer to a primitive then dont decrease its refcount, just free it
-                // Debug.Assert(hs.refcount >= 0);
                 if (hs.Refcount == 0)
                 {
                     // if it is of class type, first call its destructor before clean its members

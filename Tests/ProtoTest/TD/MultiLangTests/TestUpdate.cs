@@ -376,9 +376,9 @@ c = [Imperative]
 f = c + 1;";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
 
+            // There is no cycle as 'a' is only modified to a different value once
             thisTest.Verify("b", 12, 0);
-            thisTest.Verify("f", null, 0);
-            thisTest.VerifyRuntimeWarningCount(1);
+            thisTest.Verify("f", 16, 0);
         }
 
         [Test]
@@ -1274,7 +1274,7 @@ def foo ( x1 : A)
     return = x1;
 }
 a1 = A.A();
-a1.a = {1,2};
+a1.a = {1,2}; // Having this line means not testing the property modification in foo. This is because this line will get re-executed as a1.a is modified in foo
 b = a1.a;
 a1 = foo ( a1);
 ";
@@ -1299,7 +1299,7 @@ def foo ( x1 : A)
     return = true;
 }
 a1 = A.A();
-a1.a = {1,2};
+// a1.a = {1,2}; // Having this line means not testing the property modification in foo. This is because this line will get re-executed as a1.a is modified in foo
 b = a1.a;
 dummy = foo ( a1);
 ";
@@ -2368,7 +2368,7 @@ a =
 b = 0.0..a[0]..0.5;
 	
 ";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
             Object[] v1 = new Object[] { };
             Object[] v2 = new Object[] { 0.1 };
             Object[] v3 = new Object[] { 1, 3, 5, 7, 9 };
@@ -2395,7 +2395,7 @@ a2 = 2;
 a = x > 2 ? a1: a2;
 a1 = 3;
 a2 = 4;";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
             //Assert.Fail("1467191 - Sprint24: rev 3185 : REGRESSION: update on inline condition is not happening as expected");
 
             thisTest.Verify("a", 3);
@@ -2406,16 +2406,17 @@ a2 = 4;";
         public void T28_Update_With_Inline_Condition_2()
         {
             string errmsg = "";// "1467191 - Sprint24: rev 3185 : REGRESSION: update on inline condition is not happening as expected";
-            string code = @"x = 3;
-a1 = { 1, 2};
-a2 = 3;
-a = x > 2 ? a2: a1;
-
-a2 = 5;
-x = 1;
-a1[0] = 0;
+            string code = @"a = {
+		  1 => a1;
+		  a1 + b1 => a2;		  		  
+    };
+b1 = 2;	
+  
+	  
+	
 ";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, testPath);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
+
             Object[] v1 = new Object[] { 0, 2 };
             thisTest.Verify("a", v1);
         }
@@ -2624,14 +2625,15 @@ def foo ( x )
 	return = true;
 }
 y = B.B();
-y.b = 1;
+y.b = 1; // This is re-executed again as y.b is modified from inside foo
+
 z = y.b;
 test = foo ( y ) ;
 z2 = z;
 ";
             thisTest.VerifyRunScriptSource(code, err);
-            //Assert.Fail("1466076 - Sprint 22 : rev 2396 : Update issue : when an instance property is updated inside function/method scope, it does not update the outer associative scope variable ");
-            thisTest.Verify("z2", 2);
+            thisTest.Verify("z2", 1);
+
         }
 
         [Test]
@@ -3241,7 +3243,7 @@ b;
 ";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             Object n1 = null;
-            thisTest.Verify("a", n1);
+            thisTest.Verify("a", 4);
             thisTest.Verify("b", 3);
         }
 
@@ -3556,10 +3558,10 @@ x = c1.Pt;
         public void T50_Defect_1466076()
         {
             String code =
- @"class A{    a : int; }class B extends A {    b : var; }def foo ( x ){    x.b = 2;    return = true;}y = B.B();y.b = 1;z = y.b;test = foo ( y ) ;z2 = z; // expected 2; received 1";
+ @"class A{    a : int; }class B extends A {    b : var; }def foo ( x ){    x.b = 2;    return = true;}y = B.B();y.b = 1;z = y.b;test = foo ( y ) ;z2 = z; ";
             string errmsg = "1467385 - Sprint 27 - rev 4219 - valid update testcase throws cyclic dependancy error ";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
-            thisTest.Verify("z2", 2);
+            thisTest.Verify("z2", 1);
         }
         [Test, Ignore]
         [Category("SmokeTest")]
@@ -4457,7 +4459,7 @@ i = 0;
         {
             String code = @"a = 1;b = 0;    b = a;[Imperative]{    [Associative]    {        a = b;    }}";
             string errmsg = "";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg, testPath);
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
             thisTest.Verify("a", 1);
         }
 
@@ -4901,12 +4903,12 @@ i = 0;
         [Category("SmokeTest")]
         public void T86_variableupdate()
         {
-            String code = @"             x = 1;             a = x;             b = a;             a = a + 1;              x = 3;            ";
+            String code = @"             x = 1;             a = x;             b = a;             a = a + 1; // Redefinition 'a' no longer depends on 'x'             x = 3;            ";
             string errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
             thisTest.Verify("x", 3);
-            thisTest.Verify("a", 4);
-            thisTest.Verify("b", 4);
+            thisTest.Verify("a", 2);
+            thisTest.Verify("b", 2);
         }
 
         [Test]

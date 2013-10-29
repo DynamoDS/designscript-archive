@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -93,6 +93,7 @@ namespace ProtoTestFx
             var options = new ProtoCore.Options();
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
+            options.GCTempVarsOnDebug = false;
 
             core = new ProtoCore.Core(options);
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
@@ -128,6 +129,7 @@ namespace ProtoTestFx
             var options = new ProtoCore.Options();
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
+            options.GCTempVarsOnDebug = false;
 
             core = new ProtoCore.Core(options);
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
@@ -165,6 +167,7 @@ namespace ProtoTestFx
             var options = new ProtoCore.Options();
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
+            options.GCTempVarsOnDebug = false;
 
             core = new ProtoCore.Core(options);
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));

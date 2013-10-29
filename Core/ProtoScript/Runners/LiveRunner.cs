@@ -1318,367 +1318,367 @@ namespace ProtoScript.Runners
             /// </summary>
             /// <param name="nodeId"></param>
             /// <returns></returns>
-            public ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName)
+    public ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName)
+    {
+        while (true)
+        {
+            lock (taskQueue)
             {
-                while (true)
+                //Spin waiting for the queue to be empty
+                if (taskQueue.Count == 0)
                 {
-                    lock (taskQueue)
-                    {
-                        //Spin waiting for the queue to be empty
-                        if (taskQueue.Count == 0)
-                        {
-
-                            //No entries and we have the lock
-                            //Synchronous query to get the node
-                            // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
-                            const int blockID = 0;
-                            ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(nodeName, blockID, runnerCore);
-
-                            return runtimeMirror;
-                        }
-                    }
-                    Thread.Sleep(0);
+                    
+                        //No entries and we have the lock
+                        //Synchronous query to get the node
+                        // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
+                        const int blockID = 0;
+                        ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(nodeName, blockID, runnerCore);
+                        
+                        return runtimeMirror;
                 }
-
             }
+            Thread.Sleep(0);
+        }
+        
+    }
 
-            /// <summary>
-            /// VM Debugging API for general Debugging purposes 
-            /// temporarily used by Cmmand Line REPL
-            /// </summary>
-            /// <returns></returns>
-            public string GetCoreDump()
+    /// <summary>
+    /// VM Debugging API for general Debugging purposes 
+    /// temporarily used by Cmmand Line REPL
+    /// </summary>
+    /// <returns></returns>
+    public string GetCoreDump()
+    {
+        // Prints out the final Value of every symbol in the program
+        // Traverse order:
+        //  Exelist, Globals symbols
+        
+            StringBuilder globaltrace = null;
+            
+            ProtoCore.DSASM.Executive exec = runnerCore.CurrentExecutive.CurrentDSASMExec;
+            ProtoCore.DSASM.Mirror.ExecutionMirror execMirror = new ProtoCore.DSASM.Mirror.ExecutionMirror(exec, runnerCore);
+            ProtoCore.DSASM.Executable exe = exec.rmem.Executable;
+            
+            // Only display symbols defined in the default top-most langauge block;
+            // Otherwise garbage information may be displayed.
+            string formattedString = string.Empty;
+            if (exe.runtimeSymbols.Length > 0)
             {
-                // Prints out the final Value of every symbol in the program
-                // Traverse order:
-                //  Exelist, Globals symbols
-
-                StringBuilder globaltrace = null;
-
-                ProtoCore.DSASM.Executive exec = runnerCore.CurrentExecutive.CurrentDSASMExec;
-                ProtoCore.DSASM.Mirror.ExecutionMirror execMirror = new ProtoCore.DSASM.Mirror.ExecutionMirror(exec, runnerCore);
-                ProtoCore.DSASM.Executable exe = exec.rmem.Executable;
-
-                // Only display symbols defined in the default top-most langauge block;
-                // Otherwise garbage information may be displayed.
-                string formattedString = string.Empty;
-                if (exe.runtimeSymbols.Length > 0)
-                {
-                    int blockId = 0;
-
+                int blockId = 0;
+                    
                     ProtoCore.DSASM.SymbolTable symbolTable = exe.runtimeSymbols[blockId];
-
+                    
                     for (int i = 0; i < symbolTable.symbolList.Count; ++i)
                     {
                         //int n = symbolTable.symbolList.Count - 1;
                         //formatParams.ResetOutputDepth();
                         ProtoCore.DSASM.SymbolNode symbolNode = symbolTable.symbolList[i];
-
-                        bool isLocal = ProtoCore.DSASM.Constants.kGlobalScope != symbolNode.functionIndex;
-                        bool isStatic = (symbolNode.classScope != ProtoCore.DSASM.Constants.kInvalidIndex && symbolNode.isStatic);
-                        if (symbolNode.isArgument || isLocal || isStatic || symbolNode.isTemp)
-                        {
-                            // These have gone out of scope, their values no longer exist
-                            //return ((null == globaltrace) ? string.Empty : globaltrace.ToString());
-                            continue;
-                        }
-
-                        ProtoCore.Runtime.RuntimeMemory rmem = exec.rmem;
-                        ProtoCore.DSASM.StackValue sv = rmem.GetStackData(blockId, i, ProtoCore.DSASM.Constants.kGlobalScope);
-                        formattedString = formattedString + string.Format("{0} = {1}\n", symbolNode.name, execMirror.GetStringValue(sv, rmem.Heap, blockId));
-
-                        //if (null != globaltrace)
-                        //{
-                        //    int maxLength = 1020;
-                        //    while (formattedString.Length > maxLength)
-                        //    {
-                        //        globaltrace.AppendLine(formattedString.Substring(0, maxLength));
-                        //        formattedString = formattedString.Remove(0, maxLength);
-                        //    }
-
-                        //    globaltrace.AppendLine(formattedString);
-                        //}
+                            
+                            bool isLocal = ProtoCore.DSASM.Constants.kGlobalScope != symbolNode.functionIndex;
+                            bool isStatic = (symbolNode.classScope != ProtoCore.DSASM.Constants.kInvalidIndex && symbolNode.isStatic);
+                            if (symbolNode.isArgument || isLocal || isStatic || symbolNode.isTemp)
+                            {
+                                // These have gone out of scope, their values no longer exist
+                                //return ((null == globaltrace) ? string.Empty : globaltrace.ToString());
+                                continue;
+                            }
+                        
+                            ProtoCore.Runtime.RuntimeMemory rmem = exec.rmem;
+                            ProtoCore.DSASM.StackValue sv = rmem.GetStackData(blockId, i, ProtoCore.DSASM.Constants.kGlobalScope);
+                            formattedString = formattedString + string.Format("{0} = {1}\n", symbolNode.name, execMirror.GetStringValue(sv, rmem.Heap, blockId));
+                            
+                            //if (null != globaltrace)
+                            //{
+                            //    int maxLength = 1020;
+                            //    while (formattedString.Length > maxLength)
+                            //    {
+                            //        globaltrace.AppendLine(formattedString.Substring(0, maxLength));
+                            //        formattedString = formattedString.Remove(0, maxLength);
+                            //    }
+                            
+                            //    globaltrace.AppendLine(formattedString);
+                            //}
                     }
-
+                
                     //formatParams.ResetOutputDepth();
-                }
-
-                //return ((null == globaltrace) ? string.Empty : globaltrace.ToString());
-                return formattedString;
             }
+        
+            //return ((null == globaltrace) ? string.Empty : globaltrace.ToString());
+            return formattedString;
+    }
 
-
-            public void UpdateGraph(SynchronizeData syndData)
+    
+    public void UpdateGraph(SynchronizeData syndData)
+    {
+        
+            
+            while (true)
             {
-
-
-                while (true)
+                lock (taskQueue)
                 {
-                    lock (taskQueue)
+                    //Spin waiting for the queue to be empty
+                    if (taskQueue.Count == 0)
                     {
-                        //Spin waiting for the queue to be empty
-                        if (taskQueue.Count == 0)
-                        {
-                            string code = null;
+                        string code = null;
                             SynchronizeInternal(syndData, out code);
                             return;
-
-                        }
+                            
                     }
-                    Thread.Sleep(0);
                 }
+                Thread.Sleep(0);
             }
+    }
 
-            //Secondary thread
-            private void TaskExecMethod()
-            {
-                while (true)
+    //Secondary thread
+    private void TaskExecMethod()
+    {
+        while (true)
+        {
+            Task task = null;
+                
+                lock (taskQueue)
                 {
-                    Task task = null;
-
-                    lock (taskQueue)
-                    {
-                        if (taskQueue.Count > 0)
-                            task = taskQueue.Dequeue();
-                    }
-
-                    if (task != null)
-                    {
-                        task.Execute();
+                    if (taskQueue.Count > 0)
+                        task = taskQueue.Dequeue();
+                }
+            
+                if (task != null)
+                {
+                    task.Execute();
                         continue;
+                        
+                }
+            
+                Thread.Sleep(50);
+                
+        }
+        
+    }
 
+    
+    
+#region Internal Implementation
+    
+    
+    private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(string varname)
+    {
+        Validity.Assert(null != vmState);
+            
+            // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
+            const int blockID = 0;
+            
+            return vmState.LookupName(varname, blockID);
+    }
+
+    private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(uint nodeId)
+    {
+        //ProtoCore.DSASM.Constants.kInvalidIndex tells the UpdateUIDForCodeblock to look for the lastindex for given codeblock
+        nodeId = graphCompiler.UpdateUIDForCodeblock(nodeId, ProtoCore.DSASM.Constants.kInvalidIndex);
+            Validity.Assert(null != vmState);
+            string varname = graphCompiler.GetVarName(nodeId);
+            if (string.IsNullOrEmpty(varname))
+            {
+                return null;
+            }
+        return InternalGetNodeValue(varname);
+    }
+
+    private bool Compile(string code, out int blockId)
+    {
+        Dictionary<string, bool> execFlagList = null;
+            if (graphCompiler != null)
+                execFlagList = graphCompiler.ExecutionFlagList;
+                    
+                    staticContext.SetData(code, new Dictionary<string, object>(), execFlagList);
+                    
+                    bool succeeded = runner.Compile(staticContext, runnerCore, out blockId);
+                    if (succeeded)
+                    {
+                        // Regenerate the DS executable
+                        runnerCore.GenerateExecutable();
+                            
+                            // Update the symbol tables
+                            // TODO Jun: Expand to accomoadate the list of symbols
+                            //staticContext.symbolTable = runnerCore.DSExecutable.runtimeSymbols[0];
                     }
+        return succeeded;
+    }
 
-                    Thread.Sleep(50);
-
-                }
-
-            }
-
-
-
-            #region Internal Implementation
-
-
-            private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(string varname)
+    private bool Compile(List<AssociativeNode> astList, out int blockId)
+    {
+        bool succeeded = runner.Compile(astList, runnerCore, out blockId);
+            if (succeeded)
             {
-                Validity.Assert(null != vmState);
-
-                // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
-                const int blockID = 0;
-
-                return vmState.LookupName(varname, blockID);
-            }
-
-            private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(uint nodeId)
-            {
-                //ProtoCore.DSASM.Constants.kInvalidIndex tells the UpdateUIDForCodeblock to look for the lastindex for given codeblock
-                nodeId = graphCompiler.UpdateUIDForCodeblock(nodeId, ProtoCore.DSASM.Constants.kInvalidIndex);
-                Validity.Assert(null != vmState);
-                string varname = graphCompiler.GetVarName(nodeId);
-                if (string.IsNullOrEmpty(varname))
-                {
-                    return null;
-                }
-                return InternalGetNodeValue(varname);
-            }
-
-            private bool Compile(string code, out int blockId)
-            {
-                Dictionary<string, bool> execFlagList = null;
-                if (graphCompiler != null)
-                    execFlagList = graphCompiler.ExecutionFlagList;
-
-                staticContext.SetData(code, new Dictionary<string, object>(), execFlagList);
-
-                bool succeeded = runner.Compile(staticContext, runnerCore, out blockId);
-                if (succeeded)
-                {
-                    // Regenerate the DS executable
-                    runnerCore.GenerateExecutable();
-
-                    // Update the symbol tables
-                    // TODO Jun: Expand to accomoadate the list of symbols
-                    //staticContext.symbolTable = runnerCore.DSExecutable.runtimeSymbols[0];
-                }
-                return succeeded;
-            }
-
-            private bool Compile(List<AssociativeNode> astList, out int blockId)
-            {
-                bool succeeded = runner.Compile(astList, runnerCore, out blockId);
-                if (succeeded)
-                {
-                    // Regenerate the DS executable
-                    runnerCore.GenerateExecutable();
-
+                // Regenerate the DS executable
+                runnerCore.GenerateExecutable();
+                    
                     // Update the symbol tables
                     // TODO Jun: Expand to accomoadate the list of symbols
                     staticContext.symbolTable = runnerCore.DSExecutable.runtimeSymbols[0];
-                }
-                return succeeded;
             }
+        return succeeded;
+    }
 
-
-            private ProtoRunner.ProtoVMState Execute()
+    
+    private ProtoRunner.ProtoVMState Execute()
+    {
+        // runnerCore.GlobOffset is the number of global symbols that need to be allocated on the stack
+        // The argument to Reallocate is the number of ONLY THE NEW global symbols as the stack needs to accomodate this delta
+        int newSymbols = runnerCore.GlobOffset - deltaSymbols;
+            
+            // If there are lesser symbols to allocate for this run, then it means nodes were deleted.
+            // TODO Jun: Determine if it is safe to just leave them in the global stack 
+            //           as no symbols point to this memory location in the stack anyway
+            if (newSymbols >= 0)
             {
-                // runnerCore.GlobOffset is the number of global symbols that need to be allocated on the stack
-                // The argument to Reallocate is the number of ONLY THE NEW global symbols as the stack needs to accomodate this delta
-                int newSymbols = runnerCore.GlobOffset - deltaSymbols;
-
-                // If there are lesser symbols to allocate for this run, then it means nodes were deleted.
-                // TODO Jun: Determine if it is safe to just leave them in the global stack 
-                //           as no symbols point to this memory location in the stack anyway
-                if (newSymbols >= 0)
-                {
-                    runnerCore.Rmem.ReAllocateMemory(newSymbols);
-                }
-
-                // Store the current number of global symbols
-                deltaSymbols = runnerCore.GlobOffset;
-
-                // Initialize the runtime context and pass it the execution delta list from the graph compiler
-                ProtoCore.Runtime.Context runtimeContext = new ProtoCore.Runtime.Context();
-
-                if (graphCompiler != null)
-                    runtimeContext.execFlagList = graphCompiler.ExecutionFlagList;
-
-                runner.Execute(runnerCore, runtimeContext);
-
-                // ExecutionMirror mirror = new ExecutionMirror(runnerCore.CurrentExecutive.CurrentDSASMExec, runnerCore);
-
-                return new ProtoRunner.ProtoVMState(runnerCore);
+                runnerCore.Rmem.ReAllocateMemory(newSymbols);
             }
+        
+            // Store the current number of global symbols
+            deltaSymbols = runnerCore.GlobOffset;
+            
+            // Initialize the runtime context and pass it the execution delta list from the graph compiler
+            ProtoCore.Runtime.Context runtimeContext = new ProtoCore.Runtime.Context();
+            
+            if (graphCompiler != null)
+                runtimeContext.execFlagList = graphCompiler.ExecutionFlagList;
+                    
+                    runner.Execute(runnerCore, runtimeContext);
+                    
+                    // ExecutionMirror mirror = new ExecutionMirror(runnerCore.CurrentExecutive.CurrentDSASMExec, runnerCore);
+                    
+                    return new ProtoRunner.ProtoVMState(runnerCore);
+    }
 
-            private bool CompileAndExecute(string code)
+    private bool CompileAndExecute(string code)
+    {
+        // TODO Jun: Revisit all the Compile functions and remove the blockId out argument
+        int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+            bool succeeded = Compile(code, out blockId);
+            if (succeeded)
             {
-                // TODO Jun: Revisit all the Compile functions and remove the blockId out argument
-                int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-                bool succeeded = Compile(code, out blockId);
-                if (succeeded)
-                {
-                    runnerCore.RunningBlock = blockId;
+                runnerCore.RunningBlock = blockId;
                     vmState = Execute();
-                }
-                return succeeded;
             }
+        return succeeded;
+    }
 
-            private bool CompileAndExecute(List<AssociativeNode> astList)
+    private bool CompileAndExecute(List<AssociativeNode> astList)
+    {
+        // TODO Jun: Revisit all the Compile functions and remove the blockId out argument
+        int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
+            bool succeeded = Compile(astList, out blockId);
+            if (succeeded)
             {
-                // TODO Jun: Revisit all the Compile functions and remove the blockId out argument
-                int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-                bool succeeded = Compile(astList, out blockId);
-                if (succeeded)
-                {
-                    runnerCore.RunningBlock = blockId;
+                runnerCore.RunningBlock = blockId;
                     vmState = Execute();
-                }
-                return succeeded;
             }
+        return succeeded;
+    }
 
-            private void ResetVMForExecution()
+    private void ResetVMForExecution()
+    {
+        runnerCore.ResetForExecution();
+    }
+
+    private void ResetVMForDeltaExecution()
+    {
+        runnerCore.ResetForDeltaExecution();
+    }
+
+    /// <summary>
+    /// Resets few states in the core to prepare the core for a new
+    /// delta code compilation and execution
+    /// </summary>
+    private void ResetForDeltaASTExecution()
+    {
+        runnerCore.ResetForDeltaASTExecution();
+    }
+
+    /// <summary>
+    /// This function resets properties in LiveRunner core and compileStateTracker required in preparation for a subsequent run
+    /// </summary>
+    private void RetainVMStatesForDeltaExecution()
+    {
+        runnerCore.CompleteCodeBlockList.Clear();
+    }
+
+    /// <summary>
+    /// Compiles and executes input script in delta execution mode
+    /// </summary>
+    /// <param name="code"></param>
+    private void CompileAndExecuteForDeltaExecution(string code)
+    {
+        if (coreOptions.Verbose)
+        {
+            System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
+        }
+        
+            ResetForDeltaASTExecution();
+            bool succeeded = CompileAndExecute(code);
+            
+            if (succeeded)
             {
-                runnerCore.ResetForExecution();
+                RetainVMStatesForDeltaExecution();
             }
+    }
 
-            private void ResetVMForDeltaExecution()
-            {
-                runnerCore.ResetForDeltaExecution();
-            }
-
-            /// <summary>
-            /// Resets few states in the core to prepare the core for a new
-            /// delta code compilation and execution
-            /// </summary>
-            private void ResetForDeltaASTExecution()
-            {
-                runnerCore.ResetForDeltaASTExecution();
-            }
-
-            /// <summary>
-            /// This function resets properties in LiveRunner core and compileStateTracker required in preparation for a subsequent run
-            /// </summary>
-            private void RetainVMStatesForDeltaExecution()
-            {
-                runnerCore.CompleteCodeBlockList.Clear();
-            }
-
-            /// <summary>
-            /// Compiles and executes input script in delta execution mode
-            /// </summary>
-            /// <param name="code"></param>
-            private void CompileAndExecuteForDeltaExecution(string code)
-            {
-                if (coreOptions.Verbose)
-                {
-                    System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
-                }
-
-                ResetForDeltaASTExecution();
-                bool succeeded = CompileAndExecute(code);
-
-                if (succeeded)
-                {
-                    RetainVMStatesForDeltaExecution();
-                }
-            }
-
-            private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
-            {
-                Validity.Assert(null != runner);
-                Validity.Assert(null != graphCompiler);
-
-                if (syncData.AddedNodes.Count == 0 &&
+    private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
+    {
+        Validity.Assert(null != runner);
+            Validity.Assert(null != graphCompiler);
+            
+            if (syncData.AddedNodes.Count == 0 &&
                     syncData.ModifiedNodes.Count == 0 &&
                     syncData.RemovedNodes.Count == 0)
-                {
-                    code = "";
+            {
+                code = "";
                     ResetVMForDeltaExecution();
                     return;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("Begin SyncInternal: {0}", syncData);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Begin SyncInternal: {0}", syncData);
                     GraphToDSCompiler.GraphBuilder g = new GraphBuilder(syncData, graphCompiler);
                     code = g.BuildGraphDAG();
-
+                    
                     System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
-
+                    
                     //List<string> deletedVars = new List<string>();
                     ResetVMForDeltaExecution();
-
+                    
                     //Synchronize the core configuration before compilation and execution.
                     if (syncCoreConfigurations)
                     {
                         SyncCoreConfigurations(runnerCore, executionOptions);
-                        syncCoreConfigurations = false;
+                            syncCoreConfigurations = false;
                     }
-
+                
                     bool succeeded = CompileAndExecute(code);
                     if (succeeded)
                     {
                         graphCompiler.ResetPropertiesForNextExecution();
                     }
-                }
             }
+    }
 
-            private void SynchronizeInternal(string code)
+    private void SynchronizeInternal(string code)
+    {
+        runnerCore.Options.IsDeltaCompile = true;
+            
+            if (string.IsNullOrEmpty(code))
             {
-                runnerCore.Options.IsDeltaCompile = true;
-
-                if (string.IsNullOrEmpty(code))
-                {
-                    code = "";
-
+                code = "";
+                    
                     ResetForDeltaASTExecution();
                     return;
-                }
-                else
-                {
-                    CompileAndExecuteForDeltaExecution(code);
-                }
             }
-            #endregion
+            else
+            {
+                CompileAndExecuteForDeltaExecution(code);
+            }
+    }
+#endregion
         }
     }
 }

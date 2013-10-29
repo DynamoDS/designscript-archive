@@ -259,18 +259,7 @@ namespace ProtoTest.Associative
         public void BIM15_SortIndexByValue()
         {
             String code =
-@"a = {1,3,5,7,9,8,6,4,2,0};
-b = {1.3,2,0.8,2,null,2,2.0,2,null};
-x = SortIndexByValue(a);
-x1 = SortIndexByValue(a,true);
-x2 = SortIndexByValue(a,false);
-y = SortIndexByValue(b);
-p = x[0];
-p1 = x1[0];
-p2 = x2[0];
-q = x[9];
-s = y[0];
-t = y[7];";
+@"a = {1,3,5,7,9,8,6,4,2,0};b = {1.3,2,0.8,2,null,2,2.0,2,null};x = SortIndexByValue(a);x1 = SortIndexByValue(a,true);x2 = SortIndexByValue(a,false);y = SortIndexByValue(b);p = x[0];p1 = x1[0];p2 = x2[0];q = x[9];s = y[0];t = y[7];";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("p", 9);
             thisTest.Verify("p1", 9);

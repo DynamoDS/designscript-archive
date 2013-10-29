@@ -801,10 +801,13 @@ namespace ProtoFFITests
         [Test]
         public void DisposeOnFFITest006()
         {
+            // SSA'd transforms will not GC the temps until end of block
+            // However, they must be GC's after every line when in debug step over
+            // Here 'dv' will not be GC'd until end of block
             string code = @"                            dv = DisposeVerify.CreateObject();                            m = dv.SetValue(2);                            a1 = A.CreateObject(3);                            a2 = A.CreateObject(4);                            a2 = a1;                            b = { B.CreateObject(1), B.CreateObject(2), B.CreateObject(3) };                            b = a1;                                v = dv.GetValue();                            ";
             code = string.Format("{0}\r\n{1}\r\n{2}\r\n{3}", "import(DisposeVerify from \"ProtoTest.dll\");",
                 "import(A from \"ProtoTest.dll\");", "import(B from \"ProtoTest.dll\");", code);
-            ValidationData[] data = { new ValidationData { ValueName = "v", ExpectedValue = 10, BlockIndex = 0 } };
+            ValidationData[] data = { new ValidationData { ValueName = "v", ExpectedValue = 2, BlockIndex = 0 } };
             ExecuteAndVerify(code, data);
         }
 
@@ -1035,7 +1038,7 @@ z1 = z.a;";
         public void TestGeometryExample()
         {
             string code =
-                @"import(""ProtoGeometry.dll"");                  import(""GeometryExample.dll"");                //Create origin for symbol                origin = Point.ByCoordinates(3,3,0);                //Create symbol at the origin                sym = FixitySymbol.FromOriginSize(origin, 5, FixityType.Arrow);                sym.Color = Color.Red;                sym = sym.Move(-3,-3,3);                color = sym.Color.RedValue;                neworigin = Point.ByCoordinates(0,0,3);                success = neworigin.Equals(sym.Origin);";
+                @"import(""ProtoGeometry.dll"");                  import(""GeometryExample.dll"");                //Create origin for symbol                origin = Point.ByCoordinates(3,3,0);                //Create symbol at the origin                sym = FixitySymbol.FromOriginSize(origin, 5, FixityType.Arrow);                sym.Color = Color.Red;                sym = sym.Move(-3,-3,3);                color = sym.Color.RedValue;                neworigin = Point.ByCoordinates(0,0,3);                success = neworigin.Equals(sym.Origin);";
             ValidationData[] data = { new ValidationData { ValueName = "color", ExpectedValue = (Int64)255, BlockIndex = 0 },                                      new ValidationData { ValueName = "success", ExpectedValue = true, BlockIndex = 0} };
             ExecuteAndVerify(code, data);
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ProtoCore.DesignScriptParser;
 using ProtoCore.DSASM;
@@ -515,6 +515,7 @@ namespace ProtoCore.AST.AssociativeAST
 
     public class FunctionDotCallNode : AssociativeNode
     {
+        public IdentifierNode staticLHSIdent { get; set; }
         public FunctionCallNode DotCall { get; set; }
         public FunctionCallNode FunctionCall { get; set; }
         public FunctionCallNode NameMangledCall { get; set; }
@@ -526,6 +527,7 @@ namespace ProtoCore.AST.AssociativeAST
             DotCall = new FunctionCallNode();
             FunctionCall = callNode;
             isLastSSAIdentListFactor = false;
+            staticLHSIdent = null;
         }
 
         public FunctionDotCallNode(string lhsName, FunctionCallNode callNode)
@@ -533,6 +535,7 @@ namespace ProtoCore.AST.AssociativeAST
             this.lhsName = lhsName;
             FunctionCall = callNode;
             isLastSSAIdentListFactor = false;
+            staticLHSIdent = null;
         }
 
         public FunctionDotCallNode(FunctionDotCallNode rhs): base(rhs)
@@ -541,6 +544,7 @@ namespace ProtoCore.AST.AssociativeAST
             FunctionCall = new FunctionCallNode(rhs.FunctionCall);
             lhsName = rhs.lhsName;
             isLastSSAIdentListFactor = rhs.isLastSSAIdentListFactor;
+            staticLHSIdent = rhs.staticLHSIdent;
         }
 
         public IdentifierListNode GetIdentList()

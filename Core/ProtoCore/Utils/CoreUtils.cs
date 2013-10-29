@@ -547,7 +547,7 @@ namespace ProtoCore.Utils
             return name;
         }
 
-        public static string GetSSATemp(Core core)
+        public static string BuildSSATemp(Core core)
         {
             // Jun Comment: The current convention for auto generated SSA variables begin with '%'
             // This ensures that the variables is compiler generated as the '%' symbol cannot be used as an identifier and will fail compilation
@@ -565,6 +565,12 @@ namespace ProtoCore.Utils
             return ssaVar.StartsWith(ProtoCore.DSASM.Constants.kSSATempPrefix);
         }
 
+        public static bool IsTempVarProperty(string varname)
+        {
+            Validity.Assert(null != varname);
+            Validity.Assert(varname.Length > 0);
+            return varname.StartsWith(ProtoCore.DSASM.Constants.kTempPropertyVar);
+        }
 
         public static bool IsCompilerGenerated(string varname)
         {
@@ -780,6 +786,17 @@ namespace ProtoCore.Utils
 
             bool areEqual = s1Root.Compare(s2Root);
             return areEqual;
+        }
+
+        public static void CopyDebugData(ProtoCore.AST.Node nodeTo, ProtoCore.AST.Node nodeFrom)
+        {
+            if (null != nodeTo && null != nodeFrom)
+            {
+                nodeTo.col = nodeFrom.col;
+                nodeTo.endCol = nodeFrom.endCol;
+                nodeTo.endLine = nodeFrom.endLine;
+                nodeTo.line = nodeFrom.line;
+            }
         }
     }
 }

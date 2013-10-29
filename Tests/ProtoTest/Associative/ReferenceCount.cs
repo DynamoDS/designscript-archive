@@ -1995,18 +1995,20 @@ namespace ProtoTest.Associative
         public void TestReferenceCount66_DID1467277()
         {
             string code = @"class A{    x;    static s_dispose = 0;    constructor A(i)    {        x = i;    }    def _Dispose()    {        s_dispose = s_dispose + 1;        return = null;    }    def foo()    {        return = null;    }}class B{    def CreateA(i)    {        return = A.A(i);    }}b = B.B();r = b.CreateA(0..1).foo();t = A.s_dispose;";
-            string errorString = "DNL-1467277 Sprint 26:Rev:3660:338772: dispose is not working in while translating extruded surface.";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code, errorString);
-            thisTest.Verify("t", 2);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            // SSA'd transforms will not GC the temps until end of block
+            // However, they must be GC's after every line when in debug step over
+            thisTest.Verify("t", 0);
         }
 
         [Test]
         public void TestReferenceCount67_DID1467277_02()
         {
             string code = @"class A{    x;    static s_dispose = 0;    constructor A(i)    {        x = i;    }    def _Dispose()    {        s_dispose = s_dispose + 1;        return = null;    }    def foo()    {        return = null;    }}r = A.A(0..1).foo();t = A.s_dispose;";
-            string errorString = "DNL-1467277 Sprint 26:Rev:3660:338772: dispose is not working in while translating extruded surface.";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code, errorString);
-            thisTest.Verify("t", 2);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            // SSA'd transforms will not GC the temps until end of block
+            // However, they must be GC's after every line when in debug setp over
+            thisTest.Verify("t", 0);
         }
 
         [Test]
@@ -2067,9 +2069,10 @@ namespace ProtoTest.Associative
         public void T074_DG1465049()
         {
             string code = @"class A{    static s_dispose = 0;    mi : int;    constructor A(i:int)    {        mi = i;    }        def _Dispose()    {        s_dispose = s_dispose + 1;    }    def Translate(i)    {        newi = mi + i;        return = A.A(newi);    }}as = {A.A(2), A.A(3), A.A(5)};as[1] = as[1].Translate(100);as = null;d = A.s_dispose;";
-            string errorString = "DG-1465049 if one of the items in geoemtry collection is modified , the object does not get garbage collected";
-            thisTest.RunScriptSource(code, errorString);
-            thisTest.Verify("d", 4);
+            thisTest.RunScriptSource(code);
+            // SSA'd transforms will not GC the temps until end of block
+            // However, they must be GC's after every line when in debug setp over
+            thisTest.Verify("d", 0);
         }
 
         [Test]

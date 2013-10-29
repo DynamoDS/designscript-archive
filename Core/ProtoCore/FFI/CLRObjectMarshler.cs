@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using ProtoCore.DSASM;
@@ -53,7 +53,7 @@ namespace ProtoFFI
                 case ProtoCore.PrimitiveType.kTypeChar:
                     protoType.Name = ProtoCore.DSDefinitions.Keyword.Char;
                     break;
-                case ProtoCore.PrimitiveType.kTypeString: 
+                case ProtoCore.PrimitiveType.kTypeString:
                     protoType.Name = ProtoCore.DSDefinitions.Keyword.String;
                     break;
                 case ProtoCore.PrimitiveType.kTypePointer:
@@ -104,7 +104,7 @@ namespace ProtoFFI
             var core = dsi.runtime.Core;
             StackValue[] sv = new StackValue[csArray.Length];
             int size = sv.Length;
-            
+
             //Create new dsType for marshaling the elements, by reducing the rank
             ProtoCore.Type dsType = new ProtoCore.Type { Name = type.Name, rank = type.rank - 1, UID = type.UID };
             dsType.IsIndexable = dsType.rank > 0;
@@ -142,7 +142,7 @@ namespace ProtoFFI
         {
             var core = dsi.runtime.Core;
 
-            var array = dsi.runtime.rmem.BuildArray(new StackValue[] {});
+            var array = dsi.runtime.rmem.BuildArray(new StackValue[] { });
             HeapElement ho = ArrayUtils.GetHeapElement(array, core);
             ho.Dict = new Dictionary<StackValue, StackValue>(new StackValueComparer(core));
 
@@ -157,7 +157,7 @@ namespace ProtoFFI
                 ProtoCore.Type valueType = CLRObjectMarshler.GetProtoCoreType(value.GetType());
                 StackValue dsValue = marshaler.Marshal(dictionary[key], context, dsi, valueType);
                 GCUtils.GCRetain(dsValue, core);
-                
+
                 ho.Dict[dsKey] = dsValue;
             }
 
@@ -376,7 +376,7 @@ namespace ProtoFFI
                         return marshaller;
 
                     marshaller = new CLRObjectMarshler(core);
-                    
+
                     object value;
                     if (core.Configurations.TryGetValue(ConfigurationKeys.GeometryXmlProperties, out value))
                         marshaller.DumpXmlProperties = value == null ? false : (bool)value;
@@ -440,7 +440,7 @@ namespace ProtoFFI
                     return PrimitiveMarshler.ConvertCSArrayToDSArray(this, enumerable, context, dsi, type);
                 }
             }
-            
+
             Array arr = obj as Array;
             if (null != arr)
                 return PrimitiveMarshler.ConvertCSArrayToDSArray(this, arr, context, dsi, type);
@@ -482,15 +482,15 @@ namespace ProtoFFI
                             Type arrayType = type.GetGenericArguments()[0].MakeArrayType();
                             object arr = ConvertDSArrayToCSArray(dsObject, context, dsi, arrayType);
                             return arr;
-/*
-                            Type genericType = type.GetGenericArguments()[0];
-                            return ConvertDSArrayToCSList(dsObject, context, dsi, genericType);
+                            /*
+                                                        Type genericType = type.GetGenericArguments()[0];
+                                                        return ConvertDSArrayToCSList(dsObject, context, dsi, genericType);
 
-                            Type listType = typeof(List<>).MakeGenericType(genericType);
-                            var list = Activator.CreateInstance(listType);
-                            listType.GetMethod("AddRange").Invoke(list, new object[]{arr});
-                            return list;
-                            */
+                                                        Type listType = typeof(List<>).MakeGenericType(genericType);
+                                                        var list = Activator.CreateInstance(listType);
+                                                        listType.GetMethod("AddRange").Invoke(list, new object[]{arr});
+                                                        return list;
+                                                        */
                         }
                         break;
                     }
@@ -514,7 +514,7 @@ namespace ProtoFFI
                     }
                 default:
                     {
-                        throw new NotSupportedException(string.Format("Operand type {0} not supported for marshalling",dsObject.optype ));
+                        throw new NotSupportedException(string.Format("Operand type {0} not supported for marshalling", dsObject.optype));
                     }
             }
 
@@ -712,10 +712,10 @@ namespace ProtoFFI
 
             string name = type.GetGenericTypeDefinition().Name;
             int trim = name.IndexOf('`');
-            if(trim > 0)
+            if (trim > 0)
                 name = name.Substring(0, trim);
             Type[] args = type.GetGenericArguments();
-            for(int i = 0; i < args.Length; ++i)
+            for (int i = 0; i < args.Length; ++i)
             {
                 string prefix = (i == 0) ? "Of" : "And";
                 name = name + prefix + GetTypeName(args[i]);
@@ -748,10 +748,10 @@ namespace ProtoFFI
             Type objType = GetPublicType(obj.GetType());
             int type = classTable.IndexOf(GetTypeName(objType));
             //Recursively get the base class type if available.
-            while(type == -1 && objType != null)
+            while (type == -1 && objType != null)
             {
                 objType = objType.BaseType;
-                if(null != objType)
+                if (null != objType)
                     type = classTable.IndexOf(GetTypeName(objType));
             }
 
@@ -795,7 +795,7 @@ namespace ProtoFFI
             {
                 SymbolNode symbol = core.ClassTable.ClassNodes[classIndex].symbols.symbolList[ix];
                 object prop = null;
-                if(properties.TryGetValue(symbol.name, out prop) && null != prop)
+                if (properties.TryGetValue(symbol.name, out prop) && null != prop)
                     svs[ix] = Marshal(prop, context, dsi, GetMarshaledType(prop.GetType()));
             }
         }
@@ -853,7 +853,7 @@ namespace ProtoFFI
             string elementName = obj.GetType().ToString();
             elementName = XmlConvert.EncodeName(elementName);
             xw.WriteStartElement(elementName);
-            foreach(var item in properties)
+            foreach (var item in properties)
             {
                 if (null == item.Value)
                 {
@@ -903,7 +903,7 @@ namespace ProtoFFI
                 }
                 else
                 {
-                    XmlWriterSettings settings = new XmlWriterSettings { Indent = false, OmitXmlDeclaration = true};
+                    XmlWriterSettings settings = new XmlWriterSettings { Indent = false, OmitXmlDeclaration = true };
                     using (StringWriter sw = new StringWriter())
                     {
                         using (XmlWriter xw = XmlTextWriter.Create(sw, settings))
@@ -1007,7 +1007,7 @@ namespace ProtoFFI
         private object CreateCLRObject(StackValue dsObject, ProtoCore.Runtime.Context context, Interpreter dsi, System.Type type)
         {
             object clrObject = TryGetPrimitiveObject(dsObject, context, dsi, type);
-            if(null != clrObject)
+            if (null != clrObject)
                 return clrObject;
             //Must be a user defined type, and expecting a var object
             if (type == typeof(object) && dsObject.optype == AddressType.Pointer)

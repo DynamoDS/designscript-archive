@@ -14,6 +14,23 @@ namespace ProtoCore.AssociativeEngine
         kPropertyChangedUpdate
     }
 
+    public class Utils
+    {
+        /// <summary>
+        /// This function sets the modified temp graphnodes to the last graphnode in a statement
+        /// </summary>
+        /// <param name="graphnode"></param>
+        public static void SetFinalGraphNodeRuntimeDependents(AssociativeGraph.GraphNode graphnode)
+        {
+            if (null != graphnode && graphnode.IsSSANode())
+            {
+                if (null != graphnode.lastGraphNode)
+                {
+                    graphnode.lastGraphNode.symbolListWithinExpression.Add(graphnode.updateNodeRefList[0].nodeList[0].symbol);
+                }
+            }
+        }
+    }
     public class ArrayUpdate
     {
         /// <summary>
@@ -148,6 +165,28 @@ namespace ProtoCore.AssociativeGraph
         public bool propertyChanged { get; set; }       // The property of ffi object that created in this graph node is changed
         public bool forPropertyChanged { get; set; }    // The graph node is marked as dirty because of property changed event
 
+        public GraphNode lastGraphNode { get; set; }    // This is the last graphnode of an SSA'd statement
+
+        public List<ProtoCore.AssociativeGraph.UpdateNodeRef> updatedArguments { get; set; }
+
+
+        /// <summary>
+        /// This is the list of lhs symbols in the same expression ID
+        /// It is applicable for expressions transformed to SSA where each ssa temp in the same expression is in this list
+        /// This list is only populated on the last SSA assignment as such:
+        ///     
+        /// Given
+        ///     a = b.c.d
+        ///     
+        ///     [0] t0 = b      -> List empty
+        ///     [1] t1 = t0.b   -> List empty
+        ///     [2] t2 = t1.c   -> List empty
+        ///     [3] a = t2      -> This is the last SSA stmt, its graphnode contains a list of graphnodes {t0,t1,t2}
+        ///     
+        /// </summary>
+        public List<SymbolNode> symbolListWithinExpression { get; set; }
+
+        public bool reExecuteExpression { get; set; }
         /// <summary>
         /// Flag determines if a graph node is active or not. If inactive, the graph node is invalid
         /// this is especially used in the LiveRunner to mark modified/deleted nodes inactive so that they are not executed
@@ -155,7 +194,6 @@ namespace ProtoCore.AssociativeGraph
         public bool isActive { get; set; }
 
 
-        public List<ProtoCore.AssociativeGraph.UpdateNodeRef> updatedArguments { get; set; }
 
         
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
@@ -192,11 +230,14 @@ namespace ProtoCore.AssociativeGraph
             updateDimensions = new List<StackValue>();
             propertyChanged = false;
             forPropertyChanged = false;
+            lastGraphNode = null;
             isActive = true;
 
 #if __PROTOTYPE_ARRAYUPDATE_FUNCTIONCALL
             ArrayPointer = ProtoCore.DSASM.StackUtils.BuildNull();
 #endif
+            symbolListWithinExpression = new List<SymbolNode>();
+            reExecuteExpression = false;
         }
 
 
@@ -756,7 +797,6 @@ namespace ProtoCore.AssociativeGraph
             {
                 return true;
             }
-
             else
             {
                 return false;
@@ -971,4 +1011,3 @@ namespace ProtoCore.AssociativeGraph
         }
     }
 }
-

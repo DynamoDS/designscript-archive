@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -515,6 +515,137 @@ namespace ProtoCore
                             symbolnode = core.ClassTable.ClassNodes[lefttype.UID].symbols.symbolList[symindex];
                         }
                     }
+
+                    lefttype = symbolnode.datatype;
+
+                    ProtoCore.AssociativeGraph.UpdateNode updateNode = new AssociativeGraph.UpdateNode();
+                    updateNode.symbol = symbolnode;
+                    updateNode.nodeType = ProtoCore.AssociativeGraph.UpdateNodeType.kSymbol;
+                    nodeRef.PushUpdateNode(updateNode);
+                }
+                else
+                {
+                    // Is it a class?
+                    int ci = core.ClassTable.IndexOf(identnode.Value);
+                    if (ProtoCore.DSASM.Constants.kInvalidIndex != ci)
+                    {
+                        lefttype.UID = ci;
+
+                        // Comment Jun:
+                        // Create a symbol node that contains information about the class type that contains static properties
+                        ProtoCore.DSASM.SymbolNode classSymbol = new DSASM.SymbolNode();
+                        classSymbol.memregion = DSASM.MemoryRegion.kMemStatic;
+                        classSymbol.name = identnode.Value;
+                        classSymbol.classScope = ci;
+
+                        ProtoCore.AssociativeGraph.UpdateNode updateNode = new AssociativeGraph.UpdateNode();
+                        updateNode.symbol = classSymbol;
+                        updateNode.nodeType = ProtoCore.AssociativeGraph.UpdateNodeType.kSymbol;
+                        nodeRef.PushUpdateNode(updateNode);
+
+                    }
+                    else
+                    {
+                        // In this case, the lhs type is undefined
+                        // Just attempt to create a symbol node
+                        string ident = identnode.Value;
+                        if (0 != ident.CompareTo(ProtoCore.DSDefinitions.Keyword.This))
+                        {
+                            symbolnode = new SymbolNode();
+                            symbolnode.name = identnode.Value;
+
+                            ProtoCore.AssociativeGraph.UpdateNode updateNode = new AssociativeGraph.UpdateNode();
+                            updateNode.symbol = symbolnode;
+                            updateNode.nodeType = AssociativeGraph.UpdateNodeType.kSymbol;
+                            nodeRef.PushUpdateNode(updateNode);
+                        }
+                    }
+                }
+            }
+            else if (node is ProtoCore.AST.ImperativeAST.FunctionCallNode || node is ProtoCore.AST.AssociativeAST.FunctionCallNode)
+            {
+                string functionName = node.Function.Value;
+                if (ProtoCore.Utils.CoreUtils.IsGetterSetter(functionName))
+                {
+                    string property;
+                    if (CoreUtils.TryGetPropertyName(functionName, out property))
+                    {
+                        functionName = property;
+                    }
+                    dynamic identnode = node;
+                    ProtoCore.DSASM.SymbolNode symbolnode = null;
+
+
+                    bool isAccessible = false;
+                    bool isAllocated = VerifyAllocation(functionName, lefttype.UID, globalProcIndex, out symbolnode, out isAccessible);
+                    if (isAllocated)
+                    {
+                        if (null == symbolnode)
+                        {
+                            // It is inaccessible from here due to access modifier.
+                            // Just attempt to retrieve the symbol
+                            int symindex = core.ClassTable.ClassNodes[lefttype.UID].GetFirstVisibleSymbolNoAccessCheck(functionName);
+                            if (ProtoCore.DSASM.Constants.kInvalidIndex != symindex)
+                            {
+                                symbolnode = core.ClassTable.ClassNodes[lefttype.UID].symbols.symbolList[symindex];
+                            }
+                        }
+
+                        lefttype = symbolnode.datatype;
+
+                        ProtoCore.AssociativeGraph.UpdateNode updateNode = new AssociativeGraph.UpdateNode();
+                        updateNode.symbol = symbolnode;
+                        updateNode.nodeType = AssociativeGraph.UpdateNodeType.kSymbol;
+                        nodeRef.PushUpdateNode(updateNode);
+                    }
+                }
+                else
+                {
+                    ProtoCore.AssociativeGraph.UpdateNode updateNode = new AssociativeGraph.UpdateNode();
+                    ProtoCore.DSASM.ProcedureNode procNodeDummy = new DSASM.ProcedureNode();
+                    procNodeDummy.name = functionName;
+                    updateNode.procNode = procNodeDummy;
+                    updateNode.nodeType = AssociativeGraph.UpdateNodeType.kMethod;
+                    nodeRef.PushUpdateNode(updateNode);
+                }
+            }
+        }
+
+        // Deperecate this function after further regression testing and just use DFSGetSymbolList
+        public void DFSGetSymbolList_Simple(Node pNode, ref ProtoCore.Type lefttype, ref int functionindex, ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef)
+        {
+            dynamic node = pNode;
+            if (node is ProtoCore.AST.ImperativeAST.IdentifierListNode || node is ProtoCore.AST.AssociativeAST.IdentifierListNode)
+            {
+                dynamic bnode = node;
+                DFSGetSymbolList_Simple(bnode.LeftNode, ref lefttype, ref functionindex, nodeRef);
+                node = bnode.RightNode;
+            }
+
+            if (node is ProtoCore.AST.ImperativeAST.IdentifierNode || node is ProtoCore.AST.AssociativeAST.IdentifierNode)
+            {
+                dynamic identnode = node;
+                ProtoCore.DSASM.SymbolNode symbolnode = null;
+
+                bool isAccessible = false;
+
+                bool isAllocated = VerifyAllocation(identnode.Value, lefttype.UID, functionindex, out symbolnode, out isAccessible);
+                if (isAllocated)
+                {
+                    if (null == symbolnode)
+                    {
+                        // It is inaccessible from here due to access modifier.
+                        // Just attempt to retrieve the symbol
+                        int symindex = core.ClassTable.ClassNodes[lefttype.UID].GetFirstVisibleSymbolNoAccessCheck(identnode.Value);
+                        if (ProtoCore.DSASM.Constants.kInvalidIndex != symindex)
+                        {
+                            symbolnode = core.ClassTable.ClassNodes[lefttype.UID].symbols.symbolList[symindex];
+                        }
+                    }
+
+                    // Since the variable was found, all succeeding nodes in the ident list are class members
+                    // Class members have a function scope of kGlobalScope as they are only local to the class, not with any member function
+                    functionindex = ProtoCore.DSASM.Constants.kGlobalScope;
 
                     lefttype = symbolnode.datatype;
 
@@ -2743,7 +2874,8 @@ namespace ProtoCore
                 ProtoCore.Type type = new ProtoCore.Type();
                 type.UID = globalClassIndex;
                 ProtoCore.AssociativeGraph.UpdateNodeRef nodeRef = new AssociativeGraph.UpdateNodeRef();
-                DFSGetSymbolList(identList, ref type, nodeRef);
+                int functionIndex = globalProcIndex;
+                DFSGetSymbolList_Simple(identList, ref type, ref functionIndex, nodeRef);
 
                 if (null != graphNode && nodeRef.nodeList.Count > 0)
                 {
@@ -2791,13 +2923,18 @@ namespace ProtoCore
             {
                 ProtoCore.AST.AssociativeAST.IdentifierListNode identList = node as ProtoCore.AST.AssociativeAST.IdentifierListNode;
                 Validity.Assert(identList.LeftNode is ProtoCore.AST.AssociativeAST.IdentifierNode);
-                Validity.Assert(!string.IsNullOrEmpty(staticClass));
-                identList.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode(staticClass);
 
-                staticClass = null;
-                resolveStatic = false;
+                ProtoCore.AST.AssociativeAST.IdentifierNode leftNode = identList.LeftNode as ProtoCore.AST.AssociativeAST.IdentifierNode;
+                if (leftNode.Name != ProtoCore.DSDefinitions.Keyword.This)
+                {
+                    Validity.Assert(!string.IsNullOrEmpty(staticClass));
+                    identList.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode(staticClass);
 
-                ssaPointerList.Clear();
+                    staticClass = null;
+                    resolveStatic = false;
+
+                    ssaPointerList.Clear();
+                }
             }
 
             BuildSSADependency(node, graphNode);

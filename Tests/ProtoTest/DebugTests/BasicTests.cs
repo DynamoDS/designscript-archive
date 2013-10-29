@@ -27,6 +27,7 @@ namespace ProtoTest.DebugTests
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
             options.kDynamicCycleThreshold = 5;
+            options.DumpByteCode = false;
 
             core = new ProtoCore.Core(options);
             core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
@@ -16466,6 +16467,3 @@ b = t1.Equals(t2);
         }
     }
 }
-
-
-

@@ -142,8 +142,9 @@ c=4;
 collection = {a,b,c};
 collection[1] = collection[1] + 0.5;
 d = collection[1];
-d = d + 0.1; // updates the result of accessing the collection
-b = b + 0.1; // updates the source member of the collection";
+d = d + 0.1;    // updates the result of accessing the collection - Redefinition
+                // 'd' now only depends on any changes to 'd'
+b = b + 0.1;    // updates the source member of the collection";
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             //Assert.Fail("1459470 - Sprint17 : Rev 1459 : Associative Update not working properly with collection elements"); 
 
@@ -151,7 +152,7 @@ b = b + 0.1; // updates the source member of the collection";
             Object[] v1 = new Object[] { 1, 2.6, 4 };
             thisTest.Verify("collection", v1, 0);
             thisTest.Verify("b", 2.1, 0);
-            thisTest.Verify("d", 2.7, 0);
+            thisTest.Verify("d", 2.6, 0);
         }
 
         [Test]
@@ -1835,8 +1836,21 @@ x2;
 @"class A{    b : int[] = { 0, 1, 2, 3 };        def foo (i:int )     {        b[i] = b[i] + 1;        return = b;    }}i = 1..2;e1 = A.A().foo(i);i = 0..2;";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
-            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
-            thisTest.Verify("e1", new Object[] { new Object[] { 1, 1, 2, 3 }, new Object[] { 1, 2, 2, 3 }, new Object[] { 1, 2, 3, 3 } });
+            ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg); 
+            
+            //
+            // SSA will transform 
+            //      e1 = A.A().foo(i);
+            //
+            //      to
+            //
+            //      t0 = A.A()
+            //      t1 = i
+            //      t2 = t0.foo(t1)
+            //
+            // This means that the initial value of 'b' will be preserved as class A will not be re-initialed after the update
+            //
+            thisTest.Verify("e1", new Object[] { new Object[] { 1, 2, 3, 3 }, new Object[] { 1, 3, 3, 3 }, new Object[] { 1, 3, 4, 3 } });
         }
 
         [Test]
@@ -1848,7 +1862,20 @@ x2;
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             String errmsg = "";
             ExecutionMirror mirror = thisTest.VerifyRunScriptSource(code, errmsg);
-            thisTest.Verify("e1", new Object[] { new Object[] { 1, 1, 2, 3 }, new Object[] { 1, 2, 2, 3 }, new Object[] { 1, 2, 3, 3 } });
+
+            //
+            // SSA will transform 
+            //      e1 = A.A().foo(i);
+            //
+            //      to
+            //
+            //      t0 = A.A()
+            //      t1 = i
+            //      t2 = t0.foo(t1)
+            //
+            // This means that the initial value of 'b' will be preserved as class A will not be re-initialed after the update
+            //
+            thisTest.Verify("e1", new Object[] { new Object[] { 1, 2, 3, 3 }, new Object[] { 1, 3, 3, 3 }, new Object[] { 1, 3, 4, 3 } });
         }
 
         [Test]
@@ -1914,10 +1941,10 @@ x2;
             string errmsg = "DNL-1467336 Rev 3971 :global and local scope identifiers of same name causing cyclic dependency issue";
             string code = @"import(""T031_Defect_1467491_ImportUpdate_Sub.ds"");
 t = 5;
-z = a.x;
+z = a.x;    // This is a redefinition test where 'a' was redefined in the imported file
 ";
             thisTest.RunScriptSource(code, errmsg, importPath);
-            thisTest.Verify("z", 6);
+            thisTest.Verify("z", 3);
 
         }
     }

@@ -2486,7 +2486,7 @@ c=2 * {{1},{2}};";
         public void T66_Defect_1467125_Replication_Method_2()
         {
             String code =
-                    @"                    a = {1,2};                    b = { 10, 11 };                    c = { { 1 }, { 2 } };                    d = { {0 } };                    rab = a<1>*b<2>;                    rac = a<1>*c<2>;                    rad = a<1>*d<2>;                    ";
+                    @"                    a = {1,2};                    b = { 10, 11 };                    c = { { 1 }, { 2 } };                    d = { {0 } };                    rab = a<1>*b<2>;                    rac = a<1>*c<2>;                    rad = a<1>*d<2>;                    ";
             ProtoScript.Runners.ProtoScriptTestRunner fsr = new ProtoScript.Runners.ProtoScriptTestRunner();
             string err = "1467125 - VALIDATION NEEDED - Sprint 24 - Rev 2877 replication does not work with higher ranks , throws error Method resolution failure";
             ExecutionMirror mirror = thisTest.RunScriptSource(code, err);
@@ -3841,7 +3841,7 @@ c=2 * {{1},{2}};";
             thisTest.Verify("d1", new Object[] { 3, 2, 3, 4 });
         }
 
-        [Test]
+        [Test] 
         [Category("Replication")]
         public void T91_Defect_1467285_5()
         {
