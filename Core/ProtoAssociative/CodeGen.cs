@@ -1,5 +1,3 @@
-
-
 //#define ENABLE_INC_DEC_FIX
 using System;
 using System.IO;
@@ -2784,7 +2782,7 @@ namespace ProtoAssociative
                         tnode.right = lastnode
                     end
 
-                    bnode.optr = ‘=’ 
+                    bnode.optr = ?=? 
                     bnode.left = GetSSATemp()
                     bnode.right = tnode
                 end
@@ -2792,7 +2790,7 @@ namespace ProtoAssociative
                 ssastack.push(bnode)
             else if node is identifier
                 def bnode
-                bnode.optr = “=”
+                bnode.optr = ?=?
                 bnode.left = GetSSATemp()
                 bnode.right = node
                 astlist.append(bnode) 
@@ -3349,7 +3347,7 @@ namespace ProtoAssociative
         /*
         proc SetExecutionFlagForNode(BinaryExpressionNode bnode, int exprUID)
             // Mapping the execution flaglist from string to exprssionID
-            // Get the lhs of the node in the execFlagList – if it exists
+            // Get the lhs of the node in the execFlagList ? if it exists
             kvp = context.execFlagList.GetKey(node.lhs)
             if kvp does not exist
                 exprIdFlagList.push(exprUID, kvp.value)
@@ -3369,7 +3367,7 @@ namespace ProtoAssociative
                 Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex != expressionUID);
                 bool executionflag = true;
 
-                // Get the lhs of the node in the execFlagList – if it exists
+                // Get the lhs of the node in the execFlagList ? if it exists
                 if (context != null && 
                     context.execFlagList != null && 
                     context.execFlagList.TryGetValue(bnode.LeftNode.Name, out executionflag))

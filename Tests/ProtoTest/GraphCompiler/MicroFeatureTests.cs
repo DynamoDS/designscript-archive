@@ -7,6 +7,7 @@ using ProtoCore.Lang;
 using ProtoTest.TD;
 using GraphToDSCompiler;
 using ProtoTestFx.TD;
+using ProtoScript.Runners.Obsolete;
 namespace ProtoTest.GraphCompiler
 {
     public class MicroFeatureTests
@@ -634,7 +635,7 @@ namespace ProtoTest.GraphCompiler
             // Adds: 
             //      b = 20    
             //===========================================================================
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             //===========================================================================
             // Build the first snapshot nodes a = 10
             //===========================================================================
@@ -704,7 +705,7 @@ namespace ProtoTest.GraphCompiler
             //      literal node 20
             //      and using '+' operator node and assign it to idetifier
             //===========================================================================
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             //===========================================================================
             // Build the first literal node  10
             //===========================================================================
@@ -771,7 +772,7 @@ namespace ProtoTest.GraphCompiler
             //      driver node b= 20
             //      and using '+' operator node and assign it to idetifier
             //===========================================================================
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             //===========================================================================
             // Build the driver node a=10 
             //===========================================================================
@@ -935,7 +936,7 @@ namespace ProtoTest.GraphCompiler
         public void TestSD()
         {
             // Creation - Create   code block and assign it to identifier
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -1172,7 +1173,7 @@ namespace ProtoTest.GraphCompiler
         public void TestSD_function()
         {
             // creation-function node- create two code block nodes and assign it to + operator
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -1357,7 +1358,7 @@ namespace ProtoTest.GraphCompiler
             //1. Create a CBN : a = {1,2}
             //2. Create another CBN : b = [0];
             //3. Connect output of last CBN to input of an identifier 'c' => verify 'c' = 1
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -1491,7 +1492,7 @@ namespace ProtoTest.GraphCompiler
             // 2. add it using + operator 
             // 3. assign it to identifier
             // 4. modify the code block value from 20 to 30 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -1729,7 +1730,7 @@ namespace ProtoTest.GraphCompiler
         {
             // create code block assign it to identifier
             // delete code block 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -1837,7 +1838,7 @@ namespace ProtoTest.GraphCompiler
         {
             // create code block assign it to identifier
             // create another code block and connect to identifer
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -1998,7 +1999,7 @@ namespace ProtoTest.GraphCompiler
             //2. Connect one to the identifer
             //3. Reconnect the other code block to the identifer
             //4. undo , unless i click on the canvas its not updated
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -2198,7 +2199,7 @@ namespace ProtoTest.GraphCompiler
         {
             // create code block assign it to identifier
             // create another code block and reconnect to identifer
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -2357,7 +2358,7 @@ namespace ProtoTest.GraphCompiler
         {
             // create code block assign it to identifier
             // delete connection
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -2469,7 +2470,7 @@ namespace ProtoTest.GraphCompiler
         {
             // create code block "a=10"assign it to identifier
             // change the variable name of the code block
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -2574,7 +2575,7 @@ namespace ProtoTest.GraphCompiler
         {
             // 1. Create a code block node a=1
             // 2. Create another one b=a and assign an indentifer
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -2693,7 +2694,7 @@ namespace ProtoTest.GraphCompiler
             // 1. Create a code block node a=1
             // 2. Create another one b = a and assign an indentifer
             // 3. Delete the first node and  identifier does not update 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -2832,7 +2833,7 @@ namespace ProtoTest.GraphCompiler
             // 1. Create a code block node a=1
             // 2. Create another one b=a and assign an indentifer
             // 3. modify value of a
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -2952,7 +2953,7 @@ namespace ProtoTest.GraphCompiler
             // 1. Create a code block node
             // 2. Create an identifier
             // 3. drag and drop a code block node and leave it empty
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -3060,7 +3061,7 @@ namespace ProtoTest.GraphCompiler
             // 2. Connect each to identifier node
             // 3. select all delete
             // 4. Undo
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -3226,7 +3227,7 @@ namespace ProtoTest.GraphCompiler
         public void TestNonExistentnodes()
         {
             // non existent node - 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -3260,7 +3261,7 @@ namespace ProtoTest.GraphCompiler
             // 1. Create multiline code block with a=10; b=20;
             // 2. Create an identifier
             // 3. Connect the first one to the identifier change the connection to the second the preview does not work 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -3384,7 +3385,7 @@ b = 20;</Content>
             // 3. create identifier
             // 4. connection code block  to math and then to identifer works fine 
             // 5. but connect math node to identifier and then code block  to math does not update preview of math
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -3604,7 +3605,7 @@ b = 20;</Content>
             // Deffect -1279
             // 1. create a code block and two identifier
             // 2. connect code block to two identifiers preview for  second one does not load 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -3752,7 +3753,7 @@ b = 20;</Content>
             //1.  Create a code block node a= 10
             //2.  Assign it to Identifier named b
             //3.  create one more code block and assign the value of identifier to it , eg: c= b
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -3871,7 +3872,7 @@ b = 20;</Content>
             //1.  Create two code block nodes assign it + operator 
             //2.  Assign it to an identifier Var3
             //3.  Create one more code block and assign the value of identifier to it , eg: c= Var3
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4115,7 +4116,7 @@ b = 20;</Content>
         {
             //1.  Create a driver node var1
             //2.  Create another code block node and assign the same to var2
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4173,7 +4174,7 @@ b = 20;</Content>
         {
             //1.  Create a code block node a= 10
             //2.  Create another code block and assign b=a
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4265,7 +4266,7 @@ b = 20;</Content>
         {
             //1.  Create a driver node
             //2.  Change the value of variable to a and value to 2
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4325,7 +4326,7 @@ b = 20;</Content>
             //2. Create a driver node
             //3. Change the value of driver node to variable a 
             //4. Assign it to identifier - Var3 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4432,7 +4433,7 @@ b = 20;</Content>
             //2. Assign it to identifier - Var2 
             //3. Connect them
             //4. Delete the driver node
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4526,7 +4527,7 @@ b = 20;</Content>
         {
             // Failing due to defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1856
             //Steps : Create a driver node - Var 1 - {0,1} => verify the valye is null, as this is will throw a compiler error
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4594,7 +4595,7 @@ b = 20;</Content>
         {
             //1. Create a code block and assign it to identifier node named var2
             //2. Delete the connection between the codeblock and identifier
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4707,7 +4708,7 @@ b = 20;</Content>
             //1. Create two code block nodes and assign it + operator 
             //2. Connect the + operator node to identifier named Var4
             //3. Delete connection between the + and identifier 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -4959,7 +4960,7 @@ b = 20;</Content>
             //1. Create a code block and assign it to identifier node named var2
             //2. Delete the connection between the codeblock and identifier
             //3. Undo 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -5105,7 +5106,7 @@ b = 20;</Content>
         {
             // 1. Create a code block node with expression a=1 and conenct it to identifier
             // 2. Delete connection
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -5217,7 +5218,7 @@ b = 20;</Content>
         {
             // 1. Create a code block node a=1 and connect it two identifiers 
             // 2. Delete one connection and the preview does not udpate for identifier
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -5392,7 +5393,7 @@ b = 20;</Content>
             // 1. Create a driver node '0'
             // 2.  Create a driver node '1'
             // 3. Create a Math.Max node and connect output from driver nodes to it => verify the value is '1'           
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -5599,7 +5600,7 @@ b = 20;</Content>
             // 2. Create a CBN : b = {3,4};
             // 3. Create a CBN : c = a<1> + b<2>
             // 4. Connect output of last CBN to identifier node 'd' => vrify value is { {4,5}, { 5,6} }
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -5776,7 +5777,7 @@ b = 20;</Content>
             // 3. Create a CBN : c = a<1> + b<2>
             // 4. Connect output of last CBN to identifier node 'd'
             // 5. Now update a = {2}; => vrify value is { { 5,6} }
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -5963,7 +5964,7 @@ b = 20;</Content>
             // 5. Click on the top right hand corner of the Max node and then click once on the 'Replication Guide' item on the radial menu
             // 6. Now update the second replication guide to be '2'
             // 7. Verify the final output value : { {1,4}, {2,4} }
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -6281,7 +6282,7 @@ b = 20;</Content>
             // 6. Now update the second replication guide to be '2'
             // 7. Now press undo , and the final output value : {1, 4}
             //Faling due to defect : IDE-1351 Replication guide preview : The replication guide preview is not showing the expected result when Math.Max(a<1>, b<2>) is called
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -6651,7 +6652,7 @@ b = 20;</Content>
             // 4. create identifier
             // 5. Connect output of Range node to input of Identifier node.
             // 6. Check the preview of Indetifier node.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -6881,7 +6882,7 @@ b = 20;</Content>
             // 2. Create a driver node '1'
             // 3. Create a Math.Min node and connect output from driver nodes to it 
             // 4. Delete the connection to the driver node '1' = > verify the output of math node is null
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -7055,7 +7056,7 @@ b = 20;</Content>
             // 2. Create a driver node '1'
             // 3. Create a Math.Divrem node and connect output from driver nodes to it 
             // 4. Delete the the driver node '1' = > verify the output of math node is null
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -7225,7 +7226,7 @@ b = 20;</Content>
             // 3. Create a Math.Max node and connect output from driver nodes to it 
             // 4. Now create another driver node, and connect from it's output to the Math node's two inputs
             // => verify the output of math node is 1.5
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -7498,7 +7499,7 @@ b = 20;</Content>
             // 2. Create a driver node '1'
             // 3. Create a Math.Max node and connect output from driver nodes to it 
             // 4. Now modify the inputs to '-1' and '1.5' and verify the output of the math node = 1.5
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -7701,7 +7702,7 @@ b = 20;</Content>
             // 5. Create an identifier node and connect output of Math.Factorial node to input of this driver node => var6
             // 6. Now create a '+' operator node and connect output of var6, and output of the CBN '2' to it's inputs => var7
             // 7. Now edit the input to the range node so that the start = -1 => verify var7 is updated to : {1,3,3,4}
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -8179,7 +8180,7 @@ b = 20;</Content>
             // 4. Create an operator node, and connect output from driver node 'a' and identifier node 'c' to it's inputs
             // 5. Create Math.Factorial node ( Var5 ) , and connect output from operator node to it's input
             // 6. Now edit value of 'a' = 2 => verify var5 is updated to : 120
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -8506,7 +8507,7 @@ b = 20;</Content>
             // 5. Create Math.Factorial node ( Var5 ) , and connect output from operator node to it's input
             // 6. Now remove the driver node 'a' => verify var5 is updated to : null
             // defect :IDE-1294 deleting a node that was referenced by another does not update the preview
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -8844,7 +8845,7 @@ b = 20;</Content>
             // 6. Now update the second replication guide to be '2'
             // 7. Now press undo once and then press redo and the final output value : {{2,3,4,5}, {2,3,4,5}, {2,3,4,5}}
             //Faling due to defect : IDE-1388 Update issue with range expressions in CBN
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -9385,7 +9386,7 @@ b = 20;</Content>
             // 7. Then update it to '-1' => we get a warning that the guide is invalid, the the guide remains at '2'
             // 8. Then update the first replication guide to '2'. so that both guides ar now '2'
             // 9. Now press undo once and then redo => the final guides should both be '2', and the output : {3,4};
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -9681,7 +9682,7 @@ b = 20;</Content>
             // 6. Replication guides <1> are added to both inputs
             // => verify the final output should be {0}
             // Failing due to defect : IDE-1397 Replication guide : When replication guide is applied on a singleton and collection, the output is not as expected
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -9866,7 +9867,7 @@ b = 20;</Content>
         {
             //1. create a code block node with value "@#"
             //2. create another code blcok node with value 1 and connect it to identifier 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -9956,7 +9957,7 @@ b = 20;</Content>
         {
             //1. create a code block node with value "@#"
             //2. create another code blcok node with value 1 and connect it to identifier 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -10075,7 +10076,7 @@ b = 20;</Content>
             //1. create a code block node with value "@#"
             //3. create an identifier var 3 - it shoule be null
             //2. create another code blcok node with value 1 and connect it to identifier 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -10246,7 +10247,7 @@ b = 20;</Content>
             // 4. Then edit start to '2'
             // 5. Then edit end to '0'
             // Verify the final value = {2, 1, 0 } 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -10529,7 +10530,7 @@ b = 20;</Content>
             // 3. Create a '+' node and connect 'a' and 'b' to it
             // 4. Then edit the CBN to finally have a = {1,2} and b = {2,1} and then add replication guides <1> and <2> respectively
             // Verify the final value = {{3,2},{4,3}} 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -10846,7 +10847,7 @@ b = 20;</Content>
             // 4. Then edit the CBN to finally have a = {0, 3, 2} and b = {-1,4.5} 
             // 5. Now add another Math.Max : Var4(d1,d2) 
             // Verify the final value = {0,4.5} 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -11150,7 +11151,7 @@ b = 20;</Content>
             // 1. Create a code block node 
             // 2. Create another code block with chanined assignment a=b=1 
             // 3. Edit first node to b 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -11267,7 +11268,7 @@ b = 20;</Content>
         public void T028_DriverNodeExpression()
         {
             //1. Create a driver node - Var 1 - 0;
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -11384,7 +11385,7 @@ b = 20;</Content>
         public void T029_DriverArray()
         {
             //1. Create a driver node - Var 1 - {0,1}
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -11479,7 +11480,7 @@ b = 20;</Content>
             // Deffect -1282
             // 1. create + node 
             // 2. create a code block and identfier and connect them
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -11585,7 +11586,7 @@ b = 20;</Content>
             // 1. Create a codeblock with multiple lines a =10 and b=20
             //  2. Connect it to + operator and connect to it => verify its value  = 30
             // create anoher identifier and connect from first output of CBN to it => verify its value = 10
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -11797,7 +11798,7 @@ b = 20;</Content>
             // Drag and drop Range node.
             // Connect Code Block node with value 1 to  start slot of Range node and with value 10 to Increment slot of Range node.
             // After above step you will get the preview value for Range node starting from 1..10. which is incorrect. Because for Range node, Start and End slots are mandatory and Increment slot is optional. 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -11958,7 +11959,7 @@ b = 20;</Content>
             // 2. Create 2 identifier nodes : Var2 and Var3
             // 3. Connect the output of the first output slot of the CBN to identifier 'Var2' : verify Var2 = 1;
             // 4. Connect the output of the second output slot of the CBN to identifier 'Var3' : verify Var3 = 2;
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -12111,7 +12112,7 @@ b = 2;</Content>
             // 2. Create 2 identifier nodes : a and b
             // 3. Connect the output of the first output slot of the CBN to identifier 'a' : verify a = 1.5;
             // 4. Connect the output of the second output slot of the CBN to identifier 'b' : verify b = {0,1,2,3};
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -12298,7 +12299,7 @@ bb = 0..3;</Content>
             // d = { 0..1, 3..4 };"
             // 2. Create 4 identifier nodes and connect output from the 4 outputs nodes of the CBN to each of the identifiers and verify the outputs
             // Var3 = 3, Var4 = {-1,2.5,true}, Var5 = 0; Var6 = {{0,1},{3,4}}
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -12624,7 +12625,7 @@ d = { 0..1, 3..4 };</Content>
             // 1. create a code block node a=1;
             // 2. create another code block node b=a
             // 3. connect the second cbn to identifier - verify value is 1
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -12757,7 +12758,7 @@ d = { 0..1, 3..4 };</Content>
             //1. Create three code block nodes a =1, b=1 and c=10
             //2. Create range block node 
             //3. Connect a to start , b to Increment and c to End 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -12961,7 +12962,7 @@ d = { 0..1, 3..4 };</Content>
             // 2. Create CBN : a = 33; b = 4;
             // 3. Create '+' nodea nd connect teh 2 CBN to it.
             //=> verify output of '+' node: 38
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -13123,7 +13124,7 @@ b = 4;</Content>
             // 2. Create CBN : 1;
             // 3. Create '+' node and connect the 2nd output of 1st CBN and the second CBN to this '+' node
             //=> verify output of '+' node: 3
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -13260,7 +13261,7 @@ b= 1+1;</Content>
             // 3. Create '+' node and connect the 2nd output of 1st CBN and the second CBN to this '+' node
             // 4. Now update the second output of the CBN to : 0..2..#3
             // => verify updated output of '+' node: {1, 3, 5}
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -13439,7 +13440,7 @@ _temp_78899b67fdb44c50929b7a7539a94aa4 =0..2..#3;</Content>
             //1. Create CBN : a = 1; b= 2;
             //2. Create '+' node and connect 'a' and 'b' to it's 2 inputs.
             //=> verify output of '+' node: 3
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -13583,7 +13584,7 @@ b = 2;</Content>
             // 3. Undo
             // 4. Redo
             //=> verify preview for CBN: a.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -13727,7 +13728,7 @@ b = 2;</Content>
             // 2. Create CBN : a =2;
             // 3. Update second CBN to : b=2;
             //=> verify preview for first CBN: a=1.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -13811,7 +13812,7 @@ b = 2;</Content>
         {
             // 1. Create CBN : a={1,2,3};a[0] =4; a[1]=5;
             // 2. Create 2 Identifier nodes and connect output of second and third line of CBN to input of each Identifier.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -13967,7 +13968,7 @@ a[1]  = 5;
         {
             // 1. Create CBN : 4+4; 1..20..2; {1,3,5..}
             //2. Create 3 Identifier nodes and connect 3 outputs of CBN to each Identifier.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -14188,7 +14189,7 @@ _temp_8a105247ee644581b128af56cdde34cc ={1,3,7,9,10,-1};</Content>
             // 1. Create CBN : a = 1
             // 2. Create a nother CBN :  a
             // 3. Create another CBN : a + 1           
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -14410,7 +14411,7 @@ _temp_8a105247ee644581b128af56cdde34cc ={1,3,7,9,10,-1};</Content>
             // Create CBN : 0.56
             // Create CBN : -1
             // connect these CBN s to 5 variables and verify the values
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -14742,7 +14743,7 @@ _temp_8a105247ee644581b128af56cdde34cc ={1,3,7,9,10,-1};</Content>
             // Create CBN a : 1..3
             // Create CBN b : {1,2,3}
             // modify b[0]=a
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -14829,7 +14830,7 @@ _temp_8a105247ee644581b128af56cdde34cc ={1,3,7,9,10,-1};</Content>
             // Create CBN  {1,2}
             // Create CBN  {10,20}
             // add using + node 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -15038,7 +15039,7 @@ _temp_8a105247ee644581b128af56cdde34cc ={1,3,7,9,10,-1};</Content>
             // 1. Create multiline code block with a=10;b=20;
             // 2. Create an identifier
             // 3. Connect the first one to the identifier change the connection to the second the preview doesn not work
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -15179,7 +15180,7 @@ _temp_8a105247ee644581b128af56cdde34cc ={1,3,7,9,10,-1};</Content>
             // Create + : b + 1;
             // Create + : a + b
             // verify the values
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -15546,7 +15547,7 @@ b = a+1;</Content>
             // Now create another identifier Var4 and connect Var3 to it. It's preview should be '0' now.
             // Now create a CBN : a = Var3; => It's preview should also be 0
             // Now update the the first CBN to 10. Verify Var3, Var4 and a are all '10' now
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -16001,7 +16002,7 @@ b = a+1;</Content>
         public void T044_PreviewAfterUndoRedo()
         {
             // Create CBN a=1 -> Undo ->Redo
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -16055,7 +16056,7 @@ b = a+1;</Content>
             // 1. Create a mutliline CBN with value 1;2;a+b 
             // 2. create a Node a=1 
             // 3. Create another node b=13. the preview for CBN 'a' is not displayed
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -16170,7 +16171,7 @@ _temp_d2cd3bfc36084850866e6a9cf1b50f49 =a+b;</Content>
             // 1. Create a Math.Abs node with input '0'
             // 2. Create another Math.Abs node with input '1.5'
             // 3. Now delete the first Math.Abs and verify the preview for the second is still 1.5
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -16326,7 +16327,7 @@ _temp_d2cd3bfc36084850866e6a9cf1b50f49 =a+b;</Content>
             // 1. Create 2 Point nodes and a line from it
             // 2. Verify the Length property from the radial menu : 10
             // 3. Createa  surface from it using ExtrudeAsSurface(line, 10, Vector.ByCoordinates(0,0,1)) : verify area = 100           
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -17229,7 +17230,7 @@ _temp_7363ab3808814192ad1c2000a7d006f9 =0;</Content>
             // Verify that the preview for X node should be 5.0
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("ProtoGeometry.dll");
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("Math.dll");
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -17957,7 +17958,7 @@ _temp_7363ab3808814192ad1c2000a7d006f9 =0;</Content>
             // true;
             // Now drag and drop ByUniversalTransform (first node) from CoordianteSystem and coonec all above respective nodes to CoordianteSystem node.
             // Now access ScalFactors property from CoordinateSystem node and verify its preview. ( it should return {2,3,4})
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -18691,7 +18692,7 @@ myCS = CoordinateSystem.ByUniversalTransform(WCS, scale, rotation, rsequence, tr
             // 2. Assign it to another CBN. preview is expected here 
             // 3. Assign to another identifier and vrify it's value = 1
             // 4. create another CBN : c = 2; b = 1; and verify value of 'b' = 1
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -18897,7 +18898,7 @@ b  =a;</Content>
             // b[1] = b[1] + 3;
             // Connect first two line to Identifier nodes.
             // Now add few more identifier nodes to Canvas and verify that value for "b" shouldn't change.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -19078,7 +19079,7 @@ b[1] = b[1] +3;</Content>
         {
             // 1. Create a  CBN : a = 1;
             // 2. Update the CBN : b = a + 1;
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -19125,7 +19126,7 @@ b=a+1;</Content>
             // Failing due to defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1856
             // Create Line of length 10 and then Reverse it. After reversing access its Start Point and on Start Point access its property X.
             // Verify that the value preview for X should be 10. Right now it is coming 0.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -19832,7 +19833,7 @@ b=a+1;</Content>
             // Now create CBn with value 0;10;.
             // Now connect 0 to start and 10 to end slot of Range node.
             // After above step preview for Range node is coming but there is no preview for Identifier node. (If we create another Identifier node and then connecting it to Range node is displaying correct preview.) So this problem only happens if Identifier node connected before connecting input of Range node.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -20029,7 +20030,7 @@ _temp_76d945a4215f45be83847b5969f0f994 =4;</Content>
             // create two more cbns : 0 and 0 
             // create another cbn : 10..0..#count;
             // => verify the values of the first and last cbns 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -20246,7 +20247,7 @@ _temp_76d945a4215f45be83847b5969f0f994 =4;</Content>
             // create a CBN : count = 10
             // create another cbn : 1..count; 0; 0; 
             // assing the 3 CBN outputs to 3 different identifiers and verify the values
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -20500,7 +20501,7 @@ _temp_6eaeba43a10e473db628fa9be0578138 =0;</Content>
             // Delete CBN :a
             // Connect first CBn to + node.
             // Verify that + node should display the preview with value 5.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -20760,7 +20761,7 @@ _temp_6eaeba43a10e473db628fa9be0578138 =0;</Content>
             // Access X property from point node.
             // Connect CBN: 3 to first input of Point node.
             // Verify that preview for property node X should display value 3.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -21088,7 +21089,7 @@ _temp_6eaeba43a10e473db628fa9be0578138 =0;</Content>
             // Undate B = a*2 to b=a+2;
             // Update a = 2*5 to a=5*5;
             // Verify that preview for Identifier node should display value 52.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -21363,7 +21364,7 @@ _temp_6eaeba43a10e473db628fa9be0578138 =0;</Content>
             // Create CBN:
             //
             // Verify that preview for Identifier node should display value 52.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -21840,7 +21841,7 @@ d = b[0..(Count(b) - 1)..2];</Content>
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1630
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("ProtoGeometry.dll");
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("Math.dll");
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -22292,7 +22293,7 @@ d = b[0..(Count(b) - 1)..2];</Content>
             // click on the translate property ( it's base geometry class property ) and translate by 5
             // click on the 'x' property of the translated point => value should be 5
             // delete the initial point and then undo => the value should still be 5
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -22967,7 +22968,7 @@ d = b[0..(Count(b) - 1)..2];</Content>
             // Steps are mentioned in the defect. It is a long list of steps to it is better to refere defect for steps.
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("ProtoGeometry.dll");
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("Math.dll");
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -24077,7 +24078,7 @@ d = b[0..(Count(b) - 1)..2];</Content>
         public void T063_IDE_1823()
         {
             // Steps are mentioned in the defect.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -24650,7 +24651,7 @@ _temp_a561c2f0882f44e58c8f62adae0ce30d =10;</Content>
         public void T064_IDE_1806()
         {
             /* 1. Create a Point.ByCoordinates node 2. Click on the 'X' property from it's radial menu 3. create a CBN : '0' and connect it to all 3 inputs of the Point.ByCoordinates node  => no geometry/textual preview from neither the geometry node, nor the property node             */
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -24905,7 +24906,7 @@ _temp_a561c2f0882f44e58c8f62adae0ce30d =10;</Content>
         public void T065_IDE_1586()
         {
             // Steps are mentioned in the defect.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -24953,7 +24954,7 @@ b=1..2;</Content>
         public void T066_IDE_1830()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1830
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -25069,7 +25070,7 @@ b=1..2;</Content>
         public void T067_IDE_1800()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1800
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -25188,7 +25189,7 @@ b=1..2;</Content>
         public void T068_IDE_1800_1()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1800
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -25770,7 +25771,7 @@ b=1..2;</Content>
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1855
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("ProtoGeometry.dll");
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("Math.dll");
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26042,7 +26043,7 @@ b=1..2;</Content>
         public void T070_IDE_1792()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1792
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26167,7 +26168,7 @@ b=1..2;</Content>
         {
             // Failing due to defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1856
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1794
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26281,7 +26282,7 @@ b=1..2;</Content>
         {
             // Create Point.ByCoordiantes(0,0,0);
             // Verify that the return type and the preivew is Point. 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26476,7 +26477,7 @@ b=1..2;</Content>
         public void T072_IDE_1846()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1846
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26547,7 +26548,7 @@ b=1..2;</Content>
         public void T073_IDE_1545()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1545
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26642,7 +26643,7 @@ b=1..2;</Content>
         public void T073_IDE_1545_2()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1545
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26738,7 +26739,7 @@ b=1..2;</Content>
         {
             // Failing due to Defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1984
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1606
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -26911,7 +26912,7 @@ a[0] = b;</Content>
         public void T075_IDE_1264()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1264
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -27000,7 +27001,7 @@ b = 20;</Content>
         public void T076_IDE_1867()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1867
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -27080,7 +27081,7 @@ b = 20;</Content>
         public void T076_IDE_1867_2()
         {
             // Steps are metioned in the defect. http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1867
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -27288,7 +27289,7 @@ b = 20;</Content>
             // Failing due to defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1856
             // Create Point.ByCoordiantes(0,0,0);
             // Verify that the return type and the preivew is Point. 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -27371,7 +27372,7 @@ b = 20;</Content>
         {
             // Create Point.ByCoordiantes(0,0,0);
             // Verify that the return type and the preivew is Point. 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -27422,7 +27423,7 @@ b = 20;</Content>
         {
             // Create Point.ByCoordiantes(0,0,0);
             // Verify that the return type and the preivew is Point. 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -27472,7 +27473,7 @@ b = 20;</Content>
         public void T079_IDE_1822()
         {
             // Steps are mentioned in the defect.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -27863,7 +27864,7 @@ b = 20;</Content>
             // Now create CoordinateSystem.Origin.X  and verify the number of elements in it : 3
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("ProtoGeometry.dll");
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("Math.dll");
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -28436,7 +28437,7 @@ b = 20;</Content>
         public void T081_IDE_1583()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1583
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -28506,7 +28507,7 @@ b = 20;</Content>
         public void T082_IDE_1553_Defect_Open()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1553
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -28851,7 +28852,7 @@ _temp_d2a29f35c4ab4e588563c749b961f04b =theta/100;
             // Create CBN: b;
             // Connect all above three CBN. first to second second to third.
             // a and b should display the preivew with value 2.
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -28990,7 +28991,7 @@ _temp_d2a29f35c4ab4e588563c749b961f04b =theta/100;
         public void T084_IDE_1910()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1910
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -29178,7 +29179,7 @@ _temp_d2a29f35c4ab4e588563c749b961f04b =theta/100;
         public void T085_IDE_1762()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1762
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -29283,7 +29284,7 @@ a={10,20,30};</Content>
         public void T086_IDE_1849_Defect_Open()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1849
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -29394,7 +29395,7 @@ a={10,20,30};</Content>
         public void T087_IDE_1870()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1870
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -30255,7 +30256,7 @@ _temp_ea78b08285404161a2be6fdea5b7ddf2 =10;</Content>
             Assert.IsTrue((double)mirror.GetData().GetStackValue().opdata_d == 1);
         }
         /*  
-[Test]          public void T077_stringconcat()          {              ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();        string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
+[Test]          public void T077_stringconcat()          {              ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();        string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
     <SynchronizeData>
@@ -30385,7 +30386,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
         [Test]
         public void T078_1899()
         {
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -30500,7 +30501,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
         [Test]
         public void T079_1950_Defect_Open()
         {
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -30615,7 +30616,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
         [Test]
         public void T079_1276_Defect_Open()
         {
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -30721,7 +30722,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
         [Test]
         public void T088_1435()
         {
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -30901,7 +30902,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
             // steps are mentioned in the defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1934
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("ProtoGeometry.dll");
             GraphToDSCompiler.GraphUtilities.PreloadAssembly("Math.dll");
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -31026,7 +31027,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
         public void T090_IDE_2001()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2001
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -31194,7 +31195,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
         public void T091_IDE_2035()
         {
             // steps as per defect : http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2035
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -31293,7 +31294,7 @@ List<SynchronizeData> ls = GraphToDSCompiler.GraphUtilities.GetSDList(code)
         public void T092_IDE_1979()
         {
             // http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1979
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -31327,7 +31328,7 @@ a[0]=3;</Content>
         public void T093_IDE_1435()
         {
             //http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1435
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -31372,7 +31373,7 @@ a[0]=3;</Content>
             //5. Change ‘{1,2}’ to ‘{1}’
             // create CBN a 
             // change {1,2} to a={1,2}
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -32026,7 +32027,7 @@ a[0]=3;</Content>
             // CBN: a=1;b=2;c=3;
             // CBN: d=2;e=a+b+c;
             // Varify e should have the preivew value 6
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
 	<SynchronizeDataCollection>
@@ -32137,7 +32138,7 @@ a[0]=3;</Content>
         public void T096_IDE_1852()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1852
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -32468,7 +32469,7 @@ a[0]=3;</Content>
         {
             //http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1950
             //Create with CBN 1 ->CBN a->CBN B=a ,connect 1 to a  here the preview for a is not created 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -32593,7 +32594,7 @@ a[0]=3;</Content>
         {
             //http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1990
             //Create a CBN a Create a CBN 1 connect the above delete the connection the preview for a still shown as 1 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -32654,7 +32655,7 @@ a[0]=3;</Content>
         {
             //http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1854
             //1. create CBN[a = 1] 2. delete it3. create CBN[a = 1]4. verify a is 1 
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -32720,7 +32721,7 @@ a[0]=3;</Content>
         {
             //http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1854
             //1. create CBN[a = 1] 2. delete it3. create CBN[a = 10]4. verify a is 10
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -32785,7 +32786,7 @@ a[0]=3;</Content>
         public void T097_IDE_2065()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2065
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -32883,7 +32884,7 @@ h= 1 + 2;</Content>
         public void T098_IDE_2134()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2134
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -33089,7 +33090,7 @@ b ;</Content>
         public void T100_IDE_1733()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1733
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -33152,7 +33153,7 @@ _temp_cacfcb787feb44c9a363953e38ab6611 =20;</Content>
         public void T101_IDE_1969()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1969
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -33233,7 +33234,7 @@ _temp_cacfcb787feb44c9a363953e38ab6611 =20;</Content>
         public void T102_IDE_2001()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2001
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -33407,7 +33408,7 @@ _temp_cacfcb787feb44c9a363953e38ab6611 =20;</Content>
         public void T103_IDE_1984()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1984
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -33719,7 +33720,7 @@ b = 3;</Content>
         public void T104_IDE_2105()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2105
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -34061,7 +34062,7 @@ d = c;</Content>
         public void T105_IDE_2043()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2043
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -34531,7 +34532,7 @@ Var13 = Var6.YAxis;</Content>
         public void T106_IDE_2092()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2092
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -34819,7 +34820,7 @@ b
         public void T107_IDE_2010()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2010
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -35233,7 +35234,7 @@ b
         public void T108_IDE_2020()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2020
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -35312,7 +35313,7 @@ b
         public void T109_IDE_1931()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1931
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -35373,7 +35374,7 @@ b
         public void T110_IDE_1786()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1786
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -36016,7 +36017,7 @@ b
         public void T111_IDE_1847()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1847
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -36789,7 +36790,7 @@ b
         public void T112_IDE_2125()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2125
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -37234,7 +37235,7 @@ _temp_4b7331cec248421390edcc6ded208409 =2..5;</Content>
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2181
             /*             * 1. Start DSS and create a CBN :                     a1 = Point.ByCoordinates(0, 0, 0);                    a2 = Point.ByCoordinates(1, 1, 1);                    l1 = Line.ByCoordinates(a1, a2);               2. Now create an identifier node assign the last line to it -> there is an error saying there is not match for Line.ByCoordinates.                3. Then I go and update the CBN to  :                 a1 = Point.ByCoordinates(0, 0, 0);                a2 = Point.ByCoordinates(1, 1, 1);                l1 = Line.ByStartPointEndPoint(a1, a2);             3. Create a node from the Line.Length and verify it's value             **/
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -37493,7 +37494,7 @@ l1 = Line.ByStartPointEndPoint(a1, a2);</Content>
             //          d = c + 1;
             //          // this is comment
             // 5. Verify d = 2
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -37667,7 +37668,7 @@ d = c + 1;</Content>
         public void T115_IDE_2075()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2075
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -37923,7 +37924,7 @@ b = Var5;</Content>
         public void T116_IDE_2137()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2137
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -37981,7 +37982,7 @@ test = x  + y;</Content>
         public void T113_IDE_TrialNTC()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2125
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -38185,7 +38186,7 @@ Var3 = (Var4 + Var4_1);</Content>
         public void T117_IDE_2187()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2187
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -38639,7 +38640,7 @@ a=Var3;</Content>
         public void T118_IDE_1942()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1942
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -38732,7 +38733,7 @@ a=Var3;</Content>
                 liveRunner.UpdateGraph(sd);
             }
             //int a = sd.AddedNodes.Count - sd.RemovedNodes.Count;
-            GraphToDSCompiler.GraphCompiler graphcompiler = (liveRunner as ProtoScript.Runners.LiveRunner).GetCurrentGraphCompilerInstance();
+            GraphToDSCompiler.GraphCompiler graphcompiler = (liveRunner as ProtoScript.Runners.Obsolete.LiveRunner).GetCurrentGraphCompilerInstance();
             int count = graphcompiler.Graph.nodeList.Count;
             //Assert.IsTrue(count == 2);
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("Var2");
@@ -38741,7 +38742,7 @@ a=Var3;</Content>
             foreach (SynchronizeData sd2 in ls2)
                 liveRunner.UpdateGraph(sd2);
             //int b = sd2.AddedNodes.Count - sd2.RemovedNodes.Count;
-            graphcompiler = (liveRunner as ProtoScript.Runners.LiveRunner).GetCurrentGraphCompilerInstance();
+            graphcompiler = (liveRunner as ProtoScript.Runners.Obsolete.LiveRunner).GetCurrentGraphCompilerInstance();
             count = graphcompiler.Graph.nodeList.Count;
             //Assert.IsTrue(count == 1);
             ProtoCore.Mirror.RuntimeMirror mirror2 = liveRunner.QueryNodeValue("Var2");
@@ -38754,7 +38755,7 @@ a=Var3;</Content>
         public void T126_IDE_1936()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1936
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -38998,13 +38999,13 @@ a=Var3;</Content>
             Assert.IsTrue(mirror2.GetData().GetStackValue().opdata == 1);
         }
         /*        
-[Test]        public void T126_IDE_2152()        {            // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2152          // commenting this test as the variable name is nto consistent every time             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();            foreach (SynchronizeData sd in ls)                liveRunner.UpdateGraph(sd);            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("_temp_f111ee543d4946f9aa624c6a273dfffb");            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 6);        }*/
+[Test]        public void T126_IDE_2152()        {            // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-2152          // commenting this test as the variable name is nto consistent every time             ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();            foreach (SynchronizeData sd in ls)                liveRunner.UpdateGraph(sd);            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.QueryNodeValue("_temp_f111ee543d4946f9aa624c6a273dfffb");            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 6);        }*/
 
         [Test]
         public void T127_IDE_1934()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1934
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
@@ -39169,7 +39170,7 @@ a=Var3;</Content>
         public void T128_IDE_1845()
         {
             // Steps are mentioned in the defect http://adsk-oss.myjetbrains.com/youtrack/issue/IDE-1845
-            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            ILiveRunner liveRunner = new ProtoScript.Runners.Obsolete.LiveRunner();
             string code = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <SynchronizeDataCollection xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <SynchronizeDataCollection>
