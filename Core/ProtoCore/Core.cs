@@ -124,10 +124,10 @@ namespace ProtoCore
     {
         public Options()
         {
-            DumpByteCode = true;
-            Verbose = true;
+            DumpByteCode = false;
+            Verbose = false;
             FullSSA = true;
-            DumpIL = true;
+            DumpIL = false;
             GCTempVarsOnDebug = true;
 
             DumpFunctionResolverLogic = false;
