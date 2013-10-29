@@ -4962,7 +4962,7 @@ i = 5;
         i = i + 1; // increment i
     }
 }";
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testPath);
             thisTest.Verify("totalLength", 8.0);
         }
 
