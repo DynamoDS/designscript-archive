@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using GraphToDSCompiler;
 using ProtoCore.Utils;
-using ProtoScript.Runners;
+using ProtoScript.Runners.Obsolete;
 using System.Windows;
 using System.Threading;
 using ProtoCore.Mirror;
