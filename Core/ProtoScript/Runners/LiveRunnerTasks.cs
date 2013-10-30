@@ -595,52 +595,6 @@ namespace ProtoScript.Runners
                 }
             }
 
-            private class UpdateCmdLineInterpreterTask : Task
-            {
-                private string cmdLineString;
-                public UpdateCmdLineInterpreterTask(string code, LiveRunner runner)
-                    : base(runner)
-                {
-                    this.cmdLineString = code;
-                }
-
-                public override void Execute()
-                {
-                    GraphUpdateReadyEventArgs retArgs = null;
-
-                    lock (runner.operationsMutex)
-                    {
-                        try
-                        {
-                            string code = null;
-                            runner.SynchronizeInternal(code);
-
-                            var modfiedGuidList = runner.GetModifiedGuidList();
-                            runner.ResetModifiedSymbols();
-                            var syncDataReturn = runner.CreateSynchronizeDataForGuidList(modfiedGuidList);
-
-                            retArgs = null;
-
-                            // TODO: Implement ReportErrors override to report errors for command line statements
-                            //ReportErrors(code, syncDataReturn, modfiedGuidList, ref retArgs);
-
-                            if (retArgs == null)
-                                retArgs = new GraphUpdateReadyEventArgs(syncDataReturn);
-                        }
-                        // Any exceptions that are caught here are most likely from the graph compiler
-                        catch (Exception e)
-                        {
-                            //retArgs = new GraphUpdateReadyEventArgs(syncData, EventStatus.Error, e.Message);
-                        }
-                    }
-
-                    if (runner.GraphUpdateReady != null)
-                    {
-                        runner.GraphUpdateReady(this, retArgs); // Notify all listeners (e.g. UI).
-                    }
-                }
-
-            }
 
             private class ConvertNodesToCodeTask : Task
             {
