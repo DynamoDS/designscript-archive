@@ -1532,6 +1532,23 @@ namespace GraphToDSCompiler
             }
             return strBuilder.ToString();
         }
+
+        /// <summary>
+        /// This converts a list of ProtoASTs into ds using CodeGenDS
+        /// </summary>
+        /// <param name="astList"></param>
+        /// <returns></returns>
+        public static string ASTListToCode(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList)
+        {
+            string code = string.Empty;
+            if (null != astList && astList.Count > 0)
+            {
+                ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(astList);
+                code = codeGen.GenerateCode();
+            }
+            return code;
+        }
+
         public static List<SnapshotNode> NodeToCodeBlocks(List<SnapshotNode> inputs, GraphToDSCompiler.GraphCompiler originalGC)
         {
             List<SnapshotNode> codeBlocks = new List<SnapshotNode>();

@@ -104,6 +104,7 @@ namespace ProtoScript.Runners
 
         event DynamoNodeValueReadyEventHandler DynamoNodeValueReady;
         event DynamoGraphUpdateReadyEventHandler DynamoGraphUpdateReady;
+        event DynamoNodesToCodeCompletedEventHandler DynamoNodesToCodeCompleted;
 
     }
 
@@ -345,6 +346,7 @@ namespace ProtoScript.Runners
 
         public event DynamoNodeValueReadyEventHandler DynamoNodeValueReady = null;
         public event DynamoGraphUpdateReadyEventHandler DynamoGraphUpdateReady = null;
+        public event DynamoNodesToCodeCompletedEventHandler DynamoNodesToCodeCompleted = null;
         #endregion
 
         /// <summary>
