@@ -77,7 +77,6 @@ namespace ProtoScript.Runners
         void UpdateGraph(GraphSyncData syncData);
         void UpdateCmdLineInterpreter(string code);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
-        //ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName);
         ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName);
         #endregion
 
