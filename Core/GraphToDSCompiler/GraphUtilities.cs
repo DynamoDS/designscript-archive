@@ -1016,7 +1016,7 @@ namespace GraphToDSCompiler
         /// <param name="astNodes"></param>
         /// <returns>Returns true if compilation succeeded, or false otherwise. Returning true may still 
         /// result in warnings, which suggests that the compilation was successful with warning.</returns>             
-
+        
 
 
         public static List<SynchronizeData> GetSDList(string filepath)
@@ -1309,7 +1309,7 @@ namespace GraphToDSCompiler
         }
 
         public static bool Parse(string code, out List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
-                List<String> unboundIdentifiers)
+                List<String> unboundIdentifiers, out string parseString)
         {
             try
             {
@@ -1324,6 +1324,8 @@ namespace GraphToDSCompiler
                     singleExpression = singleExpression.Replace("%t", tempVariableName);
                     codeToParse += singleExpression;
                 }
+
+                parseString = codeToParse;
 
                 ProtoCore.BuildStatus buildStatus;
 
@@ -1356,6 +1358,7 @@ namespace GraphToDSCompiler
                 errors = null;
                 warnings = null;
                 unboundIdentifiers = null;
+                parseString = null;
                 return false;
             }
         }
