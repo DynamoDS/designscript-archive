@@ -57,7 +57,7 @@ public:
     /// call waits till the graph is evaluated for the changes due to new code 
     /// segment in the graph. 
     /// </summary>
-    virtual void updateGraph(const wchar_t* codesegment) = 0;
+    //virtual void updateGraph(const wchar_t* codesegment) = 0;
 
     /// <summary>
     /// Synchronous method to update the VM with given code segment. This 
@@ -72,7 +72,7 @@ public:
     /// graph is completely evaluated, GraphUpdateReady method is called on the
     /// passed callback object.
     /// </summary>
-    virtual void updateGraphAsync(const wchar_t* codesegment) = 0;
+    //virtual void updateGraphAsync(const wchar_t* codesegment) = 0;
 
     virtual void importLibrary(const wchar_t* codesegment) = 0;
 
@@ -85,7 +85,7 @@ public:
     /// <summary>
     /// Queries the value of the given node/variable using it's name.
     /// </summary>
-    virtual DesignScriptObject* queryNodeValue(const wchar_t* nodeName) = 0;
+    //virtual DesignScriptObject* queryNodeValue(const wchar_t* nodeName) = 0;
 
     /// <summary>
     /// Inspects the value of the given node/variable using it's name.
@@ -95,13 +95,13 @@ public:
     /// <summary>
     /// Sets up asyncronous query for value of a list of nodes.
     /// </summary>
-    virtual void queryNodeValuesAsync(const std::list<unsigned int>& nodeIds) = 0;
+    //virtual void queryNodeValuesAsync(const std::list<unsigned int>& nodeIds) = 0;
 
     /// <summary>
     /// Gets the core dump object, which has values/state of all the objects
     /// in the graph.
     /// </summary>
-    virtual DesignScriptObject* getCoreDump() = 0;
+    //virtual DesignScriptObject* getCoreDump() = 0;
     
     /// <summary>
     /// Dumps the current VM state as a formatted string of values
