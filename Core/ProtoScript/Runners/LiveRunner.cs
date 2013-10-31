@@ -22,13 +22,16 @@ namespace ProtoScript.Runners
         Warning
     }
 
-    /// <summary>
-    /// A subtree represents a node in graph. It contains a list of AST node.
-    /// </summary>
     public struct Subtree
     {
         public Guid GUID;
         public List<AssociativeNode> AstNodes;
+
+        //public Subtree(List<AssociativeNode> astNodes)
+        //{
+        //    GUID = Guid.Empty;
+        //    AstNodes = astNodes;
+        //}
 
         public Subtree(List<AssociativeNode> astNodes, System.Guid guid)
         {
@@ -37,10 +40,6 @@ namespace ProtoScript.Runners
         }
     }
 
-    /// <summary>
-    /// GraphSyncData contains three lists: Subtrees that are added, modified
-    /// and deleted in a session.
-    /// </summary>
     public class GraphSyncData
     {
         public List<Subtree> DeletedSubtrees
@@ -73,28 +72,40 @@ namespace ProtoScript.Runners
     {
         ProtoCore.Core Core { get; }
 
-        #region Synchronous call
-        void UpdateGraph(GraphSyncData syncData);
-        void UpdateCmdLineInterpreter(string code);
-        ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
-        ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName);
-        #endregion
+        void UpdateGraph(GraphToDSCompiler.SynchronizeData syncData);
+        void BeginUpdateGraph(GraphToDSCompiler.SynchronizeData syncData);
+        void BeginConvertNodesToCode(List<SnapshotNode> snapshotNodes);
 
-        #region Asynchronous call
+        void UpdateGraph(GraphSyncData syncData);
+
         void BeginUpdateGraph(GraphSyncData syncData);
         void BeginConvertNodesToCode(List<Subtree> subtrees);
-        void BeginQueryNodeValue(Guid nodeGuid);
-        void BeginQueryNodeValues(List<Guid> nodeGuid);
-        #endregion
-        
-        string GetCoreDump();
-        void ResetVMAndResyncGraph(List<string> libraries);
-		void ReInitializeLiveRunner();
 
-        // Event handlers for the notification from asynchronous call
+
+        void BeginQueryNodeValue(uint nodeId);
+
+        void UpdateCmdLineInterpreter(string code);
+
+        ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId);
+        ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName);
+        ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName);
+        void BeginQueryNodeValue(List<uint> nodeIds);
+        string GetCoreDump();
+
+        void BeginQueryNodeValue(Guid nodeGuid);
+        ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
+        void BeginQueryNodeValue(List<Guid> nodeGuid);
+        void ResetVMAndResyncGraph(List<string> libraries);
+        void ReInitializeLiveRunner();
+
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
         event NodesToCodeCompletedEventHandler NodesToCodeCompleted;
+
+        event DynamoNodeValueReadyEventHandler DynamoNodeValueReady;
+        event DynamoGraphUpdateReadyEventHandler DynamoGraphUpdateReady;
+        event DynamoNodesToCodeCompletedEventHandler DynamoNodesToCodeCompleted;
+
     }
 
     public partial class LiveRunner : ILiveRunner
@@ -127,9 +138,59 @@ namespace ProtoScript.Runners
             public bool InterpreterMode = false;
         }
 
+        private Dictionary<uint, string> GetModifiedGuidList()
+        {
+            // Retrieve the actual modified nodes 
+            // Execution is complete, get all the modified guids 
+            // Get the modified symbol names from the VM
+            List<string> modifiedNames = this.runnerCore.Rmem.GetModifiedSymbolString();
+            Dictionary<uint, string> modfiedGuidList = new Dictionary<uint, string>();
+            foreach (string name in modifiedNames)
+            {
+                // Get the uid of the modified symbol
+                if (this.graphCompiler.mapModifiedName.ContainsKey(name))
+                {
+                    uint id = this.graphCompiler.mapModifiedName[name];
+                    if (!modfiedGuidList.ContainsKey(id))
+                    {
+                        // Append the modified guid into the modified list
+                        modfiedGuidList.Add(this.graphCompiler.mapModifiedName[name], name);
+                    }
+                }
+            }
+            return modfiedGuidList;
+        }
+
         private void ResetModifiedSymbols()
         {
             this.runnerCore.Rmem.ResetModifedSymbols();
+        }
+
+        private SynchronizeData CreateSynchronizeDataForGuidList(Dictionary<uint, string> modfiedGuidList)
+        {
+            Dictionary<uint, SnapshotNode> modifiedGuids = new Dictionary<uint, SnapshotNode>();
+            SynchronizeData syncDataReturn = new SynchronizeData();
+
+            if (modfiedGuidList != null)
+            {
+                //foreach (uint guid in modfiedGuidList)
+                foreach (var kvp in modfiedGuidList)
+                {
+                    // Get the uid recognized by the graphIDE
+                    uint guid = kvp.Key;
+                    string name = kvp.Value;
+                    SnapshotNode sNode = new SnapshotNode(this.graphCompiler.GetRealUID(guid), SnapshotNodeType.Identifier, name);
+                    if (!modifiedGuids.ContainsKey(sNode.Id))
+                    {
+                        modifiedGuids.Add(sNode.Id, sNode);
+                    }
+                }
+
+                foreach (KeyValuePair<uint, SnapshotNode> kvp in modifiedGuids)
+                    syncDataReturn.ModifiedNodes.Add(kvp.Value);
+            }
+
+            return syncDataReturn;
         }
 
         private ProtoScriptTestRunner runner;
@@ -172,6 +233,11 @@ namespace ProtoScript.Runners
             InitRunner(options);
         }
 
+
+        public GraphToDSCompiler.GraphCompiler GetCurrentGraphCompilerInstance()
+        {
+            return graphCompiler;
+        }
 
         private void InitRunner(Options options)
         {
@@ -278,13 +344,34 @@ namespace ProtoScript.Runners
         public event GraphUpdateReadyEventHandler GraphUpdateReady = null;
         public event NodesToCodeCompletedEventHandler NodesToCodeCompleted = null;
 
+        public event DynamoNodeValueReadyEventHandler DynamoNodeValueReady = null;
+        public event DynamoGraphUpdateReadyEventHandler DynamoGraphUpdateReady = null;
+        public event DynamoNodesToCodeCompletedEventHandler DynamoNodesToCodeCompleted = null;
         #endregion
+
+        /// <summary>
+        /// Push new synchronization data, returns immediately and will
+        /// trigger a GraphUpdateReady when the value when the execution
+        /// is completed
+        /// </summary>
+        /// <param name="syncData"></param>
+        public void BeginUpdateGraph(SynchronizeData syncData)
+        {
+            lock (taskQueue)
+            {
+                taskQueue.Enqueue(
+                    new UpdateGraphTask(syncData, this));
+            }
+
+            //Todo(Luke) add a Monitor queue to prevent having to have the 
+            //work poll
+        }
 
         public void BeginUpdateGraph(GraphSyncData syncData)
         {
             lock (taskQueue)
             {
-                taskQueue.Enqueue(new UpdateGraphTask(syncData, this));
+                taskQueue.Enqueue(new DynamoUpdateGraphTask(syncData, this));
             }
         }
 
@@ -301,6 +388,26 @@ namespace ProtoScript.Runners
             }
         }
 
+        /// <summary>
+        /// Takes in a list of SnapshotNode objects, condensing them into one 
+        /// or more SnapshotNode objects which caller can then turn into a more 
+        /// compact representation of the former SnapshotNode objects.
+        /// </summary>
+        /// <param name="snapshotNodes">A list of source SnapshotNode objects 
+        /// from which the resulting list of SnapshotNode is to be computed.
+        /// </param>
+        public void BeginConvertNodesToCode(List<SnapshotNode> snapshotNodes)
+        {
+            if (null == snapshotNodes || (snapshotNodes.Count <= 0))
+                return; // Do nothing, there's no nodes to be converted.
+
+            lock (taskQueue)
+            {
+                taskQueue.Enqueue(
+                    new ConvertNodesToCodeTask(snapshotNodes, this));
+            }
+        }
+
         public void BeginConvertNodesToCode(List<Subtree> subtrees)
         {
             if (null == subtrees || (subtrees.Count <= 0))
@@ -308,7 +415,40 @@ namespace ProtoScript.Runners
 
             lock (taskQueue)
             {
-                taskQueue.Enqueue(new ConvertNodesToCodeTask(subtrees, this));
+                taskQueue.Enqueue(new DynamoConvertNodesToCodeTask(subtrees, this));
+            }
+        }
+
+        /// <summary>
+        /// Query For a node value this will trigger a NodeValueReady callback
+        /// when the value is available
+        /// </summary>
+        /// <param name="nodeId"></param>
+        public void BeginQueryNodeValue(uint nodeId)
+        {
+            lock (taskQueue)
+            {
+                taskQueue.Enqueue(
+                    new NodeValueRequestTask(nodeId, this));
+            }
+        }
+
+        /// <summary>
+        /// Query For a node value this will trigger a NodeValueReady callback
+        /// when the value is available
+        /// This version is more efficent than calling the BeginQueryNodeValue(uint)
+        /// repeatedly 
+        /// </summary>
+        /// <param name="nodeId"></param>
+        public void BeginQueryNodeValue(List<uint> nodeIds)
+        {
+            lock (taskQueue)
+            {
+                foreach (uint nodeId in nodeIds)
+                {
+                    taskQueue.Enqueue(
+                        new NodeValueRequestTask(nodeId, this));
+                }
             }
         }
 
@@ -316,21 +456,49 @@ namespace ProtoScript.Runners
         {
             lock (taskQueue)
             {
-                taskQueue.Enqueue(
-                    new NodeValueRequestTask(nodeGuid, this));
+                taskQueue.Enqueue(new DynamoNodeValueRequestTask(nodeGuid, this));
             }
         }
 
-        public void BeginQueryNodeValues(List<Guid> nodeGuids)
+        public void BeginQueryNodeValue(List<Guid> nodeGuids)
         {
             lock (taskQueue)
             {
                 foreach (Guid nodeGuid in nodeGuids)
                 {
                     taskQueue.Enqueue(
-                        new NodeValueRequestTask(nodeGuid, this));
+                        new DynamoNodeValueRequestTask(nodeGuid, this));
                 }
             }
+        }
+
+        /// <summary>
+        /// TODO: Deprecate - This will be replaced with the overload that takes in a Guid type
+        /// Query for a node value. This will block until the value is available.
+        /// This uses the expression interpreter to evaluate a node variable's value.
+        /// It will only serviced when all ASync calls have been completed
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        public ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId)
+        {
+            while (true)
+            {
+                lock (taskQueue)
+                {
+                    //Spin waiting for the queue to be empty
+                    if (taskQueue.Count == 0)
+                    {
+
+                        //No entries and we have the lock
+                        //Synchronous query to get the node
+
+                        return InternalGetNodeValue(nodeId);
+                    }
+                }
+                Thread.Sleep(0);
+            }
+
         }
 
         /// <summary>
@@ -362,6 +530,33 @@ namespace ProtoScript.Runners
         }
 
 
+        /// <summary>
+        /// Query for a node value given its variable name. This will block until the value is available.
+        /// This uses the expression interpreter to evaluate a node variable's value.
+        /// It will only serviced when all ASync calls have been completed
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        public ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName)
+        {
+            while (true)
+            {
+                lock (taskQueue)
+                {
+                    //Spin waiting for the queue to be empty
+                    if (taskQueue.Count == 0)
+                    {
+
+                        //No entries and we have the lock
+                        //Synchronous query to get the node
+
+                        return InternalGetNodeValue(nodeName);
+                    }
+                }
+                Thread.Sleep(0);
+            }
+
+        }
 
         /// <summary>
         /// Inspects the VM for the value of a node given its variable name. 
@@ -460,6 +655,29 @@ namespace ProtoScript.Runners
             return formattedString;
         }
 
+
+        public void UpdateGraph(SynchronizeData syndData)
+        {
+
+
+            while (true)
+            {
+                lock (taskQueue)
+                {
+                    //Spin waiting for the queue to be empty
+                    if (taskQueue.Count == 0)
+                    {
+                        string code = null;
+                        SynchronizeInternal(syndData, out code);
+                        return;
+
+                    }
+                }
+                Thread.Sleep(0);
+            }
+
+        }
+
         /// <summary>
         /// This API needs to be called for every delta AST execution
         /// </summary>
@@ -530,12 +748,7 @@ namespace ProtoScript.Runners
 
         #region Internal Implementation
 
-        /// <summary>
-        /// This is being called currently as it uses the Expression interpreter which does not
-        /// work well with delta execution. Instead we are currently inspecting into the VM using Mirrors
-        /// </summary>
-        /// <param name="varname"></param>
-        /// <returns></returns>
+
         private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(string varname)
         {
             Validity.Assert(null != vmState);
@@ -544,6 +757,19 @@ namespace ProtoScript.Runners
             const int blockID = 0;
 
             return vmState.LookupName(varname, blockID);
+        }
+
+        private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(uint nodeId)
+        {
+            //ProtoCore.DSASM.Constants.kInvalidIndex tells the UpdateUIDForCodeblock to look for the lastindex for given codeblock
+            nodeId = graphCompiler.UpdateUIDForCodeblock(nodeId, ProtoCore.DSASM.Constants.kInvalidIndex);
+            Validity.Assert(null != vmState);
+            string varname = graphCompiler.GetVarName(nodeId);
+            if (string.IsNullOrEmpty(varname))
+            {
+                return null;
+            }
+            return InternalGetNodeValue(varname);
         }
 
         private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(Guid nodeGuid)
@@ -710,6 +936,7 @@ namespace ProtoScript.Runners
         }
 
 
+
         /// <summary>
         /// Takes in a Subtree to delete or modify and marks the corresponding gragh nodes in DS inactive.
         /// This is equivalent to removing them from the VM
@@ -764,11 +991,6 @@ namespace ProtoScript.Runners
             return code;
         }
 
-        /// <summary>
-        /// Re-initializes the LiveRunner to reset the VM 
-        /// Used temporarily when importing libraries on-demand during delta execution
-        /// Will be deprecated once this is supported by the core language
-        /// </summary>
         public void ReInitializeLiveRunner()
         {
             runner = new ProtoScriptTestRunner();
@@ -867,6 +1089,46 @@ namespace ProtoScript.Runners
             CompileAndExecuteForDeltaExecution(deltaAstList);
         }
 
+
+        private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
+        {
+            Validity.Assert(null != runner);
+            Validity.Assert(null != graphCompiler);
+
+            if (syncData.AddedNodes.Count == 0 &&
+                syncData.ModifiedNodes.Count == 0 &&
+                syncData.RemovedNodes.Count == 0)
+            {
+                code = "";
+                ResetVMForDeltaExecution();
+                return;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Begin SyncInternal: {0}", syncData);
+                GraphToDSCompiler.GraphBuilder g = new GraphBuilder(syncData, graphCompiler);
+                code = g.BuildGraphDAG();
+
+                System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
+
+                //List<string> deletedVars = new List<string>();
+                ResetVMForDeltaExecution();
+
+                //Synchronize the core configuration before compilation and execution.
+                if (syncCoreConfigurations)
+                {
+                    SyncCoreConfigurations(runnerCore, executionOptions);
+                    syncCoreConfigurations = false;
+                }
+
+                bool succeeded = CompileAndExecute(code);
+                if (succeeded)
+                {
+                    graphCompiler.ResetPropertiesForNextExecution();
+                }
+            }
+        }
+
         private void SynchronizeInternal(string code)
         {
             runnerCore.Options.IsDeltaCompile = true;
@@ -884,595 +1146,5 @@ namespace ProtoScript.Runners
             }
         }
         #endregion
-    }
-
-    namespace Obsolete
-    {
-        public enum EventStatus
-        {
-            OK,
-            Error,
-            Warning
-        }
-
-        [Obsolete("This interface is obsolete, use the one that defined in ProtoScript.Runner instead", false)]
-        public interface ILiveRunner
-        {
-            ProtoCore.Core Core { get; }
-
-            void UpdateGraph(GraphToDSCompiler.SynchronizeData syncData);
-            void BeginUpdateGraph(GraphToDSCompiler.SynchronizeData syncData);
-            void BeginConvertNodesToCode(List<SnapshotNode> snapshotNodes);
-
-            void BeginQueryNodeValue(uint nodeId);
-
-            ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId);
-            ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName);
-            void BeginQueryNodeValue(List<uint> nodeIds);
-            
-            event NodeValueReadyEventHandler NodeValueReady;
-            event GraphUpdateReadyEventHandler GraphUpdateReady;
-            event NodesToCodeCompletedEventHandler NodesToCodeCompleted;
-        }
-
-        [Obsolete("This class is obsolete", false)]
-        public partial class LiveRunner : ILiveRunner
-        {
-            /// <summary>
-            ///  These are configuration parameters passed by host application to be consumed by geometry library and persistent manager implementation. 
-            /// </summary>
-            public class Options
-            {
-                /// <summary>
-                /// The configuration parameters that needs to be passed to
-                /// different applications.
-                /// </summary>
-                public Dictionary<string, object> PassThroughConfiguration;
-
-                /// <summary>
-                /// The path of the root graph/module
-                /// </summary>
-                public string RootModulePathName;
-
-                /// <summary>
-                /// List of search directories to resolve any file reference
-                /// </summary>
-                public List<string> SearchDirectories;
-
-                /// <summary>
-                /// If the Interpreter mode is true, the LiveRunner takes in code statements as input strings
-                /// and not SyncData
-                /// </summary>
-                public bool InterpreterMode = false;
-            }
-
-            private Dictionary<uint, string> GetModifiedGuidList()
-            {
-                // Retrieve the actual modified nodes 
-                // Execution is complete, get all the modified guids 
-                // Get the modified symbol names from the VM
-                List<string> modifiedNames = this.runnerCore.Rmem.GetModifiedSymbolString();
-                Dictionary<uint, string> modfiedGuidList = new Dictionary<uint, string>();
-                foreach (string name in modifiedNames)
-                {
-                    // Get the uid of the modified symbol
-                    if (this.graphCompiler.mapModifiedName.ContainsKey(name))
-                    {
-                        uint id = this.graphCompiler.mapModifiedName[name];
-                        if (!modfiedGuidList.ContainsKey(id))
-                        {
-                            // Append the modified guid into the modified list
-                            modfiedGuidList.Add(this.graphCompiler.mapModifiedName[name], name);
-                        }
-                    }
-                }
-                return modfiedGuidList;
-            }
-
-            private void ResetModifiedSymbols()
-            {
-                this.runnerCore.Rmem.ResetModifedSymbols();
-            }
-
-            private SynchronizeData CreateSynchronizeDataForGuidList(Dictionary<uint, string> modfiedGuidList)
-            {
-                Dictionary<uint, SnapshotNode> modifiedGuids = new Dictionary<uint, SnapshotNode>();
-                SynchronizeData syncDataReturn = new SynchronizeData();
-
-                if (modfiedGuidList != null)
-                {
-                    //foreach (uint guid in modfiedGuidList)
-                    foreach (var kvp in modfiedGuidList)
-                    {
-                        // Get the uid recognized by the graphIDE
-                        uint guid = kvp.Key;
-                        string name = kvp.Value;
-                        SnapshotNode sNode = new SnapshotNode(this.graphCompiler.GetRealUID(guid), SnapshotNodeType.Identifier, name);
-                        if (!modifiedGuids.ContainsKey(sNode.Id))
-                        {
-                            modifiedGuids.Add(sNode.Id, sNode);
-                        }
-                    }
-
-                    foreach (KeyValuePair<uint, SnapshotNode> kvp in modifiedGuids)
-                        syncDataReturn.ModifiedNodes.Add(kvp.Value);
-                }
-
-                return syncDataReturn;
-            }
-
-            private ProtoScriptTestRunner runner;
-            private ProtoRunner.ProtoVMState vmState;
-            private GraphToDSCompiler.GraphCompiler graphCompiler;
-            private ProtoCore.Core runnerCore = null;
-            public ProtoCore.Core Core
-            {
-                get
-                {
-                    return runnerCore;
-                }
-                private set
-                {
-                    runnerCore = value;
-                }
-            }
-
-            private ProtoCore.Options coreOptions = null;
-            private Options executionOptions = null;
-            private bool syncCoreConfigurations = false;
-            private int deltaSymbols = 0;
-            private ProtoCore.CompileTime.Context staticContext = null;
-
-            private readonly Object operationsMutex = new object();
-
-            private Queue<Task> taskQueue;
-
-            private Thread workerThread;
-
-            public LiveRunner()
-            {
-                InitRunner(new Options());
-            }
-
-            public LiveRunner(Options options)
-            {
-                InitRunner(options);
-            }
-
-
-            public GraphToDSCompiler.GraphCompiler GetCurrentGraphCompilerInstance()
-            {
-                return graphCompiler;
-            }
-
-            private void InitRunner(Options options)
-            {
-                graphCompiler = GraphToDSCompiler.GraphCompiler.CreateInstance();
-                graphCompiler.SetCore(GraphUtilities.GetCore());
-                runner = new ProtoScriptTestRunner();
-
-                executionOptions = options;
-                InitOptions();
-                InitCore();
-
-
-                taskQueue = new Queue<Task>();
-
-                workerThread = new Thread(new ThreadStart(TaskExecMethod));
-
-
-                workerThread.IsBackground = true;
-                workerThread.Start();
-
-                staticContext = new ProtoCore.CompileTime.Context();
-            }
-
-            private void InitOptions()
-            {
-
-                // Build the options required by the core
-                Validity.Assert(coreOptions == null);
-                coreOptions = new ProtoCore.Options();
-                coreOptions.GenerateExprID = true;
-                coreOptions.IsDeltaExecution = true;
-                coreOptions.BuildOptErrorAsWarning = true;
-
-                coreOptions.WebRunner = false;
-                coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;
-                //coreOptions.DumpByteCode = true;
-                //coreOptions.Verbose = true;
-
-                // This should have been set in the consturctor
-                Validity.Assert(executionOptions != null);
-            }
-
-            private void InitCore()
-            {
-                Validity.Assert(coreOptions != null);
-
-                // Comment Jun:
-                // It must be guaranteed that in delta exeuction, expression id's must not be autogerated
-                // expression Id's must be propagated from the graphcompiler to the DS codegenerators
-                //Validity.Assert(coreOptions.IsDeltaExecution && !coreOptions.GenerateExprID);
-
-                runnerCore = new ProtoCore.Core(coreOptions);
-
-                SyncCoreConfigurations(runnerCore, executionOptions);
-
-
-                runnerCore.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(runnerCore));
-                runnerCore.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(runnerCore));
-                runnerCore.FFIPropertyChangedMonitor.FFIPropertyChangedEventHandler += FFIPropertyChanged;
-                vmState = null;
-            }
-
-            private void FFIPropertyChanged(FFIPropertyChangedEventArgs arg)
-            {
-                lock (taskQueue)
-                {
-                    taskQueue.Enqueue(new PropertyChangedTask(this, arg.hostGraphNode));
-                }
-            }
-
-            private static void SyncCoreConfigurations(ProtoCore.Core core, Options options)
-            {
-                if (null == options)
-                    return;
-                //update the root module path name, if set.
-                if (!string.IsNullOrEmpty(options.RootModulePathName))
-                    core.Options.RootModulePathName = options.RootModulePathName;
-                //then update the search path, if set.
-                if (null != options.SearchDirectories)
-                    core.Options.IncludeDirectories = options.SearchDirectories;
-
-                //Finally update the pass thru configuration values
-                if (null == options.PassThroughConfiguration)
-                    return;
-                foreach (var item in options.PassThroughConfiguration)
-                {
-                    core.Configurations[item.Key] = item.Value;
-                }
-            }
-
-
-            public void SetOptions(Options options)
-            {
-                executionOptions = options;
-                syncCoreConfigurations = true; //request syncing the configuration
-            }
-
-
-            #region Public Live Runner Events
-
-            public event NodeValueReadyEventHandler NodeValueReady = null;
-            public event GraphUpdateReadyEventHandler GraphUpdateReady = null;
-            public event NodesToCodeCompletedEventHandler NodesToCodeCompleted = null;
-
-            #endregion
-
-            /// <summary>
-            /// Push new synchronization data, returns immediately and will
-            /// trigger a GraphUpdateReady when the value when the execution
-            /// is completed
-            /// </summary>
-            /// <param name="syncData"></param>
-            public void BeginUpdateGraph(SynchronizeData syncData)
-            {
-                lock (taskQueue)
-                {
-                    taskQueue.Enqueue(
-                        new UpdateGraphTask(syncData, this));
-                }
-
-                //Todo(Luke) add a Monitor queue to prevent having to have the 
-                //work poll
-            }
-
-            /// <summary>
-            /// Takes in a list of SnapshotNode objects, condensing them into one 
-            /// or more SnapshotNode objects which caller can then turn into a more 
-            /// compact representation of the former SnapshotNode objects.
-            /// </summary>
-            /// <param name="snapshotNodes">A list of source SnapshotNode objects 
-            /// from which the resulting list of SnapshotNode is to be computed.
-            /// </param>
-            public void BeginConvertNodesToCode(List<SnapshotNode> snapshotNodes)
-            {
-                if (null == snapshotNodes || (snapshotNodes.Count <= 0))
-                    return; // Do nothing, there's no nodes to be converted.
-
-                lock (taskQueue)
-                {
-                    taskQueue.Enqueue(
-                        new ConvertNodesToCodeTask(snapshotNodes, this));
-                }
-            }
-
-            /// <summary>
-            /// Query For a node value this will trigger a NodeValueReady callback
-            /// when the value is available
-            /// </summary>
-            /// <param name="nodeId"></param>
-            public void BeginQueryNodeValue(uint nodeId)
-            {
-                lock (taskQueue)
-                {
-                    taskQueue.Enqueue(
-                        new NodeValueRequestTask(nodeId, this));
-                }
-            }
-
-            /// <summary>
-            /// Query For a node value this will trigger a NodeValueReady callback
-            /// when the value is available
-            /// This version is more efficent than calling the BeginQueryNodeValue(uint)
-            /// repeatedly 
-            /// </summary>
-            /// <param name="nodeId"></param>
-            public void BeginQueryNodeValue(List<uint> nodeIds)
-            {
-                lock (taskQueue)
-                {
-                    foreach (uint nodeId in nodeIds)
-                    {
-                        taskQueue.Enqueue(
-                            new NodeValueRequestTask(nodeId, this));
-                    }
-                }
-            }
-
-            /// <summary>
-            /// TODO: Deprecate - This will be replaced with the overload that takes in a Guid type
-            /// Query for a node value. This will block until the value is available.
-            /// This uses the expression interpreter to evaluate a node variable's value.
-            /// It will only serviced when all ASync calls have been completed
-            /// </summary>
-            /// <param name="nodeId"></param>
-            /// <returns></returns>
-            public ProtoCore.Mirror.RuntimeMirror QueryNodeValue(uint nodeId)
-            {
-                while (true)
-                {
-                    lock (taskQueue)
-                    {
-                        //Spin waiting for the queue to be empty
-                        if (taskQueue.Count == 0)
-                        {
-
-                            //No entries and we have the lock
-                            //Synchronous query to get the node
-
-                            return InternalGetNodeValue(nodeId);
-                        }
-                    }
-                    Thread.Sleep(0);
-                }
-
-            }
-
-            /// <summary>
-            /// Query for a node value given its variable name. This will block until the value is available.
-            /// This uses the expression interpreter to evaluate a node variable's value.
-            /// It will only serviced when all ASync calls have been completed
-            /// </summary>
-            /// <param name="nodeId"></param>
-            /// <returns></returns>
-            public ProtoCore.Mirror.RuntimeMirror QueryNodeValue(string nodeName)
-            {
-                while (true)
-                {
-                    lock (taskQueue)
-                    {
-                        //Spin waiting for the queue to be empty
-                        if (taskQueue.Count == 0)
-                        {
-
-                            //No entries and we have the lock
-                            //Synchronous query to get the node
-
-                            return InternalGetNodeValue(nodeName);
-                        }
-                    }
-                    Thread.Sleep(0);
-                }
-
-            }
-            
-    
-    public void UpdateGraph(SynchronizeData syndData)
-    {
-        
-            
-            while (true)
-            {
-                lock (taskQueue)
-                {
-                    //Spin waiting for the queue to be empty
-                    if (taskQueue.Count == 0)
-                    {
-                        string code = null;
-                            SynchronizeInternal(syndData, out code);
-                            return;
-                            
-                    }
-                }
-                Thread.Sleep(0);
-            }
-    }
-
-    //Secondary thread
-    private void TaskExecMethod()
-    {
-        while (true)
-        {
-            Task task = null;
-                
-                lock (taskQueue)
-                {
-                    if (taskQueue.Count > 0)
-                        task = taskQueue.Dequeue();
-                }
-            
-                if (task != null)
-                {
-                    task.Execute();
-                        continue;
-                        
-                }
-            
-                Thread.Sleep(50);
-                
-        }
-        
-    }
-
-    
-    
-#region Internal Implementation
-    
-    
-    private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(string varname)
-    {
-        Validity.Assert(null != vmState);
-            
-            // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
-            const int blockID = 0;
-            
-            return vmState.LookupName(varname, blockID);
-    }
-
-    private ProtoCore.Mirror.RuntimeMirror InternalGetNodeValue(uint nodeId)
-    {
-        //ProtoCore.DSASM.Constants.kInvalidIndex tells the UpdateUIDForCodeblock to look for the lastindex for given codeblock
-        nodeId = graphCompiler.UpdateUIDForCodeblock(nodeId, ProtoCore.DSASM.Constants.kInvalidIndex);
-            Validity.Assert(null != vmState);
-            string varname = graphCompiler.GetVarName(nodeId);
-            if (string.IsNullOrEmpty(varname))
-            {
-                return null;
-            }
-        return InternalGetNodeValue(varname);
-    }
-
-    private bool Compile(string code, out int blockId)
-    {
-        Dictionary<string, bool> execFlagList = null;
-            if (graphCompiler != null)
-                execFlagList = graphCompiler.ExecutionFlagList;
-                    
-                    staticContext.SetData(code, new Dictionary<string, object>(), execFlagList);
-                    
-                    bool succeeded = runner.Compile(staticContext, runnerCore, out blockId);
-                    if (succeeded)
-                    {
-                        // Regenerate the DS executable
-                        runnerCore.GenerateExecutable();
-                            
-                            // Update the symbol tables
-                            // TODO Jun: Expand to accomoadate the list of symbols
-                            //staticContext.symbolTable = runnerCore.DSExecutable.runtimeSymbols[0];
-                    }
-        return succeeded;
-    }
-
-
-    
-    private ProtoRunner.ProtoVMState Execute()
-    {
-        // runnerCore.GlobOffset is the number of global symbols that need to be allocated on the stack
-        // The argument to Reallocate is the number of ONLY THE NEW global symbols as the stack needs to accomodate this delta
-        int newSymbols = runnerCore.GlobOffset - deltaSymbols;
-            
-            // If there are lesser symbols to allocate for this run, then it means nodes were deleted.
-            // TODO Jun: Determine if it is safe to just leave them in the global stack 
-            //           as no symbols point to this memory location in the stack anyway
-            if (newSymbols >= 0)
-            {
-                runnerCore.Rmem.ReAllocateMemory(newSymbols);
-            }
-        
-            // Store the current number of global symbols
-            deltaSymbols = runnerCore.GlobOffset;
-            
-            // Initialize the runtime context and pass it the execution delta list from the graph compiler
-            ProtoCore.Runtime.Context runtimeContext = new ProtoCore.Runtime.Context();
-            
-            if (graphCompiler != null)
-                runtimeContext.execFlagList = graphCompiler.ExecutionFlagList;
-                    
-                    runner.Execute(runnerCore, runtimeContext);
-                    
-                    // ExecutionMirror mirror = new ExecutionMirror(runnerCore.CurrentExecutive.CurrentDSASMExec, runnerCore);
-                    
-                    return new ProtoRunner.ProtoVMState(runnerCore);
-    }
-
-    private bool CompileAndExecute(string code)
-    {
-        // TODO Jun: Revisit all the Compile functions and remove the blockId out argument
-        int blockId = ProtoCore.DSASM.Constants.kInvalidIndex;
-            bool succeeded = Compile(code, out blockId);
-            if (succeeded)
-            {
-                runnerCore.RunningBlock = blockId;
-                    vmState = Execute();
-            }
-        return succeeded;
-    }
-
-
-    private void ResetVMForExecution()
-    {
-        runnerCore.ResetForExecution();
-    }
-
-    private void ResetVMForDeltaExecution()
-    {
-        runnerCore.ResetForDeltaExecution();
-    }
-
-
-    private void SynchronizeInternal(GraphToDSCompiler.SynchronizeData syncData, out string code)
-    {
-        Validity.Assert(null != runner);
-            Validity.Assert(null != graphCompiler);
-            
-            if (syncData.AddedNodes.Count == 0 &&
-                    syncData.ModifiedNodes.Count == 0 &&
-                    syncData.RemovedNodes.Count == 0)
-            {
-                code = "";
-                    ResetVMForDeltaExecution();
-                    return;
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("Begin SyncInternal: {0}", syncData);
-                    GraphToDSCompiler.GraphBuilder g = new GraphBuilder(syncData, graphCompiler);
-                    code = g.BuildGraphDAG();
-                    
-                    System.Diagnostics.Debug.WriteLine("SyncInternal => " + code);
-                    
-                    //List<string> deletedVars = new List<string>();
-                    ResetVMForDeltaExecution();
-                    
-                    //Synchronize the core configuration before compilation and execution.
-                    if (syncCoreConfigurations)
-                    {
-                        SyncCoreConfigurations(runnerCore, executionOptions);
-                            syncCoreConfigurations = false;
-                    }
-                
-                    bool succeeded = CompileAndExecute(code);
-                    if (succeeded)
-                    {
-                        graphCompiler.ResetPropertiesForNextExecution();
-                    }
-            }
-    }
-
-   
-#endregion
-        }
     }
 }
