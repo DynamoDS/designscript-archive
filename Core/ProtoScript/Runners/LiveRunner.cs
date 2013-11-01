@@ -95,6 +95,7 @@ namespace ProtoScript.Runners
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
         event NodesToCodeCompletedEventHandler NodesToCodeCompleted;
+        
     }
 
     public partial class LiveRunner : ILiveRunner

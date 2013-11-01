@@ -923,6 +923,7 @@ namespace ProtoCore.AST.AssociativeAST
             ReturnType = new Type();
             ReturnType.Initialize();
             IsBuiltIn = false;
+            Singnature = new ArgumentSignatureNode();
         }
 
         public FunctionDefinitionNode(FunctionDefinitionNode rhs)
