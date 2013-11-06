@@ -239,7 +239,9 @@ namespace ProtoCore
         protected virtual void EmitIdentifierNode(ProtoCore.AST.AssociativeAST.IdentifierNode identNode)
         {
             Validity.Assert(null != identNode);
-            EmitCode(identNode.Value);
+            string identName = identNode.Value;
+            identName = identName.Replace('%', ' ');
+            EmitCode(identName);
             EmitArrayNode(identNode.ArrayDimensions);
         }
 
