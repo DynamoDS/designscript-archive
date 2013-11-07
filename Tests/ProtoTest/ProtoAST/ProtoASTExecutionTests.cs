@@ -369,6 +369,204 @@ namespace ProtoTest.ProtoAST
         }
 
         [Test]
+        public void TestProtASTExecute_ClassDecl_PropertyAccess_01()
+        {
+
+            //  class bar
+            //  {
+            //       f : var;
+            //  }
+            //
+            //  p = bar.bar();
+            //  p.f = 10;
+            //  a = p.f;
+
+
+            // Create the class node AST
+            ProtoCore.AST.AssociativeAST.ClassDeclNode classDefNode = new ProtoCore.AST.AssociativeAST.ClassDeclNode();
+            classDefNode.className = "bar";
+
+            // Create the property AST
+            ProtoCore.AST.AssociativeAST.VarDeclNode varDeclNode = new ProtoCore.AST.AssociativeAST.VarDeclNode();
+            varDeclNode.Name = "f";
+            varDeclNode.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
+            varDeclNode.ArgumentType = new ProtoCore.Type()
+            {
+                Name = "int",
+                IsIndexable = false,
+                rank = 0,
+                UID = (int)ProtoCore.PrimitiveType.kTypeInt
+            };
+            classDefNode.varlist.Add(varDeclNode);
+
+
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(classDefNode);
+
+
+            // p = bar.bar();
+            ProtoCore.AST.AssociativeAST.FunctionCallNode constructorCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            constructorCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListConstrcctorCall = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListConstrcctorCall.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+            identListConstrcctorCall.RightNode = constructorCall;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtInitClass = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("p"),
+                identListConstrcctorCall,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtInitClass);
+
+
+            //  p.f = 10;
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListPropertySet = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListPropertySet.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("p");
+            identListPropertySet.RightNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtPropertySet = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                identListPropertySet,
+                new ProtoCore.AST.AssociativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtPropertySet);
+
+
+            //  a = p.f; 
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListPropertyAccess = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListPropertyAccess.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("p");
+            identListPropertyAccess.RightNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtPropertyAccess = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                identListPropertyAccess,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtPropertyAccess);
+
+            // Execute the AST
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 10);
+        }
+
+        [Test]
+        public void TestProtASTExecute_ClassDecl_MemFunctionCall_01()
+        {
+
+            //  class bar
+            //  {
+            //       f : var
+            //       def foo (b:int)
+            //       {
+            //           b = 10;
+            //           return = b + 10;
+            //       }
+            //  }
+            //
+            //  p = bar.bar();
+            //  a = p.foo();
+
+
+            ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
+
+
+            // Build the function body
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.assign);
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnExpr = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.add);
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(ProtoCore.DSDefinitions.Keyword.Return),
+                returnExpr,
+                ProtoCore.DSASM.Operator.assign);
+            cbn.Body.Add(assignment1);
+            cbn.Body.Add(returnNode);
+
+
+            // Build the function definition foo
+            const string functionName = "foo";
+            ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
+            funcDefNode.Name = functionName;
+            funcDefNode.FunctionBody = cbn;
+
+            // Function Return type
+            ProtoCore.Type returnType = new ProtoCore.Type();
+            returnType.Initialize();
+            returnType.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
+            returnType.Name = ProtoCore.DSDefinitions.Keyword.Var;
+            funcDefNode.ReturnType = returnType;
+
+            // Create the class node AST
+            ProtoCore.AST.AssociativeAST.ClassDeclNode classDefNode = new ProtoCore.AST.AssociativeAST.ClassDeclNode();
+            classDefNode.className = "bar";
+
+            // Add the member function 'foo'
+            classDefNode.funclist.Add(funcDefNode);
+
+
+            // Create the property AST
+            ProtoCore.AST.AssociativeAST.VarDeclNode varDeclNode = new ProtoCore.AST.AssociativeAST.VarDeclNode();
+            varDeclNode.Name = "f";
+            varDeclNode.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
+            varDeclNode.ArgumentType = new ProtoCore.Type()
+            {
+                Name = "int",
+                IsIndexable = false,
+                rank = 0,
+                UID = (int)ProtoCore.PrimitiveType.kTypeInt
+            };
+            classDefNode.varlist.Add(varDeclNode);
+
+
+            // Add the constructed class AST
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(classDefNode);
+
+
+            // p = bar.bar();
+            ProtoCore.AST.AssociativeAST.FunctionCallNode constructorCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            constructorCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListConstrcctorCall = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListConstrcctorCall.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+            identListConstrcctorCall.RightNode = constructorCall;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtInitClass = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("p"),
+                identListConstrcctorCall,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtInitClass);
+
+            //  a = p.f; 
+
+            ProtoCore.AST.AssociativeAST.FunctionCallNode functionCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            functionCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode("foo");
+
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListFunctionCall = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListFunctionCall.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("p");
+            identListFunctionCall.RightNode = functionCall;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtPropertyAccess = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                identListFunctionCall,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtPropertyAccess);
+
+
+            // Execute the AST
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 20);
+        }
+
+        [Test]
         public void TestCodeGenDS_Assign01()
         {
             // Build the AST trees
@@ -522,6 +720,7 @@ namespace ProtoTest.ProtoAST
             ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
             string code = codegen.GenerateCode();
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
+
             //a = 1800, c = a = 1800
             Obj o = mirror.GetValue("a");
             Assert.IsTrue((Int64)o.Payload == 1800);
@@ -608,10 +807,107 @@ namespace ProtoTest.ProtoAST
 
 
         [Test]
-        public void TestCodeGenDS_ClassDeclNode01()
+        public void TestCodeGenDS_ClassDecl_PropertyAccess_01()
         {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
+
+            //  class bar            //  {            //       f : var;            //  }            //
+            //  p = bar.bar();
+            //  p.f = 10;            //  a = p.f;            
+
+            // Create the class node AST
+            ProtoCore.AST.AssociativeAST.ClassDeclNode classDefNode = new ProtoCore.AST.AssociativeAST.ClassDeclNode();
+            classDefNode.className = "bar";
+
+            // Create the property AST
+            ProtoCore.AST.AssociativeAST.VarDeclNode varDeclNode = new ProtoCore.AST.AssociativeAST.VarDeclNode();
+            varDeclNode.Name = "f";
+            varDeclNode.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
+            varDeclNode.ArgumentType = new ProtoCore.Type()
+            {
+                Name = "int",
+                IsIndexable = false,
+                rank = 0,
+                UID = (int)ProtoCore.PrimitiveType.kTypeInt
+            };
+            classDefNode.varlist.Add(varDeclNode);
+
+
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(classDefNode);
+
+
+            // p = bar.bar();
+            ProtoCore.AST.AssociativeAST.FunctionCallNode constructorCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            constructorCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListConstrcctorCall = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListConstrcctorCall.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+            identListConstrcctorCall.RightNode = constructorCall;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtInitClass = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("p"),
+                identListConstrcctorCall,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtInitClass);
+
+
+            //  p.f = 10;
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListPropertySet = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListPropertySet.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("p");
+            identListPropertySet.RightNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtPropertySet = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                identListPropertySet,
+                new ProtoCore.AST.AssociativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtPropertySet);
+
+
+            //  a = p.f; 
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListPropertyAccess = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListPropertyAccess.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("p");
+            identListPropertyAccess.RightNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtPropertyAccess = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                identListPropertyAccess,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtPropertyAccess);
+
+            // Generate the script
+            ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
+            string code = codegen.GenerateCode();
+
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 10);
+        }
+
+        [Test]
+        public void TestCodeGenDS_ClassDecl_MemFunctionCall_01()
+        {
+
+            //  class bar
+            //  {
+            //       f : var
+            //       def foo (b:int)
+            //       {
+            //           b = 10;
+            //           return = b + 10;
+            //       }
+            //  }
+            //
+            //  p = bar.bar();
+            //  a = p.foo();
+
+
             ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
+
+
+            // Build the function body
             ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
                 new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
                 new ProtoCore.AST.AssociativeAST.IntNode("10"),
@@ -620,74 +916,93 @@ namespace ProtoTest.ProtoAST
                 new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
                 new ProtoCore.AST.AssociativeAST.IntNode("10"),
                 ProtoCore.DSASM.Operator.add);
-            ProtoCore.AST.AssociativeAST.ReturnNode returnNode = new ProtoCore.AST.AssociativeAST.ReturnNode();
-            returnNode.ReturnExpr = returnExpr;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(ProtoCore.DSDefinitions.Keyword.Return),
+                returnExpr,
+                ProtoCore.DSASM.Operator.assign);
             cbn.Body.Add(assignment1);
             cbn.Body.Add(returnNode);
-            ///assigning argSignatureNode to add parameters to the funcDefNode
-            ProtoCore.AST.AssociativeAST.ArgumentSignatureNode argSignatureNode = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-            ProtoCore.AST.AssociativeAST.VarDeclNode varDeclNode1 = new ProtoCore.AST.AssociativeAST.VarDeclNode();
-            ProtoCore.Type type = new ProtoCore.Type();
-            type.Initialize();
-            type.Name = "int";
-            varDeclNode1.ArgumentType = type;
-            ProtoCore.AST.AssociativeAST.IdentifierNode nameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode
-                                                                                                       {
-                                                                                                           Value = "b",
-                                                                                                           Name = "b",
-                                                                                                           datatype = new ProtoCore.Type()
-                                                                                                           {
-                                                                                                               Name = "int",
-                                                                                                               IsIndexable = false,
-                                                                                                               rank = 0,
-                                                                                                               UID = (int)ProtoCore.PrimitiveType.kTypeVar
-                                                                                                           }
-                                                                                                       };
-            varDeclNode1.NameNode = nameNode;
-            argSignatureNode.AddArgument(varDeclNode1);
-            //assigning funcDefNode's Signature Node
+
+
+            // Build the function definition foo
+            const string functionName = "foo";
             ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-            funcDefNode.Name = "foo";
+            funcDefNode.Name = functionName;
             funcDefNode.FunctionBody = cbn;
-            funcDefNode.Singnature = argSignatureNode;
-            /* def foo (b:int)             * {             *   b = 10;             *   return = b + 10;             * }*/
-            //cbn.Body.Clear();
+
+            // Function Return type
+            ProtoCore.Type returnType = new ProtoCore.Type();
+            returnType.Initialize();
+            returnType.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
+            returnType.Name = ProtoCore.DSDefinitions.Keyword.Var;
+            funcDefNode.ReturnType = returnType;
+
+            // Create the class node AST
             ProtoCore.AST.AssociativeAST.ClassDeclNode classDefNode = new ProtoCore.AST.AssociativeAST.ClassDeclNode();
-            classDefNode.funclist.Add(funcDefNode);
             classDefNode.className = "bar";
+
+            // Add the member function 'foo'
+            classDefNode.funclist.Add(funcDefNode);
+
+
+            // Create the property AST
             ProtoCore.AST.AssociativeAST.VarDeclNode varDeclNode = new ProtoCore.AST.AssociativeAST.VarDeclNode();
-            //ProtoCore.AST.AssociativeAST.AssociativeNode nodename = varDeclNode.NameNode;
             varDeclNode.Name = "f";
-            ProtoCore.AST.AssociativeAST.IdentifierNode nameNode_2 = new ProtoCore.AST.AssociativeAST.IdentifierNode()
-            {
-                Value = "f",
-                Name = "f",
-                datatype = new ProtoCore.Type()
-                {
-                    Name = "var",
-                    IsIndexable = false,
-                    rank = 0,
-                    UID = (int)ProtoCore.PrimitiveType.kTypeVar
-                }
-            };
-            varDeclNode.NameNode = nameNode_2;
-            //varDeclNode.NameNode = nodename;
-            //ProtoCore.Type type_2 = varDeclNode.ArgumentType;
-            //type_2.Name = "var";
-            //varDeclNode.ArgumentType = type_2;
+            varDeclNode.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("f");
             varDeclNode.ArgumentType = new ProtoCore.Type()
             {
                 Name = "int",
                 IsIndexable = false,
                 rank = 0,
-                UID = (int)ProtoCore.PrimitiveType.kTypeVar
+                UID = (int)ProtoCore.PrimitiveType.kTypeInt
             };
             classDefNode.varlist.Add(varDeclNode);
-            /*class foo             * {             *      f : var             *      def foo (b:int)             *      {             *          b = 10;             *          return = b + 10;             *      }             * }             */
+
+
+            // Add the constructed class AST
             List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             astList.Add(classDefNode);
+
+
+            // p = bar.bar();
+            ProtoCore.AST.AssociativeAST.FunctionCallNode constructorCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            constructorCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListConstrcctorCall = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListConstrcctorCall.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("bar");
+            identListConstrcctorCall.RightNode = constructorCall;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtInitClass = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("p"),
+                identListConstrcctorCall,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtInitClass);
+
+            //  a = p.f; 
+
+            ProtoCore.AST.AssociativeAST.FunctionCallNode functionCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            functionCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode("foo");
+
+            ProtoCore.AST.AssociativeAST.IdentifierListNode identListFunctionCall = new ProtoCore.AST.AssociativeAST.IdentifierListNode();
+            identListFunctionCall.LeftNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("p");
+            identListFunctionCall.RightNode = functionCall;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode stmtPropertyAccess = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                identListFunctionCall,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(stmtPropertyAccess);
+
+
+            // Generate the script
             ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
             string code = codegen.GenerateCode();
+
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 20);
         }
     }
 
