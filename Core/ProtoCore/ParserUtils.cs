@@ -147,9 +147,17 @@ namespace ProtoCore.Utils
                 int lastCol = lines[lastLine - 1].Length;
                 
                 string stmts = ExtractStatementHelper(code, line, col, lastLine, lastCol+1);
-
-                stmt = stmts.Split(';')[0];
-                return stmt+";";
+                string[] induvidualStmts = stmts.Split(';');
+                stmt = induvidualStmts[0] + ";";
+                if (induvidualStmts.Length > 1)
+                {
+                    foreach (char ch in induvidualStmts[1])
+                        if (ch == ' ' || ch == '\n' || ch == '\t')
+                            stmt += ch.ToString();
+                        else
+                            break;
+                }
+                return stmt;
             }
             if (node is ProtoCore.AST.AssociativeAST.IntNode) 
                 return (node as ProtoCore.AST.AssociativeAST.IntNode).value + ";";
