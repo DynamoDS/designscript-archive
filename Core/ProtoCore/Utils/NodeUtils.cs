@@ -86,6 +86,10 @@ namespace ProtoCore.Utils
             {
                 return new ProtoCore.AST.AssociativeAST.VarDeclNode(rhsNode as ProtoCore.AST.AssociativeAST.VarDeclNode);
             }
+            else if (rhsNode is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode)
+            {
+                return new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode(rhsNode as ProtoCore.AST.AssociativeAST.FunctionDefinitionNode);
+            }
             else if (rhsNode is ProtoCore.AST.AssociativeAST.IntNode)
             {
                 return new ProtoCore.AST.AssociativeAST.IntNode(rhsNode as ProtoCore.AST.AssociativeAST.IntNode);
@@ -110,6 +114,7 @@ namespace ProtoCore.Utils
             {
                 return new ProtoCore.AST.AssociativeAST.NullNode();
             }
+
 
             // Comment Jun: Leaving this as an assert to can catch unhandled nodes
             Validity.Assert(false);
