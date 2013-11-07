@@ -395,7 +395,7 @@ namespace ProtoTest.ProtoAST
         }
 
         [Test]
-        public void TestProtASTExecute_ClassDecl_MemFunctionCall_01()
+        public void TestRoundTrip_ClassDecl_MemFunctionCall_01()
         {
             int result1 = 20;
             ExecutionMirror mirror = null;
