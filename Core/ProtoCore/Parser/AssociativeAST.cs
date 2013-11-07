@@ -763,6 +763,52 @@ namespace ProtoCore.AST.AssociativeAST
             IsImportedClass = false;
         }
 
+        public ClassDeclNode(ClassDeclNode rhs)
+        {
+            IsImportedClass = rhs.IsImportedClass;
+            className = rhs.className;
+
+            Attributes = new List<AssociativeNode>();
+            if (null != rhs.Attributes)
+            {
+                foreach (AssociativeNode attr in rhs.Attributes)
+                {
+                    AssociativeNode tempNode = NodeUtils.Clone(attr);
+                    Attributes.Add(tempNode);
+                }
+            }
+
+            superClass = new List<string>();
+            if (null != rhs.superClass)
+            {
+                superClass.AddRange(rhs.superClass);
+            }
+
+            varlist = new List<AssociativeNode>();
+            if (null != rhs.varlist)
+            {
+                foreach (AssociativeNode varnode in rhs.varlist)
+                {
+                    AssociativeNode tempNode = NodeUtils.Clone(varnode);
+                    varlist.Add(tempNode);
+                }
+            }
+
+            funclist = new List<AssociativeNode>();
+            if (null != rhs.funclist)
+            {
+                foreach (AssociativeNode funcNode in rhs.funclist)
+                {
+                    AssociativeNode tempNode = NodeUtils.Clone(funcNode);
+                    funclist.Add(tempNode);
+                }
+            }
+
+            IsExternLib = rhs.IsExternLib ;
+            ExternLibName = rhs.ExternLibName;
+
+        }
+
         public bool IsImportedClass { get; set; }
         public string className { get; set; }
         public List<AssociativeNode> Attributes { get; set; }
