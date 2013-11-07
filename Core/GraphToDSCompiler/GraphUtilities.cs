@@ -1308,7 +1308,7 @@ namespace GraphToDSCompiler
             return p.root;
         }
 
-        public static bool Parse(string code, out List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
+        public static bool Parse(ref string code, out List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
                 List<String> unboundIdentifiers)
         {
             try
@@ -1324,6 +1324,8 @@ namespace GraphToDSCompiler
                     singleExpression = singleExpression.Replace("%t", tempVariableName);
                     codeToParse += singleExpression;
                 }
+
+                code = codeToParse;
 
                 ProtoCore.BuildStatus buildStatus;
 
