@@ -1327,6 +1327,14 @@ namespace GraphToDSCompiler
 
                 code = codeToParse;
 
+                if (core.BuildStatus.Errors.Count > 0)
+                {
+                    errors = core.BuildStatus.Errors;
+                    warnings = core.BuildStatus.Warnings;
+                    resultNodes = null;
+                    return false;
+                }
+
                 ProtoCore.BuildStatus buildStatus;
 
                 Dictionary<int, List<VariableLine>> tempUnboundIdentifiers = new Dictionary<int, List<VariableLine>>();

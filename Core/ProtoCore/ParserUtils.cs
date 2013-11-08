@@ -140,29 +140,29 @@ namespace ProtoCore.Utils
 
             if (node is ProtoCore.AST.AssociativeAST.IdentifierNode || node is ProtoCore.AST.AssociativeAST.IdentifierListNode
                 || node is ProtoCore.AST.AssociativeAST.FunctionCallNode || node is ProtoCore.AST.AssociativeAST.RangeExprNode
-                || node is ProtoCore.AST.AssociativeAST.StringNode)
+                || node is ProtoCore.AST.AssociativeAST.StringNode || node is ProtoCore.AST.AssociativeAST.IntNode
+                || node is ProtoCore.AST.AssociativeAST.DoubleNode || node is ProtoCore.AST.AssociativeAST.BooleanNode
+                || node is ProtoCore.AST.AssociativeAST.ExprListNode)
             {
                 string[] lines = code.Split('\n');
                 int lastLine = lines.Length;
                 int lastCol = lines[lastLine - 1].Length;
                 
                 string stmts = ExtractStatementHelper(code, line, col, lastLine, lastCol+1);
-
-                stmt = stmts.Split(';')[0];
-                return stmt+";";
+                string[] induvidualStmts = stmts.Split(';');
+                stmt = induvidualStmts[0] + ";";
+                if (induvidualStmts.Length > 1)
+                {
+                    foreach (char ch in induvidualStmts[1])
+                        if (ch == ' ' || ch == '\n' || ch == '\t')
+                            stmt += ch.ToString();
+                        else
+                            break;
+                }
+                return stmt;
             }
-            if (node is ProtoCore.AST.AssociativeAST.IntNode) 
-                return (node as ProtoCore.AST.AssociativeAST.IntNode).value + ";";
-            else if (node is ProtoCore.AST.AssociativeAST.DoubleNode)
-                return (node as ProtoCore.AST.AssociativeAST.DoubleNode).value + ";";
-            else if (node is ProtoCore.AST.AssociativeAST.BooleanNode)
-                return (node as ProtoCore.AST.AssociativeAST.BooleanNode).value + ";";
            
-            stmt = ExtractStatementHelper(code, node.line, node.col, node.endLine, node.endCol);
-            
-            if (node is ProtoCore.AST.AssociativeAST.ExprListNode)
-                return stmt + ";";
-
+            stmt = ExtractStatementHelper(code, line, col, node.endLine, node.endCol);
             return stmt;
         }
 
