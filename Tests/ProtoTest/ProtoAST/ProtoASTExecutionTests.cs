@@ -369,7 +369,7 @@ namespace ProtoTest.ProtoAST
         }
 
         [Test]
-        public void TestProtASTExecute_ClassDecl_PropertyAccess_01()
+        public void TestProtoASTExecute_ClassDecl_PropertyAccess_01()
         {
 
             //  class bar
@@ -451,7 +451,7 @@ namespace ProtoTest.ProtoAST
         }
 
         [Test]
-        public void TestProtASTExecute_ClassDecl_MemFunctionCall_01()
+        public void TestProtoASTExecute_ClassDecl_MemFunctionCall_01()
         {
 
             //  class bar
