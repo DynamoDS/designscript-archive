@@ -427,5 +427,38 @@ v1 = DisposeVerify.x; // 1
             ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
             thisTest.Verify("v1", 1);
         }
+
+        [Test]
+        public void T14_TestGCPointer_AssociativeScope()
+        {
+            string code = @"
+import(""DisposeVerify.ds"");
+
+    DisposeVerify.x = 1;
+    arr = A.A();
+    arr = 1;                // Dispose A.A() 
+    v1 = DisposeVerify.x;   // Reflect the disposed object
+
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
+            thisTest.Verify("v1", 2);
+        }
+
+        [Test]
+        public void T15_TestGCArray_AssociativeScope()
+        {
+            string code = @"
+import(""DisposeVerify.ds"");
+
+    DisposeVerify.x = 1;
+    arr = {A.A()};
+    arr = 1;                // Dispose A.A() 
+    v1 = DisposeVerify.x;   // Reflect the disposed object
+
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code, "", testCasePath);
+            thisTest.Verify("v1", 2);
+        }
+
     }
 }
