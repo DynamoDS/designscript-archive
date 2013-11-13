@@ -556,7 +556,7 @@ namespace GraphToDSCompiler
         }
 
         private static void InsertCommentsInCode(string stmt, ProtoCore.AST.Node node, 
-            ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode, ref int cNodeNum, ref List<string> compiled)
+            ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode, ref int cNodeNum, ref List<string> compiled, string expression)
         {
             if (node == null)
             {
@@ -565,8 +565,8 @@ namespace GraphToDSCompiler
                     ProtoCore.AST.AssociativeAST.CommentNode cnode = commentNode.Body[i] as ProtoCore.AST.AssociativeAST.CommentNode;
                     if (cnode == null)
                         continue;
-
-                    compiled.Add(cnode.Value);
+                    string commentString = ProtoCore.Utils.ParserUtils.ExtractCommentStatementFromCode(expression, cnode);
+                    compiled.Add(commentString);
                 }
                 return;
             }
@@ -583,11 +583,14 @@ namespace GraphToDSCompiler
                 if (cnode == null)
                     continue;
 
+                //Get the statement with the line spaces
+                string commentString = ProtoCore.Utils.ParserUtils.ExtractCommentStatementFromCode(expression, cnode);
+
                 // If comment appears on line before statement
                 if (cnode.line < node.line)
                 {
                     //compiled.Insert(nodeNum + commentCount++, cnode.Value);
-                    compiled.Insert(compiled.Count - 1, cnode.Value);
+                    compiled.Insert(compiled.Count - 1, commentString);
                     cNodeNum = i + 1;
                 }
                 // If comment is on the same lines as the statement
@@ -600,11 +603,11 @@ namespace GraphToDSCompiler
                     if (commentBeforeStmt)
                     {
                         //compiled.Insert(nodeNum + commentCount++, cnode.Value);
-                        compiled.Insert(compiled.Count - 1, cnode.Value);
+                        compiled.Insert(compiled.Count - 1, commentString);
                     }
                     else if (commentAfterStmt)
                     {
-                        compiled.Add(cnode.Value); 
+                        compiled.Add(commentString); 
                     }
                     // Ignore the case where the comment is embedded within a statement
                     cNodeNum = i + 1;
@@ -627,7 +630,7 @@ namespace GraphToDSCompiler
             int cNodeNum = 0;
             if (nodes.Count == 0)
             {
-                InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled);
+                InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled, expression);
                 return compiled;
             }
             
@@ -670,10 +673,10 @@ namespace GraphToDSCompiler
                 }
                 compiled.Add(stmt);
                 
-                InsertCommentsInCode(stmt, node, commentNode, ref cNodeNum, ref compiled);
+                InsertCommentsInCode(stmt, node, commentNode, ref cNodeNum, ref compiled, expression);
                 
             }
-            InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled);
+            InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled, expression);
 
             return compiled;
         }
