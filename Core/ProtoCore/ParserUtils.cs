@@ -113,7 +113,7 @@ namespace ProtoCore.Utils
                 if (index != -1)
                 {
                     string sub;
-                    if (index < input.Length - 2) 
+                    if (index < input.Length - 2)
                     {
                         if (input[index + 1].Equals('\r') && input[index + 2].Equals('\n'))
                         {
@@ -147,8 +147,8 @@ namespace ProtoCore.Utils
                 string[] lines = code.Split('\n');
                 int lastLine = lines.Length;
                 int lastCol = lines[lastLine - 1].Length;
-                
-                string stmts = ExtractStatementHelper(code, line, col, lastLine, lastCol+1);
+
+                string stmts = ExtractStatementHelper(code, line, col, lastLine, lastCol + 1);
                 string[] induvidualStmts = stmts.Split(';');
                 stmt = induvidualStmts[0] + ";";
                 if (induvidualStmts.Length > 1)
@@ -161,7 +161,7 @@ namespace ProtoCore.Utils
                 }
                 return stmt;
             }
-           
+
             stmt = ExtractStatementHelper(code, line, col, node.endLine, node.endCol);
             return stmt;
         }
@@ -224,8 +224,28 @@ namespace ProtoCore.Utils
                     nodes.Add(n);
                 }
             }
-            return nodes; 
+            return nodes;
         }
 
+
+        public static string ExtractCommentStatementFromCode(string code, ProtoCore.AST.AssociativeAST.CommentNode cnode)
+        {
+            string[] lines = code.Split('\n');
+            int lastLine = lines.Length;
+            int lastCol = lines[lastLine - 1].Length;
+            string stmnt = ExtractStatementHelper(code, cnode.line, cnode.col, lastLine, lastCol);
+            
+            int commentLength = cnode.Value.Length;
+            string comment = stmnt.Remove(commentLength);
+            for(int i=commentLength;i<stmnt.Length;i++)
+            {
+                char ch = stmnt[i];
+                if (char.IsWhiteSpace(ch))
+                    comment += ch.ToString();
+                else
+                    break;
+            }
+            return comment;
+        }
     }
 }
