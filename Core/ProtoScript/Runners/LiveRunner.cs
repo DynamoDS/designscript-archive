@@ -719,17 +719,13 @@ namespace ProtoScript.Runners
         /// <returns></returns>
         private List<AssociativeNode> MarkGraphNodesInactive(Subtree subtree)
         {
-            List<AssociativeNode> astNodeList = new List<AssociativeNode>();
             Subtree st;
-            try
+            if (!currentSubTreeList.TryGetValue(subtree.GUID, out st) || st.AstNodes == null)
             {
-                st = currentSubTreeList[subtree.GUID];
-            }
-            catch (KeyNotFoundException)
-            {
-                return astNodeList;
+                return null;
             }
 
+            List<AssociativeNode> astNodeList = new List<AssociativeNode>();
             foreach (var node in st.AstNodes)
             {
                 BinaryExpressionNode bNode = node as BinaryExpressionNode;
@@ -829,8 +825,10 @@ namespace ProtoScript.Runners
             {
                 foreach (var st in syncData.AddedSubtrees)
                 {
-                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
-                    deltaAstList.AddRange(st.AstNodes);
+                    if (st.AstNodes != null)
+                    {
+                        deltaAstList.AddRange(st.AstNodes);
+                    }
 
                     currentSubTreeList.Add(st.GUID, st);
                 }
@@ -840,11 +838,12 @@ namespace ProtoScript.Runners
             {
                 foreach (var st in syncData.DeletedSubtrees)
                 {
-                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
-
-                    var nullNodes = MarkGraphNodesInactive(st);
-                    if (nullNodes.Count > 0)
-                        deltaAstList.AddRange(nullNodes);
+                    if (st.AstNodes != null)
+                    {
+                        var nullNodes = MarkGraphNodesInactive(st);
+                        if (nullNodes != null)
+                            deltaAstList.AddRange(nullNodes);
+                    }
 
                     currentSubTreeList.Remove(st.GUID);
                 }
@@ -854,13 +853,14 @@ namespace ProtoScript.Runners
             {
                 foreach (var st in syncData.ModifiedSubtrees)
                 {
-                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+                    if (st.AstNodes != null)
+                    {
+                        var nullNodes = MarkGraphNodesInactive(st);
+                        if (nullNodes != null)
+                            deltaAstList.AddRange(nullNodes);
 
-                    var nullNodes = MarkGraphNodesInactive(st);
-                    if (nullNodes.Count > 0)
-                        deltaAstList.AddRange(nullNodes);
-
-                    deltaAstList.AddRange(st.AstNodes);
+                        deltaAstList.AddRange(st.AstNodes);
+                    }
                 }
             }
 
