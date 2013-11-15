@@ -236,15 +236,21 @@ namespace ProtoCore.Utils
             string stmnt = ExtractStatementHelper(code, cnode.line, cnode.col, lastLine, lastCol);
             
             int commentLength = cnode.Value.Length;
-            string comment = stmnt.Remove(commentLength);
-            for(int i=commentLength;i<stmnt.Length;i++)
+            string comment = "";
+            if (stmnt.Length > commentLength)
             {
-                char ch = stmnt[i];
-                if (char.IsWhiteSpace(ch))
-                    comment += ch.ToString();
-                else
-                    break;
+                comment = stmnt.Remove(commentLength);
+                for (int i = commentLength; i < stmnt.Length; i++)
+                {
+                    char ch = stmnt[i];
+                    if (char.IsWhiteSpace(ch))
+                        comment += ch.ToString();
+                    else
+                        break;
+                }
             }
+            else
+                comment = stmnt;
             return comment;
         }
     }
