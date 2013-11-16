@@ -3455,10 +3455,16 @@ namespace ProtoAssociative
                             foreach (AssociativeNode aNode in newASTList)
                             {
                                 Debug.Assert(aNode is BinaryExpressionNode);
-                                bnode = aNode as BinaryExpressionNode;
-                                bnode.exprUID = ssaID;
-                                NodeUtils.SetNodeLocation(bnode, node, node);
+
+                                // Set the exprID of the SSA's node
+                                BinaryExpressionNode ssaNode = aNode as BinaryExpressionNode;
+                                ssaNode.exprUID = ssaID;
+                                NodeUtils.SetNodeLocation(ssaNode, node, node);
                             }
+
+                            // Assigne the exprID of the original node 
+                            // (This is the node prior to ssa transformation)
+                            bnode.exprUID = ssaID;
                             newAstList.AddRange(newASTList);
                         }
                         else
