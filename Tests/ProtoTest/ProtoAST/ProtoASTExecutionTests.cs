@@ -369,6 +369,103 @@ namespace ProtoTest.ProtoAST
         }
 
         [Test]
+        public void TestProtoASTExecute_FunctionDefAndCall_03()
+        {
+            //  def add(a : int, b : int)
+            //  {
+            //    return = a + b;
+            //  }
+            //  
+            //  x = add(2,3);
+
+            ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
+
+
+            // Build the function body
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnExpr = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                ProtoCore.DSASM.Operator.add);
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(ProtoCore.DSDefinitions.Keyword.Return),
+                returnExpr,
+                ProtoCore.DSASM.Operator.assign);
+
+            cbn.Body.Add(returnNode);
+
+
+            // Build the function definition foo
+            const string functionName = "foo";
+            ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
+            funcDefNode.Name = functionName;
+            funcDefNode.FunctionBody = cbn;
+
+            // build the args signature
+            funcDefNode.Singnature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
+
+            // Build arg1
+            ProtoCore.AST.AssociativeAST.VarDeclNode arg1Decl = new ProtoCore.AST.AssociativeAST.VarDeclNode();
+            arg1Decl.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+
+            // Build the type of arg1
+            ProtoCore.Type arg1Type = new ProtoCore.Type();
+            arg1Type.Initialize();
+            arg1Type.UID = (int)ProtoCore.PrimitiveType.kTypeInt;
+            arg1Type.Name = ProtoCore.DSDefinitions.Keyword.Int;
+            arg1Decl.ArgumentType = arg1Type;
+            funcDefNode.Singnature.AddArgument(arg1Decl);
+
+            // Build arg2
+            ProtoCore.AST.AssociativeAST.VarDeclNode arg2Decl = new ProtoCore.AST.AssociativeAST.VarDeclNode();
+            arg2Decl.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("b");
+
+            // Build the type of arg2
+            ProtoCore.Type arg2Type = new ProtoCore.Type();
+            arg2Type.Initialize();
+            arg2Type.UID = (int)ProtoCore.PrimitiveType.kTypeInt;
+            arg2Type.Name = ProtoCore.DSDefinitions.Keyword.Int;
+            arg2Decl.ArgumentType = arg2Type;
+            funcDefNode.Singnature.AddArgument(arg2Decl);
+
+
+            // Function Return type
+            ProtoCore.Type returnType = new ProtoCore.Type();
+            returnType.Initialize();
+            returnType.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
+            returnType.Name = ProtoCore.DSDefinitions.Keyword.Var;
+            funcDefNode.ReturnType = returnType;
+
+            // Build the statement that calls the function foo
+            ProtoCore.AST.AssociativeAST.FunctionCallNode functionCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            functionCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode(functionName);
+
+
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(funcDefNode);
+
+            // Function call
+            // Function args
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> args = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            args.Add(new ProtoCore.AST.AssociativeAST.IntNode("2"));
+            args.Add(new ProtoCore.AST.AssociativeAST.IntNode("3"));
+            functionCall.FormalArguments = args;
+
+            // Call the function
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode callstmt = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("x"),
+                functionCall,
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(callstmt);
+
+
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("x");
+            Assert.IsTrue((Int64)o.Payload == 5);
+
+        }
+
+        [Test]
         public void TestProtoASTExecute_ClassDecl_PropertyAccess_01()
         {
 
