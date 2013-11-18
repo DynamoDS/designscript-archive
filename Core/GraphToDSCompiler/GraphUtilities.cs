@@ -1300,12 +1300,19 @@ namespace GraphToDSCompiler
             return p.root;
         }
 
-        public static bool Parse(ref string code, out List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
-                List<String> unboundIdentifiers)
+        public static bool Parse(ref string code, out List<ProtoCore.AST.Node> parsedNodes, out List<ProtoCore.BuildData.ErrorEntry> errors,
+            out List<ProtoCore.BuildData.WarningEntry> warnings, List<String> unboundIdentifiers)
         {
             try
             {
+                
                 List<String> compiledCode = new List<String>();
+                parsedNodes = null;
+                //-----------------------------------------------------------------------------------
+                //--------------------------------Correct the code-----------------------------------
+                //-----------------------------------------------------------------------------------
+                // Use the compile expression to format the code by adding the required %t temp vars
+                // needed for non assignment statements
                 CompileExpression(code, out compiledCode);
 
                 string codeToParse = "";
@@ -1319,27 +1326,32 @@ namespace GraphToDSCompiler
 
                 code = codeToParse;
 
+                //Catch the errors thrown by compile expression, namely function modiferstack and class decl found
                 if (core.BuildStatus.Errors.Count > 0)
                 {
                     errors = core.BuildStatus.Errors;
                     warnings = core.BuildStatus.Warnings;
-                    resultNodes = null;
+                    parsedNodes = null;
                     return false;
                 }
+                //-----------------------------------------------------------------------------------
+
+
+                //-----------------------------------------------------------------------------------
+                //-----------------------------Parse and compile the code----------------------------
+                //-----------------------------------------------------------------------------------
+                //Parse and compile the code to get the result AST nodes as well as any errors or warnings
+                //that were caught by the comiler
 
                 ProtoCore.BuildStatus buildStatus;
-
                 Dictionary<int, List<VariableLine>> tempUnboundIdentifiers = new Dictionary<int, List<VariableLine>>();
+                List<ProtoCore.AST.Node> nodeList = new List<ProtoCore.AST.Node>(); 
 
-                ParseCodeBlockNodeStatements(codeToParse, out tempUnboundIdentifiers, out resultNodes, out buildStatus);
-                //Dictionary<int, List<GraphToDSCompiler.VariableLine>> unboundIdentifiers;
-                //unboundIdentifiers = new Dictionary<int, List<GraphToDSCompiler.VariableLine>>();
-                //List<ProtoCore.AST.Node> resultNodes;
-
+                ParseCodeBlockNodeStatements(codeToParse, out tempUnboundIdentifiers, out nodeList, out buildStatus);
                 errors = buildStatus.Errors;
                 warnings = buildStatus.Warnings;
 
-                //unboundIdentifiers = new List<string>();
+                //Get the unboundIdentifiers from the warnings
                 foreach (KeyValuePair<int, List<VariableLine>> kvp in tempUnboundIdentifiers)
                 {
                     foreach (VariableLine vl in kvp.Value)
@@ -1350,15 +1362,36 @@ namespace GraphToDSCompiler
                         }
                     }
                 }
+                //-----------------------------------------------------------------------------------
+
+
+                //-----------------------------------------------------------------------------------
+                //------------------------------Assign the 'out' variables---------------------------
+                //-----------------------------------------------------------------------------------
+                // Use the parse function to get the parsed nodes to return to the user
+                if (nodeList != null)
+                {
+                    parsedNodes = new List<ProtoCore.AST.Node>();
+                    ProtoCore.AST.AssociativeAST.CodeBlockNode cNode;
+                    parsedNodes = ParserUtils.GetAstNodes(Parse(codeToParse, out cNode));
+                }
+                else
+                {
+                    parsedNodes = null;
+                }
+                //-----------------------------------------------------------------------------------
+
                 return true;
             }
             catch (Exception e)
             {
-                resultNodes = null;
-                errors = null;
-                warnings = null;
-                unboundIdentifiers = null;
-                return false;
+                throw e;
+                //parsedNodes = null;
+                //compiledNodes = null;
+                //errors = null;
+                //warnings = null;
+                //unboundIdentifiers = null;
+                //return false;
             }
         }
 
