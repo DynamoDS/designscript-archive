@@ -186,6 +186,27 @@ namespace GraphToDSCompiler
             rootModulePath = string.Empty;
         }
 
+        /// <summary>
+        /// This function returns the AST form of a variable to be watched
+        /// If input is 'a' then output is binary expression AST 'watch_result_var = a'
+        /// </summary>
+        /// <param name="lhsValueToInspect"></param>
+        /// <returns></returns>
+        public static ProtoCore.AST.AssociativeAST.BinaryExpressionNode GetWatchExpressionAST(string lhsValueToInspect)
+        {
+            if (string.IsNullOrEmpty(lhsValueToInspect))
+            {
+                return null;
+            }
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode bnode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(ProtoCore.DSASM.Constants.kWatchResultVar),
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(lhsValueToInspect),
+                ProtoCore.DSASM.Operator.assign);
+
+            return bnode;
+        }
+
         public static void SetRootModulePath(string rootModulePath)
         {
             if (null == rootModulePath)

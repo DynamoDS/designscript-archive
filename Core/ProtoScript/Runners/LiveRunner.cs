@@ -372,6 +372,7 @@ namespace ProtoScript.Runners
         /// </summary>
         /// <param name="nodeId"></param>
         /// <returns></returns>
+        ///
         public ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName)
         {
             while (true)
@@ -381,19 +382,11 @@ namespace ProtoScript.Runners
                     //Spin waiting for the queue to be empty
                     if (taskQueue.Count == 0)
                     {
-
-                        //No entries and we have the lock
-                        //Synchronous query to get the node
-                        // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
-                        const int blockID = 0;
-                        ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(nodeName, blockID, runnerCore);
-
-                        return runtimeMirror;
+                        return GetWatchValue(nodeName);
                     }
                 }
                 Thread.Sleep(0);
             }
-
         }
 
         /// <summary>
@@ -530,6 +523,18 @@ namespace ProtoScript.Runners
 
 
         #region Internal Implementation
+
+        private ProtoCore.Mirror.RuntimeMirror GetWatchValue(string varname)
+        {
+            runnerCore.Options.IsDeltaCompile = true;
+            CompileAndExecuteForDeltaExecution(new List<AssociativeNode> { GraphUtilities.GetWatchExpressionAST(varname) });
+
+            const int blockID = 0;
+            ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(varname, blockID, runnerCore);
+            return runtimeMirror;
+                
+        }
+       
 
         /// <summary>
         /// This is being called currently as it uses the Expression interpreter which does not
@@ -1346,12 +1351,12 @@ namespace ProtoScript.Runners
     {
         //ProtoCore.DSASM.Constants.kInvalidIndex tells the UpdateUIDForCodeblock to look for the lastindex for given codeblock
         nodeId = graphCompiler.UpdateUIDForCodeblock(nodeId, ProtoCore.DSASM.Constants.kInvalidIndex);
-            Validity.Assert(null != vmState);
-            string varname = graphCompiler.GetVarName(nodeId);
-            if (string.IsNullOrEmpty(varname))
-            {
-                return null;
-            }
+        Validity.Assert(null != vmState);
+        string varname = graphCompiler.GetVarName(nodeId);
+        if (string.IsNullOrEmpty(varname))
+        {
+            return null;
+        }
         return InternalGetNodeValue(varname);
     }
 
