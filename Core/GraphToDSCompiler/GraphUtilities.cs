@@ -163,12 +163,23 @@ namespace GraphToDSCompiler
 
         private static void BuildCore(bool isCodeBlockNode = false, bool isPreloadedAssembly = false)
         {
-            ProtoCore.Options options = new ProtoCore.Options();
-            options.RootModulePathName = rootModulePath;
-            core = new ProtoCore.Core(options);
-            core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
-            core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
+            // Reuse the core for every succeeding run
+            // TODO Jun: Check with UI - what instances need a new core and what needs reuse
+            if (core == null)
+            {
+                ProtoCore.Options options = new ProtoCore.Options();
+                options.RootModulePathName = rootModulePath;
+                core = new ProtoCore.Core(options);
+                core.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core));
+                core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
 
+            }
+            else
+            {
+                //core.ResetDeltaExecution();
+                core.ResetForPrecompilation();
+
+            }
             core.IsParsingPreloadedAssembly = isPreloadedAssembly;
             core.IsParsingCodeBlockNode = isCodeBlockNode;
             core.ParsingMode = ProtoCore.ParseMode.AllowNonAssignment;
