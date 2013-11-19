@@ -2497,7 +2497,7 @@ namespace ProtoAssociative
                 // Right node - Array indexing will be applied to this new identifier
                 firstVarName = identNode.Name;
                 bnode.RightNode = nodeBuilder.BuildIdentfier(firstVarName);
-                //ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
+                ProtoCore.Utils.CoreUtils.CopyDebugData(bnode.RightNode, node);
 
                 // Get the array dimensions of this node
                 arrayDimensions = identNode.ArrayDimensions;

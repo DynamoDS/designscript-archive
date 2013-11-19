@@ -1125,6 +1125,63 @@ z=Point.ByCoordinates(y,a,a);
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
 
         }
-    }
 
+        [Test]
+        public void GraphILTest_ComplexWatch01()
+        {
+            // Build the AST trees
+            // x = 1..10;
+            ProtoCore.AST.AssociativeAST.RangeExprNode rangeExpr = new ProtoCore.AST.AssociativeAST.RangeExprNode();
+            rangeExpr.FromNode = new ProtoCore.AST.AssociativeAST.IntNode("0");
+            rangeExpr.ToNode = new ProtoCore.AST.AssociativeAST.IntNode("5");
+            rangeExpr.StepNode = new ProtoCore.AST.AssociativeAST.IntNode("1");
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                rangeExpr,
+                ProtoCore.DSASM.Operator.assign);
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(assign);
+
+            // Instantiate GraphSyncData
+            List<Subtree> addedList = new List<Subtree>();
+            addedList.Add(new Subtree(astList, System.Guid.NewGuid()));
+            GraphSyncData syncData = new GraphSyncData(null, addedList, null);
+
+            // emit the DS code from the AST tree
+            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            liveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a[1]");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 1);
+        }
+
+        [Test]
+        public void GraphILTest_ComplexWatch02()
+        {
+            // Build the AST trees
+            // x = 1..10;
+            ProtoCore.AST.AssociativeAST.RangeExprNode rangeExpr = new ProtoCore.AST.AssociativeAST.RangeExprNode();
+            rangeExpr.FromNode = new ProtoCore.AST.AssociativeAST.IntNode("10");
+            rangeExpr.ToNode = new ProtoCore.AST.AssociativeAST.IntNode("100");
+            rangeExpr.StepNode = new ProtoCore.AST.AssociativeAST.IntNode("10");
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                rangeExpr,
+                ProtoCore.DSASM.Operator.assign);
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(assign);
+
+            // Instantiate GraphSyncData
+            List<Subtree> addedList = new List<Subtree>();
+            addedList.Add(new Subtree(astList, System.Guid.NewGuid()));
+            GraphSyncData syncData = new GraphSyncData(null, addedList, null);
+
+            // emit the DS code from the AST tree
+            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            liveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a[1 + 7]");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 90);
+        }
+    }
 }
