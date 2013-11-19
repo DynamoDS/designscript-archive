@@ -3666,7 +3666,10 @@ namespace ProtoCore.DSASM
                     StackValue array = rmem.BuildNullArray(0);
                     GCRetain(array);
                     rmem.SetAtSymbol(symbolnode, array);
-                    ArrayUtils.SetValueForIndex(array, 0, value, core);
+                    if (!StackUtils.IsNull(value))
+                    {
+                        ArrayUtils.SetValueForIndex(array, 0, value, core);
+                    }
                     ret = ArrayUtils.SetValueForIndices(array, dimlist, data, t, core);
                 }
             }

@@ -1130,6 +1130,42 @@ r = [Imperative]
         }
 
         [Test]
+        public void TestDictionaryRegressMAGN337()
+        {
+            string code = @"
+     a = { 1, 2, 3 };
+            b = {""x"",""y""};
+                
+def foo(a1 : var[], b1 : var[])
+            {
+
+                a1[b1] = true;
+                return =a1;
+            }
+z1 = foo(a, b);
+r1=z1[""x""];
+r2=z1[""y""];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", true);
+        }
+
+
+        [Test]
+        public void TestDictionaryRegressMAGN619()
+        {
+            string code = @"
+a[null]=5;
+c=Count(a);
+r = a[null];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("c", 0);
+            thisTest.Verify("r", 5);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
