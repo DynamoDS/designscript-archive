@@ -748,18 +748,19 @@ namespace ProtoCore.Utils
                 GCUtils.GCRetain(coercedData, core);
                 return ArrayUtils.SetValueForIndices(array, zippedIndices[0], coercedData, core);
             }
-            else if (value.optype == AddressType.ArrayPointer)
+
+            if (t.rank > 0)
+            {
+                t.rank = t.rank - 1;
+                if (t.rank == 0)
+                {
+                    t.IsIndexable = false;
+                }
+            }
+
+            if (value.optype == AddressType.ArrayPointer)
             {
                 // Replication happens on both side.
-                if (t.rank > 0)
-                {
-                    t.rank = t.rank - 1;
-                    if (t.rank == 0)
-                    {
-                        t.IsIndexable = false;
-                    }
-                }
-
                 HeapElement dataHeapElement = GetHeapElement(value, core);
                 int length = Math.Min(zippedIndices.Length, dataHeapElement.VisibleSize);
 
