@@ -527,10 +527,10 @@ namespace ProtoScript.Runners
         private ProtoCore.Mirror.RuntimeMirror GetWatchValue(string varname)
         {
             runnerCore.Options.IsDeltaCompile = true;
-            CompileAndExecuteForDeltaExecution(new List<AssociativeNode> { GraphUtilities.GetWatchExpressionAST(varname) });
+            CompileAndExecuteForDeltaExecution(GraphUtilities.GetWatchExpression(varname));
 
             const int blockID = 0;
-            ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(varname, blockID, runnerCore);
+            ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(ProtoCore.DSASM.Constants.kWatchResultVar, blockID, runnerCore);
             return runtimeMirror;
                 
         }
