@@ -382,7 +382,10 @@ namespace ProtoScript.Runners
                     //Spin waiting for the queue to be empty
                     if (taskQueue.Count == 0)
                     {
-                        return GetWatchValue(nodeName);
+                        //return GetWatchValue(nodeName);
+                        const int blockID = 0;
+                        ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(nodeName, blockID, runnerCore);
+                        return runtimeMirror;
                     }
                 }
                 Thread.Sleep(0);
