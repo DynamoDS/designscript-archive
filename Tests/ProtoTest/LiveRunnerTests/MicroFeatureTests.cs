@@ -1207,6 +1207,31 @@ z=Point.ByCoordinates(y,a,a);
             return subtree;
         }
 
+        private void AssertValue(string varname, object value)
+        {
+            var mirror = astLiveRunner.InspectNodeValue(varname);
+
+            StackValue svValue = mirror.GetData().GetStackValue();
+            if (value is double)
+            {
+                Assert.AreEqual(svValue.opdata_d, Convert.ToDouble(value));
+            }
+            else if (value is int)
+            {
+                Assert.AreEqual(svValue.opdata, Convert.ToInt64(value));
+            }
+            else if (value is IEnumerable<int>)
+            {
+                var values = (value as IEnumerable<int>).ToList().Select(v => (object)v).ToList();
+                Assert.IsTrue(mirror.GetUtils().CompareArrays(varname, values, typeof(Int64)));
+            }
+            else if (value is IEnumerable<double>)
+            {
+                var values = (value as IEnumerable<double>).ToList().Select(v => (object)v).ToList();
+                Assert.IsTrue(mirror.GetUtils().CompareArrays(varname, values, typeof(double)));
+            }
+        }
+
         [Test]
         public void TestAdd01()
         {
@@ -1274,7 +1299,7 @@ z=Point.ByCoordinates(y,a,a);
         }
 
         [Test]
-        public void TestModify02()
+        public void RegressMAGN750()
         {
             List<string> codes = new List<string>() 
             {
@@ -1302,9 +1327,120 @@ z=Point.ByCoordinates(y,a,a);
                 syncData = new GraphSyncData(null, null, modified);
                 astLiveRunner.UpdateGraph(syncData);
 
-                mirror = astLiveRunner.InspectNodeValue("b");
-                value = mirror.GetData().GetStackValue();
-                Assert.AreEqual(value.opdata, i + 1);
+                Console.WriteLine("b = " + astLiveRunner.InspectNodeValue("b").GetStringData());
+                AssertValue("b", i + 1);
+            }
+        }
+
+        [Test]
+        public void RegressMAGN753()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "t = 1..2;",
+                "x = t; a = Math.Abs(x);",
+                "z = a; pts = Point.ByCoordinates(z, 10, 2); ptsx = pts.X;"
+            };
+            List<Guid> guids = Enumerable.Range(0, codes.Count).Select(_ => System.Guid.NewGuid()).ToList();
+
+            // add two nodes
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+            var added = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            for (int i = 1; i <= 10; ++i)
+            {
+                codes[0] = "t = 0.." + i.ToString() + ";";
+                var modified = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+                syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                Console.WriteLine("a = " + astLiveRunner.InspectNodeValue("a").GetStringData());
+                AssertValue("a", Enumerable.Range(0, i + 1));
+
+                Console.WriteLine("ptsx = " + astLiveRunner.InspectNodeValue("ptsx").GetStringData());
+                AssertValue("ptsx", Enumerable.Range(0, i + 1));
+
+                Console.WriteLine("pts = " + astLiveRunner.InspectNodeValue("pts").GetStringData());
+                Assert.IsTrue(!string.IsNullOrEmpty(astLiveRunner.InspectNodeValue("pts").GetStringData()));
+            }
+        }
+
+        [Test]
+        public void RegressMAGN765()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "a=10;b=20;c=30;",
+                "var1=Point.ByCoordinates(a,b,c);",
+                "var2=Point.ByCoordinates(a,a,c);"
+            };
+            List<Guid> guids = Enumerable.Range(0, codes.Count).Select(_ => System.Guid.NewGuid()).ToList();
+
+            // add two nodes
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+            var added = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            for (int i = 1; i <= 10; ++i)
+            {
+                codes[0] = "a=10;b=20;c=" + i.ToString() + ";";
+                var modified = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+                syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                var var1_value = astLiveRunner.InspectNodeValue("var1").GetStringData();
+                Console.WriteLine("var1 = " + var1_value);
+                Assert.IsTrue(!string.IsNullOrEmpty(var1_value));
+
+                var var2_value = astLiveRunner.InspectNodeValue("var2").GetStringData();
+                Console.WriteLine("var2 = " + var2_value);
+                Assert.IsTrue(!string.IsNullOrEmpty(var2_value));
+            }
+        }
+
+        [Test]
+        public void RegressMAGN773()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "h=1;",
+                "k=h;ll=k+2;",
+                "v=ll;hf=v+2;",
+                "a45=hf;vv=Point.ByCoordinates(a45, 3, 1);"
+            };
+            List<Guid> guids = Enumerable.Range(0, codes.Count).Select(_ => System.Guid.NewGuid()).ToList();
+
+            // add two nodes
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+            var added = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            for (int i = 1; i <= 10; ++i)
+            {
+                codes[0] = "h=1.." + i.ToString() + ";";
+
+                index = Enumerable.Range(0, 2);
+                var modified = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+                syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                var strValue = astLiveRunner.InspectNodeValue("vv").GetStringData();
+                Console.WriteLine("vv = " + strValue);
+                Assert.IsTrue(!string.IsNullOrEmpty(strValue));
+
+                strValue = astLiveRunner.InspectNodeValue("hf").GetStringData();
+                Console.WriteLine("hf = " + strValue);
+                Assert.IsTrue(!string.IsNullOrEmpty(strValue));
             }
         }
     }
