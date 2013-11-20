@@ -667,18 +667,21 @@ namespace GraphToDSCompiler
                 if (n is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode ||
                     n is ProtoCore.AST.AssociativeAST.ClassDeclNode)
                 {
-                    core.BuildStatus.LogSemanticError("Class and function definitions are not supported");
+                    core.BuildStatus.LogSemanticError("Class and function definitions are not supported currently.");
 
                 }
                 else if (n is ProtoCore.AST.AssociativeAST.ModifierStackNode)
                 {
-                    core.BuildStatus.LogSemanticError("Modifier Blocks are not supported currently");
+                    core.BuildStatus.LogSemanticError("Modifier Blocks are not supported currently.");
                 }
-                //else if (n is ProtoCore.AST.AssociativeAST.ImportNode)
-                //{
-                //    core.BuildStatus.LogSemanticError("Import statements are not supported in CodeBlock Nodes. To import a file, please use the Library utility");
-
-                //}
+                else if (n is ProtoCore.AST.AssociativeAST.ImportNode)
+                {
+                    core.BuildStatus.LogSemanticError("Import statements are not supported in CodeBlock Nodes.");
+                }
+                else if (n is ProtoCore.AST.AssociativeAST.LanguageBlockNode)
+                {
+                    core.BuildStatus.LogSemanticError("Language blocks are not supported in CodeBlock Nodes.");
+                }
 
                 string stmt = ProtoCore.Utils.ParserUtils.ExtractStatementFromCode(expression, node);
 
