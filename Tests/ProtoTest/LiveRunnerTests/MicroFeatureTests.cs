@@ -7,6 +7,9 @@ using ProtoCore.Lang;
 using ProtoTest.TD;
 using ProtoScript.Runners;
 using ProtoTestFx.TD;
+using System.Linq;
+using ProtoCore.AST.AssociativeAST;
+using ProtoCore.DSASM;
 
 namespace ProtoTest.LiveRunner
 {
@@ -15,11 +18,23 @@ namespace ProtoTest.LiveRunner
         public TestFrameWork thisTest = new TestFrameWork();
         string testPath = "..\\..\\..\\Scripts\\GraphCompiler\\";
         double tolerance = 0.000001;
+
+        private ILiveRunner astLiveRunner = null;
+        private Random randomGen = new Random();
+
         [SetUp]
         public void Setup()
         {
+            GraphToDSCompiler.GraphUtilities.PreloadAssembly(new List<string> {"ProtoGeometry.dll", "Math.dll"});
+            astLiveRunner = new ProtoScript.Runners.LiveRunner();
+            astLiveRunner.ResetVMAndResyncGraph(new List<string> {"ProtoGeometry.dll", "Math.dll"});
         }
 
+        [TearDown]
+        public void CleanUp()
+        {
+            GraphToDSCompiler.GraphUtilities.CleanUp();
+        }
 
         [Test]
         public void GraphILTest_Assign01()
@@ -1182,6 +1197,115 @@ z=Point.ByCoordinates(y,a,a);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a[1 + 7]");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 90);
+        }
+
+        private Subtree CreateSubTreeFromCode(Guid guid, string code)
+        {
+            CodeBlockNode commentCode;
+            var cbn = GraphToDSCompiler.GraphUtilities.Parse(code, out commentCode) as CodeBlockNode; 
+            var subtree = null == cbn? new Subtree(null, guid) : new Subtree(cbn.Body, guid);
+            return subtree;
+        }
+
+        [Test]
+        public void TestAdd01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "a = 1;",
+                "x = a; y = a; z = a; p = Point.ByCoordinates(x, y, z); px = p.X;",
+            };
+            List<Guid> guids = Enumerable.Range(0, codes.Count).Select(_ => System.Guid.NewGuid()).ToList();
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+
+            int shuffleCount = codes.Count;
+
+            // in which add order, LiveRunner should get the same result.
+            for (int i = 0; i < shuffleCount; ++i)
+            {
+                ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+                liveRunner.ResetVMAndResyncGraph(new List<string> { "ProtoGeometry.dll", "Math.dll" });
+
+                index = index.OrderBy(_ => randomGen.Next());
+                var added = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+                var syncData = new GraphSyncData(null, added, null);
+                liveRunner.UpdateGraph(syncData);
+
+                ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("px");
+                StackValue value = mirror.GetData().GetStackValue();
+                Assert.AreEqual(value.opdata, 1);
+            }
+        }
+
+        [Test]
+        public void TestModify01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "a = 1;",
+                "x = a; y = a; z = a; p = Point.ByCoordinates(x, y, z); px = p.X;",
+            };
+            List<Guid> guids = Enumerable.Range(0, codes.Count).Select(_ => System.Guid.NewGuid()).ToList();
+
+            // add two nodes
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+            var added = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("px");
+            StackValue value = mirror.GetData().GetStackValue();
+            Assert.AreEqual(value.opdata, 1);
+
+            for (int i = 0; i < 10; ++i)
+            {
+                codes[0] = "a = " + i.ToString() + ";";
+                var modified = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+                syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                mirror = astLiveRunner.InspectNodeValue("px");
+                value = mirror.GetData().GetStackValue();
+                Assert.AreEqual(value.opdata, i);
+            }
+        }
+
+        [Test]
+        public void TestModify02()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "a = 1;",
+                "b = a; b = b + 1;",
+            };
+            List<Guid> guids = Enumerable.Range(0, codes.Count).Select(_ => System.Guid.NewGuid()).ToList();
+
+            // add two nodes
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+            var added = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("b");
+            StackValue value = mirror.GetData().GetStackValue();
+            Assert.AreEqual(value.opdata, 2);
+
+            for (int i = 0; i < 10; ++i)
+            {
+                codes[0] = "a = " + i.ToString() + ";";
+                var modified = index.Select(idx => CreateSubTreeFromCode(guids[idx], codes[idx])).ToList();
+
+                syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                mirror = astLiveRunner.InspectNodeValue("b");
+                value = mirror.GetData().GetStackValue();
+                Assert.AreEqual(value.opdata, i + 1);
+            }
         }
     }
 }
