@@ -214,6 +214,531 @@ namespace ProtoTest.ProtoAST
             Assert.IsTrue((Int64)o.Payload == 300);
         }
 
+        #region Array Index
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_LHS_Assign01()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // a[3] = 0;
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode {
+                Expr = new ProtoCore.AST.AssociativeAST.IntNode("3")};
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                nodeALHS,
+                new ProtoCore.AST.AssociativeAST.IntNode("0"),
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Console.WriteLine(o.Payload);
+
+            // Expected: a = {1, 2, 3, 0};
+            int[] expected = { 1, 2, 3, 0 };
+            ProtoCore.DSASM.Mirror.DsasmArray result = (ProtoCore.DSASM.Mirror.DsasmArray)o.Payload;
+            for (int i = 0; i < expected.Length; i++)
+                Assert.AreEqual(expected[i], Convert.ToInt32(result.members[i].Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_LHS_Assign02()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // b = 2;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("2"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // a[b] = b;
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode {
+                Expr = new ProtoCore.AST.AssociativeAST.IdentifierNode("b") };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                nodeALHS,
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Console.WriteLine(o.Payload);
+
+            // expected: a = {1, 2, 2, 4};
+            int[] expected = { 1, 2, 2, 4 };
+            ProtoCore.DSASM.Mirror.DsasmArray result = (ProtoCore.DSASM.Mirror.DsasmArray)o.Payload;
+
+            for (int i = 0; i < expected.Length; i++)
+                Assert.AreEqual(expected[i], Convert.ToInt32(result.members[i].Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_LHS_Assign03()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // b = 3;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("3"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // a[b - 3] = 0;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode operation1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("3"),
+                ProtoCore.DSASM.Operator.sub);
+
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode() {
+                Expr = operation1 };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                nodeALHS,
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("0"),
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Console.WriteLine(o.Payload);
+
+            // expected: a = { 0, 2, 3, 4 };
+            int[] expected = { 0, 2, 3, 4 };
+            ProtoCore.DSASM.Mirror.DsasmArray result = (ProtoCore.DSASM.Mirror.DsasmArray)o.Payload;
+            for (int i = 0; i < expected.Length; i++)
+                Assert.AreEqual(expected[i], Convert.ToInt32(result.members[i].Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_LHS_Assign04()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // b = 4;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("4"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // def foo(){
+            //    return = -2;
+            // }
+            ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(ProtoCore.DSDefinitions.Keyword.Return),
+                new ProtoCore.AST.AssociativeAST.IntNode("-2"),
+                ProtoCore.DSASM.Operator.assign);
+            cbn.Body.Add(returnNode);
+
+            // Build the function definition foo
+            const string functionName = "foo";
+            ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode() {
+                Name = functionName,
+                FunctionBody = cbn };
+
+            // Function Return Type
+            ProtoCore.Type returnType = new ProtoCore.Type();
+            returnType.Initialize();
+            returnType.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
+            returnType.Name = ProtoCore.DSDefinitions.Keyword.Var;
+            funcDefNode.ReturnType = returnType;
+
+            astList.Add(funcDefNode);
+
+            // a[b + foo()] = -1;
+            ProtoCore.AST.AssociativeAST.FunctionCallNode functionCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            functionCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode(functionName);
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode operation1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                functionCall,
+                ProtoCore.DSASM.Operator.add);
+
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode();
+            nodeALHS.ArrayDimensions.Expr = operation1;
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                nodeALHS,
+                new ProtoCore.AST.AssociativeAST.IntNode("-1"),
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Console.WriteLine(o.Payload);
+
+            // expected: a = { 1, 2, -1, 4 };
+            int[] expected = { 1, 2, -1, 4 };
+            ProtoCore.DSASM.Mirror.DsasmArray result = (ProtoCore.DSASM.Mirror.DsasmArray)o.Payload;
+            for (int i = 0; i < expected.Length; i++)
+                Assert.AreEqual(expected[i], Convert.ToInt32(result.members[i].Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_LHS_Assign05()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = { { 0, 1 }, { 3, 4, 5 } };
+            int[] input1 = { 0, 1 };
+            int[] input2 = { 3, 4, 5 };
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> arrayList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            arrayList.Add(CreateExprListNodeFromArray(input1));
+            arrayList.Add(CreateExprListNodeFromArray(input2));
+
+            ProtoCore.AST.AssociativeAST.ExprListNode arrayExpr = new ProtoCore.AST.AssociativeAST.ExprListNode { list = arrayList };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                arrayExpr,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(declareNodeA);
+
+            // b = 2;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("2"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // a[0][b] = b;
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode
+            {
+                Expr = new ProtoCore.AST.AssociativeAST.IntNode("0"),
+                Type = new ProtoCore.AST.AssociativeAST.ArrayNode
+                {
+                    Expr = new ProtoCore.AST.AssociativeAST.IdentifierNode("b")
+                }
+            };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                nodeALHS,
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Console.WriteLine(o.Payload);
+
+            int[] output1 = { 0, 1, 2 };
+            int[] output2 = { 3, 4, 5 };
+
+            // Result should be = { { 0, 1, 2 }, { 3, 4, 5 } };
+            ProtoCore.DSASM.Mirror.DsasmArray result = o.Payload as ProtoCore.DSASM.Mirror.DsasmArray;
+            Assert.IsNotNull( result );
+
+            // First row of array = { 0, 1, 2 }
+            ProtoCore.DSASM.Mirror.DsasmArray array1 = result.members[0].Payload as ProtoCore.DSASM.Mirror.DsasmArray;
+            Assert.IsNotNull( array1 );
+            for (int i = 0; i < output1.Length; i++)
+                Assert.AreEqual(output1[i], Convert.ToInt32(array1.members[i].Payload));
+
+            // Second row of array = { 3, 4, 5 }
+            ProtoCore.DSASM.Mirror.DsasmArray array2 = (ProtoCore.DSASM.Mirror.DsasmArray)result.members[1].Payload;
+            Assert.IsNotNull( array2 );
+            for (int i = 0; i < output2.Length; i++)
+                Assert.AreEqual(output2[i], Convert.ToInt32(array2.members[i].Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_RHS_Assign01()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // b = a[2];
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode {
+                Expr = new ProtoCore.AST.AssociativeAST.IntNode("2") };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                nodeALHS,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("b");
+
+            // Expected: b = 3;
+            Assert.AreEqual(3, Convert.ToInt32(o.Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_RHS_Assign02()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // b = 3;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("3"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // c = a[b];
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeARHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeARHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode {
+                Expr = new ProtoCore.AST.AssociativeAST.IdentifierNode("b") };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeARHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
+                nodeARHS,
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(nodeARHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("c");
+
+            // Expected: c = 4;
+            Assert.AreEqual(4, Convert.ToInt32(o.Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_RHS_Assign03()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // b = -1;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("-1"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // c = a[b + 3];
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode operation1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("3"),
+                ProtoCore.DSASM.Operator.add);
+
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode {
+                Expr = operation1};
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
+                nodeALHS,
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("c");
+
+            // Expected: c = 3
+            Assert.AreEqual(3, Convert.ToInt32(o.Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_RHS_Assign04()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = {1, 2, 3, 4};
+            int[] input = { 1, 2, 3, 4 };
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = CreateDeclareArrayNode("a", input);
+            astList.Add(declareNodeA);
+
+            // b = 4;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("5"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // def foo(){
+            //    return = -4;
+            // }
+            ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(ProtoCore.DSDefinitions.Keyword.Return),
+                new ProtoCore.AST.AssociativeAST.IntNode("-4"),
+                ProtoCore.DSASM.Operator.assign);
+            cbn.Body.Add(returnNode);
+
+            // Build the function definition foo
+            const string functionName = "foo";
+            ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode() {
+                Name = functionName,
+                FunctionBody = cbn };
+
+            // Function Return Type
+            ProtoCore.Type returnType = new ProtoCore.Type();
+            returnType.Initialize();
+            returnType.UID = (int)ProtoCore.PrimitiveType.kTypeVar;
+            returnType.Name = ProtoCore.DSDefinitions.Keyword.Var;
+            funcDefNode.ReturnType = returnType;
+
+            astList.Add(funcDefNode);
+
+            // c = a[b + foo()];
+            ProtoCore.AST.AssociativeAST.FunctionCallNode functionCall = new ProtoCore.AST.AssociativeAST.FunctionCallNode();
+            functionCall.Function = new ProtoCore.AST.AssociativeAST.IdentifierNode(functionName);
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode operation1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                functionCall,
+                ProtoCore.DSASM.Operator.add);
+
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeALHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeALHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode {
+                Expr = operation1 };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeALHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
+                nodeALHS,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeALHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("c");
+            Console.WriteLine(o.Payload);
+
+            // expected: c = 2
+            Assert.AreEqual(2, Convert.ToInt32(o.Payload));
+        }
+
+        [Test]
+        public void TestProtoASTExecute_ArrayIndex_RHS_Assign05()
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+            // a = { { 0, 1 }, { 3, 4, 5 } };
+            int[] input1 = { 0, 1 };
+            int[] input2 = { 2, 3, 4 };
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> arrayList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            arrayList.Add(CreateExprListNodeFromArray(input1));
+            arrayList.Add(CreateExprListNodeFromArray(input2));
+
+            ProtoCore.AST.AssociativeAST.ExprListNode arrayExpr = new ProtoCore.AST.AssociativeAST.ExprListNode { list = arrayList };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeA = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                arrayExpr,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(declareNodeA);
+
+            // b = 2;
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareNodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IntNode("2"),
+                ProtoCore.DSASM.Operator.assign);
+            astList.Add(declareNodeB);
+
+            // c = a[1][b];
+            ProtoCore.AST.AssociativeAST.IdentifierNode nodeARHS = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
+            nodeARHS.ArrayDimensions = new ProtoCore.AST.AssociativeAST.ArrayNode
+            {
+                Expr = new ProtoCore.AST.AssociativeAST.IntNode("1"),
+                Type = new ProtoCore.AST.AssociativeAST.ArrayNode
+                {
+                    Expr = new ProtoCore.AST.AssociativeAST.IdentifierNode("b")
+                }
+            };
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeARHSAssignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
+                nodeARHS,
+                ProtoCore.DSASM.Operator.assign);
+
+            astList.Add(nodeARHSAssignment);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("c");
+
+            // expected : c = 4
+            Assert.AreEqual(4, Convert.ToInt32(o.Payload));
+        }
+
+        private ProtoCore.AST.AssociativeAST.BinaryExpressionNode CreateDeclareArrayNode(string name, int[] intList)
+        {
+            ProtoCore.AST.AssociativeAST.ExprListNode expr = CreateExprListNodeFromArray(intList);
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode declareArrayNode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(name),
+                expr,
+                ProtoCore.DSASM.Operator.assign);
+
+            return declareArrayNode;
+        }
+
+        private ProtoCore.AST.AssociativeAST.ExprListNode CreateExprListNodeFromArray(int[] intList)
+        {
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> listIntNode = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            for (int i = 0; i < intList.Length; i++)
+                listIntNode.Add(new ProtoCore.AST.AssociativeAST.IntNode(intList[i].ToString()));
+
+            ProtoCore.AST.AssociativeAST.ExprListNode expr = new ProtoCore.AST.AssociativeAST.ExprListNode { list = listIntNode };
+
+            return expr;
+        }
+
+        #endregion
+
         [Test]
         public void TestProtoASTExecute_FunctionDefAndCall_01()
         {
