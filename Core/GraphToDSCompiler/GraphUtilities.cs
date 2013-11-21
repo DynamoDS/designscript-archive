@@ -1351,8 +1351,10 @@ namespace GraphToDSCompiler
         }
 
         public static bool Parse(ref string code, out List<ProtoCore.AST.Node> parsedNodes, out List<ProtoCore.BuildData.ErrorEntry> errors,
-            out List<ProtoCore.BuildData.WarningEntry> warnings, List<String> unboundIdentifiers)
+            out List<ProtoCore.BuildData.WarningEntry> warnings, List<String> unboundIdentifiers, out List<String> tempIdentifiers)
         {
+            tempIdentifiers = new List<string>();
+
             try
             {
                 
@@ -1369,6 +1371,8 @@ namespace GraphToDSCompiler
                 for (int i = 0; i < compiledCode.Count; i++)
                 {
                     string tempVariableName = "temp" + System.Guid.NewGuid().ToString().Replace("-", "_");
+                    tempIdentifiers.Add(tempVariableName);
+
                     string singleExpression = compiledCode[i];
                     singleExpression = singleExpression.Replace("%t", tempVariableName);
                     codeToParse += singleExpression;
