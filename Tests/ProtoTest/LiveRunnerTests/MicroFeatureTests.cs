@@ -60,6 +60,8 @@ namespace ProtoTest.LiveRunner
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
         }
 
+        
+
         [Test]
         public void GraphILTest_Assign01a()
         {
@@ -1197,6 +1199,75 @@ z=Point.ByCoordinates(y,a,a);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a[1 + 7]");
             Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 90);
+        }
+
+        [Test]
+        public void GraphILTest_DeletedNode01()
+        {
+            //====================================
+            // Create a = 10 
+            // Execute and verify a = 10
+            // Delete a = 10
+            // Create b = a
+            // Execute and verify b = null
+            //====================================
+
+            // Create a = 10 
+            // Execute and verify a = 10
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                new ProtoCore.AST.AssociativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.assign);
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(assign);
+
+            Guid guid = System.Guid.NewGuid();
+
+            // Instantiate GraphSyncData
+            List<Subtree> addedList = new List<Subtree>();
+            addedList.Add(new Subtree(astList, guid));
+            GraphSyncData syncData = new GraphSyncData(null, addedList, null);
+
+            // emit the DS code from the AST tree
+            ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
+            liveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
+            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+
+
+
+
+            // Delete a = 10
+            List<Subtree> deletedList = new List<Subtree>();
+            deletedList.Add(new Subtree(null, guid));
+            syncData = new GraphSyncData(deletedList, null, null);
+            liveRunner.UpdateGraph(syncData);
+
+
+
+            // Create b = a 
+            // Execute and verify b = null
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign2 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                ProtoCore.DSASM.Operator.assign);
+            astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(assign2);
+
+            guid = System.Guid.NewGuid();
+
+            // Instantiate GraphSyncData
+            addedList = new List<Subtree>();
+            addedList.Add(new Subtree(astList, guid));
+            syncData = new GraphSyncData(null, addedList, null);
+
+            // emit the DS code from the AST tree
+            liveRunner.UpdateGraph(syncData);
+
+            mirror = liveRunner.InspectNodeValue("b");
+            Assert.IsTrue(mirror.GetData().GetStackValue().optype == AddressType.Null);
+
         }
 
         private Subtree CreateSubTreeFromCode(Guid guid, string code)
