@@ -850,11 +850,30 @@ namespace ProtoScript.Runners
                     {
                         var nullNodes = MarkGraphNodesInactive(st);
                         if (nullNodes != null)
+                        {
                             deltaAstList.AddRange(nullNodes);
+                        }
                     }
-
+                    else
+                    {
+                        // Handle the case where only the GUID of the deleted subtree was provided
+                        // Get the cached subtree that is now being deleted
+                        Subtree removeSubTree = new Subtree();
+                        if (currentSubTreeList.TryGetValue(st.GUID, out removeSubTree))
+                        {
+                            if (removeSubTree.AstNodes != null)
+                            {
+                                var nullNodes = MarkGraphNodesInactive(removeSubTree);
+                                if (nullNodes != null)
+                                {
+                                    deltaAstList.AddRange(nullNodes);
+                                }
+                            }
+                        }
+                    }
                     currentSubTreeList.Remove(st.GUID);
                 }
+                
             }
 
             if (syncData.ModifiedSubtrees != null)
