@@ -161,12 +161,20 @@ namespace GraphToDSCompiler
         public static uint runningUID = Constants.UIDStart;
         public static uint GenerateUID() { return runningUID++; }
 
+        private static bool resetCore = true;
+
+        public static void Reset()
+        {
+            CleanUp();
+        }
+
         private static void BuildCore(bool isCodeBlockNode = false, bool isPreloadedAssembly = false)
         {
             // Reuse the core for every succeeding run
             // TODO Jun: Check with UI - what instances need a new core and what needs reuse
-            if (core == null)
+            if (core == null || resetCore)
             {
+                resetCore = false;
                 ProtoCore.Options options = new ProtoCore.Options();
                 options.RootModulePathName = rootModulePath;
                 core = new ProtoCore.Core(options);
@@ -185,10 +193,13 @@ namespace GraphToDSCompiler
             core.ParsingMode = ProtoCore.ParseMode.AllowNonAssignment;
         }
 
-        public static void CleanUp()
+        private static void CleanUp()
         {
+            resetCore = true;
             if (core != null)
+            {
                 core.Cleanup();
+            }
             core = null;
 
             numBuiltInMethods = 0;
