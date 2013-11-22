@@ -82,6 +82,18 @@ namespace ProtoCore
             {
                 EmitIdentifierListNode(node as ProtoCore.AST.AssociativeAST.IdentifierListNode);
             }
+            else if (node is ProtoCore.AST.AssociativeAST.BooleanNode)
+            {
+                EmitBooleanNode(node as ProtoCore.AST.AssociativeAST.BooleanNode);
+            }
+            else if (node is ProtoCore.AST.AssociativeAST.CharNode)
+            {
+                EmitCharNode(node as ProtoCore.AST.AssociativeAST.CharNode);
+            }
+            else if (node is ProtoCore.AST.AssociativeAST.StringNode)
+            {
+                EmitStringNode(node as ProtoCore.AST.AssociativeAST.StringNode);
+            }
             else if (node is ProtoCore.AST.AssociativeAST.IntNode)
             {
                 EmitIntNode(node as ProtoCore.AST.AssociativeAST.IntNode);
@@ -252,6 +264,28 @@ namespace ProtoCore
             DFSTraverse(identList.LeftNode);
             EmitCode(".");
             DFSTraverse(identList.RightNode);
+        }
+
+        protected virtual void EmitCharNode(ProtoCore.AST.AssociativeAST.CharNode charNode)
+        {
+            Validity.Assert(null != charNode);
+            EmitCode("'");
+            EmitCode(charNode.value);
+            EmitCode("'");
+        }
+
+        protected virtual void EmitStringNode(ProtoCore.AST.AssociativeAST.StringNode stringNode)
+        {
+            Validity.Assert(null != stringNode);
+            EmitCode("\"");
+            EmitCode(stringNode.value);
+            EmitCode("\"");
+        }
+
+        protected virtual void EmitBooleanNode(ProtoCore.AST.AssociativeAST.BooleanNode boolNode)
+        {
+            Validity.Assert(null != boolNode);
+            EmitCode(boolNode.value);
         }
 
         protected virtual void EmitIntNode(ProtoCore.AST.AssociativeAST.IntNode intNode)
