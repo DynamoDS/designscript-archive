@@ -215,26 +215,16 @@ namespace ProtoCore
         private void EmitRangeExprNode(AST.AssociativeAST.RangeExprNode rangeExprNode)
         {
             Validity.Assert(null != rangeExprNode);
-            if (rangeExprNode.FromNode is AST.AssociativeAST.IntNode)
-                EmitCode((rangeExprNode.FromNode as AST.AssociativeAST.IntNode).value);
-            else if (rangeExprNode.FromNode is AST.AssociativeAST.IdentifierNode)
-                EmitCode((rangeExprNode.FromNode as AST.AssociativeAST.IdentifierNode).Value);
+            DFSTraverse(rangeExprNode.FromNode);
             EmitCode("..");
-
-            if (rangeExprNode.ToNode is AST.AssociativeAST.IntNode)
-                EmitCode((rangeExprNode.ToNode as AST.AssociativeAST.IntNode).value);
-            else if (rangeExprNode.ToNode is AST.AssociativeAST.IdentifierNode)
-                EmitCode((rangeExprNode.ToNode as AST.AssociativeAST.IdentifierNode).Value);
+            DFSTraverse(rangeExprNode.ToNode);
 
             if (rangeExprNode.StepNode != null)
             {
                 EmitCode("..");
                 if (rangeExprNode.stepoperator == ProtoCore.DSASM.RangeStepOperator.num)
                     EmitCode("#");
-                if (rangeExprNode.StepNode is AST.AssociativeAST.IntNode)
-                    EmitCode((rangeExprNode.StepNode as AST.AssociativeAST.IntNode).value);
-                else if (rangeExprNode.StepNode is AST.AssociativeAST.IdentifierNode)
-                    EmitCode((rangeExprNode.StepNode as AST.AssociativeAST.IdentifierNode).Value);
+                DFSTraverse(rangeExprNode.StepNode);
             }
         }
 
