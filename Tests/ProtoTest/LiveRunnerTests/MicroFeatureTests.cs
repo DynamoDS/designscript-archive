@@ -1369,6 +1369,41 @@ z=Point.ByCoordinates(y,a,a);
             }
         }
 
+        [Test]
+        public void RegressMAGN747()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "a = 1;",
+            };
+            Guid guid = System.Guid.NewGuid();
+
+            // add two nodes
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+            var added = index.Select(idx => CreateSubTreeFromCode(guid, codes[idx])).ToList();
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("a");
+            StackValue value = mirror.GetData().GetStackValue();
+            Assert.AreEqual(value.opdata, 1);
+
+            // Simulate delete a = 1 and add CBN a = 2
+            int newval = 2;
+            codes[0] = "a = " + newval.ToString() + ";";
+            var modified = index.Select(idx => CreateSubTreeFromCode(guid, codes[idx])).ToList();
+
+            List<Subtree> deletedList = new List<Subtree>();
+            deletedList.Add(new Subtree(null, guid));
+
+            syncData = new GraphSyncData(deletedList, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            Console.WriteLine("a = " + astLiveRunner.InspectNodeValue("a").GetStringData());
+            AssertValue("a", newval);
+
+        }
 
         [Test]
         public void RegressMAGN750()
@@ -1404,6 +1439,7 @@ z=Point.ByCoordinates(y,a,a);
             }
         }
 
+       
 
         [Test]
         public void RegressMAGN750_1()
