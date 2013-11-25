@@ -33,7 +33,7 @@ namespace ProtoTest.LiveRunner
         [TearDown]
         public void CleanUp()
         {
-            GraphToDSCompiler.GraphUtilities.CleanUp();
+            GraphToDSCompiler.GraphUtilities.Reset();
         }
 
         [Test]
