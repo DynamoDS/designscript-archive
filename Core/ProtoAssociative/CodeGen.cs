@@ -350,6 +350,12 @@ namespace ProtoAssociative
             for (int n = 0; n < codeBlock.instrStream.dependencyGraph.GraphList.Count; ++n)
             {
                 ProtoCore.AssociativeGraph.GraphNode subNode = codeBlock.instrStream.dependencyGraph.GraphList[n];
+
+                if (!subNode.isActive)
+                {
+                    continue;
+                }
+
                 if (!IsDependentSubNode(node, subNode))
                 {
                     continue;
