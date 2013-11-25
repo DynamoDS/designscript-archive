@@ -640,25 +640,6 @@ namespace GraphToDSCompiler
                     compiled.Insert(compiled.Count - 1, commentString);
                     cNodeNum = i + 1;
                 }
-                // If comment is on the same lines as the statement
-                else if (cnode.line >= node.line && cnode.line <= nodeEndLine)
-                {
-                    bool commentBeforeStmt = cnode.line == node.line && cnode.col < node.col;   // can only be comment block
-                    bool commentAfterStmt = cnode.line == nodeEndLine && cnode.col >= nodeEndCol;
-
-                    // If comment appears either before or after the statement
-                    if (commentBeforeStmt)
-                    {
-                        //compiled.Insert(nodeNum + commentCount++, cnode.Value);
-                        compiled.Insert(compiled.Count - 1, commentString);
-                    }
-                    else if (commentAfterStmt)
-                    {
-                        compiled.Add(commentString); 
-                    }
-                    // Ignore the case where the comment is embedded within a statement
-                    cNodeNum = i + 1;
-                }
                 else // By this point we know the comment appears on a line after the statement
                     break;
             }
