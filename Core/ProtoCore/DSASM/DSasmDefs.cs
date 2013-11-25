@@ -234,6 +234,21 @@ namespace ProtoCore.DSASM
         }
 
         /// <summary>
+        /// Return the symbol representation of an unary operator. E.g., return
+        /// "-" for UnaryOperator.neg
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetUnaryOpSymbol(UnaryOperator op)
+        {
+            if (null == unaryOpSymbolTable)
+            {
+                initUnaryOpSymbolTable();
+            }
+            return unaryOpSymbolTable[op];
+        }
+
+        /// <summary>
         /// Return the string representation of an operator. E.g., return "add"
         /// for Operator.add.
         /// </summary>
@@ -298,11 +313,13 @@ namespace ProtoCore.DSASM
         }
 
         private static Dictionary<Operator, ProtoCore.DSASM.OpCode> opCodeTable;
-        private static Dictionary<UnaryOperator, ProtoCore.DSASM.OpCode> unaryOpCodeTable;
         private static Dictionary<Operator, string> opNameTable;
-        private static Dictionary<UnaryOperator, string> unaryOpNameTable;
         private static Dictionary<Operator, string> opSymbolTable;
         private static Dictionary<Operator, Operator> floatingOpTable;
+
+        private static Dictionary<UnaryOperator, ProtoCore.DSASM.OpCode> unaryOpCodeTable;
+        private static Dictionary<UnaryOperator, string> unaryOpNameTable;
+        private static Dictionary<UnaryOperator, string> unaryOpSymbolTable;
 
         private static void initUnaryOpCodeTable()
         {
@@ -428,6 +445,16 @@ namespace ProtoCore.DSASM
             opSymbolTable.Add(Operator.and, "&&");
             opSymbolTable.Add(Operator.or, "||");
             opSymbolTable.Add(Operator.assign, "=");
+        }
+
+        private static void initUnaryOpSymbolTable()
+        {
+            unaryOpSymbolTable = new Dictionary<UnaryOperator, string>();
+            unaryOpSymbolTable.Add(UnaryOperator.Decrement, "--");
+            unaryOpSymbolTable.Add(UnaryOperator.Increment, "++");
+            unaryOpSymbolTable.Add(UnaryOperator.Neg, "-");
+            unaryOpSymbolTable.Add(UnaryOperator.Negate, "~");
+            unaryOpSymbolTable.Add(UnaryOperator.Not, "!");
         }
     }
 

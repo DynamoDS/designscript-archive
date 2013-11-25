@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using ProtoCore.Utils;
+using ProtoCore.DSASM;
 
 namespace ProtoCore
 {
@@ -139,6 +140,10 @@ namespace ProtoCore
             {
                 EmitRangeExprNode(node as ProtoCore.AST.AssociativeAST.RangeExprNode);
             }
+            else if (node is ProtoCore.AST.AssociativeAST.InlineConditionalNode)
+            {
+                EmitInlineConditionalNode(node as ProtoCore.AST.AssociativeAST.InlineConditionalNode);
+            }
             else if (node is ProtoCore.AST.AssociativeAST.ArrayIndexerNode)
             {
                 EmitArrayIndexerNode(node as ProtoCore.AST.AssociativeAST.ArrayIndexerNode);
@@ -157,12 +162,22 @@ namespace ProtoCore
             }
         }
 
-
         /// <summary>
         /// These functions emit the DesignScript code on the destination stream
         /// </summary>
         /// <param name="identNode"></param>
 #region ASTNODE_CODE_EMITTERS
+
+        private void EmitInlineConditionalNode(AST.AssociativeAST.InlineConditionalNode inlineConditionalNode)
+        {
+            EmitCode("(");
+            DFSTraverse(inlineConditionalNode.ConditionExpression);
+            EmitCode(" ? ");
+            DFSTraverse(inlineConditionalNode.TrueExpression);
+            EmitCode(" : ");
+            DFSTraverse(inlineConditionalNode.FalseExpression);
+            EmitCode(")");
+        }
 
         private void EmitExprListNode(AST.AssociativeAST.ExprListNode exprListNode)
         {
@@ -298,36 +313,28 @@ namespace ProtoCore
             string functionName = (funcCallNode.Function as ProtoCore.AST.AssociativeAST.IdentifierNode).Value;
 
             Validity.Assert(!string.IsNullOrEmpty(functionName));
-            if (functionName.StartsWith("%"))
+            if (CoreUtils.IsInternalMethod(functionName))
             {
                 EmitCode("(");
-                DFSTraverse(funcCallNode.FormalArguments[0], true);
-                switch (functionName)
-                {
-                    case "%add":
-                        EmitCode("+");
-                        break;
-                    case "%sub":
-                        EmitCode("-");
-                        break;
-                    case "%mul":
-                        EmitCode("*");
-                        break;
-                    case "%div":
-                        EmitCode("/");
-                        break;
-                    case "%mod":
-                        EmitCode("%");
-                        break;
-                    case "%Not":
-                        EmitCode("!");
-                        break;
-                }
 
-                if (funcCallNode.FormalArguments.Count > 1)
+                string nameWithoutPrefix = functionName.Substring(DSASM.Constants.kInternalNamePrefix.Count());
+                Operator op;
+                UnaryOperator uop;
+
+                if (Enum.TryParse<Operator>(nameWithoutPrefix, out op))
                 {
+                    DFSTraverse(funcCallNode.FormalArguments[0], true);
+                    string opSymbol = Op.GetOpSymbol(op);
+                    EmitCode(opSymbol);
                     DFSTraverse(funcCallNode.FormalArguments[1], true);
                 }
+                else if (Enum.TryParse<UnaryOperator>(nameWithoutPrefix, out uop))
+                {
+                    string opSymbol = Op.GetUnaryOpSymbol(uop);
+                    EmitCode(opSymbol);
+                    DFSTraverse(funcCallNode.FormalArguments[0], true);
+                }
+               
                 EmitCode(")");
             }
             else
@@ -335,11 +342,11 @@ namespace ProtoCore
                 EmitCode(functionName);
 
                 EmitCode("(");
-                for (int n = 0; n < funcCallNode.FormalArguments.Count; ++n) 
+                for (int n = 0; n < funcCallNode.FormalArguments.Count; ++n)
                 {
                     ProtoCore.AST.AssociativeAST.AssociativeNode argNode = funcCallNode.FormalArguments[n];
                     DFSTraverse(argNode, true);
-                    if (n+1 < funcCallNode.FormalArguments.Count)
+                    if (n + 1 < funcCallNode.FormalArguments.Count)
                     {
                         EmitCode(",");
                     }
