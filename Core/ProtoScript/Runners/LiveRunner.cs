@@ -829,18 +829,6 @@ namespace ProtoScript.Runners
                 return;
             }
 
-            if (syncData.AddedSubtrees != null)
-            {
-                foreach (var st in syncData.AddedSubtrees)
-                {
-                    if (st.AstNodes != null)
-                    {
-                        deltaAstList.AddRange(st.AstNodes);
-                    }
-
-                    currentSubTreeList.Add(st.GUID, st);
-                }
-            }
 
             if (syncData.DeletedSubtrees != null)
             {
@@ -888,6 +876,20 @@ namespace ProtoScript.Runners
 
                         deltaAstList.AddRange(st.AstNodes);
                     }
+                }
+            }
+
+
+            if (syncData.AddedSubtrees != null)
+            {
+                foreach (var st in syncData.AddedSubtrees)
+                {
+                    if (st.AstNodes != null)
+                    {
+                        deltaAstList.AddRange(st.AstNodes);
+                    }
+
+                    currentSubTreeList.Add(st.GUID, st);
                 }
             }
 
