@@ -293,7 +293,7 @@ namespace DesignScriptStudio.Graph.Core
         {
             if (null != coreComponent)
             {
-                GraphToDSCompiler.GraphUtilities.CleanUp();
+                GraphToDSCompiler.GraphUtilities.Reset();
                 coreComponent.Shutdown();
                 coreComponent = null;
             }
