@@ -241,7 +241,7 @@ namespace GraphToDSCompiler
                     BinaryExpressionNode ben = node as BinaryExpressionNode;
                     //if ((ben.LeftNode.ID == newNode.LeftNode.ID || ben.LeftNode.Name == newNode.LeftNode.Name) &&
                     //        ben.Optr == newNode.Optr && (ben.RightNode.ID == newNode.RightNode.ID || ben.RightNode.Name == newNode.RightNode.Name))
-                    if (ben.Compare(newNode))
+                    if (ben.Equals(newNode))
                         result = false;
                 }
             }

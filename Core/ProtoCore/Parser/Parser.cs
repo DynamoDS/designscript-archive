@@ -898,7 +898,7 @@ public Node root { get; set; }
 		f.ReturnType = returnType; 
 		f.access = access;
 		f.Attributes = attrs;
-		f.Singnature = argumentSignature as ProtoCore.AST.AssociativeAST.ArgumentSignatureNode; 
+		f.Signature = argumentSignature as ProtoCore.AST.AssociativeAST.ArgumentSignatureNode; 
 		f.IsStatic = isStatic;
 		ProtoCore.AST.AssociativeAST.AssociativeNode functionBody = null; 
 		
@@ -2589,8 +2589,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 		if (la.kind == 9) {
 			Get();
 			Associative_Expression(out node);
-			if (node is ProtoCore.AST.AssociativeAST.FunctionCallNode 
-			   || node is ProtoCore.AST.AssociativeAST.IdentifierNode)
+			if (node is ProtoCore.AST.AssociativeAST.ArrayNameNode) 
 			{
 			   nameNode = node as ProtoCore.AST.AssociativeAST.ArrayNameNode;
 			}
@@ -2785,7 +2784,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 			}
 			
 		}
-		if (groupExprNode != null && groupExprNode.ArrayDimensions == null && groupExprNode.ReplicationGuides == null)
+		if (groupExprNode != null && groupExprNode.ArrayDimensions == null && (groupExprNode.ReplicationGuides == null || groupExprNode.ReplicationGuides.Count == 0))
 		{
 		   node = groupExprNode.Expression;
 		}
@@ -3380,8 +3379,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 			Get();
 			Imperative_expr(out node);
 			Expect(10);
-			if (node is ProtoCore.AST.ImperativeAST.FunctionCallNode 
-			   || node is ProtoCore.AST.ImperativeAST.IdentifierNode)
+			if (node is ProtoCore.AST.ImperativeAST.ArrayNameNode)
 			{
 			   nameNode = node as ProtoCore.AST.ImperativeAST.ArrayNameNode;
 			}

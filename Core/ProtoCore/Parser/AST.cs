@@ -33,7 +33,12 @@
             skipMe = rhs.skipMe;
         }
 
-        public virtual bool Compare(Node other)
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override bool Equals(object other)
         {
             throw new System.NotImplementedException();
         }

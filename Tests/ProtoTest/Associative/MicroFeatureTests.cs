@@ -2280,7 +2280,7 @@ r3 = 'h' + 1;";
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = GraphToDSCompiler.GraphUtilities.Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = GraphToDSCompiler.GraphUtilities.Parse(s2, out commentNode);
-            bool areEqual = s1Root.Compare(s2Root);
+            bool areEqual = s1Root.Equals(s2Root);
             Assert.AreEqual(areEqual, true);
         }
 
@@ -2292,7 +2292,7 @@ r3 = 'h' + 1;";
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = GraphToDSCompiler.GraphUtilities.Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = GraphToDSCompiler.GraphUtilities.Parse(s2, out commentNode);
-            bool areEqual = s1Root.Compare(s2Root);
+            bool areEqual = s1Root.Equals(s2Root);
             Assert.AreEqual(areEqual, true);
         }
 
@@ -2304,7 +2304,7 @@ r3 = 'h' + 1;";
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = GraphToDSCompiler.GraphUtilities.Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = GraphToDSCompiler.GraphUtilities.Parse(s2, out commentNode);
-            bool areEqual = s1Root.Compare(s2Root);
+            bool areEqual = s1Root.Equals(s2Root);
             Assert.AreEqual(areEqual, true);
         }
     }

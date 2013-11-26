@@ -550,7 +550,7 @@ namespace ProtoFFI
             ProtoCore.AST.AssociativeAST.FunctionDefinitionNode func = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
             func.Name = string.Format("%get_{0}", f.Name);
             func.Pattern = null;
-            func.Singnature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
+            func.Signature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
             func.ReturnType = CLRModuleType.GetProtoCoreType(f.FieldType, Module);
             func.FunctionBody = null;
             func.access = ProtoCore.DSASM.AccessSpecifier.kPublic;
@@ -584,7 +584,7 @@ namespace ProtoFFI
             ProtoCore.AST.AssociativeAST.FunctionDefinitionNode func = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
             func.Name = string.Format("{0}{1}", prefix, method.Name);
             func.Pattern = null;
-            func.Singnature = ParseArgumentSignature(method);
+            func.Signature = ParseArgumentSignature(method);
 
             if (retype.IsIndexable && mattrs.AllowRankReduction)
                 retype.rank = -1;

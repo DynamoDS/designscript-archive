@@ -223,7 +223,7 @@ namespace GraphToDSCompiler
             {
             }
 
-            if (funcDefNode.Singnature != null)
+            if (funcDefNode.Signature != null)
             {
             }
             else

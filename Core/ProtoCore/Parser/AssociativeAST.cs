@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using ProtoCore.DesignScriptParser;
 using ProtoCore.DSASM;
 using ProtoCore.Utils;
@@ -19,7 +21,7 @@ namespace ProtoCore.AST.AssociativeAST
             IsModifier = rhs.IsModifier;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
             throw new NotImplementedException();
         }
@@ -66,27 +68,13 @@ namespace ProtoCore.AST.AssociativeAST
         public List<AssociativeNode> Attributes { get; set; }
 
         //only comparing attributes and codeblock at the moment
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is LanguageBlockNode)
-            {
-                LanguageBlockNode otherNode = other as LanguageBlockNode;
-                bool result = true;
-                //bool result = this.codeblock.Compare(otherNode.codeblock);
-
-                if (this.Attributes.Count != otherNode.Attributes.Count)
-                    return false;
-
-                bool attrCompare = true;
-                for (int i = 0; i < this.Attributes.Count; i++)
-                {
-                    attrCompare = attrCompare && (this.Attributes[i].Compare(otherNode.Attributes[i]));
-                }
-                result = result && attrCompare;
-                return result;
-            }
-            else
+            var otherNode = other as LanguageBlockNode;
+            if (null == otherNode)
                 return false;
+
+            return Enumerable.SequenceEqual(Attributes, otherNode.Attributes);
         }
     }
 
@@ -105,6 +93,15 @@ namespace ProtoCore.AST.AssociativeAST
         {
             MergedNodes = new List<AssociativeNode>();
         }
+
+        public override bool Equals(object other)
+        {
+            var otherNode = other as MergeNode;
+            if (null == otherNode)
+                return false;
+
+            return Enumerable.SequenceEqual(MergedNodes, otherNode.MergedNodes);
+        }
     }
 
     /// <summary>
@@ -115,15 +112,29 @@ namespace ProtoCore.AST.AssociativeAST
         public ArrayNode ArrayDimensions;
         public AssociativeNode Array;
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ArrayIndexerNode)
-            {
-                ArrayIndexerNode otherNode = other as ArrayIndexerNode;
-                return (this.Array.Compare(otherNode.Array) && this.ArrayDimensions.Compare(otherNode.ArrayDimensions));
-            }
-            else
+            var otherNode = other as ArrayIndexerNode;
+            if (null == otherNode)
                 return false;
+
+            return EqualityComparer<ArrayNode>.Default.Equals(ArrayDimensions, otherNode.ArrayDimensions) &&
+                   EqualityComparer<AssociativeNode>.Default.Equals(Array, otherNode.Array);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append(Array.ToString());
+            buf.Append("[");
+            buf.Append(ArrayDimensions.Expr.ToString());
+            buf.Append("]");
+
+            if (ArrayDimensions.Type != null)
+                buf.Append(ArrayDimensions.Type.ToString());
+
+            return buf.ToString();
         }
     }
 
@@ -144,7 +155,7 @@ namespace ProtoCore.AST.AssociativeAST
         public ArrayNameNode()
         {
             ArrayDimensions = null;
-            ReplicationGuides = null;
+            ReplicationGuides = new List<AssociativeNode>();
         }
 
 
@@ -168,27 +179,26 @@ namespace ProtoCore.AST.AssociativeAST
             }
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ArrayNameNode)
-            {
-                ArrayNameNode otherNode = other as ArrayNameNode;
-                bool result = this.ArrayDimensions.Compare(otherNode.ArrayDimensions);
-
-                if (this.ReplicationGuides.Count != otherNode.ReplicationGuides.Count)
-                    return false;
-
-                bool replicationCompare = true;
-                for (int i = 0; i < this.ReplicationGuides.Count; i++)
-                {
-                    replicationCompare = replicationCompare && (this.ReplicationGuides[i].Compare(otherNode.ReplicationGuides[i]));
-                }
-                result = result && replicationCompare;
-
-                return result;
-            }
-            else
+            var otherNode = other as ArrayNameNode;
+            if (null == otherNode)
                 return false;
+            
+            return EqualityComparer<ArrayNode>.Default.Equals(ArrayDimensions, otherNode.ArrayDimensions) &&
+                   Enumerable.SequenceEqual(ReplicationGuides, otherNode.ReplicationGuides);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            if (ArrayDimensions != null)
+                buf.Append(ArrayDimensions.ToString());
+
+            ReplicationGuides.ForEach(x => buf.Append("<" + x.ToString() + ">"));
+
+            return buf.ToString();
         }
     }
 
@@ -209,19 +219,26 @@ namespace ProtoCore.AST.AssociativeAST
         {
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is GroupExpressionNode)
-            {
-                GroupExpressionNode otherNode = other as GroupExpressionNode;
-                bool result = this.Expression.Compare(otherNode.Expression);
-                return result;
-            }
+            var otherNode = other as GroupExpressionNode;
+
+            if (otherNode != null)
+                return EqualityComparer<AssociativeNode>.Default.Equals(Expression, otherNode.Expression);
+            else if (Expression != null)
+                return Expression.Equals(otherNode.Expression);
             else
                 return false;
         }
-    }
 
+        public override string ToString()
+        {
+            if (null == Expression)
+                return DSDefinitions.Keyword.Null;
+            else 
+                return "(" + Expression.ToString() + ")" + base.ToString();
+        }
+    }
 
     public class IdentifierNode : ArrayNameNode
     {
@@ -262,15 +279,20 @@ namespace ProtoCore.AST.AssociativeAST
             set;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is IdentifierNode)
-            {
-                IdentifierNode otherNode = other as IdentifierNode;
-                return this.datatype.Equals(otherNode.datatype) && this.Value.Trim() == otherNode.Value.Trim();
-            }
-            else
+            IdentifierNode otherNode = other as IdentifierNode;
+            if (null == otherNode)
                 return false;
+
+            return EqualityComparer<string>.Default.Equals(Value, otherNode.Value) && 
+                   datatype.Equals(otherNode.datatype) && 
+                   base.Equals(otherNode);
+        }
+
+        public override string ToString()
+        {
+            return Value.Replace("%", string.Empty) + base.ToString();
         }
     }
 
@@ -313,15 +335,20 @@ namespace ProtoCore.AST.AssociativeAST
             isLastSSAIdentListFactor = rhs.isLastSSAIdentListFactor;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is IdentifierListNode)
-            {
-                IdentifierListNode otherNode = other as IdentifierListNode;
-                return this.LeftNode.Compare(otherNode.LeftNode) && (this.RightNode.Compare(otherNode.RightNode)) && (this.Optr == otherNode.Optr);
-            }
-            else
+            var otherNode = other as IdentifierListNode;
+            if (null == otherNode)
                 return false;
+
+            return EqualityComparer<AssociativeNode>.Default.Equals(LeftNode, otherNode.LeftNode) && 
+                   EqualityComparer<AssociativeNode>.Default.Equals(RightNode, otherNode.RightNode) && 
+                   Optr.Equals(otherNode.Optr);
+        }
+
+        public override string ToString()
+        {
+            return LeftNode.ToString() + "." + RightNode.ToString();
         }
     }
 
@@ -338,9 +365,28 @@ namespace ProtoCore.AST.AssociativeAST
             value = rhs.value;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            return this.value == (other as IntNode).value;
+            var otherNode = other as IntNode;
+            if (null == otherNode || string.IsNullOrEmpty(value))
+                return false;
+
+            long thisValue;
+            if (Int64.TryParse(value, out thisValue))
+            {
+                long otherValue;
+                if (Int64.TryParse(otherNode.value, out otherValue))
+                {
+                    return thisValue == otherValue;
+                }
+            }
+
+            return false;
+        }
+
+        public override string ToString()
+        {
+            return value;
         }
     }
 
@@ -357,12 +403,28 @@ namespace ProtoCore.AST.AssociativeAST
             value = rhs.value;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is DoubleNode)
-                return (this.value == (other as DoubleNode).value);
-            else
+            var otherNode = other as DoubleNode;
+            if (null == otherNode || string.IsNullOrEmpty(value))
                 return false;
+
+            double thisValue;
+            if (double.TryParse(value, out thisValue))
+            {
+                double otherValue;
+                if (double.TryParse(otherNode.value, out otherValue))
+                {
+                    return thisValue == otherValue;
+                }
+            }
+
+            return false;
+        }
+
+        public override string ToString()
+        {
+            return value;
         }
     }
 
@@ -379,12 +441,18 @@ namespace ProtoCore.AST.AssociativeAST
             value = rhs.value;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is BooleanNode)
-                return this.value.Trim() == (other as BooleanNode).value.Trim();
-            else
+            var otherNode = other as BooleanNode;
+            if (null == otherNode || string.IsNullOrEmpty(value))
                 return false;
+
+            return EqualityComparer<string>.Default.Equals(value, otherNode.value);
+        }
+
+        public override string ToString()
+        {
+            return value;
         }
     }
 
@@ -399,12 +467,19 @@ namespace ProtoCore.AST.AssociativeAST
         {
             value = rhs.value;
         }
-        public override bool Compare(Node other)
+
+        public override bool Equals(object other)
         {
-            if (other is CharNode)
-                return this.value == (other as CharNode).value;
-            else
+            var otherNode = other as CharNode;
+            if (null == otherNode || string.IsNullOrEmpty(value))
                 return false;
+
+            return EqualityComparer<string>.Default.Equals(value, otherNode.value);
+        }
+
+        public override string ToString()
+        {
+            return "'" + value + "'";
         }
     }
 
@@ -421,25 +496,31 @@ namespace ProtoCore.AST.AssociativeAST
             value = rhs.value;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is StringNode)
-                return this.value == (other as StringNode).value;
-            else
+            var otherNode = other as StringNode;
+            if (null == otherNode || null == value)
                 return false;
+
+            return value.Equals(otherNode.value);
+        }
+
+        public override string ToString()
+        {
+            return "\"" + value + "\"";
         }
     }
 
     public class NullNode : AssociativeNode
     {
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is NullNode)
-            {
-                return true;
-            }
-            else
-                return false;
+            return other is NullNode;
+        }
+
+        public override string ToString()
+        {
+            return ProtoCore.DSDefinitions.Keyword.Null;
         }
     }
 
@@ -451,15 +532,28 @@ namespace ProtoCore.AST.AssociativeAST
             set;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ReturnNode)
-            {
-                ReturnNode otherNode = other as ReturnNode;
-                return (this.ReturnExpr.Compare(otherNode.ReturnExpr));
-            }
-            else
+            var otherNode = other as ReturnNode;
+            if (null == otherNode)
                 return false;
+
+            if (null == ReturnExpr)
+                return false;
+
+            return ReturnExpr.Equals(otherNode.ReturnExpr);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append(DSDefinitions.Keyword.Return);
+            buf.Append(" = ");
+            buf.Append(null == ReturnExpr ? DSDefinitions.Keyword.Null : ReturnExpr.ToString());
+            buf.Append(Constants.termline);
+
+            return buf.ToString();
         }
     }
 
@@ -489,27 +583,74 @@ namespace ProtoCore.AST.AssociativeAST
             DynamicTableIndex = rhs.DynamicTableIndex;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            bool result = true;
-            if (other is FunctionCallNode)
+            var otherNode = other as FunctionCallNode;
+            if (null == otherNode)
+                return false;
+
+            return DynamicTableIndex == otherNode.DynamicTableIndex &&
+                   EqualityComparer<AssociativeNode>.Default.Equals(Function, otherNode.Function) &&
+                   Enumerable.SequenceEqual(FormalArguments, otherNode.FormalArguments) &&
+                   base.Equals(otherNode);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+            string functionName = (Function as IdentifierNode).Value;
+            string postfix = base.ToString();
+
+            if (CoreUtils.IsInternalMethod(functionName))
             {
-                FunctionCallNode otherNode = other as FunctionCallNode;
-                result = (this.DynamicTableIndex == otherNode.DynamicTableIndex) && (this.Function.Compare(otherNode.Function));
+                if (!string.IsNullOrEmpty(postfix))
+                    buf.Append("(");
 
-                if (this.FormalArguments.Count != otherNode.FormalArguments.Count)
-                    return false;
+                string nameWithoutPrefix = functionName.Substring(DSASM.Constants.kInternalNamePrefix.Length);
+                Operator op;
+                UnaryOperator uop;
 
-                bool formalArgResult = true;
-                for (int i=0; i<this.FormalArguments.Count; i++)
+                if (Enum.TryParse<Operator>(nameWithoutPrefix, out op))
                 {
-                    formalArgResult = formalArgResult && (FormalArguments[i].Compare(otherNode.FormalArguments[i]));
+                    buf.Append(FormalArguments[0].ToString());
+                    buf.Append(" " + Op.GetOpSymbol(op) + " ");
+                    buf.Append(FormalArguments[1].ToString());
                 }
-                result = result && formalArgResult;
+                else if (Enum.TryParse<UnaryOperator>(nameWithoutPrefix, out uop))
+                {
+                    buf.Append(Op.GetUnaryOpSymbol(uop));
+                    buf.Append(FormalArguments[0].ToString());
+                }
+                else
+                {
+                    return ProtoCore.DSDefinitions.Keyword.Null;
+                }
+
+                if (!string.IsNullOrEmpty(postfix))
+                    buf.Append(")");
             }
             else
-                result = false;
-            return result;
+            {
+                buf.Append(functionName);
+                buf.Append("(");
+
+                if (FormalArguments != null)
+                {
+                    for (int n = 0; n < FormalArguments.Count; ++n)
+                    {
+                        buf.Append(FormalArguments[n]);
+                        if (n < FormalArguments.Count - 1)
+                        {
+                            buf.Append(", ");
+                        }
+                    }
+                }
+                buf.Append(")");
+            }
+
+            buf.Append(postfix);
+
+            return buf.ToString();
         }
     }
 
@@ -556,16 +697,24 @@ namespace ProtoCore.AST.AssociativeAST
             return inode;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is FunctionDotCallNode)
-            {
-                FunctionDotCallNode otherNode = other as FunctionDotCallNode;
-                return (this.DotCall.Compare(otherNode.DotCall) && this.FunctionCall.Compare(otherNode.FunctionCall) &&
-                    (this.lhsName == otherNode.lhsName));
-            }
-            else
+            var otherNode = other as FunctionDotCallNode;
+            if (null == otherNode)
                 return false;
+
+            return lhsName.Equals(otherNode.lhsName) &&
+                   DotCall.Equals(otherNode.DotCall) &&
+                   FunctionCall.Equals(otherNode.FunctionCall);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+            buf.Append(DotCall.FormalArguments[0].ToString());
+            buf.Append(".");
+            buf.Append(FunctionCall.ToString());
+            return buf.ToString();
         }
     }
 
@@ -605,47 +754,30 @@ namespace ProtoCore.AST.AssociativeAST
         public AssociativeNode NameNode { get; set; }
         public ProtoCore.DSASM.AccessSpecifier access { get; set; }
         public bool IsStatic { get; set; }
+
         public override string ToString()
         {
-            string str = IsStatic ? "static " : "";
-            return string.Format("{0}{1} : {2}", str, NameNode.Name, ToString(ArgumentType));
-        }
-        public static string ToString(ProtoCore.Type type)
-        {
-            if (!type.IsIndexable)
-                return type.Name;
-            string typename = type.Name;
-            for (int i = 0; i < type.rank; ++i)
-                typename += "[]";
-            if (type.rank == -1) //variable rank array
-                typename += "[]..[]";
-            return typename;
-        }
-        public override bool Compare(Node other)
-        {
-            if (other is VarDeclNode)
-            {
-                VarDeclNode otherNode = other as VarDeclNode;
-                bool result = true;
-                result = (this.memregion == otherNode.memregion) && (this.ArgumentType.Equals(otherNode.ArgumentType)) && (this.NameNode.Compare(otherNode.NameNode))
-                    && (this.IsStatic == otherNode.IsStatic);
-                bool attributesCompare = true;
-                if (this.Attributes.Count != otherNode.Attributes.Count)
-                {
-                    return false;
-                }
+            StringBuilder buf = new StringBuilder();
 
-                for (int i = 0; i < Attributes.Count; i++)
-                {
-                    attributesCompare = attributesCompare && (this.Attributes[i].Compare(otherNode.Attributes[i]));
-                }
-                result = result && attributesCompare;
-                return result;
-            }
-            else
-            {
+            if (IsStatic)
+                buf.Append(DSDefinitions.Keyword.Static + " ");
+            buf.Append(NameNode.Name + " : ");
+            buf.Append(ArgumentType.ToString());
+
+            return buf.ToString();
+        }
+
+        public override bool Equals(object other)
+        {
+            var otherNode = other as VarDeclNode;
+            if (null == otherNode)
                 return false;
-            }
+
+            return memregion == otherNode.memregion  &&
+                   ArgumentType.Equals(otherNode.ArgumentType) &&
+                   EqualityComparer<AssociativeNode>.Default.Equals(NameNode, otherNode.NameNode) && 
+                   IsStatic == otherNode.IsStatic && 
+                   Enumerable.SequenceEqual(Attributes, otherNode.Attributes);
         }
     }
 
@@ -674,41 +806,28 @@ namespace ProtoCore.AST.AssociativeAST
         {
             Arguments.Add(arg);
         }
+
         public override string ToString()
         {
-            string signature = "";
-            int nArgs = Arguments.Count;
-            for (int i = 0; i < nArgs; ++i)
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < Arguments.Count; ++i)
             {
-                signature += Arguments[i].ToString();
-                if (i >= 0 && i < nArgs - 1)
-                    signature += ", ";
+                buf.Append(Arguments[i].ToString());
+                if (i < Arguments.Count - 1)
+                    buf.Append(", ");
             }
-
-            return string.Format("({0})", signature);
+            return buf.ToString();
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ArgumentSignatureNode)
-            {
-                ArgumentSignatureNode otherNode = other as ArgumentSignatureNode;
-                bool result = true;
-                if (this.Arguments.Count != otherNode.Arguments.Count)
-                    return false;
-
-                for (int i = 0; i < this.Arguments.Count; i++)
-                {
-                    result = result && (this.Arguments[i].Compare(otherNode.Arguments[i]));
-                }
-                return result;
-            }
-            else
+            var otherNode = other as ArgumentSignatureNode;
+            if (null == otherNode)
                 return false;
+
+            return Enumerable.SequenceEqual(Arguments, otherNode.Arguments);
         }
     }
-
-
 
     public class CodeBlockNode : AssociativeNode
     {
@@ -733,24 +852,13 @@ namespace ProtoCore.AST.AssociativeAST
             }
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            //temp, not sure how to compare symbol table and proc table
-            if (other is CodeBlockNode)
-            {
-                CodeBlockNode otherNode = other as CodeBlockNode;
-                bool result = true;
-                if (this.Body.Count != otherNode.Body.Count)
-                    return false;
-
-                for (int i = 0; i < this.Body.Count; i++)
-                {
-                    result = result && (Body[i].Compare(otherNode.Body[i]));
-                }
-                return result;
-            }
-            else
+            var otherNode = other as CodeBlockNode;
+            if (null == otherNode)
                 return false;
+
+            return Enumerable.SequenceEqual(Body, otherNode.Body);
         }
     }
 
@@ -760,6 +868,7 @@ namespace ProtoCore.AST.AssociativeAST
         {
             varlist = new List<AssociativeNode>();
             funclist = new List<AssociativeNode>();
+            superClass = new List<string>();
             IsImportedClass = false;
         }
 
@@ -820,80 +929,52 @@ namespace ProtoCore.AST.AssociativeAST
 
         public override string ToString()
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            //if (IsExternLib)
-            //    sb.Append("extern ");
-            sb.AppendFormat("class {0}", className);
+            StringBuilder buf = new StringBuilder();
+            buf.Append(DSDefinitions.Keyword.Class + " " + className);
             if (null != superClass)
             {
                 if (superClass.Count > 0)
-                    sb.Append(" extends ");
+                    buf.Append(" " + DSDefinitions.Keyword.Extend + " ");
+
                 for (int i = 0; i < superClass.Count; ++i)
                 {
-                    if (i > 0 && i < superClass.Count - 1)
-                        sb.Append(", ");
-                    sb.Append(superClass[i]);
+                    buf.Append(superClass[i]);
+                    if (i < superClass.Count - 1)
+                        buf.Append(", ");
                 }
             }
-            sb.AppendLine();
-            sb.AppendLine("{");
+            buf.AppendLine();
+
+            buf.AppendLine("{");
+
             foreach (var item in varlist)
             {
-                sb.AppendLine(string.Format("{0};", item));
+                buf.Append(item.ToString() + Constants.termline);
             }
 
             foreach (var item in funclist)
             {
-                if (item is ConstructorDefinitionNode)
-                    sb.AppendLine(item.ToString() + "{}");
-                else if (!item.Name.StartsWith("%"))
-                    sb.AppendLine(item.ToString() + ";");
+                if (!item.Name.StartsWith("%"))
+                    buf.AppendLine(item.ToString());
             }
-            sb.AppendLine("}");
-            return sb.ToString();
+
+            buf.AppendLine("}");
+
+            return buf.ToString();
         }
 
-        //not comparing isImportedClass, isExternLib, ExternLibName
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ClassDeclNode)
-            {
-                ClassDeclNode otherNode = other as ClassDeclNode;
-                bool result = (this.className == otherNode.className);
-
-                if (this.Attributes.Count != otherNode.Attributes.Count || this.superClass.Count != otherNode.superClass.Count
-                        || this.varlist.Count != otherNode.varlist.Count || this.funclist.Count != otherNode.varlist.Count)
-                    return false;
-
-                bool attrCompare = true;
-                for (int i = 0; i < this.Attributes.Count; i++)
-                {
-                    attrCompare = attrCompare && (this.Attributes[i].Compare(otherNode.Attributes[i]));
-                }
-
-                bool superClassCompare = true;
-                for (int i = 0; i < this.Attributes.Count; i++)
-                {
-                    superClassCompare = superClassCompare && (this.superClass[i] == otherNode.superClass[i]);
-                }
-
-                bool varCompare = true;
-                for (int i = 0; i < this.Attributes.Count; i++)
-                {
-                    varCompare = varCompare && (this.varlist[i].Compare(otherNode.varlist[i]));
-                }
-
-                bool funcCompare = true;
-                for (int i = 0; i < this.Attributes.Count; i++)
-                {
-                    funcCompare = funcCompare && (this.funclist[i].Compare(otherNode.funclist[i]));
-                }
-                
-                result = result && attrCompare && superClassCompare && varCompare && funcCompare;
-                return result;
-            }
-            else
+            var otherNode = other as ClassDeclNode;
+            if (null == otherNode)
                 return false;
+
+            //not comparing isImportedClass, isExternLib, ExternLibName
+            return (className != null && className.Equals(otherNode.className)) &&
+                   Enumerable.SequenceEqual(Attributes, otherNode.Attributes) &&
+                   Enumerable.SequenceEqual(superClass, otherNode.superClass) &&
+                   Enumerable.SequenceEqual(varlist, otherNode.varlist) &&
+                   Enumerable.SequenceEqual(funclist, otherNode.funclist);
         }
     }
 
@@ -912,31 +993,40 @@ namespace ProtoCore.AST.AssociativeAST
 
         public override string ToString()
         {
-            return string.Format("constructor {0}{1}", Name, Signature);
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append(DSDefinitions.Keyword.Constructor + " ");
+            buf.Append(Name);
+
+            buf.Append("(");
+            if (Signature != null)
+                buf.Append(Signature.ToString());
+            buf.AppendLine(")");
+
+            if (baseConstr != null)
+                buf.Append(" : " + baseConstr.ToString());
+
+            if (FunctionBody != null)
+            {
+                buf.AppendLine("{");
+                FunctionBody.Body.ForEach(stmt => buf.Append(stmt.ToString()));
+                buf.AppendLine("}");
+            }
+
+            return buf.ToString();
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ConstructorDefinitionNode)
-            {
-                ConstructorDefinitionNode otherNode = other as ConstructorDefinitionNode;
-                bool result = true;
-                result = (this.localVars == otherNode.localVars) && (this.Signature.Compare(otherNode.Signature)) && (this.ReturnType.Equals(otherNode.ReturnType))
-                    && (this.FunctionBody.Compare(otherNode.FunctionBody));
-
-                if (this.Attributes.Count != otherNode.Attributes.Count)
-                    return false;
-
-                bool attrCompare = true;
-                for (int i = 0; i < this.Attributes.Count; i++)
-                {
-                    attrCompare = attrCompare && (this.Attributes[i].Compare(otherNode.Attributes[i]));
-                }
-                result = result && attrCompare;
-                return result;
-            }
-            else
+            var otherNode = other as ConstructorDefinitionNode;
+            if (null == otherNode)
                 return false;
+
+            return localVars == otherNode.localVars &&
+                   EqualityComparer<ArgumentSignatureNode>.Default.Equals(Signature, otherNode.Signature) &&
+                   ReturnType.Equals(otherNode.ReturnType) &&
+                   EqualityComparer<CodeBlockNode>.Default.Equals(FunctionBody, otherNode.FunctionBody) &&
+                   Enumerable.SequenceEqual(Attributes, otherNode.Attributes); 
         }
     }
 
@@ -946,7 +1036,7 @@ namespace ProtoCore.AST.AssociativeAST
 
         public ProtoCore.Type                                   ReturnType      { get; set; }
         public List<AssociativeNode>                            Attributes      { get; set; }
-        public ArgumentSignatureNode                            Singnature      { get; set; }
+        public ArgumentSignatureNode                            Signature      { get; set; }
         public AssociativeNode                                  Pattern         { get; set; }
         public bool                                             IsExternLib     { get; set; }
         public bool                                             IsBuiltIn       { get; set; }
@@ -969,7 +1059,7 @@ namespace ProtoCore.AST.AssociativeAST
             ReturnType = new Type();
             ReturnType.Initialize();
             IsBuiltIn = false;
-            Singnature = new ArgumentSignatureNode();
+            Signature = new ArgumentSignatureNode();
         }
 
         public FunctionDefinitionNode(FunctionDefinitionNode rhs)
@@ -987,7 +1077,7 @@ namespace ProtoCore.AST.AssociativeAST
             this.ReturnType = rhs.ReturnType;
 
             this.Attributes = rhs.Attributes;
-            this.Singnature = new ArgumentSignatureNode(rhs.Singnature);
+            this.Signature = new ArgumentSignatureNode(rhs.Signature);
             this.Pattern = rhs.Pattern;
             this.IsExternLib = rhs.IsExternLib;
             this.BuiltInMethodId = rhs.BuiltInMethodId;
@@ -1001,33 +1091,44 @@ namespace ProtoCore.AST.AssociativeAST
             this.IsBuiltIn = rhs.IsBuiltIn;
         }
 
-        public override string ToString()
+        //only compare return type, attributes and signature
+        public override bool Equals(object other)
         {
-            string str = IsStatic ? "static " : "";
-            return string.Format("{0}def {1} : {2}{3}", str, Name, VarDeclNode.ToString(ReturnType), Singnature);
+            var otherNode = other as FunctionDefinitionNode;
+            if (null == otherNode)
+                return false;
+
+            return EqualityComparer<ArgumentSignatureNode>.Default.Equals(Signature, otherNode.Signature) &&
+                   ReturnType.Equals(otherNode.ReturnType) &&
+                   Enumerable.SequenceEqual(Attributes, otherNode.Attributes);
         }
 
-        //only compare return type, attributes and signature
-        public override bool Compare(Node other)
+        public override string ToString()
         {
-            if (other is FunctionDefinitionNode)
+            StringBuilder buf = new StringBuilder();
+
+            if (IsStatic)
+                buf.Append(DSDefinitions.Keyword.Static + " ");
+
+            buf.Append(DSDefinitions.Keyword.Def + " ");
+            buf.Append(Name);
+
+            if (ReturnType.UID != Constants.kInvalidIndex)
+                buf.Append(": " + ReturnType.ToString());
+
+            buf.Append("(");
+            if (Signature != null)
+                buf.Append(Signature.ToString());
+            buf.AppendLine(")");
+
+            if (FunctionBody != null)
             {
-                FunctionDefinitionNode otherNode = other as FunctionDefinitionNode;
-                bool result = this.ReturnType.Equals(otherNode.ReturnType) && (this.Singnature.Compare(otherNode.Singnature));
-
-                if (this.Attributes.Count != otherNode.Attributes.Count)
-                    return false;
-
-                bool attributeCompare = true;
-                for (int i = 0; i < this.Attributes.Count; i++)
-                { 
-                    attributeCompare = attributeCompare && this.Attributes[i].Compare(otherNode.Attributes[i]);
-                }
-                result = result && attributeCompare;
-                return result;
+                buf.AppendLine("{");
+                FunctionBody.Body.ForEach(stmt => buf.Append(stmt.ToString()));
+                buf.AppendLine("}");
             }
-            else
-                return false;
+
+            return buf.ToString();
         }
     }
 
@@ -1037,33 +1138,21 @@ namespace ProtoCore.AST.AssociativeAST
         public List<AssociativeNode> IfBody { get; set; }
         public List<AssociativeNode> ElseBody { get; set; }
 
-        public override bool Compare(Node other)
+        public IfStatementNode()
         {
-            if (other is IfStatementNode)
-            {
-                IfStatementNode otherNode = other as IfStatementNode;
-                bool result = true;
-                result = this.ifExprNode.Compare(otherNode.ifExprNode);
+            IfBody = new List<AssociativeNode>();
+            ElseBody = new List<AssociativeNode>();
+        }
 
-                if (this.IfBody.Count != otherNode.IfBody.Count || this.ElseBody.Count != otherNode.ElseBody.Count)
-                    return false;
-
-                bool ifBodyCompare = true;
-                for (int i = 0; i < this.IfBody.Count; i++)
-                {
-                    ifBodyCompare = ifBodyCompare && (this.IfBody[i].Compare(otherNode.IfBody[i]));
-                }
-
-                bool elseBodyCompare = true;
-                for (int i = 0; i < this.ElseBody.Count; i++)
-                {
-                    elseBodyCompare = elseBodyCompare && (this.ElseBody[i].Compare(otherNode.ElseBody[i]));
-                }
-                result = result && ifBodyCompare && elseBodyCompare;
-                return result;
-            }
-            else
+        public override bool Equals(object other)
+        {
+            var otherNode = other as IfStatementNode;
+            if (null == otherNode)
                 return false;
+
+            return ifExprNode.Equals(otherNode.ifExprNode) &&
+                   Enumerable.SequenceEqual(IfBody, otherNode.IfBody) &&
+                   Enumerable.SequenceEqual(ElseBody, otherNode.ElseBody);
         }
     }
 
@@ -1079,7 +1168,6 @@ namespace ProtoCore.AST.AssociativeAST
             IsAutoGenerated = false;
         }
 
-
         public InlineConditionalNode(InlineConditionalNode rhs) : base(rhs)
         {
             IsAutoGenerated = false;
@@ -1088,16 +1176,33 @@ namespace ProtoCore.AST.AssociativeAST
             FalseExpression = NodeUtils.Clone(rhs.FalseExpression);
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is InlineConditionalNode)
-            {
-                InlineConditionalNode otherNode = other as InlineConditionalNode;
-                return this.ConditionExpression.Compare(otherNode.ConditionExpression) && (this.TrueExpression.Compare(otherNode.TrueExpression))
-                    && (this.FalseExpression.Compare(otherNode.FalseExpression));
-            }
-            else
+            if (null == ConditionExpression || null == TrueExpression || null == FalseExpression)
                 return false;
+
+            var otherNode = other as InlineConditionalNode;
+            if (null == otherNode)
+                return false;
+
+            return ConditionExpression.Equals(otherNode.ConditionExpression) &&
+                   TrueExpression.Equals(otherNode.TrueExpression) &&
+                   FalseExpression.Equals(otherNode.FalseExpression);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append("(");
+            buf.Append(ConditionExpression == null ? DSDefinitions.Keyword.Null : ConditionExpression.ToString());
+            buf.Append(" ? ");
+            buf.Append(TrueExpression == null ? DSDefinitions.Keyword.Null : TrueExpression.ToString());
+            buf.Append(" : ");
+            buf.Append(FalseExpression == null ? DSDefinitions.Keyword.Null : FalseExpression.ToString());
+            buf.Append(")");
+
+            return buf.ToString();
         }
     }
 
@@ -1149,15 +1254,32 @@ namespace ProtoCore.AST.AssociativeAST
             }
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is BinaryExpressionNode)
-            {
-                BinaryExpressionNode otherNode = other as BinaryExpressionNode;
-                return (this.LeftNode.Compare(otherNode.LeftNode) && this.Optr == otherNode.Optr && this.RightNode.Compare(otherNode.RightNode));
-            }
-            else
+            if (null == LeftNode || null == RightNode)
                 return false;
+            
+            var otherNode = other as BinaryExpressionNode;
+            if (null == otherNode)
+                return false;
+
+            return LeftNode.Equals(otherNode.LeftNode) &&
+                   Optr.Equals(otherNode.Optr) &&
+                   RightNode.Equals(otherNode.RightNode);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append(LeftNode.ToString());
+            buf.Append(" " + CoreUtils.GetOperatorString(Optr) + " ");
+            buf.Append(RightNode.ToString());
+
+            if (DSASM.Operator.assign == Optr)
+                buf.Append(DSASM.Constants.termline);
+
+            return buf.ToString();
         }
     }
 
@@ -1166,15 +1288,17 @@ namespace ProtoCore.AST.AssociativeAST
         public ProtoCore.DSASM.UnaryOperator Operator { get; set; }
         public AssociativeNode Expression { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is UnaryExpressionNode)
-            {
-                UnaryExpressionNode otherNode = other as UnaryExpressionNode;
-                return (this.Operator == otherNode.Operator) && (this.Expression.Compare(otherNode.Expression));
-            }
-            else
+            if (null == Expression)
                 return false;
+
+            var otherNode = other as UnaryExpressionNode;
+            if (null == otherNode)
+                return false;
+
+            return Operator.Equals(otherNode.Operator) &&
+                   Expression.Equals(otherNode.Expression);
         }
     }
 
@@ -1284,29 +1408,29 @@ namespace ProtoCore.AST.AssociativeAST
         public List<AssociativeNode> ElementNodes { get; private set; }
         public AssociativeNode ReturnNode { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ModifierStackNode)
-            {
-                ModifierStackNode otherNode = other as ModifierStackNode;
-                bool result = true;
-                result = this.ReturnNode.Compare(otherNode.ReturnNode);
-
-                bool elementCompare = true;
-                if (this.ElementNodes.Count != otherNode.ElementNodes.Count)
-                    return false;
-
-                for (int i = 0; i < this.ElementNodes.Count; i++)
-                {
-                    elementCompare = elementCompare && (this.ElementNodes[i].Compare(otherNode.ElementNodes[i]));
-                }
-                result = result && elementCompare;
-                return result;
-            }
-            else
+            var otherNode = other as ModifierStackNode;
+            if (null == otherNode)
                 return false;
+
+            return ReturnNode.Equals(otherNode.ReturnNode) &&
+                   Enumerable.SequenceEqual(ElementNodes, otherNode.ElementNodes);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append("{");
+            if (ElementNodes != null) 
+                ElementNodes.ForEach(e => buf.AppendLine(e.ToString() + ";"));
+            buf.Append("}");
+
+            return buf.ToString();
         }
     }
+
     public class RangeExprNode : ArrayNameNode
     {
         public AssociativeNode FromNode { get; set; }
@@ -1331,19 +1455,50 @@ namespace ProtoCore.AST.AssociativeAST
             stepoperator = rhs.stepoperator;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is RangeExprNode)
-            {
-                bool result = true;
-                RangeExprNode otherNode = other as RangeExprNode;
-                result = result && this.FromNode.Compare(otherNode.FromNode) && (this.ToNode.Compare(otherNode.ToNode)) &&
-                    (this.stepoperator == otherNode.stepoperator);
-                result = result && ((this.StepNode == otherNode.StepNode) || this.StepNode.Compare(otherNode.StepNode));
-                return result;
-            }
-            else
+            var otherNode = other as RangeExprNode;
+            if (null == otherNode)
                 return false;
+
+            return FromNode.Equals(otherNode.FromNode) &&
+                   ToNode.Equals(otherNode.ToNode) &&
+                   stepoperator.Equals(otherNode.stepoperator) &&
+                   ((StepNode == otherNode.StepNode) || (StepNode != null && StepNode.Equals(otherNode.StepNode)));
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            string postfix = base.ToString();
+            if (!string.IsNullOrEmpty(postfix))
+                buf.Append("(");
+
+            buf.Append(FromNode.ToString());
+            buf.Append("..");
+            buf.Append(ToNode.ToString());
+
+            if (StepNode != null)
+            {
+                buf.Append("..");
+                if (DSASM.RangeStepOperator.approxsize == stepoperator)
+                {
+                    buf.Append("~");
+                }
+                else if (DSASM.RangeStepOperator.num == stepoperator)
+                {
+                    buf.Append("#");
+                }
+                buf.Append(StepNode.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(postfix))
+                buf.Append(")");
+
+            buf.Append(postfix);
+
+            return buf.ToString();
         }
     }
 
@@ -1366,23 +1521,33 @@ namespace ProtoCore.AST.AssociativeAST
 
         public List<AssociativeNode> list { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ExprListNode)
-            {
-                ExprListNode otherNode = other as ExprListNode;
-                bool result = true;
-                if (otherNode.list.Count != this.list.Count)
-                    return false;
-
-                for (int i = 0; i < list.Count; i++)
-                {
-                    result = result && list[i].Compare(otherNode.list[i]);
-                }
-                return result;
-            }
-            else
+            var otherNode = other as ExprListNode;
+            if (null == otherNode)
                 return false;
+
+            return Enumerable.SequenceEqual(list, otherNode.list);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append("{");
+            if (list != null)
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    buf.Append(list[i].ToString());
+                    if (i < list.Count - 1)
+                        buf.Append(", ");
+                }
+            }
+            buf.Append("}");
+            buf.Append(base.ToString());
+
+            return buf.ToString();
         }
     }
 
@@ -1392,26 +1557,15 @@ namespace ProtoCore.AST.AssociativeAST
         public AssociativeNode expression { get; set; }
         public List<AssociativeNode> body { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ForLoopNode)
-            {
-                ForLoopNode otherNode = other as ForLoopNode;
-                bool result = true;
-                result = result && loopVar.Compare(otherNode.loopVar) && expression.Compare(otherNode.expression);
-
-                bool bodyCompare = true;
-                if (otherNode.body.Count != this.body.Count)
-                    return false;
-                for (int i = 0; i < body.Count; i++)
-                {
-                    bodyCompare = this.body[i].Compare(otherNode.body[i]);
-                }
-                result = result && bodyCompare;
-                return result;
-            }
-            else
+            var otherNode = other as ForLoopNode;
+            if (null == otherNode)
                 return false;
+
+            return loopVar.Equals(otherNode.loopVar) &&
+                   expression.Equals(otherNode.expression) &&
+                   Enumerable.SequenceEqual(body, otherNode.body);
         }
     }
 
@@ -1450,15 +1604,31 @@ namespace ProtoCore.AST.AssociativeAST
         public AssociativeNode Expr { get; set; }
         public AssociativeNode Type { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ArrayNode)
-            {
-                ArrayNode otherNode = other as ArrayNode;
-                return (this.Expr.Compare(otherNode.Expr) && (this.Type == otherNode.Type || this.Type.Compare(otherNode.Type)));
-            }
-            else
+            var otherNode = other as ArrayNode;
+            if (null == otherNode)
                 return false;
+
+            return EqualityComparer<AssociativeNode>.Default.Equals(Expr, otherNode.Expr) &&
+                   EqualityComparer<AssociativeNode>.Default.Equals(Type, otherNode.Type);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            if (null != Expr)
+            {
+                buf.Append("[");
+                buf.Append(Expr.ToString());
+                buf.Append("]");
+            }
+
+            if (null != Type)
+                buf.Append(Type.ToString());
+
+            return buf.ToString();
         }
     }
 
@@ -1489,20 +1659,21 @@ namespace ProtoCore.AST.AssociativeAST
             }
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ImportNode)
-            {
-                ImportNode otherNode = other as ImportNode;
-                bool result = true;
-                result = result && this.CodeNode.Compare(otherNode.CodeNode);
-                result = result && (this.Identifiers.Equals(otherNode.Identifiers));
-                result = result && this.ModuleName == otherNode.ModuleName;
-                result = result && this.modulePathFileName == otherNode.modulePathFileName;
-                return result;
-            }
-            else
+            var otherNode = other as ImportNode;
+            if (null == otherNode)
                 return false;
+
+            return CodeNode.Equals(otherNode.CodeNode) && 
+                   Identifiers.Equals(otherNode.Identifiers) &&
+                   ModuleName.Equals(otherNode.ModuleName) &&
+                   modulePathFileName.Equals(otherNode.modulePathFileName);
+        }
+
+        public override string ToString()
+        {
+            return ProtoCore.DSDefinitions.Keyword.Import + "(\"" + ModuleName + "\")" + ProtoCore.DSASM.Constants.termline;
         }
     }
 
@@ -1511,24 +1682,41 @@ namespace ProtoCore.AST.AssociativeAST
         public AssociativeNode Identifier { get; set; }
         public ProtoCore.DSASM.UnaryOperator Operator { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is PostFixNode)
-            {
-                PostFixNode otherNode = other as PostFixNode;
-                return this.Identifier.Compare(otherNode.Identifier) && (this.Operator == otherNode.Operator);
-            }
-            else
+            var otherNode = other as PostFixNode;
+            if (null == otherNode)
                 return false;
+
+            return Operator.Equals(otherNode.Operator) &&
+                   Identifier.Equals(otherNode.Identifier);
         }
     }
 
     public class BreakNode : AssociativeNode
     {
+        public override string ToString()
+        {
+            return DSDefinitions.Keyword.Break;
+        }
+
+        public override bool Equals(object other)
+        {
+            return other is BreakNode;
+        }
     }
 
     public class ContinueNode : AssociativeNode
     {
+        public override string ToString()
+        {
+            return DSDefinitions.Keyword.Continue;
+        }
+
+        public override bool Equals(object other)
+        {
+            return other is ContinueNode;
+        }
     }
 
     public class DefaultArgNode : AssociativeNode
@@ -1554,12 +1742,13 @@ namespace ProtoCore.AST.AssociativeAST
             block = blockId;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is DynamicBlockNode)
-                return this.block == (other as DynamicBlockNode).block;
-            else
+            var otherNode = other as DynamicBlockNode;
+            if (null == otherNode)
                 return false;
+
+            return block == otherNode.block;
         }
     }
 
@@ -1581,23 +1770,20 @@ namespace ProtoCore.AST.AssociativeAST
             rightNodeArgNum = rhsArgNum;
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is DotFunctionBodyNode)
-            {
-                DotFunctionBodyNode otherNode = other as DotFunctionBodyNode;
-                bool result = true;
-                result = result && this.leftNode.Compare(otherNode.leftNode);
-                result = result && this.rightNode.Compare(otherNode.rightNode);
-                result = result && this.rightNodeDimExprList.Compare(otherNode.rightNodeDimExprList);
-                result = result && this.rightNodeDim.Compare(otherNode.rightNodeDim);
-                result = result && this.rightNodeArgList.Compare(otherNode.rightNodeArgList);
-                result = result && this.rightNodeArgNum.Compare(otherNode.rightNodeArgNum);
-                return result;
-            }
-            else
+            var otherNode = other as DotFunctionBodyNode;
+            if (null == otherNode)
                 return false;
+
+            return leftNode.Equals(otherNode.leftNode) &&
+                   rightNode.Equals(otherNode.rightNode) &&
+                   rightNodeDimExprList.Equals(otherNode.rightNodeDimExprList) &&
+                   rightNodeDim.Equals(otherNode.rightNodeDim) &&
+                   rightNodeArgList.Equals(otherNode.rightNodeArgList) &&
+                   rightNodeArgNum.Equals(otherNode.rightNodeArgNum); 
         }
+
     }
 
     public class ThisPointerNode : AssociativeNode
@@ -1609,20 +1795,29 @@ namespace ProtoCore.AST.AssociativeAST
         public ThisPointerNode(ThisPointerNode rhs) : base (rhs)
         {
         }
+
+        public override string ToString()
+        {
+            return DSDefinitions.Keyword.This;
+        }
+
+        public override bool Equals(object other)
+        {
+            return other is ThisPointerNode;
+        }
     }
 
     public class ThrowNode : AssociativeNode
     {
         public AssociativeNode expression { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ThrowNode)
-            {
-                return this.expression.Compare((other as ThrowNode).expression);
-            }
-            else
+            var otherNode = other as ThrowNode;
+            if (null == otherNode)
                 return false;
+               
+            return expression.Equals(otherNode.expression);
         }
     }
 
@@ -1630,23 +1825,13 @@ namespace ProtoCore.AST.AssociativeAST
     {
         public List<AssociativeNode> body { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is TryBlockNode)
-            {
-                bool result = true;
-                TryBlockNode otherNode = other as TryBlockNode;
-                if (otherNode.body.Count != this.body.Count)
-                    return false;
-
-                for (int i = 0; i < body.Count; i++)
-                {
-                    result = result && this.body[i].Compare(otherNode.body[i]);
-                }
-                return result;
-            }
-            else
+            var otherNode = other as TryBlockNode;
+            if (null == otherNode)
                 return false;
+
+            return Enumerable.SequenceEqual(body, otherNode.body);
         }
     }
 
@@ -1655,15 +1840,14 @@ namespace ProtoCore.AST.AssociativeAST
         public IdentifierNode var { get; set; }
         public ProtoCore.Type type { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is CatchFilterNode)
-            {
-                CatchFilterNode otherNode = other as CatchFilterNode;
-                return this.var.Compare(otherNode.var) && (this.type.Equals(otherNode.type));
-            }
-            else
+            var otherNode = other as CatchFilterNode;
+            if (null == otherNode)
                 return false;
+
+            return var.Equals(otherNode.var) &&
+                   type.Equals(otherNode.type);
         }
     }
 
@@ -1672,27 +1856,13 @@ namespace ProtoCore.AST.AssociativeAST
         public CatchFilterNode catchFilter { get; set; }
         public List<AssociativeNode> body { get; set; }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is CatchBlockNode)
-            {
-                CatchBlockNode otherNode = other as CatchBlockNode;
-                bool result = true;
-                result = result && this.catchFilter.Compare(otherNode.catchFilter);
-
-                if (this.body.Count != otherNode.body.Count)
-                    return false;
-
-                bool bodyCompare = true;
-                for (int i = 0; i < body.Count; i++)
-                {
-                    bodyCompare = bodyCompare && (this.body[i].Compare(otherNode.body[i]));
-                }
-                result = result && bodyCompare;
-                return result;
-            }
-            else
+            var otherNode = other as CatchBlockNode;
+            if (null == otherNode)
                 return false;
+
+            return catchFilter.Equals(otherNode.catchFilter) && Enumerable.SequenceEqual(body, otherNode.body);
         }
     }
 
@@ -1706,27 +1876,13 @@ namespace ProtoCore.AST.AssociativeAST
             catchBlocks = new List<CatchBlockNode>();
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            if (other is ExceptionHandlingNode)
-            {
-                ExceptionHandlingNode otherNode = other as ExceptionHandlingNode;
-                bool result = true;
-                result = result && this.tryBlock.Compare(otherNode.tryBlock);
-
-                if (this.catchBlocks.Count != otherNode.catchBlocks.Count)
-                    return false;
-
-                bool catchBlockCompare = true;
-                for (int i = 0; i < catchBlocks.Count; i++)
-                {
-                    catchBlockCompare = catchBlockCompare && (this.catchBlocks[i].Compare(otherNode.catchBlocks[i]));
-                }
-                result = result && catchBlockCompare;
-                return result;
-            }
-            else
+            var otherNode = other as ExceptionHandlingNode;
+            if (null == otherNode)
                 return false;
+
+            return tryBlock.Equals(otherNode.tryBlock) && Enumerable.SequenceEqual(catchBlocks, otherNode.catchBlocks);
         }
     }
 

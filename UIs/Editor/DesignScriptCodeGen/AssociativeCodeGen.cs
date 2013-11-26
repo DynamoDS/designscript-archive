@@ -1053,7 +1053,7 @@ namespace DesignScript.Editor.CodeGen
             FunctionDefinitionNode getter = new FunctionDefinitionNode()
             {
                 Name = ProtoCore.DSASM.Constants.kGetterPrefix + memVar.name,
-                Singnature = new ArgumentSignatureNode(),
+                Signature = new ArgumentSignatureNode(),
                 Pattern = null,
                 ReturnType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeVar, false),
                 FunctionBody = new CodeBlockNode(),
@@ -1110,7 +1110,7 @@ namespace DesignScript.Editor.CodeGen
             FunctionDefinitionNode setter = new FunctionDefinitionNode()
             {
                 Name = ProtoCore.DSASM.Constants.kSetterPrefix + memVar.name,
-                Singnature = argumentSingature,
+                Signature = argumentSingature,
                 Pattern = null,
                 ReturnType = core.TypeSystem.BuildTypeObject((int)PrimitiveType.kTypeNull, false),
                 FunctionBody = new CodeBlockNode(),
@@ -1302,7 +1302,7 @@ namespace DesignScript.Editor.CodeGen
                     FunctionDefinitionNode initFunc = new FunctionDefinitionNode()
                     {
                         Name = ProtoCore.DSASM.Constants.kStaticPropertiesInitializer,
-                        Singnature = new ArgumentSignatureNode(),
+                        Signature = new ArgumentSignatureNode(),
                         Pattern = null,
                         ReturnType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeNull), UID = (int)PrimitiveType.kTypeNull },
                         FunctionBody = new CodeBlockNode(),
@@ -1763,10 +1763,10 @@ namespace DesignScript.Editor.CodeGen
 
                 // Append arg symbols
                 List<KeyValuePair<string, ProtoCore.Type>> argsToBeAllocated = new List<KeyValuePair<string, ProtoCore.Type>>();
-                if (null != funcDef.Singnature)
+                if (null != funcDef.Signature)
                 {
                     int argNumber = 0;
-                    foreach (VarDeclNode argNode in funcDef.Singnature.Arguments)
+                    foreach (VarDeclNode argNode in funcDef.Signature.Arguments)
                     {
                         ++argNumber;
 
@@ -1843,9 +1843,9 @@ namespace DesignScript.Editor.CodeGen
             {
                 // Build arglist for comparison
                 List<ProtoCore.Type> argList = new List<ProtoCore.Type>();
-                if (null != funcDef.Singnature)
+                if (null != funcDef.Signature)
                 {
-                    foreach (VarDeclNode argNode in funcDef.Singnature.Arguments)
+                    foreach (VarDeclNode argNode in funcDef.Signature.Arguments)
                     {
                         int argType = core.TypeSystem.GetType(argNode.ArgumentType.Name);
                         bool isArray = argNode.ArgumentType.IsIndexable;

@@ -51,7 +51,8 @@ namespace ProtoCore
             
             for (int i = 0; i < astNodeList.Count; i++)
             {
-                DFSTraverse(astNodeList[i]);
+                // DFSTraverse(astNodeList[i]);
+                EmitCode(astNodeList[i].ToString());
             }
             return code;
         }
@@ -383,9 +384,9 @@ namespace ProtoCore
                 EmitCode(": " + funcDefNode.ReturnType.Name);
             }
 
-            if (funcDefNode.Singnature != null)
+            if (funcDefNode.Signature != null)
             {
-                EmitCode(funcDefNode.Singnature.ToString());
+                EmitCode("(" + funcDefNode.Signature.ToString() + ")\n");
             }
             else 
             {
