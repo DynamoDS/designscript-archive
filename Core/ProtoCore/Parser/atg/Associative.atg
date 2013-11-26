@@ -2091,7 +2091,7 @@ Associative_NameReference<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
         )
     ]
                                         (. 
-                                            if (groupExprNode != null && groupExprNode.ArrayDimensions == null && groupExprNode.ReplicationGuides == null)
+                                            if (groupExprNode != null && groupExprNode.ArrayDimensions == null && (groupExprNode.ReplicationGuides == null || groupExprNode.ReplicationGuides.Count == 0))
                                             {
                                                 node = groupExprNode.Expression;
                                             }

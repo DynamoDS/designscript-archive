@@ -219,16 +219,6 @@ namespace ProtoCore.AST.AssociativeAST
         {
         }
 
-        public static AssociativeNode StripGrouping(GroupExpressionNode node)
-        {
-            AssociativeNode expr = node.Expression;
-            while (expr is GroupExpressionNode)
-            {
-                expr = (expr as GroupExpressionNode).Expression;
-            }
-            return expr;
-        }
-
         public override bool Equals(object other)
         {
             var otherNode = other as GroupExpressionNode;
@@ -291,9 +281,6 @@ namespace ProtoCore.AST.AssociativeAST
 
         public override bool Equals(object other)
         {
-            if (other is GroupExpressionNode)
-                other = GroupExpressionNode.StripGrouping(other as GroupExpressionNode);
-
             IdentifierNode otherNode = other as IdentifierNode;
             if (null == otherNode)
                 return false;
@@ -305,7 +292,7 @@ namespace ProtoCore.AST.AssociativeAST
 
         public override string ToString()
         {
-            return Value + base.ToString();
+            return Value.Replace("%", string.Empty) + base.ToString();
         }
     }
 
@@ -962,7 +949,7 @@ namespace ProtoCore.AST.AssociativeAST
 
             foreach (var item in varlist)
             {
-                buf.Append("\t" + item.ToString() + Constants.termline);
+                buf.Append(item.ToString() + Constants.termline);
             }
 
             foreach (var item in funclist)
@@ -1022,7 +1009,7 @@ namespace ProtoCore.AST.AssociativeAST
             if (FunctionBody != null)
             {
                 buf.AppendLine("{");
-                FunctionBody.Body.ForEach(stmt => buf.Append("\t" + stmt.ToString()));
+                FunctionBody.Body.ForEach(stmt => buf.Append(stmt.ToString()));
                 buf.AppendLine("}");
             }
 
@@ -1137,7 +1124,7 @@ namespace ProtoCore.AST.AssociativeAST
             if (FunctionBody != null)
             {
                 buf.AppendLine("{");
-                FunctionBody.Body.ForEach(stmt => buf.Append("\t" + stmt.ToString()));
+                FunctionBody.Body.ForEach(stmt => buf.Append(stmt.ToString()));
                 buf.AppendLine("}");
             }
 
@@ -1193,9 +1180,6 @@ namespace ProtoCore.AST.AssociativeAST
         {
             if (null == ConditionExpression || null == TrueExpression || null == FalseExpression)
                 return false;
-
-            if (other is GroupExpressionNode)
-                other = GroupExpressionNode.StripGrouping(other as GroupExpressionNode);
 
             var otherNode = other as InlineConditionalNode;
             if (null == otherNode)
@@ -1473,9 +1457,6 @@ namespace ProtoCore.AST.AssociativeAST
 
         public override bool Equals(object other)
         {
-            if (other is GroupExpressionNode)
-                other = GroupExpressionNode.StripGrouping(other as GroupExpressionNode);
-
             var otherNode = other as RangeExprNode;
             if (null == otherNode)
                 return false;
