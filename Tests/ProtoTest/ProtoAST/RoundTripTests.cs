@@ -173,6 +173,8 @@ namespace ProtoTest.ProtoAST
             ProtoCore.CodeGenDS codegenDS = new ProtoCore.CodeGenDS(astList);
             string code = codegenDS.GenerateCode();
 
+            Console.WriteLine(code);
+
             // 4. Execute source and verify
             mirror = thisTest.RunScriptSource(code);
             Assert.IsTrue((Int64)mirror.GetValue("x").Payload == result1);

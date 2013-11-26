@@ -2784,7 +2784,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 			}
 			
 		}
-		if (groupExprNode != null && groupExprNode.ArrayDimensions == null && groupExprNode.ReplicationGuides == null)
+		if (groupExprNode != null && groupExprNode.ArrayDimensions == null && (groupExprNode.ReplicationGuides == null || groupExprNode.ReplicationGuides.Count == 0))
 		{
 		   node = groupExprNode.Expression;
 		}
