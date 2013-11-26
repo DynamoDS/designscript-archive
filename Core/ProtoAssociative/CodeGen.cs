@@ -4818,7 +4818,7 @@ namespace ProtoAssociative
             FunctionDefinitionNode getter = new FunctionDefinitionNode
             {
                 Name = ProtoCore.DSASM.Constants.kGetterPrefix + prop.name,
-                Singnature = new ArgumentSignatureNode(),
+                Signature = new ArgumentSignatureNode(),
                 Pattern = null,
                 ReturnType = prop.datatype,
                 FunctionBody = new CodeBlockNode(),
@@ -4852,7 +4852,7 @@ namespace ProtoAssociative
             FunctionDefinitionNode setter = new FunctionDefinitionNode
             {
                 Name = ProtoCore.DSASM.Constants.kSetterPrefix + prop.name,
-                Singnature = argumentSingature,
+                Signature = argumentSingature,
                 Pattern = null,
                 ReturnType = TypeSystem.BuildPrimitiveTypeObject(PrimitiveType.kTypeNull, false, 0),
                 FunctionBody = new CodeBlockNode(),
@@ -5087,7 +5087,7 @@ namespace ProtoAssociative
                 FunctionDefinitionNode initFunc = new FunctionDefinitionNode
                 {
                     Name = ProtoCore.DSASM.Constants.kStaticPropertiesInitializer,
-                    Singnature = new ArgumentSignatureNode(),
+                    Signature = new ArgumentSignatureNode(),
                     Pattern = null,
                     ReturnType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeNull), UID = (int)PrimitiveType.kTypeNull },
                     FunctionBody = new CodeBlockNode(),
@@ -5828,10 +5828,10 @@ namespace ProtoAssociative
 
                 // Append arg symbols
                 List<KeyValuePair<string, ProtoCore.Type>> argsToBeAllocated = new List<KeyValuePair<string, ProtoCore.Type>>();
-                if (null != funcDef.Singnature)
+                if (null != funcDef.Signature)
                 {
                     int argNumber = 0;
-                    foreach (VarDeclNode argNode in funcDef.Singnature.Arguments)
+                    foreach (VarDeclNode argNode in funcDef.Signature.Arguments)
                     {
                         ++argNumber;
 
@@ -5920,9 +5920,9 @@ namespace ProtoAssociative
 
                 // Build arglist for comparison
                 List<ProtoCore.Type> argList = new List<ProtoCore.Type>();
-                if (null != funcDef.Singnature)
+                if (null != funcDef.Signature)
                 {
-                    foreach (VarDeclNode argNode in funcDef.Singnature.Arguments)
+                    foreach (VarDeclNode argNode in funcDef.Signature.Arguments)
                     {
                         ProtoCore.Type argType = BuildArgumentTypeFromVarDeclNode(argNode);
                         argList.Add(argType);
@@ -5984,7 +5984,7 @@ namespace ProtoAssociative
                     }
                     emitDebugInfo = true;
 
-                    EmitCompileLogFunctionStart(GetFunctionSignatureString(funcDef.Name, funcDef.ReturnType, funcDef.Singnature));
+                    EmitCompileLogFunctionStart(GetFunctionSignatureString(funcDef.Name, funcDef.ReturnType, funcDef.Signature));
 
                     // Traverse definition
                     foreach (AssociativeNode bnode in funcDef.FunctionBody.Body)
@@ -7245,9 +7245,9 @@ namespace ProtoAssociative
 
             // Set the arguments passed into the function excluding the 'this' argument
             List<AssociativeNode> args = new List<AssociativeNode>();
-            for (int n = 1; n < procOverload.procNode.Singnature.Arguments.Count; ++n)
+            for (int n = 1; n < procOverload.procNode.Signature.Arguments.Count; ++n)
             {
-                VarDeclNode varDecl = procOverload.procNode.Singnature.Arguments[n];
+                VarDeclNode varDecl = procOverload.procNode.Signature.Arguments[n];
                 args.Add(varDecl.NameNode);
             }
             fcall.FormalArguments = args;
@@ -7257,7 +7257,7 @@ namespace ProtoAssociative
             procOverload.procNode.FunctionBody.Body = new List<AssociativeNode>();
             procOverload.procNode.FunctionBody.Body.Add(thisFunctionBody);
 
-            thisFunctionBody.RightNode = CoreUtils.GenerateCallDotNode(procOverload.procNode.Singnature.Arguments[0].NameNode, fcall, core);
+            thisFunctionBody.RightNode = CoreUtils.GenerateCallDotNode(procOverload.procNode.Signature.Arguments[0].NameNode, fcall, core);
         }
         
 
@@ -7343,7 +7343,7 @@ namespace ProtoAssociative
                 ArgumentType = new ProtoCore.Type { Name = className, UID = procOverload.classIndex, IsIndexable = false, rank = 0 }
             };
 
-            procNode.Singnature.Arguments.Insert(0, thisPtrArg);
+            procNode.Signature.Arguments.Insert(0, thisPtrArg);
 
 
             ProtoCore.Type type = new ProtoCore.Type();

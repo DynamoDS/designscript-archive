@@ -388,7 +388,7 @@ namespace ProtoTest.GraphCompiler
             ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
             funcDefNode.FunctionBody = cbn;
             funcDefNode.Name = "f";
-            funcDefNode.Singnature = argSignatureNode;
+            funcDefNode.Signature = argSignatureNode;
             funcDefNode.ReturnType = new ProtoCore.Type()
             {
                 Name = "int",

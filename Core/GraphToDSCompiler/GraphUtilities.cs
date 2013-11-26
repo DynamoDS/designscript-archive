@@ -1841,7 +1841,7 @@ namespace GraphToDSCompiler
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = Parse(s2, out commentNode);
-            return s1Root.Compare(s2Root);
+            return s1Root.Equals(s2Root);
         }
 
         public static string ConvertAbsoluteToRelative(string absolutePath)

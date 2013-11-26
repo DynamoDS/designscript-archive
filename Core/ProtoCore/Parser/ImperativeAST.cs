@@ -12,12 +12,11 @@ namespace ProtoCore.AST.ImperativeAST
         {
         }
 
-        public override bool Compare(Node other)
+        public override bool Equals(object other)
         {
-            return base.Compare(other);
+            return base.Equals(other);
         }
     }
-
 
     public class LanguageBlockNode : ImperativeNode
     {
