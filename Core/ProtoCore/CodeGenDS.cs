@@ -383,9 +383,9 @@ namespace ProtoCore
                 EmitCode(": " + funcDefNode.ReturnType.Name);
             }
 
-            if (funcDefNode.Singnature != null)
+            if (funcDefNode.Signature != null)
             {
-                EmitCode(funcDefNode.Singnature.ToString());
+                EmitCode(funcDefNode.Signature.ToString());
             }
             else 
             {

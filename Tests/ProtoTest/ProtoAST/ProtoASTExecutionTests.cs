@@ -845,7 +845,7 @@ namespace ProtoTest.ProtoAST
             funcDefNode.FunctionBody = cbn;
 
             // build the args signature
-            funcDefNode.Singnature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
+            funcDefNode.Signature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
             ProtoCore.AST.AssociativeAST.VarDeclNode arg1Decl = new ProtoCore.AST.AssociativeAST.VarDeclNode();
             arg1Decl.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
 
@@ -855,7 +855,7 @@ namespace ProtoTest.ProtoAST
             arg1Type.UID = (int)ProtoCore.PrimitiveType.kTypeInt;
             arg1Type.Name = ProtoCore.DSDefinitions.Keyword.Int;
             arg1Decl.ArgumentType = arg1Type;
-            funcDefNode.Singnature.AddArgument(arg1Decl);
+            funcDefNode.Signature.AddArgument(arg1Decl);
 
 
             // Function Return type
@@ -927,7 +927,7 @@ namespace ProtoTest.ProtoAST
             funcDefNode.FunctionBody = cbn;
 
             // build the args signature
-            funcDefNode.Singnature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
+            funcDefNode.Signature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
 
             // Build arg1
             ProtoCore.AST.AssociativeAST.VarDeclNode arg1Decl = new ProtoCore.AST.AssociativeAST.VarDeclNode();
@@ -939,7 +939,7 @@ namespace ProtoTest.ProtoAST
             arg1Type.UID = (int)ProtoCore.PrimitiveType.kTypeInt;
             arg1Type.Name = ProtoCore.DSDefinitions.Keyword.Int;
             arg1Decl.ArgumentType = arg1Type;
-            funcDefNode.Singnature.AddArgument(arg1Decl);
+            funcDefNode.Signature.AddArgument(arg1Decl);
 
             // Build arg2
             ProtoCore.AST.AssociativeAST.VarDeclNode arg2Decl = new ProtoCore.AST.AssociativeAST.VarDeclNode();
@@ -951,7 +951,7 @@ namespace ProtoTest.ProtoAST
             arg2Type.UID = (int)ProtoCore.PrimitiveType.kTypeInt;
             arg2Type.Name = ProtoCore.DSDefinitions.Keyword.Int;
             arg2Decl.ArgumentType = arg2Type;
-            funcDefNode.Singnature.AddArgument(arg2Decl);
+            funcDefNode.Signature.AddArgument(arg2Decl);
 
 
             // Function Return type

@@ -232,7 +232,7 @@ namespace ProtoTest.ProtoAST
             funcDefNode.FunctionBody = cbn;
 
             // build the args signature
-            funcDefNode.Singnature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
+            funcDefNode.Signature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
             ProtoCore.AST.AssociativeAST.VarDeclNode arg1Decl = new ProtoCore.AST.AssociativeAST.VarDeclNode();
             arg1Decl.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode("a");
 
@@ -242,7 +242,7 @@ namespace ProtoTest.ProtoAST
             arg1Type.UID = (int)ProtoCore.PrimitiveType.kTypeInt;
             arg1Type.Name = ProtoCore.DSDefinitions.Keyword.Int;
             arg1Decl.ArgumentType = arg1Type;
-            funcDefNode.Singnature.AddArgument(arg1Decl);
+            funcDefNode.Signature.AddArgument(arg1Decl);
 
 
             // Function Return type
@@ -531,6 +531,77 @@ namespace ProtoTest.ProtoAST
             Assert.IsTrue((Int64)mirror.GetValue("a").Payload == result1);
         }
 
-    }
+        [Test]
+        public void TestAstToCode()
+        {
+            // Convert a list of code -> AST nodes -> code -> AST nodes
+            // Compare two AST node lists are equal
 
+            List<string> statements = new List<string>
+            {
+                "x = {};",
+                @"x = {1, true, false, 1.234, 41, null, ""hello world"", 'x', foo(a<1>, b<2>)[3]}[0]<1>;",
+                "x = (a..b..c)<1>..(m<1>..n<2>..~1)<2>..(i..j..#k<1>)<3>;",
+                "x = (a > b ? foo(1, 2)<1> : bar(2, 3)<2>) ? ding(1, 2)<1> : dong(1, 2)<2>;", 
+                "x = (a == b) ? ((a >= b) ? (a && b) : (a || b)) : (a < b);",
+                "x = foo(a<1>, b<2>, c<3>)[0]<1>;",
+                "x = Point.ByCoordinates({1,2,3}, {4,5,6}<1>, {7, 8, 9}<2>)<0>;",
+                "x = this.foo(1, 2);",
+                "x = this.X;",
+                "return = {1, 2, 3};",
+                "return = Math.PI;",
+                "return = Math.Cos(1.2);", 
+                "class Foo { x:var; y:int[][][]; z:double[]..[]; constructor Foo(p:int[]) { x = p; } def foo:var[](p:int[]..[]) { return = 0; }  static def bar() { return = null; }}",
+                "x[0][1] = {};",
+                // @"import (""x6.dll"");",
+                // @"import (""x6"" from ""x6.dll"");",
+                // "static def x13:int[][](x:double[]..[], y:var[], z) { sum: double = x + y + z; return = sum;};",
+            };
+
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> nodes = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> new_nodes = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            List<string> new_statements = new List<string>();
+
+            foreach (var stmt in statements)
+            {
+                ProtoCore.AST.AssociativeAST.CodeBlockNode commentCode = null;
+                var cbn = GraphToDSCompiler.GraphUtilities.Parse(stmt, out commentCode) as ProtoCore.AST.AssociativeAST.CodeBlockNode;
+                if (cbn != null)
+                {
+                    foreach (var item in cbn.Body)
+                    {
+                        nodes.Add(item);
+
+                        string code = item.ToString();
+                        new_statements.Add(code);
+                        Console.WriteLine(code);
+                    }
+                }
+            }
+
+            foreach (var stmt in new_statements)
+            {
+                ProtoCore.AST.AssociativeAST.CodeBlockNode commentCode = null;
+                var cbn = GraphToDSCompiler.GraphUtilities.Parse(stmt, out commentCode) as ProtoCore.AST.AssociativeAST.CodeBlockNode;
+                if (cbn != null)
+                {
+                    foreach (var item in cbn.Body)
+                    {
+                        new_nodes.Add(item);
+                    }
+                }
+            }
+
+            Assert.AreEqual(nodes.Count, new_nodes.Count);
+            int count = nodes.Count;
+
+            for (int i = 0; i < count; ++i)
+            {
+                Console.WriteLine("Compare: ");
+                Console.WriteLine(nodes[i].ToString());
+                Console.WriteLine(new_nodes[i].ToString());
+                Assert.IsTrue(nodes[i].Equals(new_nodes[i]));
+            }
+        }
+    }
 }
