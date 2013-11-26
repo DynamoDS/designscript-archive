@@ -240,6 +240,7 @@ namespace ProtoAssociative
             else
             {
                 cb = core.CodeBlockList[0];
+                core.DeltaCodeBlockIndex++;
             }
             Validity.Assert(null != cb);
             return cb;
@@ -263,6 +264,8 @@ namespace ProtoAssociative
 
             ++core.CodeBlockIndex;
             ++core.RuntimeTableIndex;
+
+            ++core.DeltaCodeBlockIndex;
 
             return cb;
         }
@@ -4702,7 +4705,7 @@ namespace ProtoAssociative
             bool disableLanguageBlocks = core.IsParsingCodeBlockNode || core.IsParsingPreloadedAssembly;
             if (disableLanguageBlocks)
             {
-                core.BuildStatus.LogSemanticError("Defining language blocks are not yet supported");
+                //core.BuildStatus.LogSemanticError("Defining language blocks are not yet supported");
             }
 
             if (IsParsingGlobal() || IsParsingGlobalFunctionBody() || IsParsingMemberFunctionBody() )
