@@ -32,15 +32,5 @@
             Name = rhs.Name;
             skipMe = rhs.skipMe;
         }
-
-        public override string ToString()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool Equals(object other)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }
