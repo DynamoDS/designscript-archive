@@ -553,7 +553,7 @@ namespace ProtoTest.ProtoAST
                 "return = {1, 2, 3};",
                 "return = Math.PI;",
                 "return = Math.Cos(1.2);", 
-                "class Foo { x:var; y:int[][][]; z:double[]..[]; constructor Foo(p:int[]) { x = p; } def foo:var[](p:int[]..[]) { return = 0; }  static def bar() { return = null; }}",
+                "class Foo { f0; f1 = 1; f2 = 2 + 3; f3: int = 3 + 4; f4: int[] = 5; f5: int[]..[] = {1,2,3} ; x:var; y:int[][][]; z:double[]..[]; constructor Foo(p:int[]) { x = p; } def foo:var[](p:int[]..[]) { return = 0; }  static def bar() { return = null; }}",
                 "x[0][1] = {};",
                 // @"import (""x6.dll"");",
                 // @"import (""x6"" from ""x6.dll"");",

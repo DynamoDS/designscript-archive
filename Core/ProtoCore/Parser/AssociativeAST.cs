@@ -20,11 +20,6 @@ namespace ProtoCore.AST.AssociativeAST
         {
             IsModifier = rhs.IsModifier;
         }
-
-        public override bool Equals(object other)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class CommentNode : AssociativeNode
@@ -298,6 +293,10 @@ namespace ProtoCore.AST.AssociativeAST
 
     public class TypedIdentifierNode : IdentifierNode
     {
+        public override string ToString()
+        {
+            return base.ToString() + " : " + datatype.ToString();
+        }
     }
 
     public class IdentifierListNode : AssociativeNode
@@ -761,8 +760,20 @@ namespace ProtoCore.AST.AssociativeAST
 
             if (IsStatic)
                 buf.Append(DSDefinitions.Keyword.Static + " ");
-            buf.Append(NameNode.Name + " : ");
-            buf.Append(ArgumentType.ToString());
+
+            if (NameNode is TypedIdentifierNode)
+            {
+                buf.AppendLine(NameNode.ToString());
+            }
+            else if (NameNode is IdentifierNode)
+            {
+                buf.Append(NameNode.ToString());
+                string argType = ArgumentType.ToString();
+                if (!string.IsNullOrEmpty(argType))
+                    buf.Append(" : " + argType);
+            }
+            else
+                buf.Append(NameNode.ToString());
 
             return buf.ToString();
         }
@@ -949,7 +960,14 @@ namespace ProtoCore.AST.AssociativeAST
 
             foreach (var item in varlist)
             {
-                buf.Append(item.ToString() + Constants.termline);
+                VarDeclNode member = item as VarDeclNode;
+                if (member != null)
+                {
+                    if (member.NameNode is BinaryExpressionNode)
+                        buf.Append(member.ToString());
+                    else
+                        buf.Append(member.ToString() + Constants.termline);
+                }
             }
 
             foreach (var item in funclist)
@@ -1272,9 +1290,21 @@ namespace ProtoCore.AST.AssociativeAST
         {
             StringBuilder buf = new StringBuilder();
 
+            bool needBracket = LeftNode is BinaryExpressionNode || LeftNode is InlineConditionalNode || LeftNode is RangeExprNode;
+            if (needBracket)
+                buf.Append("(");
             buf.Append(LeftNode.ToString());
+            if (needBracket)
+                buf.Append(")");
+
             buf.Append(" " + CoreUtils.GetOperatorString(Optr) + " ");
+
+            needBracket = RightNode is BinaryExpressionNode || RightNode is InlineConditionalNode || RightNode is RangeExprNode;
+            if (needBracket)
+                buf.Append("(");
             buf.Append(RightNode.ToString());
+            if (needBracket)
+                buf.Append(")");
 
             if (DSASM.Operator.assign == Optr)
                 buf.Append(DSASM.Constants.termline);
@@ -1784,6 +1814,10 @@ namespace ProtoCore.AST.AssociativeAST
                    rightNodeArgNum.Equals(otherNode.rightNodeArgNum); 
         }
 
+        public override string ToString()
+        {
+            return DSDefinitions.Keyword.Null;
+        }
     }
 
     public class ThisPointerNode : AssociativeNode
