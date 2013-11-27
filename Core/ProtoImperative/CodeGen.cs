@@ -1278,16 +1278,6 @@ namespace ProtoImperative
 #endif
         private void EmitLanguageBlockNode(ImperativeNode node, ref ProtoCore.Type inferedType, ProtoCore.AssociativeGraph.GraphNode propogateUpdateGraphNode = null)
         {
-            //
-            // TODO Jun:
-            //      Add support for language blocks, classes and functions in GRAPH post july release
-            //      This Temporary guard will no longer be necessary
-            bool disableLanguageBlocks = core.IsParsingCodeBlockNode || core.IsParsingPreloadedAssembly;
-            if (disableLanguageBlocks)
-            {
-                //core.BuildStatus.LogSemanticError("Defining language blocks are not yet supported");
-            }
-
             if (IsParsingGlobal() || IsParsingGlobalFunctionBody())
             {
                 LanguageBlockNode langblock = node as LanguageBlockNode;
