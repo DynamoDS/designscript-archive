@@ -873,7 +873,7 @@ Imperative_NameReference<out ProtoCore.AST.ImperativeAST.ImperativeNode node>
             Imperative_expr<out node>   
                                     (. 
                                         array.Expr = node; 
-                                        array.Type = null;
+                                        array.Type = nameNode.ArrayDimensions;
                                         NodeUtils.SetNodeLocation(array, t);
                                         nameNode.ArrayDimensions = array; 
                                     .)

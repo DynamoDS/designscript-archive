@@ -1927,7 +1927,7 @@ Associative_NameReference<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
                                         (. 
                                             isLeft = tmpIsLeft; 
                                             array.Expr = node; 
-                                            array.Type = null;
+                                            array.Type = nameNode.ArrayDimensions;
                                             NodeUtils.SetNodeLocation(array, t);
                                             nameNode.ArrayDimensions = array; 
                                             

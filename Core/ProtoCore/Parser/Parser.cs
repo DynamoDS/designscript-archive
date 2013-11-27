@@ -2630,7 +2630,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 				Associative_Expression(out node);
 				isLeft = tmpIsLeft; 
 				array.Expr = node; 
-				array.Type = null;
+				array.Type = nameNode.ArrayDimensions;
 				NodeUtils.SetNodeLocation(array, t);
 				nameNode.ArrayDimensions = array; 
 				
@@ -3410,7 +3410,7 @@ langblock.codeblock.language == ProtoCore.Language.kInvalid) {
 			if (StartOf(4)) {
 				Imperative_expr(out node);
 				array.Expr = node; 
-				array.Type = null;
+				array.Type = nameNode.ArrayDimensions;
 				NodeUtils.SetNodeLocation(array, t);
 				nameNode.ArrayDimensions = array; 
 				
