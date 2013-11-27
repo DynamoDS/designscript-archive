@@ -10,6 +10,8 @@ using ProtoTestFx.TD;
 using System.Linq;
 using ProtoCore.AST.AssociativeAST;
 using ProtoCore.DSASM;
+using ProtoCore.Mirror;
+using System.Collections;
 
 namespace ProtoTest.LiveRunner
 {
@@ -57,7 +59,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
         }
 
         
@@ -90,7 +92,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             astList.Add(assign);
@@ -102,7 +104,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
         }
 
         [Test]
@@ -134,7 +136,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 30);
         }
 
         [Test]
@@ -186,7 +188,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 30);
         }
 
         [Test]
@@ -220,7 +222,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign2 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
@@ -237,9 +239,9 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 20);
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign3 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
@@ -259,11 +261,11 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 20);
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 30);
         }
 
         [Test]
@@ -299,7 +301,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
 
             //string o = liveRunner.GetCoreDump();
 
@@ -319,9 +321,9 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 20);
 
             //string o = liveRunner.GetCoreDump();
 
@@ -343,11 +345,11 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 20);
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 30);
 
             //o = liveRunner.GetCoreDump();
 
@@ -361,11 +363,11 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
 
             //o = liveRunner.GetCoreDump();
         }
@@ -409,10 +411,10 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 78);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 78);
 
             mirror = liveRunner.InspectNodeValue("d");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
 
             // Build the AST trees
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
@@ -438,13 +440,13 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 78);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 78);
             mirror = liveRunner.InspectNodeValue("d");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
             ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign3 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
@@ -461,16 +463,16 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
 
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
 
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 78);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 78);
 
             mirror = liveRunner.InspectNodeValue("d");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
         }
 
         [Test]
@@ -545,7 +547,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10.0);
+            Assert.IsTrue((double)mirror.GetData().Data == 10.0);
 
 
             ///////////////////////////////////////////////////////////////////////////////
@@ -608,7 +610,7 @@ namespace ProtoTest.LiveRunner
 
 
             mirror = liveRunner.InspectNodeValue("xval");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10.0);
+            Assert.IsTrue((double)mirror.GetData().Data == 10.0);
 
 
             astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
@@ -643,7 +645,7 @@ namespace ProtoTest.LiveRunner
 
 
             mirror = liveRunner.InspectNodeValue("m");
-            var res = mirror.GetData().GetStackValue().opdata;
+            var res = (double)mirror.GetData().Data;
             Assert.IsTrue(res == 1.0);
         }
 
@@ -748,7 +750,7 @@ namespace ProtoTest.LiveRunner
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("xval");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
+            Assert.IsTrue((double)mirror.GetData().Data == 11.0);
 
         }
 
@@ -968,7 +970,9 @@ z=Point.ByCoordinates(y,a,a);
                 liveRunner.UpdateGraph(syncData);
 
                 ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("z");
-                Assert.IsTrue(mirror.GetData().GetStackValue().optype == ProtoCore.DSASM.AddressType.ArrayPointer);
+                var zValues = mirror.GetData().GetElements();
+                Assert.IsTrue(zValues != null && zValues.Count == 10);
+                Assert.IsTrue(zValues[0].Class.ClassName == "Point");
             }
 
         }
@@ -982,7 +986,7 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateCmdLineInterpreter("a=10;");
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
 
             //string o = liveRunner.GetCoreDump();
 
@@ -990,9 +994,9 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateCmdLineInterpreter("c=20;");
 
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 20);
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
 
             //string o = liveRunner.GetCoreDump();
 
@@ -1000,11 +1004,11 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateCmdLineInterpreter("b = a+c;");
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 20);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 20);
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 30);
 
             //o = liveRunner.GetCoreDump();
 
@@ -1012,11 +1016,11 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateCmdLineInterpreter("c= 30;");
 
             mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
             mirror = liveRunner.InspectNodeValue("c");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 30);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 30);
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 40);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 40);
 
             //o = liveRunner.GetCoreDump();
         }
@@ -1030,7 +1034,7 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateCmdLineInterpreter("x=99;");
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("x");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 99);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 99);
 
             //string o = liveRunner.GetCoreDump();
 
@@ -1038,9 +1042,9 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateCmdLineInterpreter("y=x;");
 
             mirror = liveRunner.InspectNodeValue("y");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 99);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 99);
             mirror = liveRunner.InspectNodeValue("x");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 99);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 99);
 
             //string o = liveRunner.GetCoreDump();
 
@@ -1048,9 +1052,9 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateCmdLineInterpreter("x = 100;");
 
             mirror = liveRunner.InspectNodeValue("x");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 100);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 100);
             mirror = liveRunner.InspectNodeValue("y");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 100);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 100);
         }
 
         [Test]
@@ -1086,7 +1090,7 @@ z=Point.ByCoordinates(y,a,a);
             // xval = newPoint.X;
             //
             //==============================================
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
+            Assert.IsTrue((double)mirror.GetData().Data == 11.0);
 
         }
 
@@ -1118,7 +1122,7 @@ z=Point.ByCoordinates(y,a,a);
             // xval = newPoint.X;
             //
             //==============================================
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10.0);
+            Assert.IsTrue((double)mirror.GetData().Data == 10.0);
 
             //==============================================
             // Translate the point
@@ -1139,7 +1143,7 @@ z=Point.ByCoordinates(y,a,a);
             // xval = newPoint.X;
             //
             //==============================================
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 11.0);
+            Assert.IsTrue((double)mirror.GetData().Data == 11.0);
 
         }
 
@@ -1168,8 +1172,9 @@ z=Point.ByCoordinates(y,a,a);
             ProtoScript.Runners.ILiveRunner liveRunner = new ProtoScript.Runners.LiveRunner();
             liveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a[1]");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 1);
+            ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
+            var collection = mirror.GetData().GetElements();
+            Assert.IsTrue((Int64)collection[1].Data == 1);
         }
 
         [Test]
@@ -1198,7 +1203,7 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a[1 + 7]");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 90);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 90);
         }
 
         [Test]
@@ -1233,7 +1238,7 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("a");
-            Assert.IsTrue(mirror.GetData().GetStackValue().opdata == 10);
+            Assert.IsTrue((Int64)mirror.GetData().Data == 10);
 
 
 
@@ -1266,7 +1271,7 @@ z=Point.ByCoordinates(y,a,a);
             liveRunner.UpdateGraph(syncData);
 
             mirror = liveRunner.InspectNodeValue("b");
-            Assert.IsTrue(mirror.GetData().GetStackValue().optype == AddressType.Null);
+            Assert.IsTrue(mirror.GetData().IsNull);
 
         }
 
@@ -1281,23 +1286,25 @@ z=Point.ByCoordinates(y,a,a);
         private void AssertValue(string varname, object value)
         {
             var mirror = astLiveRunner.InspectNodeValue(varname);
-
-            StackValue svValue = mirror.GetData().GetStackValue();
+            MirrorData data = mirror.GetData();
+            object svValue = data.Data;
             if (value is double)
             {
-                Assert.AreEqual(svValue.opdata_d, Convert.ToDouble(value));
+                Assert.AreEqual((double)svValue, Convert.ToDouble(value));
             }
             else if (value is int)
             {
-                Assert.AreEqual(svValue.opdata, Convert.ToInt64(value));
+                Assert.AreEqual((Int64)svValue, Convert.ToInt64(value));
             }
             else if (value is IEnumerable<int>)
             {
+                Assert.IsTrue(data.IsCollection);
                 var values = (value as IEnumerable<int>).ToList().Select(v => (object)v).ToList();
                 Assert.IsTrue(mirror.GetUtils().CompareArrays(varname, values, typeof(Int64)));
             }
             else if (value is IEnumerable<double>)
             {
+                Assert.IsTrue(data.IsCollection);
                 var values = (value as IEnumerable<double>).ToList().Select(v => (object)v).ToList();
                 Assert.IsTrue(mirror.GetUtils().CompareArrays(varname, values, typeof(double)));
             }
@@ -1329,8 +1336,8 @@ z=Point.ByCoordinates(y,a,a);
                 liveRunner.UpdateGraph(syncData);
 
                 ProtoCore.Mirror.RuntimeMirror mirror = liveRunner.InspectNodeValue("px");
-                StackValue value = mirror.GetData().GetStackValue();
-                Assert.AreEqual(value.opdata, 1);
+                var value = (double)mirror.GetData().Data;
+                Assert.AreEqual(value, 1);
             }
         }
 
@@ -1373,8 +1380,8 @@ z=Point.ByCoordinates(y,a,a);
             astLiveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("px");
-            StackValue value = mirror.GetData().GetStackValue();
-            Assert.AreEqual(value.opdata, 1);
+            var value = (double)mirror.GetData().Data;
+            Assert.AreEqual(value, 1);
 
             for (int i = 0; i < 10; ++i)
             {
@@ -1385,8 +1392,8 @@ z=Point.ByCoordinates(y,a,a);
                 astLiveRunner.UpdateGraph(syncData);
 
                 mirror = astLiveRunner.InspectNodeValue("px");
-                value = mirror.GetData().GetStackValue();
-                Assert.AreEqual(value.opdata, i);
+                value = (double)mirror.GetData().Data;
+                Assert.AreEqual(value, i);
             }
         }
 
@@ -1407,8 +1414,8 @@ z=Point.ByCoordinates(y,a,a);
             astLiveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("a");
-            StackValue value = mirror.GetData().GetStackValue();
-            Assert.AreEqual(value.opdata, 1);
+            var value = (Int64)mirror.GetData().Data;
+            Assert.AreEqual(value, 1);
 
             // Simulate delete a = 1 and add CBN a = 2
             int newval = 2;
@@ -1444,8 +1451,8 @@ z=Point.ByCoordinates(y,a,a);
             astLiveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("b");
-            StackValue value = mirror.GetData().GetStackValue();
-            Assert.AreEqual(value.opdata, 2);
+            var value = (Int64)mirror.GetData().Data;
+            Assert.AreEqual(value, 2);
 
             for (int i = 0; i < 10; ++i)
             {
@@ -1480,8 +1487,8 @@ z=Point.ByCoordinates(y,a,a);
             astLiveRunner.UpdateGraph(syncData);
 
             ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("b");
-            StackValue value = mirror.GetData().GetStackValue();
-            Assert.AreEqual(value.opdata, 2);
+            var value = (Int64)mirror.GetData().Data;
+            Assert.AreEqual(value, 2);
 
             int newval = 2;
             codes[0] = "a = " + newval.ToString() + ";";
