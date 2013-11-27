@@ -1335,6 +1335,27 @@ z=Point.ByCoordinates(y,a,a);
         }
 
         [Test]
+        public void TestImperative01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "i = [Imperative] {a = 1;b = a;a = 10;return = b;}"
+            };
+            Guid guid = System.Guid.NewGuid();
+
+            // add two nodes
+            IEnumerable<int> index = Enumerable.Range(0, codes.Count);
+            var added = index.Select(idx => CreateSubTreeFromCode(guid, codes[idx])).ToList();
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("i");
+            StackValue value = mirror.GetData().GetStackValue();
+            Assert.AreEqual(value.opdata, 1);
+        }
+
+        [Test]
         public void TestModify01()
         {
             List<string> codes = new List<string>() 
