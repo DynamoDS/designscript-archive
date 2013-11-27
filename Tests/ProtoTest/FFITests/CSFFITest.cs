@@ -109,7 +109,7 @@ namespace ProtoFFITests
         public void TestImportPointClassWithoutImportingVectorClass()
         {
             String code =
-            @"               import(Point from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = p1.DirectionTo(p2);               p3 = p1.Translate(v, 3.464102);               success = p3.Equals(p2);            ";
+            @"               import(Point from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = p1.DirectionTo(p2);               p3 = p1.Translate(v, 3.464102);               success = p3.IsCoincident(p2);            ";
             ValidationData[] data = { new ValidationData { ValueName = "success", ExpectedValue = true, BlockIndex = 0 } };
             ExecuteAndVerify(code, data);
         }
@@ -119,7 +119,7 @@ namespace ProtoFFITests
         public void TestImportPointAndVectorClass()
         {
             String code =
-            @"               import(Point from ""ProtoGeometry.dll"");               import(Vector from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = Vector.ByCoordinates(2,1.99999999,2.00000001);               p3 = p1.Translate(v,v.GetLength());               success = p3.Equals(p2);            ";
+            @"               import(Point from ""ProtoGeometry.dll"");               import(Vector from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = Vector.ByCoordinates(2,1.99999999,2.00000001);               p3 = p1.Translate(v,v.GetLength());               success = p3.IsCoincident(p2);            ";
             ValidationData[] data = { new ValidationData { ValueName = "success", ExpectedValue = true, BlockIndex = 0 } };
             Assert.True(0 == ExecuteAndVerify(code, data));
         }
@@ -128,7 +128,7 @@ namespace ProtoFFITests
         public void TestProperty()
         {
             String code =
-            @"               import(Point from ""ProtoGeometry.dll"");               import(Line from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               l = Line.ByStartPointEndPoint(p1, p2);               success = l.StartPoint.Equals(p1);            ";
+            @"               import(Point from ""ProtoGeometry.dll"");               import(Line from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               l = Line.ByStartPointEndPoint(p1, p2);               success = l.StartPoint.IsCoincident(p1);            ";
             ValidationData[] data = { new ValidationData { ValueName = "success", ExpectedValue = true, BlockIndex = 0 } };
             ExecuteAndVerify(code, data);
         }
@@ -146,7 +146,7 @@ namespace ProtoFFITests
         public void TestImportVectorAndPointClass()
         {
             String code =
-            @"               import(Vector from ""ProtoGeometry.dll"");               import(Point from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = Vector.ByCoordinates(2,1.99999999,2.00000001);               p3 = p1.Translate(v,v.GetLength());               success = p3.Equals(p2);            ";
+            @"               import(Vector from ""ProtoGeometry.dll"");               import(Point from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = Vector.ByCoordinates(2,1.99999999,2.00000001);               p3 = p1.Translate(v,v.GetLength());               success = p3.IsCoincident(p2);            ";
             ValidationData[] data = { new ValidationData { ValueName = "success", ExpectedValue = true, BlockIndex = 0 } };
             ExecuteAndVerify(code, data);
         }
@@ -170,7 +170,7 @@ namespace ProtoFFITests
         public void TestDisposeOnImplicitImport()
         {
             String code =
-            @"               import(Point from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = p1.DirectionTo(p2);               v = p2.DirectionTo(p1);               v = p1.DirectionTo(p2);               p3 = p1.Translate(v,3.464102);               success = p3.Equals(p2);            ";
+            @"               import(Point from ""ProtoGeometry.dll"");               p1 = Point.ByCoordinates(1,2,3);               p2 = Point.ByCoordinates(3,4,5);               v = p1.DirectionTo(p2);               v = p2.DirectionTo(p1);               v = p1.DirectionTo(p2);               p3 = p1.Translate(v,3.464102);               success = p3.IsCoincident(p2);            ";
             ValidationData[] data = { new ValidationData { ValueName = "success", ExpectedValue = true, BlockIndex = 0 } };
             ExecuteAndVerify(code, data);
         }
