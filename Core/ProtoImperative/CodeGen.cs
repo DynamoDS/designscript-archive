@@ -50,15 +50,24 @@ namespace ProtoImperative
             // Set the new symbol table's parent
             // Set the new table as a child of the parent table
 
-            codeBlock = new ProtoCore.DSASM.CodeBlock(
-                ProtoCore.DSASM.CodeBlockType.kLanguage, 
-                ProtoCore.Language.kImperative,
-                core.CodeBlockIndex, 
-                new ProtoCore.DSASM.SymbolTable("imperative lang block", core.RuntimeTableIndex),
-                new ProtoCore.DSASM.ProcedureTable(core.RuntimeTableIndex), false, coreObj);
-
-            ++core.CodeBlockIndex;
-            ++core.RuntimeTableIndex;
+            // Comment Jun: Get the codeblock to use for this codegenerator
+            if (core.Options.IsDeltaExecution)
+            {
+                codeBlock = GetDeltaCompileCodeBlock();
+                //if (core.Options.IsDeltaCompile)
+                //{
+                //    pc = codeBlock.instrStream.instrList.Count;
+                //}
+                //else
+                //{
+                //    pc = core.deltaCompileStartPC;
+                //}
+            }
+            else
+            {
+                codeBlock = BuildNewCodeBlock();
+            }
+            //codeBlock = BuildNewCodeBlock();
 
             if (null == parentBlock)
             {
@@ -84,6 +93,64 @@ namespace ProtoImperative
             backpatchMap = new BackpatchMap();
 
             nodeBuilder = new NodeBuilder(core);
+        }
+
+        private ProtoCore.DSASM.CodeBlock GetDeltaCompileCodeBlock()
+        {
+            ProtoCore.DSASM.CodeBlock cb = null;
+
+            // If the codeBlockindex is greater than the size of the codeblockList then it means that this imperative codeblock already exists
+            // Just retrieve it
+            if (core.CodeBlockList.Count > 1 && core.CodeBlockList.Count <= core.CodeBlockIndex)
+            {
+                cb = core.CodeBlockList[core.DeltaCodeBlockIndex];
+                core.DeltaCodeBlockIndex++;
+            }
+            else
+            {
+                cb = BuildNewCodeBlock();
+                core.CodeBlockList.Add(cb);
+            }
+            Validity.Assert(null != cb);
+            return cb;
+        }
+
+        private ProtoCore.DSASM.CodeBlock BuildNewCodeBlock(ProcedureTable procTable = null)
+        {
+            /*
+            ProcedureTable pTable = procTable == null ? new ProtoCore.DSASM.ProcedureTable(core.RuntimeTableIndex) : procTable;
+
+            // Create a new symboltable for this block
+            // Set the new symbol table's parent
+            // Set the new table as a child of the parent table
+            ProtoCore.DSASM.CodeBlock cb = new ProtoCore.DSASM.CodeBlock(
+                    ProtoCore.DSASM.CodeBlockType.kLanguage,
+                    ProtoCore.Language.kAssociative,
+                    core.CodeBlockIndex,
+                    new ProtoCore.DSASM.SymbolTable("associative lang block", core.RuntimeTableIndex),
+                    pTable,
+                    false,
+                    core);
+
+            ++core.CodeBlockIndex;
+            ++core.RuntimeTableIndex;
+
+            return cb;
+             * */
+
+            ProtoCore.DSASM.CodeBlock cb = new ProtoCore.DSASM.CodeBlock(
+                ProtoCore.DSASM.CodeBlockType.kLanguage,
+                ProtoCore.Language.kImperative,
+                core.CodeBlockIndex,
+                new ProtoCore.DSASM.SymbolTable("imperative lang block", core.RuntimeTableIndex),
+                new ProtoCore.DSASM.ProcedureTable(core.RuntimeTableIndex), false, core);
+
+            ++core.CodeBlockIndex;
+            ++core.RuntimeTableIndex;
+
+            ++core.DeltaCodeBlockIndex;
+
+            return cb;
         }
 
         private void SetCompileOptions()
@@ -1211,16 +1278,6 @@ namespace ProtoImperative
 #endif
         private void EmitLanguageBlockNode(ImperativeNode node, ref ProtoCore.Type inferedType, ProtoCore.AssociativeGraph.GraphNode propogateUpdateGraphNode = null)
         {
-            //
-            // TODO Jun:
-            //      Add support for language blocks, classes and functions in GRAPH post july release
-            //      This Temporary guard will no longer be necessary
-            bool disableLanguageBlocks = core.IsParsingCodeBlockNode || core.IsParsingPreloadedAssembly;
-            if (disableLanguageBlocks)
-            {
-                core.BuildStatus.LogSemanticError("Defining language blocks are not yet supported");
-            }
-
             if (IsParsingGlobal() || IsParsingGlobalFunctionBody())
             {
                 LanguageBlockNode langblock = node as LanguageBlockNode;
@@ -1567,6 +1624,11 @@ namespace ProtoImperative
 
         private void EmitIfStmtNode(ImperativeNode node, ref ProtoCore.Type inferedType, ProtoCore.AST.ImperativeAST.BinaryExpressionNode parentNode = null, bool isForInlineCondition = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null)
         {
+            if (core.IsParsingCodeBlockNode || core.IsParsingPreloadedAssembly)
+            {
+                return;
+            }
+
             if (IsParsingGlobal() || IsParsingGlobalFunctionBody())
             {
                 /*
@@ -1632,16 +1694,24 @@ namespace ProtoImperative
                 // Set the current codeblock as the parent of the new codeblock
                 // Set the new codeblock as a new child of the current codeblock
                 // Set the new codeblock as the current codeblock
-                ProtoCore.DSASM.CodeBlock localCodeBlock = new ProtoCore.DSASM.CodeBlock(
+                ProtoCore.DSASM.CodeBlock localCodeBlock = null;
+
+            
+                localCodeBlock = new ProtoCore.DSASM.CodeBlock(
                     ProtoCore.DSASM.CodeBlockType.kConstruct,
                     Language.kInvalid,
-                    core.CodeBlockIndex++,
+                    core.DeltaCodeBlockIndex++,
                     new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("if"), core.RuntimeTableIndex++),
                     null);
+
+                core.CodeBlockIndex++;
 
                 localCodeBlock.instrStream = codeBlock.instrStream;
                 localCodeBlock.parent = codeBlock;
                 codeBlock.children.Add(localCodeBlock);
+                
+
+
                 codeBlock = localCodeBlock;
                 core.CompleteCodeBlockList.Add(localCodeBlock);
                 EmitPushBlockID(localCodeBlock.codeBlockId);
@@ -1719,9 +1789,11 @@ namespace ProtoImperative
                         localCodeBlock = new ProtoCore.DSASM.CodeBlock(
                             ProtoCore.DSASM.CodeBlockType.kConstruct,
                             Language.kInvalid,
-                            core.CodeBlockIndex++,
+                            core.DeltaCodeBlockIndex++,
                             new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("elseif"), core.RuntimeTableIndex++),
                             null);
+
+                        core.CodeBlockIndex++;
 
                         localCodeBlock.instrStream = codeBlock.instrStream;
                         localCodeBlock.parent = codeBlock;
@@ -1784,9 +1856,11 @@ namespace ProtoImperative
                     localCodeBlock = new ProtoCore.DSASM.CodeBlock(
                         ProtoCore.DSASM.CodeBlockType.kConstruct,
                         Language.kInvalid,
-                        core.CodeBlockIndex++,
+                        core.DeltaCodeBlockIndex++,
                         new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("else"), core.RuntimeTableIndex++),
                         null);
+
+                    core.CodeBlockIndex++;
 
                     localCodeBlock.instrStream = codeBlock.instrStream;
                     localCodeBlock.parent = codeBlock;
@@ -1831,6 +1905,11 @@ namespace ProtoImperative
 
         private void EmitWhileStmtNode(ImperativeNode node, ref ProtoCore.Type inferedType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null)
         {
+            if (core.IsParsingCodeBlockNode || core.IsParsingPreloadedAssembly)
+            {
+                return;
+            }
+
             if (IsParsingGlobal() || IsParsingGlobalFunctionBody())
             {
                 /*
@@ -1889,10 +1968,13 @@ namespace ProtoImperative
                     ProtoCore.DSASM.CodeBlock localCodeBlock = new ProtoCore.DSASM.CodeBlock(
                         ProtoCore.DSASM.CodeBlockType.kConstruct,
                         Language.kInvalid,
-                        core.CodeBlockIndex++,
+                        core.DeltaCodeBlockIndex++,
                         new ProtoCore.DSASM.SymbolTable(GetConstructBlockName("while"), core.RuntimeTableIndex++),
                         null,
                         true);
+
+
+                    core.CodeBlockIndex++;
 
                     localCodeBlock.instrStream = codeBlock.instrStream;
                     localCodeBlock.parent = codeBlock;
@@ -2529,6 +2611,11 @@ namespace ProtoImperative
 
         private void EmitForLoopNode(ImperativeNode node, ref ProtoCore.Type inferredType, bool isBooleanOp = false, ProtoCore.AssociativeGraph.GraphNode graphNode = null)
         {
+            if (core.IsParsingCodeBlockNode || core.IsParsingPreloadedAssembly)
+            {
+                return;
+            }
+
             if (IsParsingGlobal() || IsParsingGlobalFunctionBody())
             {
                 /*

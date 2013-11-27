@@ -240,6 +240,7 @@ namespace ProtoAssociative
             else
             {
                 cb = core.CodeBlockList[0];
+                core.DeltaCodeBlockIndex++;
             }
             Validity.Assert(null != cb);
             return cb;
@@ -263,6 +264,8 @@ namespace ProtoAssociative
 
             ++core.CodeBlockIndex;
             ++core.RuntimeTableIndex;
+
+            ++core.DeltaCodeBlockIndex;
 
             return cb;
         }
@@ -4695,16 +4698,6 @@ namespace ProtoAssociative
 
         private void EmitLanguageBlockNode(AssociativeNode node, ref ProtoCore.Type inferedType, ProtoCore.AssociativeGraph.GraphNode graphNode, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone)
         {
-            //
-            // TODO Jun:
-            //      Add support for language blocks, classes and functions in GRAPH post july release
-            //      This Temporary guard will no longer be necessary
-            bool disableLanguageBlocks = core.IsParsingCodeBlockNode || core.IsParsingPreloadedAssembly;
-            if (disableLanguageBlocks)
-            {
-                core.BuildStatus.LogSemanticError("Defining language blocks are not yet supported");
-            }
-
             if (IsParsingGlobal() || IsParsingGlobalFunctionBody() || IsParsingMemberFunctionBody() )
             {
                 if (subPass == ProtoCore.DSASM.AssociativeSubCompilePass.kUnboundIdentifier)
