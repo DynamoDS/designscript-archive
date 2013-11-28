@@ -28,10 +28,15 @@ namespace ProtoCore
 
         public override string ToString()
         {
-            string retName = (Name == "" ? UID.ToString() : Name);
+            string typename = Name;
+            if (string.IsNullOrEmpty(typename))
+            {
+                typename = TypeSystem.GetPrimitTypeName((PrimitiveType)UID);
+                if (string.IsNullOrEmpty(typename))
+                    typename = DSDefinitions.Keyword.Var;
+            }
 
-            string rankText = "";
-
+            string rankText = string.Empty;
             if (IsIndexable)
             {
                 if (rank == DSASM.Constants.kArbitraryRank)
@@ -43,7 +48,7 @@ namespace ProtoCore
                 }
             }
 
-            return retName + rankText;
+            return typename + rankText;
         }
 
         public bool Equals(Type type)
@@ -87,14 +92,14 @@ namespace ProtoCore
 
         public static string GetPrimitTypeName(PrimitiveType type)
         {
-            if (type == PrimitiveType.kInvalidType || type == PrimitiveType.kMaxPrimitives)
+            if (type == PrimitiveType.kInvalidType || type >= PrimitiveType.kMaxPrimitives)
             {
                 return null;
             }
 
             if (null == primitiveTypeNames)
             {
-                primitiveTypeNames = new Dictionary<PrimitiveType,string>();
+                primitiveTypeNames = new Dictionary<PrimitiveType, string>();
                 primitiveTypeNames[PrimitiveType.kTypeArray] = DSDefinitions.Keyword.Array;
                 primitiveTypeNames[PrimitiveType.kTypeDouble] = DSDefinitions.Keyword.Double;
                 primitiveTypeNames[PrimitiveType.kTypeInt] = DSDefinitions.Keyword.Int;
@@ -220,7 +225,7 @@ namespace ProtoCore
             cnode.coerceTypes.Add((int)PrimitiveType.kTypeChar, (int)ProtoCore.DSASM.ProcedureDistance.kCoerceScore);
             cnode.coerceTypes.Add((int)PrimitiveType.kTypeString, (int)ProtoCore.DSASM.ProcedureDistance.kCoerceScore);*/
             cnode.classId = (int)PrimitiveType.kTypeVar;
-            classTable.SetClassNodeAt(cnode,(int)PrimitiveType.kTypeVar);
+            classTable.SetClassNodeAt(cnode, (int)PrimitiveType.kTypeVar);
 
             //
             //
@@ -237,7 +242,7 @@ namespace ProtoCore
             //
             cnode = new ProtoCore.DSASM.ClassNode { name = DSDefinitions.Keyword.Void, size = 0, rank = 0, symbols = null, vtable = null, typeSystem = this };
             cnode.classId = (int)PrimitiveType.kTypeVoid;
-            classTable.SetClassNodeAt(cnode,(int)PrimitiveType.kTypeVoid);
+            classTable.SetClassNodeAt(cnode, (int)PrimitiveType.kTypeVoid);
 
             //
             //
@@ -282,8 +287,8 @@ namespace ProtoCore
             return classTable.ClassNodes[t1].rank >= classTable.ClassNodes[t2].rank;
         }
 
-        public static Type BuildPrimitiveTypeObject(PrimitiveType pType, 
-                                                    bool isArray, 
+        public static Type BuildPrimitiveTypeObject(PrimitiveType pType,
+                                                    bool isArray,
                                                     int rank = Constants.kUndefinedRank)
         {
             Type type = new Type();
@@ -386,8 +391,8 @@ namespace ProtoCore
             if (sv.optype == AddressType.DefaultArg)
                 return sv;
 
-            if ( !(
-                (int)sv.metaData.type == targetType.UID || 
+            if (!(
+                (int)sv.metaData.type == targetType.UID ||
                 (core.ClassTable.ClassNodes[(int)sv.metaData.type].ConvertibleTo(targetType.UID))
                 || sv.optype == AddressType.ArrayPointer))
             {
@@ -406,14 +411,14 @@ namespace ProtoCore
             }
 
 
-            if (sv.optype == AddressType.ArrayPointer && 
+            if (sv.optype == AddressType.ArrayPointer &&
                 targetType.IsIndexable)
             {
                 Validity.Assert(StackUtils.IsArray(sv));
 
                 //We're being asked to convert an array into an array
                 //walk over the structure converting each othe elements
-               
+
                 if (targetType.UID == (int)PrimitiveType.kTypeVar && targetType.rank == DSASM.Constants.kArbitraryRank && core.Heap.IsTemporaryPointer(sv))
                 {
                     return sv;
@@ -442,15 +447,15 @@ namespace ProtoCore
                         newTargetType.rank = ProtoCore.DSASM.Constants.kArbitraryRank;
                         newTargetType.IsIndexable = true;
                     }
-                    
+
                 }
 
                 return ArrayUtils.CopyArray(sv, newTargetType, core);
             }
 
-            if (sv.optype != AddressType.ArrayPointer && 
-                sv.optype != AddressType.Null && 
-                targetType.IsIndexable && 
+            if (sv.optype != AddressType.ArrayPointer &&
+                sv.optype != AddressType.Null &&
+                targetType.IsIndexable &&
                 targetType.rank != DSASM.Constants.kArbitraryRank)
             {
                 //We're being asked to promote the value into an array
@@ -461,7 +466,7 @@ namespace ProtoCore
                     newTargetType.IsIndexable = false;
                     newTargetType.Name = targetType.Name;
                     newTargetType.rank = 0;
-                    
+
                     //Upcast once
                     StackValue coercedValue = Coerce(sv, newTargetType, core);
                     GCUtils.GCRetain(coercedValue, core);
@@ -476,7 +481,7 @@ namespace ProtoCore
                     newTargetType.UID = targetType.UID;
                     newTargetType.IsIndexable = true;
                     newTargetType.Name = targetType.Name;
-                    newTargetType.rank = targetType.rank -1;
+                    newTargetType.rank = targetType.rank - 1;
 
                     //Upcast once
                     StackValue coercedValue = Coerce(sv, newTargetType, core);
@@ -567,7 +572,7 @@ namespace ProtoCore
                             newSV = StackUtils.BuildString(ch.ToString(), core.Heap);
                         }
                         return newSV;
-                    } 
+                    }
 
                 case (int)PrimitiveType.kTypeVar:
                     {
