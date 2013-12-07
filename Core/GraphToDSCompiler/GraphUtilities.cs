@@ -161,12 +161,20 @@ namespace GraphToDSCompiler
         public static uint runningUID = Constants.UIDStart;
         public static uint GenerateUID() { return runningUID++; }
 
+        private static bool resetCore = true;
+
+        public static void Reset()
+        {
+            CleanUp();
+        }
+
         private static void BuildCore(bool isCodeBlockNode = false, bool isPreloadedAssembly = false)
         {
-
-
-            if (core == null)
+            // Reuse the core for every succeeding run
+            // TODO Jun: Check with UI - what instances need a new core and what needs reuse
+            if (core == null || resetCore)
             {
+                resetCore = false;
                 ProtoCore.Options options = new ProtoCore.Options();
                 options.RootModulePathName = rootModulePath;
                 core = new ProtoCore.Core(options);
@@ -185,16 +193,55 @@ namespace GraphToDSCompiler
             core.ParsingMode = ProtoCore.ParseMode.AllowNonAssignment;
         }
 
-        public static void CleanUp()
+        private static void CleanUp()
         {
+            resetCore = true;
             if (core != null)
+            {
                 core.Cleanup();
+            }
             core = null;
 
             numBuiltInMethods = 0;
             builtInMethods = null;
             importedAssemblies.Clear();
             rootModulePath = string.Empty;
+        }
+
+        /// <summary>
+        /// This function returns the AST form of a variable to be watched
+        /// If input is 'a' then output is binary expression AST 'watch_result_var = a'
+        /// </summary>
+        /// <param name="lhsValueToInspect"></param>
+        /// <returns></returns>
+        public static ProtoCore.AST.AssociativeAST.BinaryExpressionNode GetWatchExpressionAST(string lhsValueToInspect)
+        {
+            if (string.IsNullOrEmpty(lhsValueToInspect))
+            {
+                return null;
+            }
+
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode bnode = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(ProtoCore.DSASM.Constants.kWatchResultVar),
+                new ProtoCore.AST.AssociativeAST.IdentifierNode(lhsValueToInspect),
+                ProtoCore.DSASM.Operator.assign);
+
+            return bnode;
+        } 
+        
+        /// <summary>
+        /// This function returns the DS code form of a variable to be watched
+        /// If input is 'a' then output is binary expression 'watch_result_var = a'
+        /// </summary>
+        /// <param name="lhsValueToInspect"></param>
+        /// <returns></returns>
+        public static string GetWatchExpression(string lhsValueToInspect)
+        {
+            if (string.IsNullOrEmpty(lhsValueToInspect))
+            {
+                return string.Empty;
+            }
+            return ProtoCore.DSASM.Constants.kWatchResultVar + "=" + lhsValueToInspect + ";";
         }
 
         public static void SetRootModulePath(string rootModulePath)
@@ -556,7 +603,7 @@ namespace GraphToDSCompiler
         }
 
         private static void InsertCommentsInCode(string stmt, ProtoCore.AST.Node node, 
-            ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode, ref int cNodeNum, ref List<string> compiled)
+            ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode, ref int cNodeNum, ref List<string> compiled, string expression)
         {
             if (node == null)
             {
@@ -565,8 +612,8 @@ namespace GraphToDSCompiler
                     ProtoCore.AST.AssociativeAST.CommentNode cnode = commentNode.Body[i] as ProtoCore.AST.AssociativeAST.CommentNode;
                     if (cnode == null)
                         continue;
-
-                    compiled.Add(cnode.Value);
+                    string commentString = ProtoCore.Utils.ParserUtils.ExtractCommentStatementFromCode(expression, cnode);
+                    compiled.Add(commentString);
                 }
                 return;
             }
@@ -583,30 +630,14 @@ namespace GraphToDSCompiler
                 if (cnode == null)
                     continue;
 
+                //Get the statement with the line spaces
+                string commentString = ProtoCore.Utils.ParserUtils.ExtractCommentStatementFromCode(expression, cnode);
+
                 // If comment appears on line before statement
                 if (cnode.line < node.line)
                 {
                     //compiled.Insert(nodeNum + commentCount++, cnode.Value);
-                    compiled.Insert(compiled.Count - 1, cnode.Value);
-                    cNodeNum = i + 1;
-                }
-                // If comment is on the same lines as the statement
-                else if (cnode.line >= node.line && cnode.line <= nodeEndLine)
-                {
-                    bool commentBeforeStmt = cnode.line == node.line && cnode.col < node.col;   // can only be comment block
-                    bool commentAfterStmt = cnode.line == nodeEndLine && cnode.col >= nodeEndCol;
-
-                    // If comment appears either before or after the statement
-                    if (commentBeforeStmt)
-                    {
-                        //compiled.Insert(nodeNum + commentCount++, cnode.Value);
-                        compiled.Insert(compiled.Count - 1, cnode.Value);
-                    }
-                    else if (commentAfterStmt)
-                    {
-                        compiled.Add(cnode.Value); 
-                    }
-                    // Ignore the case where the comment is embedded within a statement
+                    compiled.Insert(compiled.Count - 1, commentString);
                     cNodeNum = i + 1;
                 }
                 else // By this point we know the comment appears on a line after the statement
@@ -627,7 +658,7 @@ namespace GraphToDSCompiler
             int cNodeNum = 0;
             if (nodes.Count == 0)
             {
-                InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled);
+                InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled, expression);
                 return compiled;
             }
             
@@ -639,18 +670,21 @@ namespace GraphToDSCompiler
                 if (n is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode ||
                     n is ProtoCore.AST.AssociativeAST.ClassDeclNode)
                 {
-                    core.BuildStatus.LogSemanticError("Class and function definitions are not supported");
+                    core.BuildStatus.LogSemanticError("Class and function definitions are not supported currently.");
 
                 }
                 else if (n is ProtoCore.AST.AssociativeAST.ModifierStackNode)
                 {
-                    core.BuildStatus.LogSemanticError("Modifier Blocks are not supported currently");
+                    core.BuildStatus.LogSemanticError("Modifier Blocks are not supported currently.");
                 }
-                //else if (n is ProtoCore.AST.AssociativeAST.ImportNode)
-                //{
-                //    core.BuildStatus.LogSemanticError("Import statements are not supported in CodeBlock Nodes. To import a file, please use the Library utility");
-
-                //}
+                else if (n is ProtoCore.AST.AssociativeAST.ImportNode)
+                {
+                    core.BuildStatus.LogSemanticError("Import statements are not supported in CodeBlock Nodes.");
+                }
+                else if (n is ProtoCore.AST.AssociativeAST.LanguageBlockNode)
+                {
+                    core.BuildStatus.LogSemanticError("Language blocks are not supported in CodeBlock Nodes.");
+                }
 
                 string stmt = ProtoCore.Utils.ParserUtils.ExtractStatementFromCode(expression, node);
 
@@ -670,10 +704,10 @@ namespace GraphToDSCompiler
                 }
                 compiled.Add(stmt);
                 
-                InsertCommentsInCode(stmt, node, commentNode, ref cNodeNum, ref compiled);
+                InsertCommentsInCode(stmt, node, commentNode, ref cNodeNum, ref compiled, expression);
                 
             }
-            InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled);
+            InsertCommentsInCode(null, null, commentNode, ref cNodeNum, ref compiled, expression);
 
             return compiled;
         }
@@ -1308,36 +1342,62 @@ namespace GraphToDSCompiler
             return p.root;
         }
 
-        public static bool Parse(string code, out List<ProtoCore.AST.Node> resultNodes, out List<ProtoCore.BuildData.ErrorEntry> errors, out List<ProtoCore.BuildData.WarningEntry> warnings,
-                List<String> unboundIdentifiers)
+        public static bool Parse(ref string code, out List<ProtoCore.AST.Node> parsedNodes, out List<ProtoCore.BuildData.ErrorEntry> errors,
+            out List<ProtoCore.BuildData.WarningEntry> warnings, List<String> unboundIdentifiers, out List<String> tempIdentifiers)
         {
+            tempIdentifiers = new List<string>();
+
             try
             {
+                
                 List<String> compiledCode = new List<String>();
+                parsedNodes = null;
+                //-----------------------------------------------------------------------------------
+                //--------------------------------Correct the code-----------------------------------
+                //-----------------------------------------------------------------------------------
+                // Use the compile expression to format the code by adding the required %t temp vars
+                // needed for non assignment statements
                 CompileExpression(code, out compiledCode);
 
                 string codeToParse = "";
                 for (int i = 0; i < compiledCode.Count; i++)
                 {
                     string tempVariableName = "temp" + System.Guid.NewGuid().ToString().Replace("-", "_");
+                    tempIdentifiers.Add(tempVariableName);
+
                     string singleExpression = compiledCode[i];
                     singleExpression = singleExpression.Replace("%t", tempVariableName);
                     codeToParse += singleExpression;
                 }
 
+                code = codeToParse;
+
+                //Catch the errors thrown by compile expression, namely function modiferstack and class decl found
+                if (core.BuildStatus.Errors.Count > 0)
+                {
+                    errors = core.BuildStatus.Errors;
+                    warnings = core.BuildStatus.Warnings;
+                    parsedNodes = null;
+                    return false;
+                }
+                //-----------------------------------------------------------------------------------
+
+
+                //-----------------------------------------------------------------------------------
+                //-----------------------------Parse and compile the code----------------------------
+                //-----------------------------------------------------------------------------------
+                //Parse and compile the code to get the result AST nodes as well as any errors or warnings
+                //that were caught by the comiler
+
                 ProtoCore.BuildStatus buildStatus;
-
                 Dictionary<int, List<VariableLine>> tempUnboundIdentifiers = new Dictionary<int, List<VariableLine>>();
+                List<ProtoCore.AST.Node> nodeList = new List<ProtoCore.AST.Node>(); 
 
-                ParseCodeBlockNodeStatements(codeToParse, out tempUnboundIdentifiers, out resultNodes, out buildStatus);
-                //Dictionary<int, List<GraphToDSCompiler.VariableLine>> unboundIdentifiers;
-                //unboundIdentifiers = new Dictionary<int, List<GraphToDSCompiler.VariableLine>>();
-                //List<ProtoCore.AST.Node> resultNodes;
-
+                ParseCodeBlockNodeStatements(codeToParse, out tempUnboundIdentifiers, out nodeList, out buildStatus);
                 errors = buildStatus.Errors;
                 warnings = buildStatus.Warnings;
 
-                //unboundIdentifiers = new List<string>();
+                //Get the unboundIdentifiers from the warnings
                 foreach (KeyValuePair<int, List<VariableLine>> kvp in tempUnboundIdentifiers)
                 {
                     foreach (VariableLine vl in kvp.Value)
@@ -1348,15 +1408,36 @@ namespace GraphToDSCompiler
                         }
                     }
                 }
+                //-----------------------------------------------------------------------------------
+
+
+                //-----------------------------------------------------------------------------------
+                //------------------------------Assign the 'out' variables---------------------------
+                //-----------------------------------------------------------------------------------
+                // Use the parse function to get the parsed nodes to return to the user
+                if (nodeList != null)
+                {
+                    parsedNodes = new List<ProtoCore.AST.Node>();
+                    ProtoCore.AST.AssociativeAST.CodeBlockNode cNode;
+                    parsedNodes = ParserUtils.GetAstNodes(Parse(codeToParse, out cNode));
+                }
+                else
+                {
+                    parsedNodes = null;
+                }
+                //-----------------------------------------------------------------------------------
+
                 return true;
             }
             catch (Exception e)
             {
-                resultNodes = null;
-                errors = null;
-                warnings = null;
-                unboundIdentifiers = null;
-                return false;
+                throw e;
+                //parsedNodes = null;
+                //compiledNodes = null;
+                //errors = null;
+                //warnings = null;
+                //unboundIdentifiers = null;
+                //return false;
             }
         }
 
@@ -1532,6 +1613,23 @@ namespace GraphToDSCompiler
             }
             return strBuilder.ToString();
         }
+
+        /// <summary>
+        /// This converts a list of ProtoASTs into ds using CodeGenDS
+        /// </summary>
+        /// <param name="astList"></param>
+        /// <returns></returns>
+        public static string ASTListToCode(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList)
+        {
+            string code = string.Empty;
+            if (null != astList && astList.Count > 0)
+            {
+                ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(astList);
+                code = codeGen.GenerateCode();
+            }
+            return code;
+        }
+
         public static List<SnapshotNode> NodeToCodeBlocks(List<SnapshotNode> inputs, GraphToDSCompiler.GraphCompiler originalGC)
         {
             List<SnapshotNode> codeBlocks = new List<SnapshotNode>();
@@ -1743,7 +1841,7 @@ namespace GraphToDSCompiler
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = Parse(s2, out commentNode);
-            return s1Root.Compare(s2Root);
+            return s1Root.Equals(s2Root);
         }
 
         public static string ConvertAbsoluteToRelative(string absolutePath)

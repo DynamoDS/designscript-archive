@@ -748,18 +748,19 @@ namespace ProtoCore.Utils
                 GCUtils.GCRetain(coercedData, core);
                 return ArrayUtils.SetValueForIndices(array, zippedIndices[0], coercedData, core);
             }
-            else if (value.optype == AddressType.ArrayPointer)
+
+            if (t.rank > 0)
+            {
+                t.rank = t.rank - 1;
+                if (t.rank == 0)
+                {
+                    t.IsIndexable = false;
+                }
+            }
+
+            if (value.optype == AddressType.ArrayPointer)
             {
                 // Replication happens on both side.
-                if (t.rank > 0)
-                {
-                    t.rank = t.rank - 1;
-                    if (t.rank == 0)
-                    {
-                        t.IsIndexable = false;
-                    }
-                }
-
                 HeapElement dataHeapElement = GetHeapElement(value, core);
                 int length = Math.Min(zippedIndices.Length, dataHeapElement.VisibleSize);
 
@@ -1032,6 +1033,21 @@ namespace ProtoCore.Utils
         /// <returns></returns>
         public static StackValue[] GetValues(StackValue array, Core core)
         {
+            List<StackValue> values = GetValues<StackValue>(array, core, (StackValue sv) => sv);
+            return values.ToArray();
+        }
+
+        /// <summary>
+        /// Gets all array elements in a List of given type using the given converter to
+        /// convert the stackValue.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="core"></param>
+        /// <param name="converter"></param>
+        /// <returns></returns>
+        public static List<T> GetValues<T>(StackValue array, Core core, Func<StackValue, T> converter)
+        {
             Validity.Assert(StackUtils.IsArray(array));
             if (!StackUtils.IsArray(array))
             {
@@ -1039,17 +1055,21 @@ namespace ProtoCore.Utils
             }
 
             HeapElement he = GetHeapElement(array, core);
-            List<StackValue> values = new List<StackValue>(he.Stack);
+            List<T> values = new List<T>();
+            foreach (var sv in he.Stack)
+            {
+                values.Add(converter(sv));
+            }
 
             if (he.Dict != null)
             {
-                foreach (var value in he.Dict.Values)
+                foreach (var sv in he.Dict.Values)
                 {
-                    values.Add(value);
+                    values.Add(converter(sv));
                 }
             }
 
-            return values.ToArray();
+            return values;
         }
 
         private static StackValue[] GetFlattenValue(StackValue array, Core core)

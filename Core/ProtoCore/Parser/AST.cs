@@ -32,10 +32,5 @@
             Name = rhs.Name;
             skipMe = rhs.skipMe;
         }
-
-        public virtual bool Compare(Node other)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

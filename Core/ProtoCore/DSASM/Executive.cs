@@ -2173,6 +2173,32 @@ namespace ProtoCore.DSASM
                 if (!areDependentsEqual)
                 {
                     gnode.dependentList.Clear();
+
+                    // GC all the temporaries associated with the redefined variable
+                    // Given:
+                    //      a = A.A()
+                    //      a = 10
+                    //
+                    // Transforms to:
+                    //        
+                    //      t0 = A.A()
+                    //      a = t0
+                    //      a = 10      // Redefinition of 'a' will GC 't0'
+                    //
+                    // Another example
+                    // Given:
+                    //      a = {A.A()}
+                    //      a = 10
+                    //
+                    // Transforms to:
+                    //        
+                    //      t0 = A.A()
+                    //      t1 = {t0}
+                    //      a = t1
+                    //      a = 10      // Redefinition of 'a' will GC t0 and t1
+                    //
+                    GCAnonymousSymbols(gnode.symbolListWithinExpression);
+                    gnode.symbolListWithinExpression.Clear();
                 }
             }
         }
@@ -3640,7 +3666,10 @@ namespace ProtoCore.DSASM
                     StackValue array = rmem.BuildNullArray(0);
                     GCRetain(array);
                     rmem.SetAtSymbol(symbolnode, array);
-                    ArrayUtils.SetValueForIndex(array, 0, value, core);
+                    if (!StackUtils.IsNull(value))
+                    {
+                        ArrayUtils.SetValueForIndex(array, 0, value, core);
+                    }
                     ret = ArrayUtils.SetValueForIndices(array, dimlist, data, t, core);
                 }
             }

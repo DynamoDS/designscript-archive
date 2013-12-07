@@ -43,14 +43,14 @@ namespace ProtoCore.Utils
         fDef.IsExternLib = true;
         fDef.IsBuiltIn = true;
         fDef.BuiltInMethodId = method.ID;
-        fDef.Singnature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
+        fDef.Signature = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
 
         foreach (KeyValuePair<string, ProtoCore.Type> param in method.Parameters)
         {
             ProtoCore.AST.AssociativeAST.VarDeclNode arg = new ProtoCore.AST.AssociativeAST.VarDeclNode();
             arg.NameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode { Name = param.Key, Value = param.Key };
             arg.ArgumentType = param.Value;
-            fDef.Singnature.AddArgument(arg);
+            fDef.Signature.AddArgument(arg);
         }
 
         return fDef;
@@ -103,7 +103,7 @@ namespace ProtoCore.Utils
             NameNode = BuildAssocIdentifier(core, "%rhsDim"),
             ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt }
         });
-        funcDefNode.Singnature = args;
+        funcDefNode.Signature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
         ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(core, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
@@ -166,7 +166,7 @@ namespace ProtoCore.Utils
             NameNode = BuildAssocIdentifier(core, "%rhsArgNum"),
             ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)PrimitiveType.kTypeInt), UID = (int)PrimitiveType.kTypeInt }
         });
-        funcDefNode.Singnature = args;
+        funcDefNode.Signature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
         ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(core, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
@@ -201,7 +201,7 @@ namespace ProtoCore.Utils
             NameNode = BuildAssocIdentifier(core, ProtoCore.DSASM.Constants.kRHS),
             ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)op2), UID = (int)op2, rank = op2rank, IsIndexable = (op2rank > 0)}
         });
-        funcDefNode.Singnature = args;
+        funcDefNode.Signature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
         ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(core, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
@@ -231,7 +231,7 @@ namespace ProtoCore.Utils
             NameNode = BuildAssocIdentifier(core, "%param"),
             ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)operand), UID = (int)operand }
         });
-        funcDefNode.Singnature = args;
+        funcDefNode.Signature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
         ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(core, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
@@ -269,7 +269,7 @@ namespace ProtoCore.Utils
             NameNode = BuildAssocIdentifier(core, "%falseExp"),
             ArgumentType = new ProtoCore.Type { Name = core.TypeSystem.GetType((int)r), UID = (int)r }
         });
-        funcDefNode.Singnature = args;
+        funcDefNode.Signature = args;
 
         ProtoCore.AST.AssociativeAST.CodeBlockNode body = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
         ProtoCore.AST.AssociativeAST.IdentifierNode _return = BuildAssocIdentifier(core, ProtoCore.DSDefinitions.Keyword.Return, ProtoCore.PrimitiveType.kTypeReturn);
@@ -767,7 +767,7 @@ namespace ProtoCore.Utils
 
         public static bool Compare(ProtoCore.AST.Node node1, ProtoCore.AST.Node node2)
         {
-            return node1.Compare(node2);
+            return node1.Equals(node2);
         }
 
         public static bool Compare(string s1, string s2, Core core)
@@ -784,7 +784,7 @@ namespace ProtoCore.Utils
             p.Parse();
             ProtoCore.AST.Node s2Root = p.root;
 
-            bool areEqual = s1Root.Compare(s2Root);
+            bool areEqual = s1Root.Equals(s2Root);
             return areEqual;
         }
 

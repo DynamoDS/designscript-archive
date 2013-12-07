@@ -1130,6 +1130,42 @@ r = [Imperative]
         }
 
         [Test]
+        public void TestDictionaryRegressMAGN337()
+        {
+            string code = @"
+     a = { 1, 2, 3 };
+            b = {""x"",""y""};
+                
+def foo(a1 : var[], b1 : var[])
+            {
+
+                a1[b1] = true;
+                return =a1;
+            }
+z1 = foo(a, b);
+r1=z1[""x""];
+r2=z1[""y""];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("r1", true);
+            thisTest.Verify("r2", true);
+        }
+
+
+        [Test]
+        public void TestDictionaryRegressMAGN619()
+        {
+            string code = @"
+a[null]=5;
+c=Count(a);
+r = a[null];
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("c", 0);
+            thisTest.Verify("r", 5);
+        }
+
+        [Test]
         public void TestArrayCopyAssignment01()
         {
             String code = @"a = {1, 2, 3};b[1] = a;b[1][1] = 100;z = a[1];";
@@ -2234,521 +2270,6 @@ r3 = 'h' + 1;";
             thisTest.Verify("r", new Object[] { 5.0, 6.0, 7.0 });
         }
 
-        [Test]
-        public void TestProtoASTExecute_Assign01()
-        {
-            // Build the AST trees
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(assign);
-            // Verify the results
-            ExecutionMirror mirror = thisTest.RunASTSource(astList);
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 10);
-        }
-
-        [Test]
-        public void TestProtoASTExecute_Assign02()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            // Build the AST tree
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(assign);
-            // Verify the results
-            ExecutionMirror mirror = thisTest.RunASTSource(astList);
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 30);
-        }
-
-        [Test]
-        public void TestProtoASTExecute_Assign03()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            /*b = 20;*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign2 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                ProtoCore.DSASM.Operator.assign);
-            /*a = (b + 50)*(b + 20)*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                        new ProtoCore.AST.AssociativeAST.IntNode("50"),
-                        ProtoCore.DSASM.Operator.add),
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                        new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                        ProtoCore.DSASM.Operator.add),
-                    ProtoCore.DSASM.Operator.mul),
-                ProtoCore.DSASM.Operator.assign);
-            /*c = a - 200*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign3 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("200"),
-                    ProtoCore.DSASM.Operator.sub),
-                ProtoCore.DSASM.Operator.assign);
-            /*d = b*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign4 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("d"),
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(assign2);
-            astList.Add(assign1);
-            astList.Add(assign3);
-            astList.Add(assign4);
-            ExecutionMirror mirror = thisTest.RunASTSource(astList);
-            //a = 2800, c = 2600, d = b = 20
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 2800);
-            o = mirror.GetValue("c");
-            Assert.IsTrue((Int64)o.Payload == 2600);
-            Obj p = mirror.GetValue("b");
-            Assert.IsTrue((Int64)p.Payload == 20);
-            o = mirror.GetValue("d");
-            Assert.IsTrue((Int64)o.Payload == 20);
-        }
-
-        [Test]
-        public void TestProtoASTExecute_Assign04()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            /*b = 30*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("30"),
-                ProtoCore.DSASM.Operator.assign);
-            /*a = (b - 10) * 20 + (b + 10) * (b - 20) */
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment =
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                                ProtoCore.DSASM.Operator.sub),
-                            new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                            ProtoCore.DSASM.Operator.mul),
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                                ProtoCore.DSASM.Operator.add),
-                            new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                                new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                                ProtoCore.DSASM.Operator.sub),
-                            ProtoCore.DSASM.Operator.mul),
-                        ProtoCore.DSASM.Operator.add),
-                    ProtoCore.DSASM.Operator.assign);
-            /*c = a*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeC = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                ProtoCore.DSASM.Operator.assign);
-            /*a = a + 1000*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment2 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("1000"),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(nodeB);
-            astList.Add(assignment);
-            astList.Add(nodeC);
-            astList.Add(assignment2);
-            ExecutionMirror mirror = thisTest.RunASTSource(astList);
-            //a = 1800, c = a = 1800
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 1800);
-            o = mirror.GetValue("c");
-            Assert.IsTrue((Int64)o.Payload == 1800);
-        }
-
-        [Test]
-        public void TestProtoASTExecute_Assign05()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            /*b = 30*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("30"),
-                ProtoCore.DSASM.Operator.assign);
-            /*c = b + 30*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeC = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("30"),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            /*a = (b + 20) - (c - 10) + c*5 */
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                            new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                            ProtoCore.DSASM.Operator.add),
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                            new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                            ProtoCore.DSASM.Operator.sub),
-                        ProtoCore.DSASM.Operator.sub),
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                        new ProtoCore.AST.AssociativeAST.IntNode("5"),
-                        ProtoCore.DSASM.Operator.mul),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(nodeB);
-            astList.Add(nodeC);
-            astList.Add(assignment);
-            /*a = 300, b = 30, c= 60 */
-            ExecutionMirror mirror = thisTest.RunASTSource(astList);
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 300);
-        }
-
-        [Test]
-        public void TestCodeGenDS_Assign01()
-        {
-            // Build the AST trees
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(assign);
-            // emit the DS code from the AST tree
-            ProtoCore.CodeGenDS codegenDS = new ProtoCore.CodeGenDS(astList);
-            string code = codegenDS.GenerateCode();
-            // Verify the results
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 10);
-        }
-
-        [Test]
-        public void TestCodeGenDS_Assign02()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            // Build the AST tree
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(assign);
-            // emit the DS code from the AST tree
-            ProtoCore.CodeGenDS codegenDS = new ProtoCore.CodeGenDS(astList);
-            string code = codegenDS.GenerateCode();
-            // Verify the results
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 30);
-        }
-
-        [Test]
-        public void TestCodeGenDS_Assign03()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-
-            /*b = 20;*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign2 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                ProtoCore.DSASM.Operator.assign);
-            /*a = (b + 50)*(b + 20)*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                        new ProtoCore.AST.AssociativeAST.IntNode("50"),
-                        ProtoCore.DSASM.Operator.add),
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                        new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                        ProtoCore.DSASM.Operator.add),
-                    ProtoCore.DSASM.Operator.mul),
-                ProtoCore.DSASM.Operator.assign);
-            /*c = a - 200*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign3 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("200"),
-                    ProtoCore.DSASM.Operator.sub),
-                ProtoCore.DSASM.Operator.assign);
-            /*d = b*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign4 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("d"),
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(assign2);
-            astList.Add(assign1);
-            astList.Add(assign3);
-            astList.Add(assign4);
-
-            ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
-            string code = codegen.GenerateCode();
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            //a = 2800, c = 2600, d = b = 20
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 2800);
-            o = mirror.GetValue("c");
-            Assert.IsTrue((Int64)o.Payload == 2600);
-            Obj p = mirror.GetValue("b");
-            Assert.IsTrue((Int64)p.Payload == 20);
-            o = mirror.GetValue("d");
-            Assert.IsTrue((Int64)o.Payload == 20);
-        }
-
-        [Test]
-        public void TestCodeGenDS_Assign04()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            /*b = 30*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("30"),
-                ProtoCore.DSASM.Operator.assign);
-
-            /*a = (b - 10) * 20 + (b + 10) * (b - 20) */
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment =
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                                ProtoCore.DSASM.Operator.sub),
-                            new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                            ProtoCore.DSASM.Operator.mul),
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                                ProtoCore.DSASM.Operator.add),
-                            new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                                new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                                ProtoCore.DSASM.Operator.sub),
-                            ProtoCore.DSASM.Operator.mul),
-                        ProtoCore.DSASM.Operator.add),
-                    ProtoCore.DSASM.Operator.assign);
-            /*c = a*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeC = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                ProtoCore.DSASM.Operator.assign);
-            /*a = a + 1000*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment2 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("1000"),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(nodeB);
-            astList.Add(assignment);
-            astList.Add(nodeC);
-            astList.Add(assignment2);
-            ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
-            string code = codegen.GenerateCode();
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            //a = 1800, c = a = 1800
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 1800);
-            o = mirror.GetValue("c");
-            Assert.IsTrue((Int64)o.Payload == 1800);
-        }
-
-        [Test]
-        public void TestCodeGenDS_Assign05()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            /*b = 30*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeB = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("30"),
-                ProtoCore.DSASM.Operator.assign);
-            /*c = b + 30*/
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode nodeC = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                    new ProtoCore.AST.AssociativeAST.IntNode("30"),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            /*a = (b + 20) - (c - 10) + c*5 */
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
-                new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                            new ProtoCore.AST.AssociativeAST.IntNode("20"),
-                            ProtoCore.DSASM.Operator.add),
-                        new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                            new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                            new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                            ProtoCore.DSASM.Operator.sub),
-                        ProtoCore.DSASM.Operator.sub),
-                    new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                        new ProtoCore.AST.AssociativeAST.IdentifierNode("c"),
-                        new ProtoCore.AST.AssociativeAST.IntNode("5"),
-                        ProtoCore.DSASM.Operator.mul),
-                    ProtoCore.DSASM.Operator.add),
-                ProtoCore.DSASM.Operator.assign);
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(nodeB);
-            astList.Add(nodeC);
-            astList.Add(assignment);
-            ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
-            string code = codegen.GenerateCode();
-            /*a = 300, b = 30, c= 60 */
-            ExecutionMirror mirror = thisTest.RunScriptSource(code);
-            Obj o = mirror.GetValue("a");
-            Assert.IsTrue((Int64)o.Payload == 300);
-        }
-
-        [Test]
-        public void TestCodeGenDS_FunctionDefNode1()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                ProtoCore.DSASM.Operator.assign);
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnExpr = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                ProtoCore.DSASM.Operator.add);
-            ProtoCore.AST.AssociativeAST.ReturnNode returnNode = new ProtoCore.AST.AssociativeAST.ReturnNode();
-            returnNode.ReturnExpr = returnExpr;
-            cbn.Body.Add(assignment1);
-            cbn.Body.Add(returnNode);
-            ///
-            ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-            funcDefNode.Name = "foo";
-            funcDefNode.FunctionBody = cbn;
-            /* def foo()             * {             *   b = 10;             *   return = b + 10;             * }*/
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(funcDefNode);
-            ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
-            string code = codegen.GenerateCode();
-        }
-
-        [Test]
-        public void TestCodeGenDS_ClassDeclNode01()
-        {
-            GraphToDSCompiler.GraphCompiler gc = GraphToDSCompiler.GraphCompiler.CreateInstance();
-            ProtoCore.AST.AssociativeAST.CodeBlockNode cbn = new ProtoCore.AST.AssociativeAST.CodeBlockNode();
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assignment1 = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                ProtoCore.DSASM.Operator.assign);
-            ProtoCore.AST.AssociativeAST.BinaryExpressionNode returnExpr = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
-                new ProtoCore.AST.AssociativeAST.IdentifierNode("b"),
-                new ProtoCore.AST.AssociativeAST.IntNode("10"),
-                ProtoCore.DSASM.Operator.add);
-            ProtoCore.AST.AssociativeAST.ReturnNode returnNode = new ProtoCore.AST.AssociativeAST.ReturnNode();
-            returnNode.ReturnExpr = returnExpr;
-            cbn.Body.Add(assignment1);
-            cbn.Body.Add(returnNode);
-            ///assigning argSignatureNode to add parameters to the funcDefNode
-            ProtoCore.AST.AssociativeAST.ArgumentSignatureNode argSignatureNode = new ProtoCore.AST.AssociativeAST.ArgumentSignatureNode();
-            ProtoCore.AST.AssociativeAST.VarDeclNode varDeclNode1 = new ProtoCore.AST.AssociativeAST.VarDeclNode();
-            ProtoCore.Type type = new ProtoCore.Type();
-            type.Initialize();
-            type.Name = "int";
-            varDeclNode1.ArgumentType = type;
-            ProtoCore.AST.AssociativeAST.IdentifierNode nameNode = new ProtoCore.AST.AssociativeAST.IdentifierNode
-                                                                                                       {
-                                                                                                           Value = "b",
-                                                                                                           Name = "b",
-                                                                                                           datatype = new ProtoCore.Type()
-                                                                                                           {
-                                                                                                               Name = "int",
-                                                                                                               IsIndexable = false,
-                                                                                                               rank = 0,
-                                                                                                               UID = (int)ProtoCore.PrimitiveType.kTypeVar
-                                                                                                           }
-                                                                                                       };
-            varDeclNode1.NameNode = nameNode;
-            argSignatureNode.AddArgument(varDeclNode1);
-            //assigning funcDefNode's Signature Node
-            ProtoCore.AST.AssociativeAST.FunctionDefinitionNode funcDefNode = new ProtoCore.AST.AssociativeAST.FunctionDefinitionNode();
-            funcDefNode.Name = "foo";
-            funcDefNode.FunctionBody = cbn;
-            funcDefNode.Singnature = argSignatureNode;
-            /* def foo (b:int)             * {             *   b = 10;             *   return = b + 10;             * }*/
-            //cbn.Body.Clear();
-            ProtoCore.AST.AssociativeAST.ClassDeclNode classDefNode = new ProtoCore.AST.AssociativeAST.ClassDeclNode();
-            classDefNode.funclist.Add(funcDefNode);
-            classDefNode.className = "bar";
-            ProtoCore.AST.AssociativeAST.VarDeclNode varDeclNode = new ProtoCore.AST.AssociativeAST.VarDeclNode();
-            //ProtoCore.AST.AssociativeAST.AssociativeNode nodename = varDeclNode.NameNode;
-            varDeclNode.Name = "f";
-            ProtoCore.AST.AssociativeAST.IdentifierNode nameNode_2 = new ProtoCore.AST.AssociativeAST.IdentifierNode()
-            {
-                Value = "f",
-                Name = "f",
-                datatype = new ProtoCore.Type()
-                {
-                    Name = "var",
-                    IsIndexable = false,
-                    rank = 0,
-                    UID = (int)ProtoCore.PrimitiveType.kTypeVar
-                }
-            };
-            varDeclNode.NameNode = nameNode_2;
-            //varDeclNode.NameNode = nodename;
-            //ProtoCore.Type type_2 = varDeclNode.ArgumentType;
-            //type_2.Name = "var";
-            //varDeclNode.ArgumentType = type_2;
-            varDeclNode.ArgumentType = new ProtoCore.Type()
-            {
-                Name = "int",
-                IsIndexable = false,
-                rank = 0,
-                UID = (int)ProtoCore.PrimitiveType.kTypeVar
-            };
-            classDefNode.varlist.Add(varDeclNode);
-            /*class foo             * {             *      f : var             *      def foo (b:int)             *      {             *          b = 10;             *          return = b + 10;             *      }             * }             */
-            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
-            astList.Add(classDefNode);
-            ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(astList);
-            string code = codegen.GenerateCode();
-        }
 
         [Test]
         public void Test_Compare_Node_01()
@@ -2759,7 +2280,7 @@ r3 = 'h' + 1;";
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = GraphToDSCompiler.GraphUtilities.Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = GraphToDSCompiler.GraphUtilities.Parse(s2, out commentNode);
-            bool areEqual = s1Root.Compare(s2Root);
+            bool areEqual = s1Root.Equals(s2Root);
             Assert.AreEqual(areEqual, true);
         }
 
@@ -2771,7 +2292,7 @@ r3 = 'h' + 1;";
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = GraphToDSCompiler.GraphUtilities.Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = GraphToDSCompiler.GraphUtilities.Parse(s2, out commentNode);
-            bool areEqual = s1Root.Compare(s2Root);
+            bool areEqual = s1Root.Equals(s2Root);
             Assert.AreEqual(areEqual, true);
         }
 
@@ -2783,7 +2304,7 @@ r3 = 'h' + 1;";
             ProtoCore.AST.AssociativeAST.CodeBlockNode commentNode = null;
             ProtoCore.AST.Node s1Root = GraphToDSCompiler.GraphUtilities.Parse(s1, out commentNode);
             ProtoCore.AST.Node s2Root = GraphToDSCompiler.GraphUtilities.Parse(s2, out commentNode);
-            bool areEqual = s1Root.Compare(s2Root);
+            bool areEqual = s1Root.Equals(s2Root);
             Assert.AreEqual(areEqual, true);
         }
     }

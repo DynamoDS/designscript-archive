@@ -62,7 +62,36 @@ namespace ProtoScript.Runners
 
             public override void Execute()
             {
-                throw new NotImplementedException();
+                NodesToCodeCompletedEventArgs args = null;
+                List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+
+                if (subtrees != null)
+                {
+                    foreach (var tree in subtrees)
+                    {
+                        Validity.Assert(tree.AstNodes != null && tree.AstNodes.Count > 0);
+                        astList.AddRange(tree.AstNodes);
+                    }
+                }
+
+                lock (runner.operationsMutex)
+                {
+                    try
+                    {
+                        string code = GraphUtilities.ASTListToCode(astList);
+                        args = new NodesToCodeCompletedEventArgs(code, EventStatus.OK, "Node to code task complete.");
+                    }
+                    catch (Exception exception)
+                    {
+                        args = new NodesToCodeCompletedEventArgs(string.Empty, EventStatus.Error, exception.Message);
+                    }
+                }
+
+                // Notify the listener
+                if (null != runner.NodesToCodeCompleted)
+                {
+                    runner.NodesToCodeCompleted(this, args);
+                }
             }
         }
 

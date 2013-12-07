@@ -95,6 +95,7 @@ namespace ProtoScript.Runners
         event NodeValueReadyEventHandler NodeValueReady;
         event GraphUpdateReadyEventHandler GraphUpdateReady;
         event NodesToCodeCompletedEventHandler NodesToCodeCompleted;
+        
     }
 
     public partial class LiveRunner : ILiveRunner
@@ -371,6 +372,7 @@ namespace ProtoScript.Runners
         /// </summary>
         /// <param name="nodeId"></param>
         /// <returns></returns>
+        ///
         public ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName)
         {
             while (true)
@@ -380,19 +382,14 @@ namespace ProtoScript.Runners
                     //Spin waiting for the queue to be empty
                     if (taskQueue.Count == 0)
                     {
-
-                        //No entries and we have the lock
-                        //Synchronous query to get the node
-                        // Comment Jun: all symbols are in the global block as there is no notion of scoping the the graphUI yet.
+                        //return GetWatchValue(nodeName);
                         const int blockID = 0;
                         ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(nodeName, blockID, runnerCore);
-
                         return runtimeMirror;
                     }
                 }
                 Thread.Sleep(0);
             }
-
         }
 
         /// <summary>
@@ -529,6 +526,18 @@ namespace ProtoScript.Runners
 
 
         #region Internal Implementation
+
+        private ProtoCore.Mirror.RuntimeMirror GetWatchValue(string varname)
+        {
+            runnerCore.Options.IsDeltaCompile = true;
+            CompileAndExecuteForDeltaExecution(GraphUtilities.GetWatchExpression(varname));
+
+            const int blockID = 0;
+            ProtoCore.Mirror.RuntimeMirror runtimeMirror = ProtoCore.Mirror.Reflection.Reflect(ProtoCore.DSASM.Constants.kWatchResultVar, blockID, runnerCore);
+            return runtimeMirror;
+                
+        }
+       
 
         /// <summary>
         /// This is being called currently as it uses the Expression interpreter which does not
@@ -718,17 +727,13 @@ namespace ProtoScript.Runners
         /// <returns></returns>
         private List<AssociativeNode> MarkGraphNodesInactive(Subtree subtree)
         {
-            List<AssociativeNode> astNodeList = new List<AssociativeNode>();
             Subtree st;
-            try
+            if (!currentSubTreeList.TryGetValue(subtree.GUID, out st) || st.AstNodes == null)
             {
-                st = currentSubTreeList[subtree.GUID];
-            }
-            catch (KeyNotFoundException)
-            {
-                return astNodeList;
+                return null;
             }
 
+            List<AssociativeNode> astNodeList = new List<AssociativeNode>();
             foreach (var node in st.AstNodes)
             {
                 BinaryExpressionNode bNode = node as BinaryExpressionNode;
@@ -824,42 +829,67 @@ namespace ProtoScript.Runners
                 return;
             }
 
-            if (syncData.AddedSubtrees != null)
-            {
-                foreach (var st in syncData.AddedSubtrees)
-                {
-                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
-                    deltaAstList.AddRange(st.AstNodes);
-
-                    currentSubTreeList.Add(st.GUID, st);
-                }
-            }
 
             if (syncData.DeletedSubtrees != null)
             {
                 foreach (var st in syncData.DeletedSubtrees)
                 {
-                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
-
-                    var nullNodes = MarkGraphNodesInactive(st);
-                    if (nullNodes.Count > 0)
-                        deltaAstList.AddRange(nullNodes);
-
+                    if (st.AstNodes != null)
+                    {
+                        var nullNodes = MarkGraphNodesInactive(st);
+                        if (nullNodes != null)
+                        {
+                            deltaAstList.AddRange(nullNodes);
+                        }
+                    }
+                    else
+                    {
+                        // Handle the case where only the GUID of the deleted subtree was provided
+                        // Get the cached subtree that is now being deleted
+                        Subtree removeSubTree = new Subtree();
+                        if (currentSubTreeList.TryGetValue(st.GUID, out removeSubTree))
+                        {
+                            if (removeSubTree.AstNodes != null)
+                            {
+                                var nullNodes = MarkGraphNodesInactive(removeSubTree);
+                                if (nullNodes != null)
+                                {
+                                    deltaAstList.AddRange(nullNodes);
+                                }
+                            }
+                        }
+                    }
                     currentSubTreeList.Remove(st.GUID);
                 }
+                
             }
 
             if (syncData.ModifiedSubtrees != null)
             {
                 foreach (var st in syncData.ModifiedSubtrees)
                 {
-                    Validity.Assert(st.AstNodes != null && st.AstNodes.Count > 0);
+                    if (st.AstNodes != null)
+                    {
+                        var nullNodes = MarkGraphNodesInactive(st);
+                        if (nullNodes != null)
+                            deltaAstList.AddRange(nullNodes);
 
-                    var nullNodes = MarkGraphNodesInactive(st);
-                    if (nullNodes.Count > 0)
-                        deltaAstList.AddRange(nullNodes);
+                        deltaAstList.AddRange(st.AstNodes);
+                    }
+                }
+            }
 
-                    deltaAstList.AddRange(st.AstNodes);
+
+            if (syncData.AddedSubtrees != null)
+            {
+                foreach (var st in syncData.AddedSubtrees)
+                {
+                    if (st.AstNodes != null)
+                    {
+                        deltaAstList.AddRange(st.AstNodes);
+                    }
+
+                    currentSubTreeList.Add(st.GUID, st);
                 }
             }
 
@@ -1345,12 +1375,12 @@ namespace ProtoScript.Runners
     {
         //ProtoCore.DSASM.Constants.kInvalidIndex tells the UpdateUIDForCodeblock to look for the lastindex for given codeblock
         nodeId = graphCompiler.UpdateUIDForCodeblock(nodeId, ProtoCore.DSASM.Constants.kInvalidIndex);
-            Validity.Assert(null != vmState);
-            string varname = graphCompiler.GetVarName(nodeId);
-            if (string.IsNullOrEmpty(varname))
-            {
-                return null;
-            }
+        Validity.Assert(null != vmState);
+        string varname = graphCompiler.GetVarName(nodeId);
+        if (string.IsNullOrEmpty(varname))
+        {
+            return null;
+        }
         return InternalGetNodeValue(varname);
     }
 

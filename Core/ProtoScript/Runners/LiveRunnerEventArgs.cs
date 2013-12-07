@@ -70,20 +70,19 @@ namespace ProtoScript.Runners
 
     public class NodesToCodeCompletedEventArgs : EventArgs
     {
-        public List<Guid> InputNodeIds { get; private set; }
-        public List<SnapshotNode> OutputNodes { get; private set; }
+        public String output { get; private set; }
         public EventStatus ResultStatus { get; private set; }
         public String ErrorString { get; private set; }
 
-        public NodesToCodeCompletedEventArgs(List<Guid> inputNodeIds,
-            List<SnapshotNode> outputNodes, EventStatus resultStatus, String errorString)
+        public NodesToCodeCompletedEventArgs(
+            string outputData, EventStatus resultStatus, String errorString)
         {
-            this.InputNodeIds = inputNodeIds;
-            this.OutputNodes = outputNodes;
+            this.output = outputData;
             this.ResultStatus = resultStatus;
             this.ErrorString = errorString;
         }
     }
+
 
     public delegate void NodeValueReadyEventHandler(object sender, NodeValueReadyEventArgs e);
     public delegate void GraphUpdateReadyEventHandler(object sender, GraphUpdateReadyEventArgs e);

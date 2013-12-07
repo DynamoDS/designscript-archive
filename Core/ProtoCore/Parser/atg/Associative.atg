@@ -1871,8 +1871,7 @@ Associative_NameReference<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
             '('
             Associative_Expression<out node>
                                         (.
-                                            if (node is ProtoCore.AST.AssociativeAST.FunctionCallNode 
-                                                || node is ProtoCore.AST.AssociativeAST.IdentifierNode)
+                                            if (node is ProtoCore.AST.AssociativeAST.ArrayNameNode)
                                             {
                                                 nameNode = node as ProtoCore.AST.AssociativeAST.ArrayNameNode;
                                             }
@@ -1928,7 +1927,7 @@ Associative_NameReference<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
                                         (. 
                                             isLeft = tmpIsLeft; 
                                             array.Expr = node; 
-                                            array.Type = null;
+                                            array.Type = nameNode.ArrayDimensions;
                                             NodeUtils.SetNodeLocation(array, t);
                                             nameNode.ArrayDimensions = array; 
                                             
@@ -2092,7 +2091,7 @@ Associative_NameReference<out ProtoCore.AST.AssociativeAST.AssociativeNode node>
         )
     ]
                                         (. 
-                                            if (groupExprNode != null && groupExprNode.ArrayDimensions == null && groupExprNode.ReplicationGuides == null)
+                                            if (groupExprNode != null && groupExprNode.ArrayDimensions == null && (groupExprNode.ReplicationGuides == null || groupExprNode.ReplicationGuides.Count == 0))
                                             {
                                                 node = groupExprNode.Expression;
                                             }

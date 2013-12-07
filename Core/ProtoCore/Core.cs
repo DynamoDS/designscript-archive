@@ -122,10 +122,12 @@ namespace ProtoCore
     {
         public Options()
         {
+
             DumpByteCode = false;
             Verbose = false;
-            FullSSA = true;
             DumpIL = false;
+
+            FullSSA = true;
             GCTempVarsOnDebug = true;
 
             DumpFunctionResolverLogic = false;
@@ -983,10 +985,28 @@ namespace ProtoCore
         public int RunningBlock { get; set; }
         public int CodeBlockIndex { get; set; }
         public int RuntimeTableIndex { get; set; }
+
+
         public List<CodeBlock> CodeBlockList { get; set; }
         // The Complete Code Block list contains all the code blocks
         // unlike the codeblocklist which only stores the outer most code blocks
         public List<CodeBlock> CompleteCodeBlockList { get; set; }
+
+
+
+        /// <summary>
+        /// The delta codeblock index tracks the current number of new language blocks created at compile time for every new compile phase
+        /// </summary>
+        public int DeltaCodeBlockIndex { get; set; }
+
+        // TODO Jun: Refactor this and similar indices into a logical grouping of block incrementing variables 
+
+        /// <summary>
+        /// ForLoopBlockIndex tracks the current number of new for loop blocks created at compile time for every new compile phase
+        /// It is reset for delta compilation
+        /// </summary>
+        public int ForLoopBlockIndex { get; set; }
+
         public Executable DSExecutable { get; set; }
 
         public List<Instruction> Breakpoints { get; set; }
@@ -1255,6 +1275,14 @@ namespace ProtoCore
                     // as dirty at the next run.
                     CodeBlockList[0].instrStream.dependencyGraph.RemoveNodesFromScope(Constants.kInvalidIndex, Constants.kInvalidIndex);
                 }
+
+
+
+                // Jun this is where the temp solutions starts for implementing language blocks in delta execution
+                for (int n = 1; n < CodeBlockList.Count; ++n)
+                {
+                    CodeBlockList[n].instrStream.instrList.Clear();
+                }
             }
         }
 
@@ -1267,6 +1295,14 @@ namespace ProtoCore
             ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
             ExecutionState = (int)ExecutionStateEventArgs.State.kInvalid;
             RunningBlock = 0;
+            DeltaCodeBlockIndex = 0;
+            ForLoopBlockIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
+
+            // Jun this is where the temp solutions starts for implementing language blocks in delta execution
+            for (int n = 1; n < CodeBlockList.Count; ++n)
+            {
+                CodeBlockList[n].instrStream.instrList.Clear();
+            }
         }
 
         public void ResetForDeltaASTExecution()
@@ -1394,6 +1430,9 @@ namespace ProtoCore
                 AstNodeList.Clear();
 
             ResetDeltaCompile();
+
+            DeltaCodeBlockIndex = 0;
+            ForLoopBlockIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
         }
 
         public void ResetForPrecompilation()
@@ -1432,6 +1471,7 @@ namespace ProtoCore
                 AstNodeList.Clear();
 
             ExpressionUID = 0;
+            ForLoopBlockIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
         }
 
         private void ResetAll(Options options)
@@ -1555,6 +1595,7 @@ namespace ProtoCore
             {
                 csExecutionState = new CallsiteExecutionState();
             }
+            ForLoopBlockIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
         }
 
         // The unique subscript for SSA temporaries

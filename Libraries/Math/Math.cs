@@ -3,7 +3,7 @@ using CSMath = System.Math;
 
 namespace Math
 {
-    public class Math
+    public static class Math
     {
         internal static readonly double kRadiansToDegrees = 180.0 / PI;
         internal static readonly double kDegreesToRadians = PI / 180.0;

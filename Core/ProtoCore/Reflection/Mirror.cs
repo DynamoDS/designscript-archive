@@ -503,6 +503,26 @@ namespace ProtoCore
             }
 
             /// <summary>
+            /// Constructor to construct ClassMirror from runtime data i.e. StackValue
+            /// </summary>
+            /// <param name="svData">StackValue</param>
+            /// <param name="core">ProtoCore.Core</param>
+            internal ClassMirror(StackValue svData, ProtoCore.Core core)
+                : base(core)
+            {
+                Validity.Assert(svData.optype == AddressType.Pointer);
+                Validity.Assert(null != core);
+                Validity.Assert(null != core.DSExecutable.classTable);
+
+                IList<ClassNode> classNodes = core.DSExecutable.classTable.ClassNodes;
+                Validity.Assert(classNodes != null && classNodes.Count > 0);
+
+                this.classNode = classNodes[(int)svData.metaData.type];
+                this.ClassName = this.classNode.name;
+                libraryMirror = new LibraryMirror(classNode.ExternLib, core);
+            }
+
+            /// <summary>
             /// Returns the library mirror of the assembly that the class belongs to
             /// </summary>
             /// <returns></returns>
