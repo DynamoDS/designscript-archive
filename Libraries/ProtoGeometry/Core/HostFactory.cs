@@ -9,7 +9,8 @@ using System.Configuration;
 
 namespace Autodesk.DesignScript.Geometry
 {
-    class HostFactory
+    [Browsable(false)]
+    public class HostFactory
     {
 
         #region PRIVATE_METHODS
@@ -91,6 +92,24 @@ namespace Autodesk.DesignScript.Geometry
                     System.Diagnostics.Debug.Write(ex.InnerException);
                 System.Diagnostics.Debug.Write(ex);
                 mErrorString = ex.Message;
+            }
+        }
+
+        // Explicitly start up geometry extension application.
+        public void StartUp()
+        {
+            foreach (IExtensionApplication app in mExtensionApplications)
+            {
+                app.StartUp();
+            }
+        }
+
+        // Explicity shut down geometry extension application.
+        public void ShutDown()
+        {
+            foreach (IExtensionApplication app in mExtensionApplications)
+            {
+                app.ShutDown();
             }
         }
 
@@ -189,7 +208,7 @@ namespace Autodesk.DesignScript.Geometry
 
         //Double check locking for multi-threaded singleton class.
         private static readonly Object syncRoot = new Object();
-        private static HostFactory Instance
+        public static HostFactory Instance
         {
             get
             {
