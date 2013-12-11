@@ -763,14 +763,8 @@ namespace ProtoScript.Runners
         /// <returns></returns>
         private List<AssociativeNode> UpdateFunctionDefinition(Subtree subtree)
         {
-            Subtree st;
-            if (!currentSubTreeList.TryGetValue(subtree.GUID, out st) || st.AstNodes == null)
-            {
-                return null;
-            }
-
             List<AssociativeNode> astNodeList = new List<AssociativeNode>();
-            foreach (var node in st.AstNodes)
+            foreach (var node in subtree.AstNodes)
             {
                 FunctionDefinitionNode fNode = node as FunctionDefinitionNode;
                 if (fNode != null)
