@@ -667,13 +667,8 @@ namespace GraphToDSCompiler
                 ProtoCore.AST.AssociativeAST.AssociativeNode n = node as ProtoCore.AST.AssociativeAST.AssociativeNode;
                 ProtoCore.Utils.Validity.Assert(n != null);
 
-                if (n is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode ||
-                    n is ProtoCore.AST.AssociativeAST.ClassDeclNode)
-                {
-                    core.BuildStatus.LogSemanticError("Class and function definitions are not supported currently.");
-
-                }
-                else if (n is ProtoCore.AST.AssociativeAST.ModifierStackNode)
+                
+                if (n is ProtoCore.AST.AssociativeAST.ModifierStackNode)
                 {
                     core.BuildStatus.LogSemanticError("Modifier Blocks are not supported currently.");
                 }
@@ -686,22 +681,37 @@ namespace GraphToDSCompiler
                     core.BuildStatus.LogSemanticError("Language blocks are not supported in CodeBlock Nodes.");
                 }
 
-                string stmt = ProtoCore.Utils.ParserUtils.ExtractStatementFromCode(expression, node);
 
-                ProtoCore.AST.AssociativeAST.BinaryExpressionNode ben = node as ProtoCore.AST.AssociativeAST.BinaryExpressionNode;
-                if (ben != null && ben.Optr == ProtoCore.DSASM.Operator.assign)
+                string stmt = string.Empty; 
+
+                // Append the temporaries only if it is not a function def or class decl
+                bool isFunctionOrClassDef = n is ProtoCore.AST.AssociativeAST.FunctionDefinitionNode || n is ProtoCore.AST.AssociativeAST.ClassDeclNode;
+
+                if (isFunctionOrClassDef)
                 {
-                    ProtoCore.AST.AssociativeAST.IdentifierNode lNode = ben.LeftNode as ProtoCore.AST.AssociativeAST.IdentifierNode;
-                    if (lNode != null && lNode.Value == ProtoCore.DSASM.Constants.kTempProcLeftVar)
-                    {
-                        stmt = "%t =" + stmt;
-                    }                    
+                    ProtoCore.CodeGenDS codegen = new ProtoCore.CodeGenDS(new List<ProtoCore.AST.AssociativeAST.AssociativeNode>{ n });
+                    stmt = codegen.GenerateCode();
                 }
                 else
                 {
-                    // These nodes are non-assignment nodes
-                    stmt = "%t =" + stmt;                
+                    stmt = ProtoCore.Utils.ParserUtils.ExtractStatementFromCode(expression, node);
+
+                    ProtoCore.AST.AssociativeAST.BinaryExpressionNode ben = node as ProtoCore.AST.AssociativeAST.BinaryExpressionNode;
+                    if (ben != null && ben.Optr == ProtoCore.DSASM.Operator.assign)
+                    {
+                        ProtoCore.AST.AssociativeAST.IdentifierNode lNode = ben.LeftNode as ProtoCore.AST.AssociativeAST.IdentifierNode;
+                        if (lNode != null && lNode.Value == ProtoCore.DSASM.Constants.kTempProcLeftVar)
+                        {
+                            stmt = "%t =" + stmt;
+                        }
+                    }
+                    else
+                    {
+                        // These nodes are non-assignment nodes
+                        stmt = "%t =" + stmt;
+                    }
                 }
+
                 compiled.Add(stmt);
                 
                 InsertCommentsInCode(stmt, node, commentNode, ref cNodeNum, ref compiled, expression);

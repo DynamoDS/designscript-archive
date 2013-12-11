@@ -5821,6 +5821,7 @@ namespace ProtoAssociative
 
                 // Append arg symbols
                 List<KeyValuePair<string, ProtoCore.Type>> argsToBeAllocated = new List<KeyValuePair<string, ProtoCore.Type>>();
+                string functionDescription = localProcedure.name;
                 if (null != funcDef.Signature)
                 {
                     int argNumber = 0;
@@ -5856,7 +5857,10 @@ namespace ProtoAssociative
                         localProcedure.argTypeList.Add(argType);
                         ProtoCore.DSASM.ArgumentInfo argInfo = new ProtoCore.DSASM.ArgumentInfo { Name = paramNode.Value, isDefault = aIsDefault, defaultExpression = aDefaultExpression };
                         localProcedure.argInfoList.Add(argInfo);
+
+                        functionDescription += argNode.ArgumentType.ToString();
                     }
+                    localProcedure.HashID = functionDescription.GetHashCode();
                 }
 
                 if (ProtoCore.DSASM.Constants.kInvalidIndex == globalClassIndex)
