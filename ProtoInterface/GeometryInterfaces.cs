@@ -29,24 +29,9 @@ namespace Autodesk.DesignScript.Interfaces
     [Browsable(false)]
     public interface IColor
     {
-        /// <summary>
-        /// 
-        /// </summary>
         byte AlphaValue { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         byte RedValue { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         byte GreenValue { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         byte BlueValue { get; }
     }
 
@@ -54,21 +39,10 @@ namespace Autodesk.DesignScript.Interfaces
     /// Interface to represent vector data object
     /// </summary>
     [Browsable(false)]
-    public interface IVector
+    public interface IVectorEntity : IDesignScriptEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
         double X { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         double Y { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         double Z { get; }
     }
 
@@ -183,123 +157,71 @@ namespace Autodesk.DesignScript.Interfaces
     }
 
     [Browsable(false)]
-    public interface ICoordinateSystemEntity : IDesignScriptEntity
+    public interface ITransformableEntity 
     {
+        void Translate(double x, double y, double z);
+        void Translate(IVectorEntity vec);
+
+        void TransformBy(ICoordinateSystemEntity cs);
+        void TransformFromTo(ICoordinateSystemEntity from, ICoordinateSystemEntity to);
+
         /// <summary>
-        /// 
+        /// Rotates an object around an origin and an axis by a specified 
+        /// degree
         /// </summary>
-        /// <returns></returns>
+        void Rotate(IPointEntity origin, IVectorEntity axis, double degrees);
+
+        /// <summary>
+        /// Rotates an object around the Plane origin and normal by a specified 
+        /// degree
+        /// </summary>
+        void Rotate(IPlaneEntity origin, double degrees);
+
+        void Scale(double amount);
+        void Scale(double xamount, double yamount, double zamount);
+    }
+
+
+    [Browsable(false)]
+    public interface ICoordinateSystemEntity : IDesignScriptEntity, ITransformableEntity
+    {
         ICoordinateSystemEntity Inverse();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity PostMultiplyBy(ICoordinateSystemEntity other);
+        ICoordinateSystemEntity Mirror(IPlaneEntity mirror_plane);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        ICoordinateSystemEntity PostMultiplyBy(ICoordinateSystemEntity other);
         ICoordinateSystemEntity PreMultiplyBy(ICoordinateSystemEntity other);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="rotationAngle"></param>
-        /// <param name="axis"></param>
-        /// <param name="origin"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity Rotation(double rotationAngle, IVector axis, IPointEntity origin);
+        bool IsSingular { get; }
+        bool IsScaledOrtho { get; }
+        bool IsUniscaledOrtho { get; }
+        double Determinant { get; }
 
         /// <summary>
-        /// 
+        /// Returns three doubles representing the X, Y, and Z scale factors
         /// </summary>
-        /// <param name="scaleX"></param>
-        /// <param name="scaleY"></param>
-        /// <param name="scaleZ"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity Scale(double scaleX, double scaleY, double scaleZ);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="translationVector"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity Translate(IVector translationVector);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool IsSingular();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool IsScaledOrtho();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool IsUniscaledOrtho();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double GetDeterminant();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         double[] GetScaleFactors();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
         bool IsEqualTo(ICoordinateSystemEntity other);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <param name="xAxis"></param>
-        /// <param name="yAxis"></param>
-        /// <param name="zAxis"></param>
-        void Set(IPointEntity origin, IVector xAxis, IVector yAxis, IVector zAxis);
-
-        /// <summary>
-        /// Origin point of the coordinate system.
-        /// </summary>
         IPointEntity Origin { get; }
 
-        /// <summary>
-        /// X-Axis IVector for the coordinate system.
-        /// </summary>
-        IVector XAxis { get; }
+        IVectorEntity XAxis { get; }
+        IVectorEntity YAxis { get; }
+        IVectorEntity ZAxis { get; }
 
-        /// <summary>
-        /// Y-Axis IVector for the coordinate system.
-        /// </summary>
-        IVector YAxis { get; }
+        double XScaleFactor { get; }
+        double YScaleFactor { get; }
+        double ZScaleFactor { get; }
 
-        /// <summary>
-        /// Z-Axis IVector for the coordinate system.
-        /// </summary>
-        IVector ZAxis { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         IDisplayable Display { get; }
+    }
+
+    [Browsable(false)]
+    public interface IUV
+    {
+        double U { get; }
+        double V { get; }
     }
 
     [Browsable(false)]
@@ -310,334 +232,236 @@ namespace Autodesk.DesignScript.Interfaces
     }
 
     [Browsable(false)]
-    public interface IGeometryEntity : IDesignScriptEntity
+    public interface IGeometryEntity : IDesignScriptEntity, ITransformableEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         IGeometryEntity Clone();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="offset"></param>
-        /// <returns></returns>
-        IGeometryEntity CopyAndTranslate(IVector offset);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fromCS"></param>
-        /// <param name="toCS"></param>
-        /// <returns></returns>
+        IGeometryEntity CopyAndTranslate(IVectorEntity offset);
+        IGeometryEntity CopyAndTransform(ICoordinateSystemEntity toCS);
         IGeometryEntity CopyAndTransform(ICoordinateSystemEntity fromCS, ICoordinateSystemEntity toCS);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        double DistanceTo(IPointEntity point);
+        double DistanceTo(IGeometryEntity entity);
+
+        IPointEntity GetClosestPoint(IGeometryEntity entity);
+
+        bool DoesIntersect(IGeometryEntity entity);
+
+        bool IsWithin(IPointEntity point); 
+
+        ICoordinateSystemEntity CoordinateSystem { get; }
+
+        IGeometryEntity[] Intersect(IGeometryEntity entity);
+        IGeometryEntity[] Intersect(IGeometryEntity[] entity);
+
+        IGeometryEntity[] Split(IGeometryEntity tool);
+        IGeometryEntity[] Split(IGeometryEntity[] tools);
 
         /// <summary>
-        /// 
+        /// Removes elements of the entity closest to the pick point
         /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        IPointEntity GetClosestPoint(IPointEntity point);
+        IGeometryEntity[] Trim(IGeometryEntity tool, IPointEntity pick);
+
+        /// <summary>
+        /// Removes elements of the entity closest to the pick point
+        /// </summary>
+        IGeometryEntity[] Trim(IGeometryEntity[] tools, IPointEntity pick);
+
+        /// <summary>
+        /// Separates compound or non-separated elements into their component
+        /// parts.
+        /// </summary>
+        IGeometryEntity[] Explode();
+
+        IColor Color { get; }
+
+        IBoundingBoxEntity BoundingBox { get; }
     }
 
     [Browsable(false)]
     public interface IPointEntity : IGeometryEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
         double X { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         double Y { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         double Z { get; }
     }
+
 
     [Browsable(false)]
     public interface ICurveEntity : IGeometryEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        IVector TangentAtParameter(double param);
+        IPointEntity PointAtParameter(double param);
+        IVectorEntity TangentAtParameter(double param);
+        IVectorEntity NormalAtParameter(double param);
+        ICoordinateSystemEntity CoordinateSystemAtParameter(double param);
+        ICoordinateSystemEntity HorizantalFrameAtParameter(double param);
+        ICoordinateSystemEntity GetNoTwistFrameAtParameter(double param);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        IVector NormalAtParameter(double param);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
         double DistanceAtParameter(double param);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <returns></returns>
         double ParameterAtDistance(double distance);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         double StartParameter();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         double EndParameter();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double GetLength();
+        double Length { get; }
+        double GetLength(double startParam, double endParam);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        IPointEntity PointAtParameter(double param);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <returns></returns>
         IPointEntity PointAtDistance(double distance);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
         double ParameterAtPoint(IPointEntity point);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="extend"></param>
-        /// <returns></returns>
-        IPointEntity GetClosestPointTo(IPointEntity point, bool extend);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="direction"></param>
-        /// <param name="extend"></param>
-        /// <returns></returns>
-        IPointEntity GetClosestPointTo(IPointEntity point, IVector direction, bool extend);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         ICurveEntity Reverse();
 
-        /// <summary>
-        /// 
-        /// </summary>
         bool IsPlanar { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         bool IsClosed { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         IPointEntity StartPoint { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         IPointEntity EndPoint { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="iCurveEntity"></param>
-        /// <returns></returns>
-        IPointEntity GetClosestPointTo(ICurveEntity iCurveEntity);
+        IVectorEntity Normal { get; }
+
+        ICurveEntity Offset(double distance);
+
+        IPointEntity Project(IPointEntity point, IVectorEntity direction);
+
+        ICurveEntity ProjectOn(IPlaneEntity plane, IVectorEntity direction);
+
+        IGeometryEntity[] ProjectOn(ISurfaceEntity surface, IVectorEntity direction);
 
         /// <summary>
-        /// 
+        /// Removes the start of the Curve at the specified parameter
         /// </summary>
-        /// <param name="distance"></param>
-        /// <returns></returns>
-        ICurveEntity GetOffsetCurve(double distance);
+        ICurveEntity ParameterTrimStart(double startParameter);
+        /// <summary>
+        /// Removes the end of the Curve at the specified parameter
+        /// </summary>
+        ICurveEntity ParameterTrimEnd(double endParameter);
+        /// <summary>
+        /// Removes the beginning and ends of at the specified parameters.
+        /// </summary>
+        ICurveEntity ParameterTrim(double startParameter, double endParameter);
+        /// <summary>
+        /// Removes the interior portion of a Curve at the specified parameters
+        /// </summary>
+        ICurveEntity[] ParameterTrimInterior(double startParameter, double endParameter);
+        /// <summary>
+        /// Removes several segments of the curve, discarding the 1st, 3rd, 5th ... segments
+        /// </summary>
+        ICurveEntity[] ParameterTrimSegments(double[] parameters);
+        /// <summary>
+        /// Removes several segments of the Curve, disgarding 2nd, 4th, 6th ... segments if the bool is true
+        /// </summary>
+        ICurveEntity[] ParameterTrimSegments(double[] parameters, bool discardEvenSegments);
+
+        ICurveEntity[] ParameterSplit(double parameter);
+        ICurveEntity[] ParameterSplit(double[] parameters);
 
         /// <summary>
-        /// 
+        /// Join combines this curve and the input curve into a new PolyCurve,
+        /// maintaining the original curves exactly.
         /// </summary>
-        /// <param name="solid"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(ISolidEntity solid);
+        IPolyCurveEntity Join(ICurveEntity curve);
 
         /// <summary>
-        /// 
+        /// Create an approximate NurbsCurve representing the two curves.
         /// </summary>
-        /// <param name="surface"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(ISurfaceEntity surface);
+        INurbsCurveEntity Merge(ICurveEntity curve);
 
         /// <summary>
-        /// 
+        /// Extrudes a Curve in the normal Vector direction
         /// </summary>
-        /// <param name="plane"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(IPlaneEntity plane);
+        ISurfaceEntity Extrude(double distance);
+        /// <summary>
+        /// Extrudes a Curve in the specified direction, by the length of the 
+        /// input Vector
+        /// </summary>
+        ISurfaceEntity Extrude(IVectorEntity direction);
+        /// <summary>
+        /// Extrudes a Curve in the specified direction, by the specified distance
+        /// </summary>
+        ISurfaceEntity Extrude(IVectorEntity direction, double distance);
 
         /// <summary>
-        /// 
+        /// Extrudes a Curve in the normal Vector direction. Curve must be closed.
         /// </summary>
-        /// <param name="otherCurve"></param>
-        /// <returns></returns>
-        IPointEntity[] IntersectWith(ICurveEntity otherCurve);
+        ISurfaceEntity ExtrudeAsSolid(double distance);
+        /// <summary>
+        /// Extrudes a Curve in the specified direction, by the length of the 
+        /// input Vector. Curve must be closed.
+        /// </summary>
+        ISurfaceEntity ExtrudeAsSolid(IVectorEntity direction);
+        /// <summary>
+        /// Extrudes a Curve in the specified direction, by the specified distance. Curve must be closed.
+        /// </summary>
+        ISurfaceEntity ExtrudeAsSolid(IVectorEntity direction, double distance);
+        
+        ICurveEntity Extend(double distance, IPointEntity pickSide);
+        ICurveEntity ExtendStart(double distance);
+        ICurveEntity ExtendEnd(double distance);
+
+        ICurveEntity[] ApproximateWithArcAndLineSegments();
+
+        ICurveEntity Project(IGeometryEntity otherGeom, IVectorEntity vec);
 
         /// <summary>
-        /// Projects a given point onto this curve in the given direction
+        /// Converts the Curve to a NurbsCurve, if needs be
         /// </summary>
-        /// <param name="point">Point for projection</param>
-        /// <param name="direction">Direction vector</param>
-        /// <returns>Projected point</returns>
-        IPointEntity Project(IPointEntity point, IVector direction);
+        INurbsCurveEntity ToNurbsCurve();
+
+        ICurveEntity PullOntoPlane(IPlaneEntity plane);
 
         /// <summary>
-        /// Projects this curve on the given plane.
+        /// Patch a closed Curve
         /// </summary>
-        /// <param name="plane"></param>
-        /// <param name="direction"></param>
-        /// <returns>Projected curve</returns>
-        ICurveEntity ProjectOn(IPlaneEntity plane, IVector direction);
-
-        /// <summary>
-        /// Project this curve on the given surface and returns array of geometry.
-        /// </summary>
-        /// <param name="surface"></param>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        IGeometryEntity[] ProjectOn(ISurfaceEntity surface, IVector direction);
-
-        /// <summary>
-        /// Trims this curve by given parameters and optionally discards 
-        /// even segments
-        /// </summary>
-        /// <param name="parameters">array of parameters</param>
-        /// <param name="discardEvenSegments">flag to discard even segments</param>
-        /// <returns>array of trimmed curves</returns>
-        ICurveEntity[] Trim(double[] parameters, bool discardEvenSegments);
-
-        /// <summary>
-        /// Trims this curve by given start and end parameters
-        /// </summary>
-        /// <param name="startParameter"></param>
-        /// <param name="endParameter"></param>
-        /// <param name="discardBetweenParams"></param>
-        /// <returns>array of trimmed curves</returns>
-        ICurveEntity[] Trim(double startParameter, double endParameter, bool discardBetweenParams);
-
-        /// <summary>
-        /// Splits this curve at given parameters
-        /// </summary>
-        /// <param name="parameters"></param>
-        /// <returns>array of split curves</returns>
-        ICurveEntity[] Split(double[] parameters);
-
-        /// <summary>
-        /// Joins given set of curve with this curve to return a BSpline curve
-        /// </summary>
-        /// <param name="curves">array of curves to join with</param>
-        /// <returns>BSpline curve</returns>
-        IBSplineCurveEntity JoinWith(ICurveEntity[] curves);
-
-        /// <summary>
-        /// Joins given set of curve with this curve with a given tolerance
-        /// </summary>
-        /// <param name="curves">array of curves to join with</param>
-        /// <param name="bridgeTolerance">tolerance</param>
-        /// <returns>array of curves</returns>
-        ICurveEntity[] JoinWith(ICurveEntity[] curves, double bridgeTolerance);
-
-        /// <summary>
-        /// Returns an extruded surface upon extruding a curve in a given direction 
-        /// by an input distance. This surface may have multiple faces, if this 
-        /// curve is not C1 continuous.
-        /// </summary>
-        /// <param name="direction"></param>
-        /// <param name="distance"></param>
-        /// <returns></returns>
-        ISurfaceEntity Extrude(IVector direction, double distance);
+        ISurfaceEntity Patch();
     }
 
     [Browsable(false)]
     public interface ILineEntity : ICurveEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
-        void UpdateEndPoints(IPointEntity start, IPointEntity end);
+    }
+
+    [Browsable(false)]
+    public interface IHelixEntity : ICurveEntity
+    {
+        double Angle { get; }
+        double Pitch { get; }
+        double Radius { get; }
+
+        IVectorEntity AxisDirection { get; }
+        IPointEntity AxisPoint { get; }
     }
 
     [Browsable(false)]
     public interface ICircleEntity : ICurveEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
         IPointEntity CenterPoint { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        IVector Normal { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         double Radius { get; }
+    }
+
+    [Browsable(false)]
+    public interface IEllipseEntity : ICurveEntity
+    {
+        IPointEntity CenterPoint { get; }
+        IVectorEntity MajorAxis { get; }
+        IVectorEntity MinorAxis { get; }
+    }
+
+    [Browsable(false)]
+    public interface IRectangleEntity : ICurveEntity
+    {
+        double Width { get; }
+        double Height { get; }
+
+        IPointEntity Center { get; }
+
+        IPointEntity[] Corners { get; }
     }
 
     [Browsable(false)]
     public interface IArcEntity : ICurveEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
         IPointEntity CenterPoint { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         double Radius { get; }
 
         /// <summary>
@@ -649,96 +473,53 @@ namespace Autodesk.DesignScript.Interfaces
         /// Returns Sweep angle in Radians
         /// </summary>
         double SweepAngle { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        IVector Normal { get; }
     }
 
     [Browsable(false)]
-    public interface IBSplineCurveEntity : ICurveEntity
+    public interface IBoundingBoxEntity : IDesignScriptEntity, ITransformableEntity
     {
-        /// <summary>
-        /// Returns list of control vertices.
-        /// </summary>
-        /// <returns></returns>
+        IPointEntity MinPoint { get; }
+        IPointEntity MaxPoint { get; }
+
+        IBoundingBoxEntity Intersection(IBoundingBoxEntity other);
+        bool Intersects(IBoundingBoxEntity other);
+
+        bool IsEmpty();
+
+        bool Contains(IPointEntity point);
+
+        ICuboidEntity ToCuboid();
+        IPolySurfaceEntity ToPolySurface();
+    }
+
+    [Browsable(false)]
+    public interface IPolyCurveEntity : IGeometryEntity
+    {
+
+    }
+
+    [Browsable(false)]
+    public interface INurbsCurveEntity : ICurveEntity
+    {
         IPointEntity[] GetControlVertices();
 
-        /// <summary>
-        /// Returns knot vector.
-        /// </summary>
-        /// <returns></returns>
         double[] GetKnots();
-
-        /// <summary>
-        /// Returns weight vector
-        /// </summary>
-        /// <returns></returns>
         double[] GetWeights();
 
-        /// <summary>
-        /// Returns degree
-        /// </summary>
-        /// <returns></returns>
-        int GetDegree();
-
-        /// <summary>
-        /// Return true if the curve is periodic.
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsPeriodic();
-
-        /// <summary>
-        /// Returns true if the cuve is closed.
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsClosed();
-
-        /// <summary>
-        /// Returns true if the cuve is closed.
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsRational();
+        int Degree { get; }
+        bool IsPeriodic { get; }
+        bool IsRational { get; }
     }
 
     [Browsable(false)]
     public interface IBRepEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+        IVertexEntity[] GetVertices();
+        IEdgeEntity[] GetEdges();
         IFaceEntity[] GetFaces();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IEdgeEntity[] GetEdges();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IVertexEntity[] GetVertices();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         int GetVertexCount();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         int GetEdgeCount();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         int GetFaceCount();
     }
 
@@ -746,921 +527,222 @@ namespace Autodesk.DesignScript.Interfaces
     public interface ISurfaceEntity : IGeometryEntity
     {
         /// <summary>
-        /// 
+        /// Gets a Nurbs representation of the Surface. This method may approximate
+        /// Surface in certain circumstances.
         /// </summary>
-        /// <param name="crossSections"></param>
-        /// <returns></returns>
-        bool UpdateSurfaceByLoftedCrossSections(ICurveEntity[] crossSections);
+        INurbsSurfaceEntity ToNurbsSurface();
+        INurbsSurfaceEntity ApproximateWithTolerance(double tolerance);
 
         /// <summary>
-        /// 
+        /// Thickens the Surface on both sides
         /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        bool UpdateSurfaceByLoftedCrossSectionsPath(ICurveEntity[] crossSections, ICurveEntity path);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="guides"></param>
-        /// <returns></returns>
-        bool UpdateSurfaceByLoftFromCrossSectionsGuides(ICurveEntity[] crossSections, ICurveEntity[] guides);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        bool UpdateSweep(ICurveEntity profile, ICurveEntity path);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="origin"></param>
-        /// <param name="revolveAxis"></param>
-        /// <param name="startAngle"></param>
-        /// <param name="sweepAngle"></param>
-        /// <returns></returns>
-        bool UpdateRevolve(ICurveEntity profile, IPointEntity origin, IVector revolveAxis, double startAngle, double sweepAngle);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="thickness"></param>
-        /// <param name="bothSides"></param>
-        /// <returns></returns>
+        ISolidEntity Thicken(double thickness);
         ISolidEntity Thicken(double thickness, bool bothSides);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <returns></returns>
         ISurfaceEntity Offset(double distance);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IBSplineSurfaceEntity GetBsplineSurface();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        IVector GetNormalAtPoint(IPointEntity point);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="u"></param>
-        /// <param name="v"></param>
-        /// <returns></returns>
-        IVector TangentAtUParameter(double u, double v);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="u"></param>
-        /// <param name="v"></param>
-        /// <returns></returns>
-        IVector TangentAtVParameter(double u, double v);
 
         /// <summary>
         /// The returned coordination system use xAxis, yAxis and zAxis to represent the uDir, vDir and normal.
         /// The length of xAxis, yAxis represents the curvatures.
         /// </summary>
-        /// <param name="u"></param>
-        /// <param name="v"></param>
-        /// <returns></returns>
         ICoordinateSystemEntity CurvatureAtParameter(double u, double v);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="u"></param>
-        /// <param name="v"></param>
-        /// <returns></returns>
+        ICoordinateSystemEntity CoordinateSystemAtParameter(double u, double v);
+        IVectorEntity TangentAtUParameter(double u, double v);
+        IVectorEntity TangentAtVParameter(double u, double v);
+        IVectorEntity NormalAtParameter(double u, double v);
+        IVectorEntity[] DerivativesAtParameter(double u, double v);
+        double GaussianCurvatureAtParameter(double u, double v);
+        double[] PrincipalCurvaturesAtParameter(double u, double v);
+        IVectorEntity[] PrincipalDirectionsAtParameter(double u, double v);
         IPointEntity PointAtParameter(double u, double v);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        IVector NormalAtPoint(IPointEntity point);
+        // Question: should this be removed, it seems odd
+        IVectorEntity NormalAtPoint(IPointEntity point);
+
+        Tuple<double, double> UVParameterAtPoint(IPointEntity point);
+
+        double Area { get; }
+        double Perimeter { get; }
+
+        bool ClosedInU { get; }
+        bool ClosedInV { get; }
+        bool Closed { get; }
+
+        ICurveEntity[] PerimeterCurves();
 
         /// <summary>
-        /// 
+        /// TODO: this needs documentation
         /// </summary>
-        /// <param name="curves"></param>
-        /// <param name="planes"></param>
-        /// <param name="surfaces"></param>
-        /// <param name="solids"></param>
-        /// <param name="point"></param>
-        /// <param name="bAutoExtend"></param>
-        /// <returns></returns>
-        ISurfaceEntity Trim(ICurveEntity[] curves, IPlaneEntity[] planes,
-                            ISurfaceEntity[] surfaces, ISolidEntity[] solids,
-                            IPointEntity point, bool bAutoExtend);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="plane"></param>
-        /// <returns></returns>
-        ISurfaceEntity[] Split(IPlaneEntity plane);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="plane"></param>
-        /// <param name="negativeHalf"></param>
-        /// <param name="positiveHalf"></param>
-        void Split(IPlaneEntity plane, ref ISurfaceEntity[] negativeHalf, ref ISurfaceEntity[] positiveHalf);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="surface"></param>
-        /// <returns></returns>
-        ISurfaceEntity[] Split(ISurfaceEntity surface);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] SubtractFrom(IGeometryEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        Tuple<double, double> GetUVParameterAtPoint(IPointEntity point);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double GetArea();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double GetPerimeter();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsClosedInU();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsClosedInV();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsClosed();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <returns></returns>
-        ISurfaceEntity GetOffsetSurface(double distance);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IBSplineSurfaceEntity[] ConvertToBSplineSurface();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IBSplineSurfaceEntity ApproxBSpline(double tol);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="plane"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(IPlaneEntity plane);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(ISurfaceEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        IGeometryEntity[] Project(IGeometryEntity geometry, IVector direction);
-    }
-
-    [Browsable(false)]
-    public interface IBSplineSurfaceEntity : ISurfaceEntity
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetUDegree();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetVDegree();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetNumPolesAlongU();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetNumPolesAlongV();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsPeriodicInU();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsPeriodicInV();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool GetIsRational();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IPointEntity[][] GetPoles();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IPointEntity[][] GetPoints();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double[] GetUKnots();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double[] GetVKnots();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double[][] GetWeights();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="u"></param>
-        /// <param name="v"></param>
-        /// <returns></returns>
-        IVector NormalAtParameter(double u, double v);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="isoDirection"></param>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
         ICurveEntity[] GetIsolines(int isoDirection, double parameter);
 
         /// <summary>
-        /// 
+        /// Returns a new Surface with the Normal flipped. Leaves this surface
+        /// unchanged.
         /// </summary>
-        /// <param name="poles"></param>
-        /// <param name="uDegree"></param>
-        /// <param name="vDegree"></param>
-        /// <returns></returns>
-        bool UpdateByPoles(IPointEntity[][] poles, int uDegree, int vDegree);
+        ISurfaceEntity FlipNormalDirection();
+    }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="points"></param>
-        /// <param name="uDegree"></param>
-        /// <param name="vDegree"></param>
-        /// <returns></returns>
-        bool UpdateByPoints(IPointEntity[][] points, int uDegree, int vDegree);
+    [Browsable(false)]
+    public interface INurbsSurfaceEntity : ISurfaceEntity
+    {
+        int DegreeU { get; }
+        int DegreeV { get; }
+
+        int NumControlPointsU { get; }
+        int NumControlPointsV { get; }
+
+        bool IsPeriodicInU { get; }
+        bool IsPeriodicInV { get; }
+
+        bool IsRational { get; }
+
+        IPointEntity[][] GetPoles();
+        IPointEntity[][] GetControlPoints();
+        double[][] GetWeights();
+
+        double[] GetUKnots();
+        double[] GetVKnots();
     }
 
     [Browsable(false)]
     public interface IPlaneEntity : IGeometryEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
         IPointEntity Origin { get; }
+        IVectorEntity Normal { get; }
+
+        ICoordinateSystemEntity ToCoordinateSystem();
+
+        IPlaneEntity Offset(double dist);
 
         /// <summary>
-        /// 
+        /// The XAxis bias of the Plane
         /// </summary>
-        IVector Normal { get; }
-
+        IVectorEntity XAxis { get; }
         /// <summary>
-        /// 
+        /// The YAxis bais of the Plane
         /// </summary>
-        /// <returns></returns>
-        ICoordinateSystemEntity GetCoordinateSystem();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="iPointEntity"></param>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        IPointEntity Project(IPointEntity iPointEntity, IVector direction);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="perpPlane"></param>
-        /// <returns></returns>
-        ILineEntity IntersectWith(IPlaneEntity perpPlane);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <param name="normal"></param>
-        void Update(IPointEntity origin, IVector normal);
+        IVectorEntity YAxis { get; }
     }
 
     [Browsable(false)]
     public interface ISolidEntity : IGeometryEntity, IBRepEntity
-    {
-        #region GENERAL_SOLID_PROPERTIES
+    {      
         /// <summary>
-        /// 
+        /// Returns the surface area -- sum of all the areas of all faces
         /// </summary>
-        /// <returns></returns>
-        double GetArea();
+        double Area { get; }
+        double Volume { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double GetVolume();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+        IPointEntity GetCenterOfGravity();
         IPointEntity GetCentroid();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        bool IsNonManifold();
+        ISolidEntity CSGUnion(ISolidEntity geometry);
+        ISolidEntity CSGDifference(ISolidEntity geometry);
+        ISolidEntity CSGIntersect(ISolidEntity geometry);
 
-        #endregion
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] UnionWith(IGeometryEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] NonRegularUnionWith(IGeometryEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="solids"></param>
-        /// <returns></returns>
-        ISolidEntity NonRegularUnionWithMany(IGeometryEntity[] solids);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        ISolidEntity NonRegularImpose(ISolidEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] SubtractFrom(IGeometryEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(ISolidEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(IPlaneEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        IGeometryEntity[] Project(IGeometryEntity geometry, IVector direction);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        IGeometryEntity[] IntersectWith(ISurfaceEntity geometry);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="plane"></param>
-        /// <returns></returns>
-        IGeometryEntity[] SliceWithPlane(IPlaneEntity plane);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="planes"></param>
-        /// <param name="surfaces"></param>
-        /// <param name="solids"></param>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        ISolidEntity Trim(IPlaneEntity[] planes, ISurfaceEntity[] surfaces,
-                        ISolidEntity[] solids, IPointEntity point);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="plane"></param>
-        /// <returns></returns>
-        ISolidEntity NonRegularSliceWithPlane(IPlaneEntity plane);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="planes"></param>
-        /// <returns></returns>
-        ISolidEntity NonRegularSliceWithPlanes(IPlaneEntity[] planes);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="surface"></param>
-        /// <returns></returns>
-        IGeometryEntity[] SliceWithSurface(ISurfaceEntity surface);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="surfaces"></param>
-        /// <returns></returns>
-        IGeometryEntity[] SliceWithSurfaces(ISurfaceEntity[] surfaces);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="surface"></param>
-        /// <returns></returns>
-        ISolidEntity NonRegularSliceWithSurface(ISurfaceEntity surface);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="surfaces"></param>
-        /// <returns></returns>
-        ISolidEntity NonRegularSliceWithSurfaces(ISurfaceEntity[] surfaces);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="internalFaceThickness"></param>
-        /// <param name="externalFaceThickness"></param>
-        /// <returns></returns>
         ISolidEntity ThinShell(double internalFaceThickness, double externalFaceThickness);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="guides"></param>
-        bool UpdateSolidByLoftFromCrossSectionsGuides(ICurveEntity[] crossSections, ICurveEntity[] guides);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="path"></param>
-        bool UpdateSolidByLoftedCrossSectionsPath(ICurveEntity[] crossSections, ICurveEntity path);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        bool UpdateSolidByLoftedCrossSections(ICurveEntity[] crossSections);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="path"></param>
-        bool UpdateSolidBySweep(ICurveEntity profile, ICurveEntity path);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profileCurve"></param>
-        /// <param name="originPoint"></param>
-        /// <param name="revolveAxis"></param>
-        /// <param name="startAngle"></param>
-        /// <param name="sweepAngle"></param>
-        /// <returns></returns>
-        bool UpdateSolidByRevolve(ICurveEntity profileCurve, IPointEntity originPoint, IVector revolveAxis, double startAngle, double sweepAngle);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IGeometryEntity[] SeparateSolid();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         ISolidEntity Regularise();
+        bool IsNonManifold();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         IShellEntity[] GetShells();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         ICellEntity[] GetCells();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="planeHosts"></param>
-        /// <returns></returns>
-        IGeometryEntity[] SliceWithPlanes(IPlaneEntity[] planeHosts);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         int GetCellCount();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         int GetShellCount();
     }
 
     [Browsable(false)]
     public interface IPrimitiveSolidEntity : ISolidEntity
     {
-        /// <summary>
-        /// Returns coordinate system of this primitive solid. This coordinate 
-        /// system may be non-uniformly scaled or sheared.
-        /// </summary>
-        /// <returns>ICoordinateSystemEntity</returns>
-        ICoordinateSystemEntity GetCoordinateSystem();
+
     }
 
     [Browsable(false)]
     public interface IConeEntity : IPrimitiveSolidEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="startRadius"></param>
-        /// <param name="endRadius"></param>
-        void UpdateCone(IPointEntity startPoint, IPointEntity endPoint, double startRadius, double endRadius);
+        IPointEntity StartPoint { get; }
+        IPointEntity EndPoint { get; } 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="startRadius"></param>
-        /// <param name="endRadius"></param>
-        /// <param name="length"></param>
-        void UpdateCylinder(double[] data, double startRadius, double endRadius, double length);
+        double RadiusRatio { get; }
 
-        /// <summary>
-        /// Returns start point of the cone in WCS
-        /// </summary>
-        /// <returns>IPointEntity</returns>
-        IPointEntity GetStartPoint();
+        double StartRadius { get; }
+        double EndRadius { get; }
 
-        /// <summary>
-        /// Returns end point of the cone in WCS
-        /// </summary>
-        /// <returns></returns>
-        IPointEntity GetEndPoint();
-
-        /// <summary>
-        /// Returns ratio of start and end radius of the cone
-        /// </summary>
-        /// <returns></returns>
-        double GetRadiusRatio();
-
-        /// <summary>
-        /// Returns start radius of the cone, when it is multiplied by radius 
-        /// ratio it gives end radius of the cone.
-        /// </summary>
-        /// <returns>Start radius</returns>
-        double GetStartRadius();
-
-        /// <summary>
-        /// Returns height of the cone.
-        /// </summary>
-        /// <returns></returns>
-        double GetHeight();
+        double Height { get; }
     }
 
     [Browsable(false)]
     public interface ICuboidEntity : IPrimitiveSolidEntity
     {
-        /// <summary>
-        /// Updates this cuboid with new transformation data and parameters.
-        /// </summary>
-        /// <param name="data">Transformation data</param>
-        /// <param name="length">New length of cuboid</param>
-        /// <param name="width">New width of cuboid</param>
-        /// <param name="height">New height of cuboid</param>
-        void UpdateCuboid(double[] data, double length, double width, double height);
-
-        /// <summary>
-        /// Returns length of the cuboid
-        /// </summary>
-        /// <returns></returns>
-        double GetLength();
-
-        /// <summary>
-        /// Returns width of the cuboid
-        /// </summary>
-        /// <returns></returns>
-        double GetWidth();
-
-        /// <summary>
-        /// Returns height of the cuboid
-        /// </summary>
-        /// <returns></returns>
-        double GetHeight();
+        double Length { get; }
+        double Width { get; }
+        double Height { get; }
     }
 
     [Browsable(false)]
     public interface ISphereEntity : IPrimitiveSolidEntity
     {
-        /// <summary>
-        /// Updates this sphere with new center point and radius.
-        /// </summary>
-        /// <param name="centerPoint">New center point for update</param>
-        /// <param name="radius">radius value for update</param>
-        void UpdateSphere(IPointEntity centerPoint, double radius);
-
-        /// <summary>
-        /// Returns center point of the sphere
-        /// </summary>
-        /// <returns></returns>
-        IPointEntity GetCenterPoint();
-
-        /// <summary>
-        /// Returns radius of the sphere
-        /// </summary>
-        /// <returns></returns>
-        double GetRadius();
+        IPointEntity CenterPoint { get; }
+        double Radius { get; }
     }
 
     [Browsable(false)]
-    public interface IPolygonEntity : IGeometryEntity
+    public interface IPolygonEntity : ISurfaceEntity
     {
-        /// <summary>
-        /// Returns trimmed polygon after trimming the input polygon using the 
-        /// given array of planes as half spaces.
-        /// </summary>
-        /// <param name="halfSpaces">Trimming planes.</param>
-        /// <returns>Trimmed Polygon</returns>
-        IPolygonEntity Trim(IPlaneEntity[] halfSpaces);
+        IPointEntity[] GetPoints();
 
-        /// <summary>
-        /// Returns vertices of this polygon.
-        /// </summary>
-        /// <returns>Array of IPointEntity.</returns>
-        IPointEntity[] GetVertices();
-
-        /// <summary>
-        /// Computes average plane for the polygon.
-        /// </summary>
-        /// <returns>Average Plane.</returns>
-        IPlaneEntity GetPlane();
+        IPlaneEntity Plane { get; }
 
         /// <summary>
         /// Returns maximum deviation from average plane of polygon.
         /// </summary>
-        /// <returns>Out of plane value.</returns>
-        double GetOutOfPlane();
+        double PlaneDeviation { get; }
+    }
 
+
+    [Browsable(false)]
+    public interface IPolySurfaceEntity : ISurfaceEntity
+    {
         /// <summary>
-        /// Updates vertices.
+        /// Similar to ToNurbsSurface, this converts each backing Surface into
+        /// a NurbsSurface separately, helping accuracy
         /// </summary>
-        /// <param name="positions">new vertex points.</param>
-        void UpdateVertices(IPointEntity[] positions);
+        INurbsSurfaceEntity[] ToNurbsSurfaces();
+    }
+
+    /// <summary>
+    /// This is a "dumb" mesh, such as an OBJ or STL, verses a SubD Mesh
+    /// </summary>
+    [Browsable(false)]
+    public interface IPolyMeshEntity : IGeometryEntity
+    {
     }
 
     [Browsable(false)]
     public interface ISubDMeshEntity : IGeometryEntity
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetNumVertices();
+        int NumVertices { get; }
+        int NumFaces { get; }
+        int NumResultVertices { get; }
+        int NumResultFaces { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         IPointEntity[] GetVertices();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         IColor[] GetVertexColors();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        IVector[] GetVertexNormals();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetNumFaces();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
+        IVectorEntity[] GetVertexNormals();
         int[][] GetFaceIndices();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetNumResultVertices();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         IPointEntity[] GetResultVertices();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        int GetNumResultFaces();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         int[][] GetResultFaceIndices();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         ILineEntity[] GetEdges();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double ComputeSurfaceArea();
+        double Area { get; }
+        double Volume { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         bool GetIsClosed();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        double ComputeVolume();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="faceIndices"></param>
-        /// <param name="subDLevel"></param>
-        /// <returns></returns>
-        bool UpdateByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices, int subDLevel);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="normals"></param>
-        /// <param name="colors"></param>
-        /// <param name="faceIndices"></param>
-        /// <param name="subDLevel"></param>
-        /// <returns></returns>
-        bool UpdateSubDMeshColors(IPointEntity[] vertices, IVector[] normals,
-            IColor[] colors, int[][] faceIndices, int subDLevel);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="colors"></param>
-        /// <returns></returns>
-        bool UpdateSubDMeshColors(IColor[] colors);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="normals"></param>
-        /// <returns></returns>
-        bool UpdateSubDMeshNormals(IVector[] normals);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bConvertAsSmooth"></param>
-        /// <returns></returns>
         ISurfaceEntity ConvertToSurface(bool bConvertAsSmooth);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="bConvertAsSmooth"></param>
-        /// <returns></returns>
         ISolidEntity ConvertToSolid(bool bConvertAsSmooth);
     }
 
@@ -1706,17 +788,11 @@ namespace Autodesk.DesignScript.Interfaces
         bool PurgeBlock(string blockName);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     [Browsable(false)]
     public interface ITopologyEntity : IDesignScriptEntity
     {
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     [Browsable(false)]
     public interface IShellEntity : ITopologyEntity
     {
@@ -1739,9 +815,7 @@ namespace Autodesk.DesignScript.Interfaces
         int GetFaceCount();
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
+
     [Browsable(false)]
     public interface ICellEntity : ITopologyEntity
     {
@@ -1963,41 +1037,32 @@ namespace Autodesk.DesignScript.Interfaces
         int GetAdjacentFaceCount();
     }
 
-    /// <summary>
-    /// Represents Mesh entity
-    /// </summary>
-    [Browsable(false)]
-    public interface IMeshEntity : ITopologyEntity, IBRepEntity
+    public interface IIndiceGroup
     {
         /// <summary>
-        /// Gets underlying geometry object, this can be ISolidEntity or ISubDMeshEntity
+        /// Either 3 or 4, depending if it represents a triangle or a quad
         /// </summary>
-        IGeometryEntity Geometry { get; }
+        int Count { get; set; }
+
+        int A { get; set; }
+        int B { get; set; }
+        int C { get; set; }
+        int D { get; set; }
     }
 
     [Browsable(false)]
     public interface ITextEntity : IGeometryEntity
     {
         /// <summary>
-        /// 
+        /// Returns the height in absolute units;
         /// </summary>
-        /// <param name="cs"></param>
-        /// <param name="orientation"></param>
-        /// <param name="textString"></param>
-        /// <param name="fontSize"></param>
-        bool UpdateByCoordinateSystem(ICoordinateSystemEntity cs, int orientation, string textString, double fontSize);
+        double Height { get; }
+        string Text { get; }
 
         /// <summary>
-        /// 
+        /// Gets the encoding of the underlying text
         /// </summary>
-        /// <returns></returns>
-        double GetFontSize();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        string GetString();
+        System.Text.Encoding GetEncoding();
     }
 
     [Browsable(false)]
@@ -2012,324 +1077,146 @@ namespace Autodesk.DesignScript.Interfaces
     [Browsable(false)]
     public interface IGeometryFactory
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity CoordinateSystemByData(double[] data);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="contextCS"></param>
-        /// <param name="radius"></param>
-        /// <param name="theta"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity CoordinateSystemByCylindricalCoordinates(ICoordinateSystemEntity contextCS, double radius, double theta, double height);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="contextCS"></param>
-        /// <param name="radius"></param>
-        /// <param name="theta"></param>
-        /// <param name="phi"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity CoordinateSystemBySphericalCoordinates(ICoordinateSystemEntity contextCS, double radius, double theta, double phi);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        ICoordinateSystemEntity CoordinateSystemByUniversalTransform(ICoordinateSystemEntity contextCoordinateSys, double[] scaleFactors,
-            double[] rotationAngles, int[] rotationSequence, IVector translationVector, bool translationSequence);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="contextCoordinateSys"></param>
-        /// <param name="scaleFactors"></param>
-        /// <param name="rotationAngles"></param>
-        /// <param name="rotationSequence"></param>
-        /// <param name="translationVector"></param>
-        /// <param name="translationSequence"></param>
-        /// <returns></returns>
-        ICoordinateSystemEntity CoordinateSystemByUniversalTransform(ICoordinateSystemEntity contextCoordinateSys, double[] scaleFactors,
-            double[] rotationAngles, int[] rotationSequence, double[] translationVector, bool translationSequence);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
-        IPointEntity CreatePoint(double x, double y, double z);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="controlVertices"></param>
-        /// <param name="degree"></param>
-        /// <param name="makePeriodic"></param>
-        /// <returns></returns>
-        IBSplineCurveEntity BSplineByControlVertices(IPointEntity[] controlVertices, int degree, bool makePeriodic);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pts"></param>
-        /// <param name="makePeriodic"></param>
-        /// <returns></returns>
-        IBSplineCurveEntity BSplineByPoints(IPointEntity[] pts, bool makePeriodic);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pts"></param>
-        /// <param name="startTangent"></param>
-        /// <param name="endTangent"></param>
-        /// <returns></returns>
-        IBSplineCurveEntity BSplineByPoints(IPointEntity[] pts, IVector startTangent, IVector endTangent);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="firstPoint"></param>
-        /// <param name="secondPoint"></param>
-        /// <param name="thirdPoint"></param>
-        /// <returns></returns>
         IArcEntity ArcByPointsOnCurve(IPointEntity firstPoint, IPointEntity secondPoint, IPointEntity thirdPoint);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="center"></param>
-        /// <param name="radius"></param>
-        /// <param name="startAngle"></param>
-        /// <param name="endAngle"></param>
-        /// <param name="normal"></param>
-        /// <returns></returns>
-        IArcEntity ArcByCenterPointRadiusAngle(IPointEntity center, double radius, double startAngle, double endAngle, IVector normal);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="centerPoint"></param>
-        /// <param name="startPoint"></param>
-        /// <param name="sweepAngle"></param>
-        /// <param name="normal"></param>
-        /// <returns></returns>
-        IArcEntity ArcByCenterPointStartPointSweepAngle(IPointEntity centerPoint, IPointEntity startPoint, double sweepAngle, IVector normal);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="centerPoint"></param>
-        /// <param name="startPoint"></param>
-        /// <param name="sweepPoint"></param>
-        /// <returns></returns>
+        IArcEntity ArcByCenterPointRadiusAngle(IPointEntity center, double radius, double startAngle, double endAngle, IVectorEntity normal);
+        IArcEntity ArcByCenterPointStartPointSweepAngle(IPointEntity centerPoint, IPointEntity startPoint, double sweepAngle, IVectorEntity normal);
         IArcEntity ArcByCenterPointStartPointSweepPoint(IPointEntity centerPoint, IPointEntity startPoint, IPointEntity sweepPoint);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <returns></returns>
+        IBoundingBoxEntity BoundingBoxByGeometry(IGeometryEntity geom);
+        IBoundingBoxEntity BoundingBoxByGeometries(IGeometryEntity[] geom);
+        IBoundingBoxEntity BoundingBoxByGeometry(IGeometryEntity geom, ICoordinateSystemEntity cs);
+        IBoundingBoxEntity BoundingBoxByGeometries(IGeometryEntity[] geom, ICoordinateSystemEntity cs);
+
+        INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points);
+        INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree);
+        INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree, bool close_curve);
+        // weight array: the array size must be the size of the control vertices
+        // knot array: the array size must be num_control_points + degree + 1
+        INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree, double[] weights, double[] knots);
+        INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points);
+        INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points, int degree);
+        INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] pts, IVectorEntity startTangent, IVectorEntity endTangent);
+
+        INurbsSurfaceEntity NurbsSurfaceByPoints(IPointEntity[][] points, int uDegree, int vDegree);
+        INurbsSurfaceEntity NurbsSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree);
+        INurbsSurfaceEntity NurbsSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree, double[][] weights, double[][] knots);
+
+        ICircleEntity CircleByCenterPointRadius(IPointEntity centerPoint, double radius);
+        ICircleEntity CircleByCenterPointRadiusNormal(IPointEntity centerPoint, double radius, IVectorEntity normal);
+        ICircleEntity CircleByPlaneRadius(IPlaneEntity plane, double radius);
+        ICircleEntity CircleByThreePoints(IPointEntity p1, IPointEntity p2, IPointEntity p3);
+
+        IConeEntity ConeByPointsRadius(IPointEntity startPoint, IPointEntity endPoint, double startRadius);
+        IConeEntity ConeByPointsRadii(IPointEntity startPoint, IPointEntity endPoint, double startRadius, double endRadius);
+        IConeEntity ConeByCoordinateSystemHeightRadius(ICoordinateSystemEntity cs, double height, double startRadius);
+        IConeEntity ConeByCoordinateSystemHeightRadii(ICoordinateSystemEntity cs, double height, double startRadius, double endRadius);
+
+        ICoordinateSystemEntity CoordinateSystemByOrigin(double x, double y);
+        ICoordinateSystemEntity CoordinateSystemByOrigin(double x, double y, double z);
+        ICoordinateSystemEntity CoordinateSystemByOrigin(IPointEntity origin);
+        ICoordinateSystemEntity CoordinateSystemByPlane(IPlaneEntity plane);
+        ICoordinateSystemEntity CoordinateSystemByOriginVectors(IPointEntity origin, IVectorEntity xAxis, IVectorEntity yAxis);
+        ICoordinateSystemEntity CoordinateSystemByOriginVectors(IPointEntity origin, IVectorEntity xAxis, IVectorEntity yAxis, IVectorEntity zAxis);
+        ICoordinateSystemEntity CoordinateSystemByCylindricalCoordinates(IPointEntity origin, double radius, double theta, double height);
+        ICoordinateSystemEntity CoordinateSystemByCylindricalCoordinates(ICoordinateSystemEntity contextCS, double radius, double theta, double height);
+        ICoordinateSystemEntity CoordinateSystemBySphericalCoordinates(IPointEntity origin, double radius, double theta, double phi);
+        ICoordinateSystemEntity CoordinateSystemBySphericalCoordinates(ICoordinateSystemEntity contextCS, double radius, double theta, double phi);
+
+        ICuboidEntity CuboidByLengths(double width, double length, double height);
+        ICuboidEntity CuboidByLengths(IPointEntity originPoint, double width, double length, double height);
+        ICuboidEntity CuboidByLengths(ICoordinateSystemEntity cs, double width, double length, double height);
+        ICuboidEntity CuboidByCorners(IPointEntity lowPoint, IPointEntity highPoint);
+
+        IUV UVByUV(double u, double v);
+
+        ICurveEntity CurveByParameterLineOnSurface(ISurfaceEntity baseSurface, IUV startParams, IUV endParams);
+
+        IEllipseEntity EllipseByOriginRadii(IPointEntity origin, double xAxisRadius, double yAxisRadius);
+        IEllipseEntity EllipseByOriginVectors(IPointEntity origin, IVectorEntity xAxisRadius, IVectorEntity yAxisRadius);
+        IEllipseEntity EllipseByCoordinateSystemRadii(ICoordinateSystemEntity origin, double xAxisRadius, double yAxisRadius);
+        IEllipseEntity EllipseByPlaneRadii(IPlaneEntity plane, double xAxisRadius, double yAxisRadius);
+
+        IHelixEntity HelixByAxis(IPointEntity axisPoint, IVectorEntity axisDirection, IPointEntity startPoint, double pitch, double angleTurns);
+
         ILineEntity LineByStartPointEndPoint(IPointEntity startPoint, IPointEntity endPoint);
+        ILineEntity LineByBestFit(IPointEntity[] bestFitPoints);
+        ILineEntity LineByTangency(ICurveEntity curve, double parameter);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <param name="normal"></param>
-        /// <returns></returns>
-        IPlaneEntity PlaneByOriginNormal(IPointEntity origin, IVector normal);
 
+        IPlaneEntity PlaneByOriginNormal(IPointEntity origin, IVectorEntity normal);
+        IPlaneEntity PlaneByOriginNormalXAxis(IPointEntity origin, IVectorEntity normal, IVectorEntity xAxis);
+        IPlaneEntity PlaneByOriginXAxisYAxis(IPointEntity origin, IVectorEntity xAxis, IVectorEntity yAxis);
+        IPlaneEntity PlaneByBestFitThroughPoints(IPointEntity[] points);
         /// <summary>
-        /// 
+        /// Create the Plane that lies in the three Points determined by the Line start Point
+        /// Line end Point, and the input Point
         /// </summary>
-        /// <param name="cs"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <returns></returns>
+        IPlaneEntity PlaneByLineAndPoint(ILineEntity line, IPointEntity point);
+        IPlaneEntity PlaneByThreePoints(IPointEntity p1, IPointEntity p2, IPointEntity p3);
+
+        IPointEntity PointByCoordinates(double x, double y);
+        IPointEntity PointByCoordinates(double x, double y, double z);
         IPointEntity PointByCartesianCoordinates(ICoordinateSystemEntity cs, double x, double y, double z);
+        IPointEntity PointByCylindricalCoordinates(ICoordinateSystemEntity cs, double angle, double elevation, double offset);
+        IPointEntity PointBySphereicalCoordinates(ICoordinateSystemEntity cs, double phi, double theta, double radius);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="center"></param>
-        /// <param name="radius"></param>
-        /// <param name="normal"></param>
-        /// <returns></returns>
-        ICircleEntity CircleByCenterPointRadius(IPointEntity center, double radius, IVector normal);
+        IPolygonEntity PolygonByPoints(IPointEntity[] points);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="firstPoint"></param>
-        /// <param name="secondPoint"></param>
-        /// <param name="thirdPoint"></param>
-        /// <returns></returns>
-        ICircleEntity CircleByPointsOnCurve(IPointEntity firstPoint, IPointEntity secondPoint, IPointEntity thirdPoint);
+        IPolyCurveEntity PolyCurveByJoinedCurves(ICurveEntity[] curves);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <returns></returns>
-        ISurfaceEntity SurfaceByLoftCrossSections(ICurveEntity[] crossSections);
+        IRectangleEntity RectangleByCornerPoints(IPointEntity[] points);
+        IRectangleEntity RectangleByCornerPoints(IPointEntity p1, IPointEntity p2, IPointEntity p3, IPointEntity p4);
+        IRectangleEntity RectangleByWidthLength(double width, double length);
+        IRectangleEntity RectangleByWidthLength(IPlaneEntity plane, double width, double length);
+        IRectangleEntity RectangleByWidthLength(ICoordinateSystemEntity cs, double width, double length);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        ISurfaceEntity SurfaceByLoftCrossSectionsPath(ICurveEntity[] crossSections, ICurveEntity path);
+        ISurfaceEntity SurfaceByLoft(ICurveEntity[] crossSections);
+        ISurfaceEntity SurfaceByLoft(ICurveEntity[] crossSections, ICurveEntity guideCurve);
+        ISurfaceEntity SurfaceBySweep1Rail(ICurveEntity rail, ICurveEntity[] crossSections);
+        ISurfaceEntity SurfaceBySweep2Rails(ICurveEntity rail1, ICurveEntity rail2, ICurveEntity[] crossSections);
+        ISurfaceEntity SurfaceByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVectorEntity axisDirection, double startAngle, double sweepAngle);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="guides"></param>
-        /// <returns></returns>
-        ISurfaceEntity SurfaceByLoftCrossSectionsGuides(ICurveEntity[] crossSections, ICurveEntity[] guides);
+        ISolidEntity SolidByLoft(ICurveEntity[] crossSections);
+        ISolidEntity SolidByLoft(ICurveEntity[] crossSections, ICurveEntity guideCurve);
+        ISolidEntity SolidBySweep1Rail(ICurveEntity rail, ICurveEntity[] crossSections);
+        ISolidEntity SolidBySweep2Rails(ICurveEntity rail1, ICurveEntity rail2, ICurveEntity[] crossSections);
+        ISolidEntity SolidByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVectorEntity axisDirection, double startAngle, double sweepAngle);
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        ISurfaceEntity SurfaceBySweep(ICurveEntity profile, ICurveEntity path);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="axisOrigin"></param>
-        /// <param name="axisDirection"></param>
-        /// <param name="startAngle"></param>
-        /// <param name="sweepAngle"></param>
-        /// <returns></returns>
-        ISurfaceEntity SurfaceByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVector axisDirection, double startAngle, double sweepAngle);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <returns></returns>
-        ISurfaceEntity SurfacePatchFromCurve(ICurveEntity profile);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="controlVertices"></param>
-        /// <param name="uDegree"></param>
-        /// <param name="vDegree"></param>
-        /// <returns></returns>
-        IBSplineSurfaceEntity BSplineSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="points"></param>
-        /// <param name="uDegree"></param>
-        /// <param name="vDegree"></param>
-        /// <returns></returns>
-        IBSplineSurfaceEntity BSplineSurfaceByPoints(IPointEntity[][] points, int uDegree, int vDegree);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <returns></returns>
-        ISolidEntity SolidByLoftCrossSections(ICurveEntity[] crossSections);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="guides"></param>
-        /// <returns></returns>
-        ISolidEntity SolidByLoftCrossSectionsGuides(ICurveEntity[] crossSections, ICurveEntity[] guides);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="crossSections"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        ISolidEntity SolidByLoftCrossSectionsPath(ICurveEntity[] crossSections, ICurveEntity path);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        ISolidEntity SolidBySweep(ICurveEntity profile, ICurveEntity path);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="profile"></param>
-        /// <param name="axisOrigin"></param>
-        /// <param name="axisDirection"></param>
-        /// <param name="startAngle"></param>
-        /// <param name="sweepAngle"></param>
-        /// <returns></returns>
-        ISolidEntity SolidByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVector axisDirection, double startAngle, double sweepAngle);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="startRadius"></param>
-        /// <param name="endRadius"></param>
-        /// <returns></returns>
-        IConeEntity ConeByPointsRadius(IPointEntity startPoint, IPointEntity endPoint, double startRadius, double endRadius);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cs"></param>
-        /// <param name="startRadius"></param>
-        /// <param name="endRadius"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        IConeEntity ConeByRadiusLength(ICoordinateSystemEntity cs, double startRadius, double endRadius, double height);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="centerPoint"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
         ISphereEntity SphereByCenterPointRadius(IPointEntity centerPoint, double radius);
 
         /// <summary>
-        /// 
+        /// Create a Text at the origin Point, oriented along the XAxis, pointing upward to the ZAxis 
         /// </summary>
-        /// <param name="cs"></param>
-        /// <param name="length"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        ICuboidEntity CuboidByLengths(ICoordinateSystemEntity cs, double length, double width, double height);
-
+        ITextEntity TextByPoint(IPointEntity origin, string textString, double textHeight);
         /// <summary>
-        /// Constructs a closed Polygon that joins the vertices in the 1D array end-to-end.
+        /// Create a Text at the origin Point, oriented along the XAxis, pointing upward to the ZAxis 
         /// </summary>
-        /// <param name="vertices">Array of Point.</param>
-        /// <returns>Polygon</returns>
-        IPolygonEntity PolygonByVertices(IPointEntity[] vertices);
+        ITextEntity TextByPoint(IPointEntity origin, string textString, double textHeight, System.Text.Encoding textEncoding);
+        /// <summary>
+        /// Create a Text in the XZ Plane of the input CoordinateSystem.
+        /// </summary>
+        ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity cs, string textString, double textHeight);
+        /// <summary>
+        /// Create a Text in the XZ Plane of the input CoordinateSystem.
+        /// </summary>
+        ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity cs, string textString, double textHeight, System.Text.Encoding textEncoding);
+
+        IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndiceGroup[] indices);
+
+
+        IBlockHelper GetBlockHelper();
+
+
+        IGeometryEntity[] LoadSat(string satFile);
+        bool SaveSat(string satFile, Object[] ffiObjects);
+
+
+        IGeometrySettings GetSettings();
+
+
+        // NOTE: (by Patrick) I don't think we should support SubDMeshes for the 
+        // first pass of this API. They are not easily supported by ASM, and
+        // have no equivalence in Revit
 
         /// <summary>
         /// Constructs a subdivision mesh given an input array of vertex points
@@ -2337,89 +1224,13 @@ namespace Autodesk.DesignScript.Interfaces
         /// the indices of the vertices in the 'vertices' array making up the 
         /// face. 'subDivisionLevel' is the initial smoothness level.
         /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="faceIndices"></param>
-        /// <param name="subDLevel"></param>
-        /// <returns></returns>
-        ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices, int subDLevel);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="points"></param>
-        /// <param name="faceIndices"></param>
-        /// <param name="vertexNormals"></param>
-        /// <param name="vertexColors"></param>
-        /// <param name="subDLevel"></param>
-        /// <returns></returns>
-        ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] points,
-            int[][] faceIndices, IVector[] vertexNormals, IColor[] vertexColors, int subDLevel);
+        //ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices, int subDLevel);
+        //ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] points,
+        //    int[][] faceIndices, IVectorEntity[] vertexNormals, IColor[] vertexColors, int subDLevel);
 
         /// <summary>
         /// Constructs a quad SubDMesh from Surface or Solid geometry.
         /// </summary>
-        /// <param name="geometry">Geometry object</param>
-        /// <param name="maxEdgeLength">mesh size</param>
-        /// <returns>ISubDMeshEntity</returns>
-        ISubDMeshEntity SubDMeshFromGeometry(IGeometryEntity geometry, double maxEdgeLength);
-
-        /// <summary>
-        /// Constructs a topology mesh given an input array of vertex points
-        /// and an input array of faces defined by a set of numbers, which are 
-        /// the indices of the vertices in the 'vertices' array making up the 
-        /// face. 
-        /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="faceIndices"></param>
-        /// <returns></returns>
-        IMeshEntity MeshByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices);
-
-        /// <summary>
-        /// Constructs a topology mesh given an input array of vertex points
-        /// and an input array of edges defined by a pair of numbers, which are 
-        /// the indices of the vertices in the 'vertices' array making up the 
-        /// edge. 
-        /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="edgeIndices"></param>
-        /// <returns></returns>
-        IMeshEntity MeshByVerticesEdgeIndices(IPointEntity[] vertices, int[] edgeIndices);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="contextCoordinateSystem"></param>
-        /// <param name="orientation"></param>
-        /// <param name="textString"></param>
-        /// <param name="fontSize"></param>
-        /// <returns></returns>
-        ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity contextCoordinateSystem, int orientation, string textString, double fontSize);
-
-        /// <summary>
-        /// Returns IBlockHelper
-        /// </summary>
-        /// <returns>IBlockHelper</returns>
-        IBlockHelper GetBlockHelper();
-
-        /// <summary>
-        /// Load a sat file and returns the FFI objects
-        /// </summary>
-        /// <param name="satFile"></param>
-        /// <returns></returns>
-        IGeometryEntity[] LoadSat(string satFile);
-
-        /// <summary>
-        /// Save the objects to a given sat file
-        /// </summary>
-        /// <param name="satFile"></param>
-        /// <param name="ffiObjects"></param>
-        /// <returns></returns>
-        bool SaveSat(string satFile, Object[] ffiObjects);
-
-        /// <summary>
-        /// Returns the settings object
-        /// </summary>
-        /// <returns></returns>
-        IGeometrySettings GetSettings();
+        //ISubDMeshEntity SubDMeshFromGeometry(IGeometryEntity geometry, double maxEdgeLength);
     }
 }
