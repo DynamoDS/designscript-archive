@@ -798,5 +798,22 @@ namespace ProtoCore.Utils
                 nodeTo.line = nodeFrom.line;
             }
         }
+
+
+        /// <summary>
+        /// Gets the has id of a function signature given the name and argument types
+        /// </summary>
+        /// <param name="functionDef"></param>
+        /// <returns></returns>
+        public static int GetFunctionHash(ProtoCore.AST.AssociativeAST.FunctionDefinitionNode functionDef)
+        {
+            Validity.Assert(null != functionDef);
+            string functionDescription = functionDef.Name;
+            foreach (ProtoCore.AST.AssociativeAST.VarDeclNode argNode in functionDef.Signature.Arguments)
+            {
+                functionDescription += argNode.ArgumentType.ToString();
+            }
+            return functionDescription.GetHashCode();
+        }
     }
 }
