@@ -92,6 +92,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AssociativeGraph.cs" />
+    <Compile Include="ASTCompilerUtils.cs" />
     <Compile Include="AttributeEntry.cs" />
     <Compile Include="BuildStatus.cs" />
     <Compile Include="CallsiteExecutionState\CallsiteExecutionState.cs" />

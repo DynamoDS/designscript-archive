@@ -1,5 +1,7 @@
 #pragma once
+
 #include<list>
+#include<vector>
 
 // The following ifdef block is the standard way of creating macros which make exporting 
 // from a DLL simpler. All files within this DLL are compiled with the DESIGNSCRIPTRUNNER_EXPORTS
@@ -22,11 +24,33 @@ enum ErrorStatus
     eKeyNotFound,
 };
 
+class DesignScriptMethod;
 class DesignScriptClass;
 class DesignScriptObject;
 class DesignScriptConfiguration;
 class DesignScriptRunnerCallback;
 class DesignScriptNode;
+class GraphNodeWrapper;
+
+class __declspec(novtable) GraphNode
+{
+public:
+    /*DESIGNSCRIPTRUNNER_API static GraphNode* create(const wchar_t* type, void* host_ptr, const wchar_t* methodName, const std::vector<const wchar_t*> inputs);*/
+
+    GraphNode::GraphNode() {}
+    DESIGNSCRIPTRUNNER_API GraphNode(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*> selectionInputs, const std::vector<const wchar_t*> cmdInputs);
+    virtual ~GraphNode() = 0 {}
+    virtual const wchar_t* getNodeName() const = 0;
+    virtual const wchar_t* getCode() const = 0;
+private:
+    const wchar_t* type;
+    void* hostInstancePtr;
+    const wchar_t* methodName;
+    const std::vector<const void*> selectionInputs;
+    const std::vector<const wchar_t*> cmdInputs;
+
+    //GraphNodeWrapper* m_pWrapper;
+};
 
 /// <summary>
 /// DesignScriptRunner class implements the design script graph execution 
@@ -49,16 +73,6 @@ public:
     /// </summary>
     virtual ~DesignScriptRunner() = 0 {}
 
-    //virtual DesignScriptNode* createCodeBlockNode(const wchar_t* codesegment) = 0;
-    //virtual DesignScriptNode* createFunctionNode(const wchar_t* functionName) = 0;
-
-    /// <summary>
-    /// Synchronous method to update the graph with given code segment. This 
-    /// call waits till the graph is evaluated for the changes due to new code 
-    /// segment in the graph. 
-    /// </summary>
-    //virtual void updateGraph(const wchar_t* codesegment) = 0;
-
     /// <summary>
     /// Synchronous method to update the VM with given code segment. This 
     /// call waits till the live execution finishes for the changes due to new code 
@@ -67,14 +81,17 @@ public:
     virtual void updateCLInterpreter(const wchar_t* codesegment) = 0;
 
     /// <summary>
-    /// Asynchronous method to update the graph with given code segment. This 
-    /// call queues the given code segment to the graph for evaluation. Once
-    /// graph is completely evaluated, GraphUpdateReady method is called on the
-    /// passed callback object.
+    /// Imports given library by compiling import statement
+    /// Temporarily reinitializes LiveRunner before importing new library
     /// </summary>
-    //virtual void updateGraphAsync(const wchar_t* codesegment) = 0;
+    virtual void importLibrary(const std::vector<const wchar_t*>& libraries) = 0;
 
-    virtual void importLibrary(const wchar_t* codesegment) = 0;
+    /// <summary>
+    /// Imports given library by compiling import statement
+    /// Temporarily reinitializes LiveRunner before importing new library
+    /// Returns list of Library mirrors, one for each imported library
+    /// </summary>
+    virtual std::vector<DesignScriptObject*>* resetAndImportLibrary(const std::vector<const wchar_t*>& libraries) = 0;
 
     /// <summary>
     /// Asynchronous method to update the VM with given code segment from the command-line interpreter. This 
@@ -93,11 +110,6 @@ public:
     virtual DesignScriptObject* inspectNodeValue(const wchar_t* nodeName) = 0;
 
     /// <summary>
-    /// Sets up asyncronous query for value of a list of nodes.
-    /// </summary>
-    //virtual void queryNodeValuesAsync(const std::list<unsigned int>& nodeIds) = 0;
-
-    /// <summary>
     /// Gets the core dump object, which has values/state of all the objects
     /// in the graph.
     /// </summary>
@@ -109,6 +121,23 @@ public:
     /// </summary>
     virtual const wchar_t* getCoreDumpCmdLineREPL() = 0;
 
+    /// <summary>
+    /// Re-initializes the LiveRunner. Must be used temporarily whenever we import new libraries
+    /// </summary>
+    virtual void reInitializeLiveRunner() = 0;
+
+    /// <summary>
+    /// Builds a delta AST node, compiles and executes it in the LiveRunner
+    /// </summary>
+    //virtual void updateGraph(List<AssociativeNode^>^ astList) = 0;
+    virtual void updateGraph(GraphNode* graphNode) = 0;
+
+    /// <summary>
+    /// Compiles and executes the delta list of AST nodes in the LiveRunner
+    /// </summary>
+    virtual GraphNode* buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString) = 0;
+
+    virtual void getFunctionArgs(DesignScriptMethod* methodMirror, std::vector<const wchar_t*>& argNames, std::vector<DesignScriptClass*>& argTypes) = 0;
 };
 
 
@@ -147,20 +176,34 @@ class __declspec(novtable) DesignScriptObject
 {
 public:
     virtual ~DesignScriptObject() = 0 {}
-    virtual bool isKindOf(const DesignScriptClass * aClass) const = 0;
-    virtual DesignScriptClass* isA() const = 0;
-    virtual bool isEqualTo(const DesignScriptObject * other) const = 0;
-    virtual int comparedTo(const DesignScriptObject * other) const  = 0;
+    //virtual bool isKindOf(const DesignScriptClass * aClass) const = 0;
+    //virtual DesignScriptClass* isA() const = 0;
+    //virtual bool isEqualTo(const DesignScriptObject * other) const = 0;
+    //virtual int comparedTo(const DesignScriptObject * other) const  = 0;
     virtual const wchar_t* toString() const = 0;
+
+    virtual std::vector<DesignScriptClass*>* getClasses() const = 0;
 };
 
 class __declspec(novtable) DesignScriptClass
 {
 public:
     virtual ~DesignScriptClass() = 0 {}
-    virtual const wchar_t* name() = 0;
-    virtual DesignScriptClass* parent() = 0;
+    virtual const wchar_t* name() const = 0;
+    virtual DesignScriptClass* parent() const = 0;
+    virtual std::vector<DesignScriptMethod*>* getConstructors() const = 0;
+    virtual std::vector<DesignScriptMethod*>* getMethods() const = 0;
 };
+
+class __declspec(novtable) DesignScriptMethod
+{
+public:
+    virtual ~DesignScriptMethod() = 0 {}
+    virtual const wchar_t* name() const = 0;
+    //virtual std::vector<const wchar_t*> getArgumentNames() const = 0;
+    //virtual std::vector<DesignScriptClass*> getArgumentTypes(ProtoCore::Core^ core) const = 0; 
+};
+
 
 class __declspec(novtable) DesignScriptConfiguration
 {
@@ -183,3 +226,8 @@ public:
     virtual DesignScriptObject* setValue(const wchar_t* parameter, DesignScriptObject* pValue) = 0;
     virtual Iterator* newIterator() = 0;
 };
+
+
+
+
+
