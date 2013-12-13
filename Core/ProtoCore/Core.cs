@@ -1110,6 +1110,33 @@ namespace ProtoCore
         public bool EnableCallsiteExecutionState { get; set; }
         public CallsiteExecutionState csExecutionState { get; set; }
 
+        /// <summary>
+        /// Sets the function to an inactive state where it can no longer be used by the front-end and backend
+        /// </summary>
+        /// <param name="functionDef"></param>
+        public void SetFunctionInactive(ProtoCore.AST.AssociativeAST.FunctionDefinitionNode functionDef)
+        {
+            // DS language only supports function definition on the global and first language block scope 
+            // TODO Jun: Determine if it is still required to combine function tables in the codeblocks and callsite
+
+            // Update the functiond definition in the codeblocks
+            foreach (ProtoCore.DSASM.CodeBlock block in CodeBlockList)
+            {
+                // Update the current function definition in the current block
+                block.procedureTable.SetInactive(functionDef);
+            }
+
+            // Update the function definition in global function tables
+            int hash = ProtoCore.Utils.CoreUtils.GetFunctionHash(functionDef);
+            foreach (KeyValuePair<int, Dictionary<string, FunctionGroup>> functionGroupList in FunctionTable.GlobalFuncTable)
+            {
+                foreach (KeyValuePair<string, FunctionGroup> functionGroup in functionGroupList.Value)
+                {
+                    functionGroup.Value.FunctionEndPoints.RemoveAll(func => func.procedureNode.HashID == hash);
+                }
+            }
+        }
+
         public void LogErrorInGlobalMap(Core.ErrorType type, string msg, string fileName = null, int line = -1, int col = -1, 
             BuildData.WarningID buildId = BuildData.WarningID.kDefault, RuntimeData.WarningID runtimeId = RuntimeData.WarningID.kDefault)
         {

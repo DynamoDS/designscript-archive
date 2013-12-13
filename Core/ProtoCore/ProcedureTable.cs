@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using ProtoCore.Utils;
 
 namespace ProtoCore.DSASM
 {
@@ -44,6 +45,7 @@ namespace ProtoCore.DSASM
         public int runtimeIndex { get; set; }       // Index of the procedure at the runtime executable tables
         public int procId { get; set; }             // Index of the procedure in its procedure table
         public int classScope { get; set; }         // Index of the class that the procedure belongs to
+        public int HashID { get; set; }             // The hash of the function given the name and argument type string
         public AccessSpecifier access {get; set;}
         public bool isThisCallReplication { get; set; }
 		public List<AttributeEntry> Attributes { get; set; }		
@@ -79,6 +81,16 @@ namespace ProtoCore.DSASM
             updatedArgumentProperties = new Dictionary<string, List<AssociativeGraph.UpdateNodeRef>>();
             updatedArgumentArrays = new Dictionary<string, List<AssociativeGraph.UpdateNode>>();
         }
+
+        /// <summary>
+        ///  This will deactivate the function so it can no longer be used or referred to 
+        /// </summary>
+        /// <returns></returns>
+        public void SetInactive()
+        {
+            name = ProtoCore.DSASM.Constants.kInactiveFunction;
+        }
+          
 
         public bool IsEqual(ProcedureNode rhs)
         {
@@ -390,6 +402,37 @@ namespace ProtoCore.DSASM
                 }
             }
             return ProtoCore.DSASM.Constants.kInvalidIndex;
+        }
+
+        private int IndexOfHash(int hash)
+        {
+            for (int n = 0; n < procList.Count; ++n)
+            {
+                if (hash == procList[n].HashID)
+                {
+                    return n;
+                }
+            }
+            return ProtoCore.DSASM.Constants.kInvalidIndex;
+        }
+
+        /// <summary>
+        /// This sets the procedure node to be inactive by modifiying its name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="args"></param>
+        public bool SetInactive(ProtoCore.AST.AssociativeAST.FunctionDefinitionNode function)
+        {
+            // Research alternatives on how REPL languages handle function redefinition in after a 'read' phase.
+            // Find the function
+            int index = IndexOfHash(ProtoCore.Utils.CoreUtils.GetFunctionHash(function));
+            if (ProtoCore.DSASM.Constants.kInvalidIndex != index)
+            {
+                // Rename it
+                procList[index].SetInactive();
+                return true;
+            }
+            return false;
         }
     }
 }

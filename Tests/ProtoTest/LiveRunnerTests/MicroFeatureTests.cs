@@ -1613,5 +1613,60 @@ z=Point.ByCoordinates(y,a,a);
                 Assert.IsTrue(!string.IsNullOrEmpty(strValue));
             }
         }
+
+        [Test]
+        public void TestFunctionDefinition01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 1; } x = f();"
+            };
+
+            Guid guid = System.Guid.NewGuid();
+
+            List<Subtree> added = new List<Subtree>();
+            added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("x");
+            StackValue value = mirror.GetData().GetStackValue();
+            Assert.AreEqual(value.opdata, 1);
+        }
+
+        [Test]
+        public void TestFunctionModification01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 1; } x = f();",
+                "def f() { return = 2; } x = f();"
+            };
+
+            Guid guid = System.Guid.NewGuid();
+
+            List<Subtree> added = new List<Subtree>();
+            added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("x");
+            StackValue value = mirror.GetData().GetStackValue();
+            Assert.AreEqual(value.opdata, 1);
+
+
+            // Modify the function and verify
+            List<Subtree> modified = new List<Subtree>();
+            modified.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+            syncData = new GraphSyncData(null, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            mirror = astLiveRunner.InspectNodeValue("x");
+            value = mirror.GetData().GetStackValue();
+            Assert.AreEqual(value.opdata, 2);
+        }
     }
 }

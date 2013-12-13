@@ -778,6 +778,28 @@ namespace ProtoScript.Runners
         }
 
         /// <summary>
+        /// This method updates a redefined function
+        /// </summary>
+        /// <param name="subtree"></param>
+        /// <returns></returns>
+        private List<AssociativeNode> UpdateFunctionDefinition(Subtree subtree)
+        {
+            List<AssociativeNode> astNodeList = new List<AssociativeNode>();
+            foreach (var node in subtree.AstNodes)
+            {
+                FunctionDefinitionNode fNode = node as FunctionDefinitionNode;
+                if (fNode != null)
+                {
+                    runnerCore.SetFunctionInactive(fNode);
+
+                    // Add the modified function    
+                    astNodeList.Add(fNode);
+                }
+            }
+            return astNodeList;
+        }
+
+        /// <summary>
         /// This is to be used for debugging only to check code emitted from delta AST input
         /// </summary>
         /// <param name="deltaAstList"></param>
@@ -939,9 +961,12 @@ namespace ProtoScript.Runners
                     {
                         var nullNodes = MarkGraphNodesInactive(st);
                         if (nullNodes != null)
+                        {
                             deltaAstList.AddRange(nullNodes);
-
+                        }
                         deltaAstList.AddRange(st.AstNodes);
+
+                        UpdateFunctionDefinition(st);
                     }
                 }
             }
@@ -959,8 +984,6 @@ namespace ProtoScript.Runners
                     currentSubTreeList.Add(st.GUID, st);
                 }
             }
-
-
             CompileAndExecuteForDeltaExecution(deltaAstList);
         }
 
