@@ -150,7 +150,6 @@ const wchar_t* LibraryMirrorWrapper::toString() const
 ClassMirrorWrapper::ClassMirrorWrapper(ClassMirror^ classMirror)
 {
     this->setWrapper(classMirror);
-    //mpClassMirror = classMirror;
 }
 
 const wchar_t* ClassMirrorWrapper::name() const

@@ -82,13 +82,16 @@ namespace ProtoCore
 
             ProtoCore.AST.AssociativeAST.FunctionDotCallNode dotCallNode = null;
             List<AssociativeNode> argNodes = new List<AssociativeNode>();
-            foreach (var arg in userDefinedArgs)
+            if (userDefinedArgs != null)
             {
-                dotCallNode = CreateEntityNode((long)arg, core);
-                bNode = CreateAssignmentNode(dotCallNode);
-                argNodes.Add(bNode);
+                foreach (var arg in userDefinedArgs)
+                {
+                    dotCallNode = CreateEntityNode((long)arg, core);
+                    bNode = CreateAssignmentNode(dotCallNode);
+                    argNodes.Add(bNode);
+                }
+                astNodes.AddRange(argNodes);
             }
-            astNodes.AddRange(argNodes);
             List<ProtoCore.AST.AssociativeAST.AssociativeNode> args = CreateArgs(formatString, primitiveArgs, argNodes);
 
             

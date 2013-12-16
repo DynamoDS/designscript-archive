@@ -49,7 +49,6 @@ private:
     const std::vector<const void*> selectionInputs;
     const std::vector<const wchar_t*> cmdInputs;
 
-    //GraphNodeWrapper* m_pWrapper;
 };
 
 /// <summary>
@@ -200,8 +199,8 @@ class __declspec(novtable) DesignScriptMethod
 public:
     virtual ~DesignScriptMethod() = 0 {}
     virtual const wchar_t* name() const = 0;
-    //virtual std::vector<const wchar_t*> getArgumentNames() const = 0;
-    //virtual std::vector<DesignScriptClass*> getArgumentTypes(ProtoCore::Core^ core) const = 0; 
+    /*virtual std::vector<const wchar_t*> getArgumentNames() const = 0;
+    virtual std::vector<DesignScriptClass*> getArgumentTypes(ProtoCore::Core^ core) const = 0; */
 };
 
 

@@ -91,6 +91,7 @@ namespace ProtoScript.Runners
         
         string GetCoreDump();
         void ResetVMAndResyncGraph(List<string> libraries);
+        List<LibraryMirror> ResetVMAndImportLibrary(List<string> libraries);
 		void ReInitializeLiveRunner();
 
         // Event handlers for the notification from asynchronous call
@@ -494,6 +495,20 @@ namespace ProtoScript.Runners
 
                 UpdateGraph(syncData);
             }
+            else if (astNode is AssociativeNode)
+            {
+                List<AssociativeNode> astList = new List<AssociativeNode>();
+                astList.Add(astNode);
+                List<Subtree> addedList = new List<Subtree>();
+                addedList.Add(new Subtree(astList, System.Guid.NewGuid()));
+                GraphSyncData syncData = new GraphSyncData(null, addedList, null);
+
+                UpdateGraph(syncData);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
 
         }
 
@@ -861,8 +876,9 @@ namespace ProtoScript.Runners
         }
 
         /// <summary>
-        /// Used temporarily to reset the VM whenever a new library is imported and re-executes 
+        /// Resets the VM whenever a new library is imported and re-imports them
         /// Returns the list of new Library Mirrors for reflection
+        /// TODO: It should not be needed once we have language support to insert import statements arbitrarily
         /// </summary>
         /// <param name="libraries"></param>
         /// <returns></returns>

@@ -27,7 +27,6 @@ LiveRunnerWrapper::~LiveRunnerWrapper()
 
 void LiveRunnerWrapper::importLibrary(const std::vector<const wchar_t*>& libraries) 
 {
-    //return GraphUtilities::PreloadAssembly(WcharToString(codesegment));
     List<System::String^>^ inputList = gcnew List<System::String^>();
     for(std::vector<const wchar_t*>::const_iterator it = libraries.begin(); it != libraries.end(); ++it)    
     {
@@ -138,9 +137,7 @@ GraphNode::GraphNode(const wchar_t* type, void* hostInstancePtr, const wchar_t* 
     this->type = type;
     this->hostInstancePtr = hostInstancePtr;
     this->methodName = methodName;
-    //this->inputs = inputs;
-
-    //m_pWrapper = new GraphNodeWrapper(type, hostInstancePtr, methodName, selectionInputs, cmdInputs);
+    
 }
 
 GraphNodeWrapper::GraphNodeWrapper(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString, ProtoCore::Core^ core) 
@@ -160,7 +157,6 @@ GraphNodeWrapper::GraphNodeWrapper(const wchar_t* type, void* hostInstancePtr, c
         inputList->Add(WcharToString(*it));
     }
 
-    /*AssociativeNode^ pAssocNode = AssociativeNode::BuildAST(WcharToString(type), (long int)hostInstancePtr, WcharToString(methodName), selectionList, inputList, WcharToString(formatString), core, symbolName, code);*/
     AssociativeNode^ pAssocNode = ProtoCore::ASTCompilerUtils::BuildAST(WcharToString(type), (long int)hostInstancePtr, WcharToString(methodName), selectionList, inputList, WcharToString(formatString), core, symbolName, code);
 
     this->setWrapper(pAssocNode);
