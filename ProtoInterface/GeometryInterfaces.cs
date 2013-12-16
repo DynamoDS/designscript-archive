@@ -39,11 +39,16 @@ namespace Autodesk.DesignScript.Interfaces
     /// Interface to represent vector data object
     /// </summary>
     [Browsable(false)]
-    public interface IVectorEntity : IDesignScriptEntity
+    public interface IVectorEntity : IDesignScriptEntity, ITransformableEntity
     {
         double X { get; }
         double Y { get; }
         double Z { get; }
+
+        /// <summary>
+        /// Tolerance is set at the Host level
+        /// </summary>
+        bool IsAlmostEqualTo(IVectorEntity other);
     }
 
     /// <summary>
@@ -202,9 +207,9 @@ namespace Autodesk.DesignScript.Interfaces
         double Determinant { get; }
 
         /// <summary>
-        /// Returns three doubles representing the X, Y, and Z scale factors
+        /// Returns a Vector containing the X, Y, and Z scale factors
         /// </summary>
-        double[] GetScaleFactors();
+        IVectorEntity Scale();
 
         bool IsEqualTo(ICoordinateSystemEntity other);
 
@@ -325,6 +330,11 @@ namespace Autodesk.DesignScript.Interfaces
         IVectorEntity Normal { get; }
 
         ICurveEntity Offset(double distance);
+
+        /// <summary>
+        /// Tolerance is set at the Host level
+        /// </summary>
+        bool IsAlmostEqualTo(IPointEntity other);
 
         /// <summary>
         /// Removes the start of the Curve at the specified parameter
@@ -553,9 +563,6 @@ namespace Autodesk.DesignScript.Interfaces
         double[] PrincipalCurvaturesAtParameter(double u, double v);
         IVectorEntity[] PrincipalDirectionsAtParameter(double u, double v);
         IPointEntity PointAtParameter(double u, double v);
-
-        // Question: should this be removed, it seems odd
-        IVectorEntity NormalAtPoint(IPointEntity point);
 
         Tuple<double, double> UVParameterAtPoint(IPointEntity point);
 
