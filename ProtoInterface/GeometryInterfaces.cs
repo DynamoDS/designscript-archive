@@ -179,6 +179,10 @@ namespace Autodesk.DesignScript.Interfaces
 
         void Scale(double amount);
         void Scale(double xamount, double yamount, double zamount);
+        void Scale(IPointEntity from, IPointEntity to);
+
+        void Scale1D(IPointEntity from, IPointEntity to);
+        void Scale2D(IPointEntity from, IPointEntity to);
     }
 
 
@@ -322,12 +326,6 @@ namespace Autodesk.DesignScript.Interfaces
 
         ICurveEntity Offset(double distance);
 
-        IPointEntity Project(IPointEntity point, IVectorEntity direction);
-
-        ICurveEntity ProjectOn(IPlaneEntity plane, IVectorEntity direction);
-
-        IGeometryEntity[] ProjectOn(ISurfaceEntity surface, IVectorEntity direction);
-
         /// <summary>
         /// Removes the start of the Curve at the specified parameter
         /// </summary>
@@ -384,16 +382,16 @@ namespace Autodesk.DesignScript.Interfaces
         /// <summary>
         /// Extrudes a Curve in the normal Vector direction. Curve must be closed.
         /// </summary>
-        ISurfaceEntity ExtrudeAsSolid(double distance);
+        ISolidEntity ExtrudeAsSolid(double distance);
         /// <summary>
         /// Extrudes a Curve in the specified direction, by the length of the 
         /// input Vector. Curve must be closed.
         /// </summary>
-        ISurfaceEntity ExtrudeAsSolid(IVectorEntity direction);
+        ISolidEntity ExtrudeAsSolid(IVectorEntity direction);
         /// <summary>
         /// Extrudes a Curve in the specified direction, by the specified distance. Curve must be closed.
         /// </summary>
-        ISurfaceEntity ExtrudeAsSolid(IVectorEntity direction, double distance);
+        ISolidEntity ExtrudeAsSolid(IVectorEntity direction, double distance);
         
         ICurveEntity Extend(double distance, IPointEntity pickSide);
         ICurveEntity ExtendStart(double distance);
@@ -401,7 +399,7 @@ namespace Autodesk.DesignScript.Interfaces
 
         ICurveEntity[] ApproximateWithArcAndLineSegments();
 
-        ICurveEntity Project(IGeometryEntity otherGeom, IVectorEntity vec);
+        IGeometryEntity[] Project(IGeometryEntity otherGeom, IVectorEntity vec);
 
         /// <summary>
         /// Converts the Curve to a NurbsCurve, if needs be
@@ -640,7 +638,7 @@ namespace Autodesk.DesignScript.Interfaces
         ISolidEntity CSGDifference(ISolidEntity geometry);
         ISolidEntity CSGIntersect(ISolidEntity geometry);
 
-        ISolidEntity ThinShell(double internalFaceThickness, double externalFaceThickness);
+        ISolidEntity[] ThinShell(double internalFaceThickness, double externalFaceThickness);
 
         ISolidEntity Regularise();
         bool IsNonManifold();
@@ -702,13 +700,9 @@ namespace Autodesk.DesignScript.Interfaces
 
 
     [Browsable(false)]
-    public interface IPolySurfaceEntity : ISurfaceEntity
+    public interface IPolySurfaceEntity : IGeometryEntity
     {
-        /// <summary>
-        /// Similar to ToNurbsSurface, this converts each backing Surface into
-        /// a NurbsSurface separately, helping accuracy
-        /// </summary>
-        INurbsSurfaceEntity[] ToNurbsSurfaces();
+        ISurfaceEntity[] Surfaces();
     }
 
     /// <summary>
@@ -1051,7 +1045,7 @@ namespace Autodesk.DesignScript.Interfaces
     }
 
     [Browsable(false)]
-    public interface ITextEntity : IGeometryEntity
+    public interface ITextEntity : IDesignScriptEntity
     {
         /// <summary>
         /// Returns the height in absolute units;
