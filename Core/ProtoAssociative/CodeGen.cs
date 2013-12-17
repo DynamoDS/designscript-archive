@@ -329,7 +329,8 @@ namespace ProtoAssociative
                     while (ProtoCore.DSASM.Constants.kInvalidIndex != subNode.exprUID)
                     {
                         subNode = codeBlock.instrStream.dependencyGraph.GraphList[++index];
-                        if (!ProtoCore.Utils.CoreUtils.IsSSATemp(subNode.updateNodeRefList[0].nodeList[0].symbol.name))
+                        if (subNode.updateNodeRefList.Count > 0 &&
+                            !ProtoCore.Utils.CoreUtils.IsSSATemp(subNode.updateNodeRefList[0].nodeList[0].symbol.name))
                         {
                             break;
                         }
@@ -505,7 +506,7 @@ namespace ProtoAssociative
             symbolnode.memregion = region;
             symbolnode.classScope = classScope;
             symbolnode.absoluteClassScope = classScope;
-            symbolnode.runtimeTableIndex = codeBlock.symbolTable.runtimeIndex;
+            symbolnode.runtimeTableIndex = codeBlock.symbolTable.RuntimeIndex;
             symbolnode.isStatic = isStatic;
             symbolnode.access = access;
             symbolnode.codeBlockId = codeBlock.codeBlockId;
@@ -561,7 +562,7 @@ namespace ProtoAssociative
                     staticSymbolnode.isArgument = false;
                     staticSymbolnode.memregion = region;
                     staticSymbolnode.classScope = classScope;
-                    staticSymbolnode.runtimeTableIndex = codeBlock.symbolTable.runtimeIndex;
+                    staticSymbolnode.runtimeTableIndex = codeBlock.symbolTable.RuntimeIndex;
                     staticSymbolnode.isStatic = isStatic;
                     staticSymbolnode.access = access;
                     staticSymbolnode.codeBlockId = codeBlock.codeBlockId;
@@ -647,7 +648,7 @@ namespace ProtoAssociative
                 size,
                 datasize,
                 true,
-                codeBlock.symbolTable.runtimeIndex,
+                codeBlock.symbolTable.RuntimeIndex,
                 region,
                 false,
                 null,
@@ -807,29 +808,6 @@ namespace ProtoAssociative
 
             // TODO: Figure out why using AppendInstruction fails for adding these instructions to ExpressionInterpreter
             //AppendInstruction(instr);
-        }
-
-        private void InferTypes()
-        {
-            int size = astNodes.Count;
-            for (int n = 0; n < size; ++n)
-            {
-                if (astNodes[n] is BinaryExpressionNode)
-                {
-                    ProtoCore.Type type = new ProtoCore.Type();
-                    type.UID = (int)ProtoCore.PrimitiveType.kTypeVoid;
-                    type.IsIndexable = false;
-
-                    BinaryExpressionNode b = astNodes[n] as BinaryExpressionNode;
-                    InferDFSTraverse(b.RightNode, ref type);
-
-                    // Do we even need to update lhs?
-                    Debug.Assert(b.LeftNode is IdentifierNode);
-                    IdentifierNode t = b.LeftNode as IdentifierNode;
-                    
-                    codeBlock.symbolTable.SetDataType(t.Name, globalProcIndex, type);
-                }
-            }
         }
 
         private void InferDFSTraverse(AssociativeNode node, ref ProtoCore.Type inferedType)
@@ -4235,7 +4213,7 @@ namespace ProtoAssociative
             int dimensions = 0;
 
             ProtoCore.DSASM.SymbolNode symbolnode = null;
-            int runtimeIndex = codeBlock.symbolTable.runtimeIndex;
+            int runtimeIndex = codeBlock.symbolTable.RuntimeIndex;
 
             ProtoCore.Type type = new ProtoCore.Type();
             type.UID = (int)ProtoCore.PrimitiveType.kTypeVoid;
@@ -5875,8 +5853,6 @@ namespace ProtoAssociative
                 // Comment Jun: Catch this assert given the condition as this type of mismatch should never occur
                 if (ProtoCore.DSASM.Constants.kInvalidIndex != globalProcIndex)
                 {
-                    Debug.Assert(peekFunctionindex == localProcedure.procId);
-
                     argsToBeAllocated.ForEach(arg =>
                     {
                         int symbolIndex = AllocateArg(arg.Key, globalProcIndex, arg.Value);
@@ -8365,7 +8341,7 @@ namespace ProtoAssociative
                     //int type = (int)ProtoCore.PrimitiveType.kTypeVoid;
                     bool isAccessible = false;
                     bool isAllocated = VerifyAllocation(t.Name, globalClassIndex, globalProcIndex, out symbolnode, out isAccessible);
-                    int runtimeIndex = (!isAllocated || !isAccessible) ? codeBlock.symbolTable.runtimeIndex : symbolnode.runtimeTableIndex;
+                    int runtimeIndex = (!isAllocated || !isAccessible) ? codeBlock.symbolTable.RuntimeIndex : symbolnode.runtimeTableIndex;
 
                     if (isAllocated && !isAccessible)
                     {

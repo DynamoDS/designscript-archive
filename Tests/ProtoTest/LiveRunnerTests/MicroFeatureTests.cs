@@ -1296,6 +1296,10 @@ z=Point.ByCoordinates(y,a,a);
             {
                 Assert.AreEqual((Int64)svValue, Convert.ToInt64(value));
             }
+            else if (value is bool)
+            {
+                Assert.AreEqual((bool)svValue, Convert.ToBoolean(value));
+            }
             else if (value is IEnumerable<int>)
             {
                 Assert.IsTrue(data.IsCollection);
@@ -1630,9 +1634,7 @@ z=Point.ByCoordinates(y,a,a);
             var syncData = new GraphSyncData(null, added, null);
             astLiveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("x");
-            StackValue value = mirror.GetData().GetStackValue();
-            Assert.AreEqual(value.opdata, 1);
+            AssertValue("x", 1);
         }
 
         [Test]
@@ -1640,33 +1642,139 @@ z=Point.ByCoordinates(y,a,a);
         {
             List<string> codes = new List<string>() 
             {
-                "def f() { return = 1; } x = f();",
-                "def f() { return = 2; } x = f();"
+                "def f() { t = 41; return = t;} x = f();",
+                "def f() { t1 = 41; t2 = 42; return = {t1, t2}; } x = f();",
+                "def f() { t1 = 41; t2 = 42; t3 = 43; return = {t1, t2, t3};} x = f();"
             };
 
             Guid guid = System.Guid.NewGuid();
 
-            List<Subtree> added = new List<Subtree>();
-            added.Add(CreateSubTreeFromCode(guid, codes[0]));
+            {
+                List<Subtree> added = new List<Subtree>();
+                added.Add(CreateSubTreeFromCode(guid, codes[0]));
 
-            var syncData = new GraphSyncData(null, added, null);
-            astLiveRunner.UpdateGraph(syncData);
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
 
-            ProtoCore.Mirror.RuntimeMirror mirror = astLiveRunner.InspectNodeValue("x");
-            StackValue value = mirror.GetData().GetStackValue();
-            Assert.AreEqual(value.opdata, 1);
+                AssertValue("x", 41);
+            }
+
+            {
+                // Modify the function and verify
+                List<Subtree> modified = new List<Subtree>();
+                modified.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+                var syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("x", new int[] {41, 42});
+            }
+
+            {
+                // Modify the function and verify
+                List<Subtree> modified = new List<Subtree>();
+                modified.Add(CreateSubTreeFromCode(guid, codes[2]));
+
+                var syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("x", new int[] { 41, 42, 43 });
+            }
+        }
+
+        [Test]
+        public void TestFunctionModification02()
+        {
+            // Test function re-defintion but without parameters
+            List<string> codes = new List<string>() 
+            {
+                "def f() { t = 41; return = t;} x = f(); r = Equals(x, 41);",
+                "def f() { t1 = 41; t2 = 42; return = {t1, t2}; } x = f(); r = Equals(x, {41, 42});",
+                "def f() { t1 = 41; t2 = 42; t3 = 43; return = {t1, t2, t3};} x = f(); r = Equals(x, {41, 42, 43});",
+                "def f() { t1 = 43; t2 = 42; t3 = 41; return = {t1, t2, t3};} x = f(); r = Equals(x, {43, 42, 41});",
+                "def f() { t1 = t2 + t3; return = t;} x = f(); r = Equals(x, null);",
+                "def f() { t1 = 2; t2 = 5; t3 = t1..t2; return = t3;} x = f(); r = Equals(x, {2, 3, 4, 5});",
+                "def f() { t1 = 2; t2 = 5; t3 = t1..t2..#2; return = t3;} x = f(); r = Equals(x, {2, 5});",
+                "def f() { a = 1; b = 2; c = (a == b) ? 3 : 4; return = c; } x = f(); r = Equals(x, 4);",
+                "def f() { a = 2; b = 2; c = (a == b) ? 3 : 4; return = c; } x = f(); r = Equals(x, 3);",
+            };
+
+            Guid guid = System.Guid.NewGuid();
+
+            {
+                List<Subtree> added = new List<Subtree>();
+                added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("r", true);
+            }
+
+            IEnumerable<int> indexes = Enumerable.Range(0, codes.Count);
+            int shuffleCount = codes.Count;
+
+            for (int i = 0; i < shuffleCount; ++i)
+            {
+                indexes = indexes.OrderBy(_ => randomGen.Next());
+
+                foreach (var index in indexes)
+                {
+                    List<Subtree> modified = new List<Subtree>();
+                    modified.Add(CreateSubTreeFromCode(guid, codes[index]));
+
+                    var syncData = new GraphSyncData(null, null, modified);
+                    astLiveRunner.UpdateGraph(syncData);
+
+                    AssertValue("r", true);
+                }
+            }
+        }
+
+        [Test]
+        public void TestFunctionModification03()
+        {
+            // Test function with same name but with different parameters
+            List<string> codes = new List<string>() 
+            {
+                "def f() { t1 = 1; t2 = 5; return = t1..t2;} x = f(); r = Equals(x, {1, 2, 3, 4, 5});",
+                "def f(x) { t = (x > 0) ? 41 : 42; return = t;} x = f(-1); r = Equals(x, 42);",
+                "def f(x, y) { t1 = x; t2 = y; return = t1 + t2;} x = f(1, 2); r = Equals(x, 3);",
+                "def f(x, y) { return = x..y;} m = 2; n = 6; z1 = f(m, n); z2 = f(); r1 = Equals(z1, {2, 3, 4, 5, 6}); r2 = Equals(z2, {1,2,3,4,5}); r = r1 && r2;",
+                "def f(x, y, z) { t1 = x; t2 = y; t3 = z; return = t1 + t2 + t3;} x = f(1, 2, 3); r = Equals(x, 6);",
+            };
+
+            Guid guid = System.Guid.NewGuid();
+
+            {
+                List<Subtree> added = new List<Subtree>();
+                added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("r", true);
+            }
 
 
-            // Modify the function and verify
-            List<Subtree> modified = new List<Subtree>();
-            modified.Add(CreateSubTreeFromCode(guid, codes[1]));
+            IEnumerable<int> indexes = Enumerable.Range(0, codes.Count);
+            int shuffleCount = codes.Count;
 
-            syncData = new GraphSyncData(null, null, modified);
-            astLiveRunner.UpdateGraph(syncData);
+            for (int i = 0; i < shuffleCount; ++i)
+            {
+                indexes = indexes.OrderBy(_ => randomGen.Next());
 
-            mirror = astLiveRunner.InspectNodeValue("x");
-            value = mirror.GetData().GetStackValue();
-            Assert.AreEqual(value.opdata, 2);
+                foreach (var index in indexes)
+                {
+                    List<Subtree> modified = new List<Subtree>();
+                    modified.Add(CreateSubTreeFromCode(guid, codes[index]));
+
+                    var syncData = new GraphSyncData(null, null, modified);
+                    astLiveRunner.UpdateGraph(syncData);
+
+                    AssertValue("r", true);
+                }
+            }
         }
     }
 }
