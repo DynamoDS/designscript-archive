@@ -1738,10 +1738,10 @@ z=Point.ByCoordinates(y,a,a);
             List<string> codes = new List<string>() 
             {
                 "def f() { t1 = 1; t2 = 5; return = t1..t2;} x = f(); r = Equals(x, {1, 2, 3, 4, 5});",
-                "def f(x) { t = (x > 0) ? 41 : 42; return = t;} r = null; x = f(-1); r = Equals(x, 41);",
-                "def f(x, y) { t1 = x; t2 = y; return = t1 + t2;} r = null; x = f(1, 2); r = Equals(x, 3);",
-                "def f(x, y) { return = x..y;} x = 2; y = 6; z = f(); r = null; r = Equals(z, {2, 3, 4, 5, 6});",
-                "def f(x, y, z) { t1 = x; t2 = y; t3 = z; return = t1 + t2 + t3;} r = null; x = f(1, 2, 3); r = Equals(x, 6);",
+                "def f(x) { t = (x > 0) ? 41 : 42; return = t;} x = f(-1); r = Equals(x, 42);",
+                "def f(x, y) { t1 = x; t2 = y; return = t1 + t2;} x = f(1, 2); r = Equals(x, 3);",
+                "def f(x, y) { return = x..y;} m = 2; n = 6; z1 = f(m, n); z2 = f(); r1 = Equals(z1, {2, 3, 4, 5, 6}); r2 = Equals(z2, {1,2,3,4,5}); r = r1 && r2;",
+                "def f(x, y, z) { t1 = x; t2 = y; t3 = z; return = t1 + t2 + t3;} x = f(1, 2, 3); r = Equals(x, 6);",
             };
 
             Guid guid = System.Guid.NewGuid();
@@ -1767,7 +1767,7 @@ z=Point.ByCoordinates(y,a,a);
                 foreach (var index in indexes)
                 {
                     List<Subtree> modified = new List<Subtree>();
-                    modified.Add(CreateSubTreeFromCode(guid, codes[i]));
+                    modified.Add(CreateSubTreeFromCode(guid, codes[index]));
 
                     var syncData = new GraphSyncData(null, null, modified);
                     astLiveRunner.UpdateGraph(syncData);
