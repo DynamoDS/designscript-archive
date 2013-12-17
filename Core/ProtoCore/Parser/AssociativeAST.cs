@@ -20,6 +20,7 @@ namespace ProtoCore.AST.AssociativeAST
         {
             IsModifier = rhs.IsModifier;
         }
+
     }
 
     public class CommentNode : AssociativeNode
@@ -1962,7 +1963,7 @@ namespace ProtoCore.AST.AssociativeAST
         }
 
         public static AssociativeNode BuildFunctionCall(string function,
-                                                        List<AssociativeNode> arguments)
+                                                        List<AssociativeNode> arguments, Core core = null)
         {
             string[] dotcalls = function.Split('.');
             string functionName = dotcalls[dotcalls.Length - 1];
@@ -1978,7 +1979,7 @@ namespace ProtoCore.AST.AssociativeAST
             else
             {
                 IdentifierNode lhs = BuildIdentifier(dotcalls[0]);
-                return CoreUtils.GenerateCallDotNode(lhs, funcCall);
+                return CoreUtils.GenerateCallDotNode(lhs, funcCall, core);
             }
         }
 

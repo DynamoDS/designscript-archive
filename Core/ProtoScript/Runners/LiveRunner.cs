@@ -78,6 +78,8 @@ namespace ProtoScript.Runners
         void UpdateCmdLineInterpreter(string code);
         ProtoCore.Mirror.RuntimeMirror QueryNodeValue(Guid nodeId);
         ProtoCore.Mirror.RuntimeMirror InspectNodeValue(string nodeName);
+
+        void UpdateGraph(AssociativeNode astNode);
         #endregion
 
         #region Asynchronous call
@@ -89,6 +91,7 @@ namespace ProtoScript.Runners
         
         string GetCoreDump();
         void ResetVMAndResyncGraph(List<string> libraries);
+        List<LibraryMirror> ResetVMAndImportLibrary(List<string> libraries);
 		void ReInitializeLiveRunner();
 
         // Event handlers for the notification from asynchronous call
@@ -475,6 +478,39 @@ namespace ProtoScript.Runners
         }
 
         /// <summary>
+        /// Called for delta execution of AST node input
+        /// </summary>
+        /// <param name="astNode"></param>
+        public void UpdateGraph(AssociativeNode astNode)
+        {
+            CodeBlockNode cNode = astNode as CodeBlockNode;
+            if (cNode != null)
+            {
+                List<AssociativeNode> astList = cNode.Body;
+                List<Subtree> addedList = new List<Subtree>();
+                addedList.Add(new Subtree(astList, System.Guid.NewGuid()));
+                GraphSyncData syncData = new GraphSyncData(null, addedList, null);
+
+                UpdateGraph(syncData);
+            }
+            else if (astNode is AssociativeNode)
+            {
+                List<AssociativeNode> astList = new List<AssociativeNode>();
+                astList.Add(astNode);
+                List<Subtree> addedList = new List<Subtree>();
+                addedList.Add(new Subtree(astList, System.Guid.NewGuid()));
+                GraphSyncData syncData = new GraphSyncData(null, addedList, null);
+
+                UpdateGraph(syncData);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+        }
+
+        /// <summary>
         /// This api needs to be called by a command line REPL for each DS command/expression entered to be executed
         /// </summary>
         /// <param name="code"></param>
@@ -835,6 +871,53 @@ namespace ProtoScript.Runners
             string code = codeGen.GenerateCode();
 
             UpdateCmdLineInterpreter(code);
+        }
+
+        /// <summary>
+        /// Resets the VM whenever a new library is imported and re-imports them
+        /// Returns the list of new Library Mirrors for reflection
+        /// TODO: It should not be needed once we have language support to insert import statements arbitrarily
+        /// </summary>
+        /// <param name="libraries"></param>
+        /// <returns></returns>
+        public List<LibraryMirror> ResetVMAndImportLibrary(List<string> libraries)
+        {
+            List<LibraryMirror> libs = new List<LibraryMirror>();
+
+            // Reset VM
+            ReInitializeLiveRunner();
+
+            // generate import node for each library in input list
+            List<AssociativeNode> importNodes = null;
+            foreach (string lib in libraries)
+            {
+                importNodes = new List<AssociativeNode>();
+
+                ProtoCore.AST.AssociativeAST.ImportNode importNode = new ProtoCore.AST.AssociativeAST.ImportNode();
+                importNode.ModuleName = lib;
+
+                importNodes.Add(importNode);
+
+                ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(importNodes);
+                string code = codeGen.GenerateCode();
+                                
+                int currentCI = runnerCore.ClassTable.ClassNodes.Count;
+
+                UpdateCmdLineInterpreter(code);
+
+                int postCI = runnerCore.ClassTable.ClassNodes.Count;
+
+                IList<ProtoCore.DSASM.ClassNode> classNodes = new List<ProtoCore.DSASM.ClassNode>();
+                for (int i = currentCI; i < postCI; ++i)
+                {
+                    classNodes.Add(runnerCore.ClassTable.ClassNodes[i]);
+                }
+                
+                ProtoCore.Mirror.LibraryMirror libraryMirror = ProtoCore.Mirror.Reflection.Reflect(lib, classNodes, runnerCore);
+                libs.Add(libraryMirror);
+            }            
+
+            return libs;
         }
 
         private void SynchronizeInternal(GraphSyncData syncData)

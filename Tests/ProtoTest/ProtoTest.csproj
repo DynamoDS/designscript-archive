@@ -134,6 +134,7 @@
     <Compile Include="MultiLangTests\GCTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ProtoAST\ASTCompilerUtilsTests.cs" />
     <Compile Include="ProtoAST\ProtoASTExecutionTests.cs" />
     <Compile Include="ProtoAST\RoundTripTests.cs" />
     <Compile Include="TD\Associative\ReplicationGuide.cs" />
