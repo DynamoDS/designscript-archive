@@ -210,8 +210,6 @@ namespace ProtoScript.Runners
 
             coreOptions.WebRunner = false;
             coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;
-            //coreOptions.DumpByteCode = true;
-            //coreOptions.Verbose = true;
 
             // This should have been set in the consturctor
             Validity.Assert(executionOptions != null);
@@ -1132,8 +1130,6 @@ namespace ProtoScript.Runners
 
                 coreOptions.WebRunner = false;
                 coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;
-                //coreOptions.DumpByteCode = true;
-                //coreOptions.Verbose = true;
 
                 // This should have been set in the consturctor
                 Validity.Assert(executionOptions != null);

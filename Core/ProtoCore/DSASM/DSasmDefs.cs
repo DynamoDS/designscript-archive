@@ -522,7 +522,6 @@ namespace ProtoCore.DSASM
         public const string kTempModifierStateNamePrefix = "%tmp_modifierState_";
         public const string kTempProcLeftVar = "%temp_proc_var_";
         public const string kImportData = "ImportData";
-        public const string kInactiveFunction = "%InactiveFunction";
     }
 
     public enum MemoryRegion

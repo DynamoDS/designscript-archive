@@ -800,11 +800,6 @@ namespace GraphToDSCompiler
             
         }
 
-        public static void RemoveGlobalSymbols(string symbolName)
-        {
-            core.CodeBlockList[0].symbolTable.RemoveGlobalSymbols(symbolName);
-        }
-
         private static List<string> GenerateStatements(int oldIndex, string expression)
         {
 

@@ -61,8 +61,6 @@ namespace ProtoTest.EventTests
             var options = new ProtoCore.Options();
             options.ExecutionMode = ProtoCore.ExecutionMode.Serial;
             options.SuppressBuildOutput = false;
-            options.DumpByteCode = false;
-            options.Verbose = false;
             core_ = new ProtoCore.Core(options);
             core_.Executives.Add(ProtoCore.Language.kAssociative, new ProtoAssociative.Executive(core_));
             core_.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core_));

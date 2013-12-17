@@ -9,6 +9,8 @@ using ProtoCore.DSASM;
 using ProtoCore.Utils;
 using ProtoFFI;
 using Autodesk.DesignScript.Interfaces;
+using ProtoCore.AssociativeGraph;
+using System.Linq;
 
 namespace ProtoCore
 {
@@ -123,7 +125,7 @@ namespace ProtoCore
         public Options()
         {
 
-            DumpByteCode = false;
+            DumpByteCode = false; 
             Verbose = false;
             DumpIL = false;
 
@@ -1120,14 +1122,40 @@ namespace ProtoCore
             // TODO Jun: Determine if it is still required to combine function tables in the codeblocks and callsite
 
             // Update the functiond definition in the codeblocks
-            foreach (ProtoCore.DSASM.CodeBlock block in CodeBlockList)
+            int hash = CoreUtils.GetFunctionHash(functionDef);
+
+            foreach (CodeBlock block in CodeBlockList)
             {
                 // Update the current function definition in the current block
-                block.procedureTable.SetInactive(functionDef);
+                int index = block.procedureTable.IndexOfHash(hash);
+                if (Constants.kInvalidIndex == index)
+                    continue;
+
+                block.procedureTable.SetInactive(index);
+
+                // Remove staled graph nodes
+                var graph = block.instrStream.dependencyGraph;
+                graph.GraphList.RemoveAll(g => g.classIndex == ClassIndex && 
+                                               g.procIndex == index);
+                graph.RemoveNodesFromScope(Constants.kGlobalScope, index);
+
+                // Make a copy of all symbols defined in this function
+                var localSymbols = block.symbolTable.symbolList.Values
+                                        .Where(n => 
+                                                n.classScope == Constants.kGlobalScope 
+                                             && n.functionIndex == index)
+                                        .ToList();
+
+                foreach (var symbol in localSymbols)
+                {
+                    // Dont remove from symbol table, but just nullify it.
+                    block.symbolTable.symbolList[symbol.symbolTableIndex] = new SymbolNode();
+                }
+
+                break;
             }
 
             // Update the function definition in global function tables
-            int hash = ProtoCore.Utils.CoreUtils.GetFunctionHash(functionDef);
             foreach (KeyValuePair<int, Dictionary<string, FunctionGroup>> functionGroupList in FunctionTable.GlobalFuncTable)
             {
                 foreach (KeyValuePair<string, FunctionGroup> functionGroup in functionGroupList.Value)
@@ -1256,60 +1284,57 @@ namespace ProtoCore
         /// </summary>
         private void ResetDeltaCompile()
         {
-            if (CodeBlockList.Count > 0)
+            if (CodeBlockList.Count <= 0)
+                return;
+
+            var globalBlock = CodeBlockList[0];
+            var instructionStream = globalBlock.instrStream;
+            var graph = globalBlock.instrStream.dependencyGraph;
+
+            // Preserve only the instructions of libraries that were previously 
+            // loaded. Other instructions need to be removed and regenerated
+            int count = instructionStream.instrList.Count - deltaCompileStartPC;
+            instructionStream.instrList.RemoveRange(deltaCompileStartPC, count);
+
+            // Remove graphnodes from this range
+            // TODO Jun: Optimize this - determine which graphnodes need to be removed during compilation
+            int removeGraphnodesFrom = Constants.kInvalidIndex;
+            for (int n = 0; n < graph.GraphList.Count; ++n)
             {
-                // Preserve only the instructions of libraries that were previously loaded
-                // Other instructions need to be removed and regenerated
-                int instrCount = CodeBlockList[0].instrStream.instrList.Count;
-
-                // Remove from these indices
-                int from = deltaCompileStartPC;
-                int count = instrCount - deltaCompileStartPC;
-
-                CodeBlockList[0].instrStream.instrList.RemoveRange(from, count);
-
-                // Remove graphnodes from this range
-                // TODO Jun: Optimize this - determine which graphnodes need to be removed during compilation
-                int removeGraphnodesFrom = ProtoCore.DSASM.Constants.kInvalidIndex;
-                for (int n = 0; n < CodeBlockList[0].instrStream.dependencyGraph.GraphList.Count; ++n)
+                var graphNode = graph.GraphList[n];
+                if (graphNode.updateBlock.startpc >= deltaCompileStartPC)
                 {
-                    ProtoCore.AssociativeGraph.GraphNode graphNode = CodeBlockList[0].instrStream.dependencyGraph.GraphList[n];
-                    if (graphNode.updateBlock.startpc >= deltaCompileStartPC)
-                    {
-                        removeGraphnodesFrom = n;
-                        break;
-                    }
+                    removeGraphnodesFrom = n;
+                    break;
                 }
+            }
 
-                if (ProtoCore.DSASM.Constants.kInvalidIndex != removeGraphnodesFrom)
-                {
-                    count = CodeBlockList[0].instrStream.dependencyGraph.GraphList.Count - removeGraphnodesFrom;
+            if (ProtoCore.DSASM.Constants.kInvalidIndex != removeGraphnodesFrom)
+            {
+                count = graph.GraphList.Count - removeGraphnodesFrom;
 
-                    int classIndex = CodeBlockList[0].instrStream.dependencyGraph.GraphList[removeGraphnodesFrom].classIndex;
-                    int procIndex = CodeBlockList[0].instrStream.dependencyGraph.GraphList[removeGraphnodesFrom].procIndex;
+                int classIndex = graph.GraphList[removeGraphnodesFrom].classIndex;
+                int procIndex = graph.GraphList[removeGraphnodesFrom].procIndex;
 
-                    // TODO Jun: Find the better way to remove the graphnodes from the nodemap
-                    // Does getting the classindex and proindex of the first node sufficient?
-                    CodeBlockList[0].instrStream.dependencyGraph.RemoveNodesFromScope(classIndex, procIndex);
+                // TODO Jun: Find the better way to remove the graphnodes from the nodemap
+                // Does getting the classindex and proindex of the first node sufficient?
+                graph.RemoveNodesFromScope(classIndex, procIndex);
 
-                    // Remove the graphnodes from them main list
-                    CodeBlockList[0].instrStream.dependencyGraph.GraphList.RemoveRange(removeGraphnodesFrom, count);
-                }
-                else
-                {
-                    // @keyu: This is for the first run. Just simply remove 
-                    // global graph node from the map to avoid they are marked
-                    // as dirty at the next run.
-                    CodeBlockList[0].instrStream.dependencyGraph.RemoveNodesFromScope(Constants.kInvalidIndex, Constants.kInvalidIndex);
-                }
+                // Remove the graphnodes from them main list
+                graph.GraphList.RemoveRange(removeGraphnodesFrom, count);
+            }
+            else
+            {
+                // @keyu: This is for the first run. Just simply remove 
+                // global graph node from the map to avoid they are marked
+                // as dirty at the next run.
+                graph.RemoveNodesFromScope(Constants.kInvalidIndex, Constants.kInvalidIndex);
+            }
 
-
-
-                // Jun this is where the temp solutions starts for implementing language blocks in delta execution
-                for (int n = 1; n < CodeBlockList.Count; ++n)
-                {
-                    CodeBlockList[n].instrStream.instrList.Clear();
-                }
+            // Jun this is where the temp solutions starts for implementing language blocks in delta execution
+            for (int n = 1; n < CodeBlockList.Count; ++n)
+            {
+                CodeBlockList[n].instrStream.instrList.Clear();
             }
         }
 
@@ -1319,11 +1344,11 @@ namespace ProtoCore
         // states need to be reset.
         public void ResetForExecution()
         {
-            ExecMode = ProtoCore.DSASM.InterpreterMode.kNormal;
+            ExecMode = InterpreterMode.kNormal;
             ExecutionState = (int)ExecutionStateEventArgs.State.kInvalid;
             RunningBlock = 0;
             DeltaCodeBlockIndex = 0;
-            ForLoopBlockIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
+            ForLoopBlockIndex = Constants.kInvalidIndex;
 
             // Jun this is where the temp solutions starts for implementing language blocks in delta execution
             for (int n = 1; n < CodeBlockList.Count; ++n)
@@ -2076,8 +2101,8 @@ namespace ProtoCore
                 || DSASM.CodeBlockType.kFunction == codeBlock.blockType
                 || DSASM.CodeBlockType.kConstruct == codeBlock.blockType)
             {
-                Debug.Assert(codeBlock.symbolTable.runtimeIndex < RuntimeTableIndex);
-                runtimeSymbols[codeBlock.symbolTable.runtimeIndex] = codeBlock.symbolTable;
+                Debug.Assert(codeBlock.symbolTable.RuntimeIndex < RuntimeTableIndex);
+                runtimeSymbols[codeBlock.symbolTable.RuntimeIndex] = codeBlock.symbolTable;
             }
 
             foreach (DSASM.CodeBlock child in codeBlock.children)
