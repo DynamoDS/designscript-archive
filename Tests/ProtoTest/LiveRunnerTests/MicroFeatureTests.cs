@@ -2148,5 +2148,48 @@ z=Point.ByCoordinates(y,a,a);
                 }
             }
         }
+
+        [Test]
+        public void TestFunctionModification04()
+        {
+            // Test function re-define and should remove the old function
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 41; } x = f(); r1 = Equals(x, 41); y = f(0); r2 = Equals(y, null); r = r1 && r2;",
+                "def f(x) { return = 42;} x = f(0); r1 = Equals(x, 42); y = f(); r2 = Equals(y, null); r = r1 && r2;",
+            };
+
+            Guid guid = System.Guid.NewGuid();
+
+            {
+                List<Subtree> added = new List<Subtree>();
+                added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("r", true);
+            }
+
+
+            IEnumerable<int> indexes = Enumerable.Range(0, codes.Count);
+            int shuffleCount = codes.Count;
+
+            for (int i = 0; i < shuffleCount; ++i)
+            {
+                indexes = indexes.OrderBy(_ => randomGen.Next());
+
+                foreach (var index in indexes)
+                {
+                    List<Subtree> modified = new List<Subtree>();
+                    modified.Add(CreateSubTreeFromCode(guid, codes[index]));
+
+                    var syncData = new GraphSyncData(null, null, modified);
+                    astLiveRunner.UpdateGraph(syncData);
+
+                    AssertValue("r", true);
+                }
+            }
+        }
     }
 }

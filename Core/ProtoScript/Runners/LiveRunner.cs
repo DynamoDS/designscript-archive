@@ -12,6 +12,7 @@ using ProtoFFI;
 using ProtoCore.AssociativeGraph;
 using ProtoCore.AST.AssociativeAST;
 using ProtoCore.Mirror;
+using System.Linq;
 
 namespace ProtoScript.Runners
 {
@@ -795,21 +796,12 @@ namespace ProtoScript.Runners
         /// </summary>
         /// <param name="subtree"></param>
         /// <returns></returns>
-        private List<AssociativeNode> UpdateFunctionDefinition(Subtree subtree)
+        private void UndefineFunctions(IEnumerable<AssociativeNode> functionDefintions)
         {
-            List<AssociativeNode> astNodeList = new List<AssociativeNode>();
-            foreach (var node in subtree.AstNodes)
+            foreach (var funcDef in functionDefintions)
             {
-                FunctionDefinitionNode fNode = node as FunctionDefinitionNode;
-                if (fNode != null)
-                {
-                    runnerCore.SetFunctionInactive(fNode);
-
-                    // Add the modified function    
-                    astNodeList.Add(fNode);
-                }
+                runnerCore.SetFunctionInactive(funcDef as FunctionDefinitionNode);
             }
-            return astNodeList;
         }
 
         /// <summary>
@@ -962,7 +954,16 @@ namespace ProtoScript.Runners
                             }
                         }
                     }
-                    currentSubTreeList.Remove(st.GUID);
+
+                    Subtree oldSubTree;
+                    if (currentSubTreeList.TryGetValue(st.GUID, out oldSubTree))
+                    {
+                        if (oldSubTree.AstNodes != null)
+                        {
+                            UndefineFunctions(oldSubTree.AstNodes.Where(n => n is FunctionDefinitionNode));
+                        }
+                        currentSubTreeList.Remove(st.GUID);
+                    }
                 }
                 
             }
@@ -980,11 +981,20 @@ namespace ProtoScript.Runners
                         }
                         deltaAstList.AddRange(st.AstNodes);
 
-                        UpdateFunctionDefinition(st);
+                        UndefineFunctions(st.AstNodes.Where(n => n is FunctionDefinitionNode));
+                    }
+
+                    Subtree oldSubTree;
+                    if (currentSubTreeList.TryGetValue(st.GUID, out oldSubTree))
+                    {
+                        if (oldSubTree.AstNodes != null)
+                        {
+                            UndefineFunctions(oldSubTree.AstNodes.Where(n => n is FunctionDefinitionNode));
+                        }
+                        currentSubTreeList[st.GUID] = st;
                     }
                 }
             }
-
 
             if (syncData.AddedSubtrees != null)
             {
