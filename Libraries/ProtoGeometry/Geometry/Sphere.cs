@@ -15,7 +15,7 @@ namespace Autodesk.DesignScript.Geometry
 
         private void InitializeGuaranteedProperties()
         {
-            Radius = SphereEntity.GetRadius();
+            Radius = SphereEntity.Radius;
         }
 
         protected override void Dispose(bool disposing)
@@ -96,7 +96,7 @@ namespace Autodesk.DesignScript.Geometry
             get 
             { 
                 if(null == mCenterPoint)
-                    mCenterPoint = SphereEntity.GetCenterPoint().ToPoint(false, this);
+                    mCenterPoint = SphereEntity.CenterPoint.ToPoint(false, this);
                 return mCenterPoint; 
             }
         }

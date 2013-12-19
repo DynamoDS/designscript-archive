@@ -91,8 +91,9 @@
     <Compile Include="Core\GraphicDataProvider.cs" />
     <Compile Include="Geometry\Arc.cs" />
     <Compile Include="Geometry\Block.cs" />
-    <Compile Include="Geometry\BSplineCurve.cs" />
-    <Compile Include="Geometry\BSplineSurface.cs" />
+    <Compile Include="Geometry\BoundingBox.cs" />
+    <Compile Include="Geometry\NurbsCurve.cs" />
+    <Compile Include="Geometry\NurbsSurface.cs" />
     <Compile Include="Geometry\LoftedSurface.cs" />
     <Compile Include="Geometry\NonManifoldSolid.cs" />
     <Compile Include="Geometry\PatchSurface.cs" />

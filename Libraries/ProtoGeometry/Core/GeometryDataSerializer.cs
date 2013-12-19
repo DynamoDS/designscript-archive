@@ -221,7 +221,7 @@ namespace Autodesk.DesignScript.Geometry
             mSerializers.RegisterSerializers<ILineEntity>("Line", (GeometryDataSerializer s) => s.ReadLine());
             mSerializers.RegisterSerializers<ICircleEntity>("Circle", (GeometryDataSerializer s) => s.ReadCircle());
             mSerializers.RegisterSerializers<IArcEntity>("Arc", (GeometryDataSerializer s) => s.ReadArc());
-            mSerializers.RegisterSerializers<IBSplineCurveEntity>("BSplineCurve", (GeometryDataSerializer s) => s.ReadBSplineCurve());
+            mSerializers.RegisterSerializers<INurbsCurveEntity>("BSplineCurve", (GeometryDataSerializer s) => s.ReadBSplineCurve());
         }
 
         /// <summary>
@@ -415,7 +415,7 @@ namespace Autodesk.DesignScript.Geometry
 
         public IPointEntity ReadPoint()
         {
-            return HostFactory.Factory.CreatePoint(ReadDouble("X"), ReadDouble("Y"), ReadDouble("Z"));
+            return Point.ByCoordinates(ReadDouble("X"), ReadDouble("Y"), ReadDouble("Z")).PointEntity;
         }
 
         public void WriteObject(IPointEntity point)
@@ -428,17 +428,17 @@ namespace Autodesk.DesignScript.Geometry
         #endregion
 
         #region Vector
-        IVector ReadVector(string parameter)
+        IVectorEntity ReadVector(string parameter)
         {
-            return ReadObject<IVector>(parameter, (GeometryDataSerializer s) => s.ReadVector());
+            return ReadObject<IVectorEntity>(parameter, (GeometryDataSerializer s) => s.ReadVector());
         }
 
-        public IVector ReadVector()
+        public IVectorEntity ReadVector()
         {
             return DsVector.ByCoordinates(this.ReadDouble("X"), this.ReadDouble("Y"), this.ReadDouble("Z"));
         }
 
-        public void WriteObject(IVector vector)
+        public void WriteObject(IVectorEntity vector)
         {
             WriteDouble("X", vector.X);
             WriteDouble("Y", vector.Y);
@@ -449,13 +449,12 @@ namespace Autodesk.DesignScript.Geometry
         #region CoordinateSystem
         public ICoordinateSystemEntity ReadCoordinateSystem()
         {
-            ICoordinateSystemEntity cs = HostFactory.Factory.CoordinateSystemByData(null);
-            using (IPointEntity origin = ReadPoint("Origin"))
+            using (var origin = ReadPoint("Origin"))
             {
-                IVector xAxis = ReadVector("XAxis");
-                IVector yAxis = ReadVector("YAxis");
-                IVector zAxis = ReadVector("ZAxis");
-                cs.Set(origin, xAxis, yAxis, zAxis);
+                var xAxis = ReadVector("XAxis");
+                var yAxis = ReadVector("YAxis");
+                var zAxis = ReadVector("ZAxis");
+                var cs = HostFactory.Factory.CoordinateSystemByOriginVectors(origin, xAxis, yAxis, zAxis);
                 return cs;
             }
         }
@@ -488,11 +487,11 @@ namespace Autodesk.DesignScript.Geometry
         #region Circle
         public ICircleEntity ReadCircle()
         {
-            using (IPointEntity cen = ReadPoint("CenterPoint"))
+            using (var cen = ReadPoint("CenterPoint"))
             {
-                double radius = ReadDouble("Radius");
-                IVector normal = ReadVector("Normal");
-                return HostFactory.Factory.CircleByCenterPointRadius(cen, radius, normal);
+                var radius = ReadDouble("Radius");
+                var normal = ReadVector("Normal");
+                return HostFactory.Factory.CircleByCenterPointRadiusNormal(cen, radius, normal);
             }
         }
 
@@ -513,7 +512,7 @@ namespace Autodesk.DesignScript.Geometry
                 double startAngle = ReadDouble("StartAngle");
                 double sweepAngle = ReadDouble("SweepAngle");
                 double endAngle = startAngle + sweepAngle;
-                IVector normal = ReadVector("Normal");
+                var normal = ReadVector("Normal");
                 return HostFactory.Factory.ArcByCenterPointRadiusAngle(cen, radius, startAngle, endAngle, normal);
             }
         }
@@ -529,7 +528,7 @@ namespace Autodesk.DesignScript.Geometry
         #endregion
 
         #region BSplineCurve
-        public IBSplineCurveEntity ReadBSplineCurve()
+        public INurbsCurveEntity ReadBSplineCurve()
         {
             Object data = GetData("ControlVertices");
             Array vertices = data as Array;
@@ -546,17 +545,17 @@ namespace Autodesk.DesignScript.Geometry
             int degree = ReadInteger("Degree");
             bool periodic = ReadBoolean("IsPeriodic");
 
-            IBSplineCurveEntity entity = HostFactory.Factory.BSplineByControlVertices(points.ToArray(), degree, periodic);
+            INurbsCurveEntity entity = HostFactory.Factory.NurbsCurveByControlVertices(points.ToArray(), degree, periodic);
             points.ForEach(GeometryExtension.DisposeObject);
             return entity;
         }
 
-        public void WriteObject(IBSplineCurveEntity entity)
+        public void WriteObject(INurbsCurveEntity entity)
         {
             IPointEntity[] points = entity.GetControlVertices();
             WriteEntity<IPointEntity>("ControlVertices", points);
-            WriteInteger("Degree", entity.GetDegree());
-            WriteBoolean("IsPeriodic", entity.GetIsPeriodic());
+            WriteInteger("Degree", entity.Degree);
+            WriteBoolean("IsPeriodic", entity.IsPeriodic);
         }
         #endregion
 

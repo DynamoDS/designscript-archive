@@ -449,7 +449,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         protected virtual Geometry Translate(Vector offset)
         {
-            IGeometryEntity clone = GeomEntity.CopyAndTranslate(offset.IVector);
+            IGeometryEntity clone = GeomEntity.CopyAndTranslate(offset.VectorEntity);
             if (null == clone)
                 throw new InvalidOperationException("Failed to clone and translate geometry.");
 
@@ -574,7 +574,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new ArgumentNullException("other");
 
             IGeometryEntity[] geoms = null;
-            geoms = other.ProjectOn(this, direction);
+            geoms = other.GeomEntity.Project(this.GeomEntity, direction.VectorEntity);
 
             return geoms.ToArray<Geometry, IGeometryEntity>(true);
         }

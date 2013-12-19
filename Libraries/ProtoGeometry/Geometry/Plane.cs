@@ -85,7 +85,7 @@ namespace Autodesk.DesignScript.Geometry
                     |_________________________________________
              * 
             */
-            ICoordinateSystemEntity coordSys = PlaneEntity.GetCoordinateSystem();
+            ICoordinateSystemEntity coordSys = PlaneEntity.CoordinateSystem;
             IPointEntity orig = coordSys.Origin;
 
             var xNorm = new Vector(coordSys.XAxis).Normalize().MultiplyBy(size / 2.0);
@@ -237,7 +237,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new ArgumentException(string.Format(Properties.Resources.IsZeroVector, normal), "normal");
 
             normal = normal.IsNormalized ? normal : normal.Normalize();
-            IPlaneEntity entity = HostFactory.Factory.PlaneByOriginNormal(origin.PointEntity, normal.IVector);
+            IPlaneEntity entity = HostFactory.Factory.PlaneByOriginNormal(origin.PointEntity, normal.VectorEntity);
             if (null == entity)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Plane.ByOriginNormal"));
             return entity;
@@ -300,7 +300,7 @@ namespace Autodesk.DesignScript.Geometry
                 return null;
             }
 
-            IPointEntity projectedPt = PlaneEntity.Project(point.PointEntity, direction.IVector);
+            IPointEntity projectedPt = PlaneEntity.Project(point.PointEntity, direction.VectorEntity);
             if (null == projectedPt)
             {
                 return null;
@@ -314,42 +314,39 @@ namespace Autodesk.DesignScript.Geometry
 
         internal override IGeometryEntity[] IntersectWithCurve(Curve curve)
         {
-            return curve.CurveEntity.IntersectWith(PlaneEntity);
+            return curve.CurveEntity.Intersect(PlaneEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithPlane(Plane plane)
         {
-            ILineEntity line = PlaneEntity.IntersectWith(plane.PlaneEntity);
-            if (null != line)
-                return new IGeometryEntity[] { line };
-
-            return null;
+            return PlaneEntity.Intersect(plane.PlaneEntity);
+           
         }
 
         internal override IGeometryEntity[] IntersectWithSurface(Surface surf)
         {
-            return surf.SurfaceEntity.IntersectWith(PlaneEntity);
+            return surf.SurfaceEntity.Intersect(PlaneEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithSolid(Solid solid)
         {
-            return solid.SolidEntity.IntersectWith(PlaneEntity);
+            return solid.SolidEntity.Intersect(PlaneEntity);
         }
 
         internal override IPointEntity ClosestPointTo(IPointEntity otherPoint)
         {
-            return PlaneEntity.Project(otherPoint, Normal.IVector);
+            return PlaneEntity.Project(otherPoint, Normal.VectorEntity);
         }
 
         internal override Geometry TransformBy(ICoordinateSystemEntity csEntity)
         {
             //Let the default code handle orthogonal transform.
-            if (csEntity.IsScaledOrtho())
+            if (csEntity.IsScaledOrtho)
                 return base.TransformBy(csEntity);
 
             using (IPointEntity origin = Origin.PointEntity.CopyAndTransform(CoordinateSystem.WCS.CSEntity, csEntity) as IPointEntity)
             {
-                using (IPointEntity pt = Origin.PointEntity.CopyAndTranslate(Normal.IVector) as IPointEntity)
+                using (IPointEntity pt = Origin.PointEntity.CopyAndTranslate(Normal.VectorEntity) as IPointEntity)
                 {
                     using (IPointEntity transformPt = pt.CopyAndTransform(CoordinateSystem.WCS.CSEntity, csEntity) as IPointEntity)
                     {

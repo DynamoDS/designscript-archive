@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Runtime;
 
@@ -298,7 +299,7 @@ namespace Autodesk.DesignScript.Geometry
             if (GeometryExtension.Equals(sweepAngle, 0.0))
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "sweepAngle"), "sweepAngle");
 
-            ISolidEntity entity = HostFactory.Factory.SolidByRevolve(profile.CurveEntity, axis.StartPoint.PointEntity, axis.Direction.IVector, startAngle, sweepAngle);
+            ISolidEntity entity = HostFactory.Factory.SolidByRevolve(profile.CurveEntity, axis.StartPoint.PointEntity, axis.Direction.VectorEntity, startAngle, sweepAngle);
             if (entity == null)
                 throw new InvalidOperationException(string.Format(Properties.Resources.OperationFailed, "Solid.Revolve"));
             return entity;
@@ -319,7 +320,7 @@ namespace Autodesk.DesignScript.Geometry
             if (GeometryExtension.Equals(sweepAngle, 0.0))
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "sweepAngle"), "sweepAngle");
 
-            ISolidEntity entity = HostFactory.Factory.SolidByRevolve(profile.CurveEntity, axisOrigin.PointEntity, axisDirection.IVector, startAngle, sweepAngle);
+            ISolidEntity entity = HostFactory.Factory.SolidByRevolve(profile.CurveEntity, axisOrigin.PointEntity, axisDirection.VectorEntity, startAngle, sweepAngle);
             if (entity == null)
                 throw new InvalidOperationException(string.Format(Properties.Resources.OperationFailed, "Solid.Revolve"));
             return entity;
@@ -350,20 +351,13 @@ namespace Autodesk.DesignScript.Geometry
         {
             if (otherSolid == null)
                 return this;
-            IGeometryEntity[] solids = null;
-            if (isRegular)
-                solids = SolidEntity.UnionWith(otherSolid.SolidEntity);
-            else
-                solids = SolidEntity.NonRegularUnionWith(otherSolid.SolidEntity);
+            ISolidEntity solidHost = null;
+            solidHost = SolidEntity.CSGUnion(otherSolid.SolidEntity);
 
-            if (null == solids || solids.Length == 0)
+            if (null == solidHost)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Union"));
 
-            ISolidEntity solidhost = solids[0] as ISolidEntity;
-            if (solidhost == null)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Union"));
-
-            return solidhost.ToSolid(true, this);
+            return solidHost.ToSolid(true, this);
         }
 
         /// <summary>
@@ -396,7 +390,13 @@ namespace Autodesk.DesignScript.Geometry
             if (isRegular)
                 return UnionCore(SolidEntity, othersolidhosts, true);
 
-            ISolidEntity host = SolidEntity.NonRegularUnionWithMany(othersolidhosts);
+            ISolidEntity host = this.SolidEntity;
+
+            for (var i = 0; i < othersolidhosts.Length; i++)
+            {
+                host = SolidEntity.CSGUnion(othersolidhosts[i]);
+            }
+            
             if (host == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Union"));
             return host.ToSolid(true, this);
@@ -415,6 +415,9 @@ namespace Autodesk.DesignScript.Geometry
             return UnionCore(solidhosts[0], solidhosts, true);
         }
 
+#region Impose
+
+        /*
         /// <summary>
         /// Returns a non-manifold solid by imposing the input regular solid onto 
         /// the given solid
@@ -426,11 +429,14 @@ namespace Autodesk.DesignScript.Geometry
             if (otherSolid == null)
                 throw new ArgumentNullException("otherSolid");
 
-            ISolidEntity host = SolidEntity.NonRegularImpose(otherSolid.SolidEntity);
+            ISolidEntity host = SolidEntity.(otherSolid.SolidEntity);
             if (host == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Impose"));
             return host.ToSolid(true, this) as NonManifoldSolid;
         }
+         * */
+
+#endregion
 
         /// <summary>
         /// Returns a solid by subtracting one solid by another solid. 
@@ -442,12 +448,12 @@ namespace Autodesk.DesignScript.Geometry
             if (otherSolid == null)
                 throw new ArgumentNullException("otherSolid");
 
-            IGeometryEntity[] solids = SolidEntity.SubtractFrom(otherSolid.SolidEntity);
-            if (solids == null || solids.Length == 0 || solids[0] == null)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Impose"));
+            var solid = SolidEntity.CSGDifference(otherSolid.SolidEntity);
 
-            ISolidEntity host = solids[0] as ISolidEntity;
-            return host.ToSolid(true, this);
+            if (solid == null)
+                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Difference"));
+
+            return solid.ToSolid(true, this);
         }
 
         /// <summary>
@@ -460,9 +466,9 @@ namespace Autodesk.DesignScript.Geometry
             if (otherSolid == null)
                 throw new ArgumentNullException("otherSolid");
 
-            IGeometryEntity[] solids = SolidEntity.IntersectWith(otherSolid.SolidEntity);
+            IGeometryEntity[] solids = SolidEntity.Intersect(otherSolid.SolidEntity);
             if (solids == null || solids.Length == 0 || solids[0] == null)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Impose"));
+                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Intersect"));
 
             ISolidEntity host = solids[0] as ISolidEntity;
             return host.ToSolid(true, this);
@@ -492,6 +498,10 @@ namespace Autodesk.DesignScript.Geometry
         //        throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Regularise"));
         //    return host.ToSolid(true, this);
         //}
+
+        #region Commented out slice
+
+        /*
 
         /// <summary>
         /// Returns an array of solids (manifold or non-manifold) by slicing 
@@ -610,55 +620,26 @@ namespace Autodesk.DesignScript.Geometry
             return solids.ToArray<Solid, IGeometryEntity>(true);
         }
 
+        */
+        #endregion
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="uniformFaceThickness"></param>
         /// <returns></returns>
-        public Solid ThinShell(double uniformFaceThickness)
+        public Solid[] ThinShell(double uniformFaceThickness)
         {
             if (uniformFaceThickness.EqualsTo(0.0))
                 throw new ArgumentException(string.Format(Properties.Resources.IsZero, "uniformFaceThickness"), "uniformFaceThickness");
             if (uniformFaceThickness < 0)
                 throw new ArgumentException(string.Format(Properties.Resources.LessThanZero, "uniformFaceThickness"), "uniformFaceThickness");
 
-            ISolidEntity host = SolidEntity.ThinShell(uniformFaceThickness, uniformFaceThickness);
-            if (null == host)
+            var hosts = SolidEntity.ThinShell(uniformFaceThickness, uniformFaceThickness);
+            if (null == hosts)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.ThinShell"));
 
-            return host.ToSolid(true, this);
-        }
-
-        // TODO: To be fixed - pratapa
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="planes"></param>
-        /// <param name="surfaces"></param>
-        /// <param name="solids"></param>
-        /// <param name="selectPoint"></param>
-        /// <returns></returns>
-        public Solid Trim(Plane[] planes, Surface[] surfaces, Solid[] solids, Point selectPoint)
-        {
-            IPlaneEntity[] hostPlanes = planes.ConvertAll(GeometryExtension.ToEntity<Plane, IPlaneEntity>);
-            ISurfaceEntity[] hostSurfaces = surfaces.ConvertAll(GeometryExtension.ToEntity<Surface, ISurfaceEntity>);
-            ISolidEntity[] hostSolids = solids.ConvertAll(GeometryExtension.ToEntity<Solid, ISolidEntity>);
-            if (selectPoint == null)
-                throw new System.ArgumentNullException("selectPoint");
-            IPointEntity hostPoint = selectPoint.PointEntity;
-            if (hostPlanes == null && hostSurfaces == null && hostSolids == null)
-                throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "Geometry", "Solid.Trim"));
-
-            ISolidEntity trimSolid = SolidEntity.Trim(hostPlanes, hostSurfaces, hostSolids, hostPoint);
-            if (null == trimSolid)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Trim"));
-
-            Hide(planes);
-            Hide(surfaces);
-            Hide(solids);
-            SetVisibility(false);
-
-            return new Solid(trimSolid, true);
+            return hosts.Select(x => x.ToSolid(true, this)).ToArray();
         }
 
         /// <summary>
@@ -670,7 +651,7 @@ namespace Autodesk.DesignScript.Geometry
         public Solid Trim(Plane plane, Point selectPoint)
         {
             Plane[] planes = { plane };
-            return Trim(planes, null, null, selectPoint);
+            return this.Trim(planes, selectPoint);
         }
 
         /// <summary>
@@ -681,7 +662,8 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public Solid Trim(Plane[] planes, Point selectPoint)
         {
-            return Trim(planes, null, null, selectPoint);
+            return SolidEntity.Trim(planes.Select(x => x.PlaneEntity).ToArray(), selectPoint.PointEntity)
+                 .Cast<ISolidEntity>().Select(x => new Solid(x)).FirstOrDefault();
         }
 
         /// <summary>
@@ -693,7 +675,7 @@ namespace Autodesk.DesignScript.Geometry
         public Solid Trim(Surface surface, Point selectPoint)
         {
             Surface[] surfaces = { surface };
-            return Trim(null, surfaces, null, selectPoint);
+            return this.Trim(surfaces, selectPoint);
         }
 
         /// <summary>
@@ -704,7 +686,9 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public Solid Trim(Surface[] surfaces, Point selectPoint)
         {
-            return Trim(null, surfaces, null, selectPoint);
+            return SolidEntity.Trim(surfaces.Select(x => x.SurfaceEntity).ToArray(), selectPoint.PointEntity)
+                .Cast<ISolidEntity>().Select(x => new Solid(x)).FirstOrDefault();
+
         }
 
         /// <summary>
@@ -716,7 +700,7 @@ namespace Autodesk.DesignScript.Geometry
         public Solid Trim(Solid solid, Point selectPoint)
         {
             Solid[] solids = { solid };
-            return Trim(null, null, solids, selectPoint);
+            return this.Trim(solids, selectPoint);
         }
 
         /// <summary>
@@ -727,7 +711,8 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public Solid Trim(Solid[] solids, Point selectPoint)
         {
-            return Trim(null, null, solids, selectPoint);
+            return SolidEntity.Trim(solids.Select(x => x.GeomEntity).ToArray(), selectPoint.PointEntity)
+                .Cast<ISolidEntity>().Select(x => new Solid(x)).FirstOrDefault();
         }
 
         /// <summary>
@@ -829,7 +814,7 @@ namespace Autodesk.DesignScript.Geometry
         {
             get
             {
-                return SolidEntity.GetArea();
+                return SolidEntity.Area;
             }
         }
 
@@ -841,7 +826,7 @@ namespace Autodesk.DesignScript.Geometry
         {
             get
             {
-                return SolidEntity.GetVolume();
+                return SolidEntity.Volume;
             }
         }
 
@@ -1016,22 +1001,22 @@ namespace Autodesk.DesignScript.Geometry
 
         internal override IGeometryEntity[] IntersectWithCurve(Curve curve)
         {
-            return curve.CurveEntity.IntersectWith(SolidEntity);
+            return curve.CurveEntity.Intersect(SolidEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithPlane(Plane plane)
         {
-            return SolidEntity.IntersectWith(plane.PlaneEntity);
+            return SolidEntity.Intersect(plane.PlaneEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithSolid(Solid solid)
         {
-            return SolidEntity.IntersectWith(solid.SolidEntity);
+            return SolidEntity.Intersect(solid.SolidEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithSurface(Surface surf)
         {
-            return SolidEntity.IntersectWith(surf.SurfaceEntity);
+            return SolidEntity.Intersect(surf.SurfaceEntity);
         }
 
         private static Solid[] SelectTrimCore(ISolidEntity[] solidhosts, ISolidEntity trimmingEntity, bool keepInside)
@@ -1041,9 +1026,12 @@ namespace Autodesk.DesignScript.Geometry
             {
                 IGeometryEntity[] geometryHosts;
                 if (keepInside)
-                    geometryHosts = trimmingEntity.IntersectWith(solid);
+                    geometryHosts = trimmingEntity.Intersect(solid);
                 else
-                    geometryHosts = solid.SubtractFrom(trimmingEntity);
+                    geometryHosts = new IGeometryEntity[]
+                    {
+                        solid.CSGDifference(trimmingEntity)
+                    };
 
                 if (null != geometryHosts)
                     geometries.AddRange(geometryHosts);
@@ -1069,16 +1057,15 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         internal static Solid UnionCore(ISolidEntity thisEntity, ISolidEntity[] othersolidhosts, bool persist)
         {
-            ISolidEntity host = thisEntity;
+            var host = thisEntity;
             foreach (var solidhost in othersolidhosts)
             {
                 if (host == solidhost)
                     continue;
 
-                IGeometryEntity[] solids = host.UnionWith(solidhost);
-                if (solids != null && solids.Length > 0 && solids[0] != null)
-                    host = solids[0] as ISolidEntity;
-                else
+                var union = host.CSGUnion(solidhost);
+
+                if (union == null)
                     throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Union"));
             }
 

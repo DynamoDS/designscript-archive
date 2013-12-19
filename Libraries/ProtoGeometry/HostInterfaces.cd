@@ -428,7 +428,7 @@
       <FileName>Core\Interfaces.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="Autodesk.DesignScript.Interfaces.IBSplineCurveEntity" Collapsed="true">
+  <Interface Name="Autodesk.DesignScript.Interfaces.INurbsCurveEntity" Collapsed="true">
     <Position X="27.75" Y="4.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAIAAAAAAABAAAAAAAAABAAAAAEAA=</HashCode>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using Autodesk.DesignScript.Interfaces;
 
 namespace Autodesk.DesignScript.Geometry
@@ -108,16 +109,17 @@ namespace Autodesk.DesignScript.Geometry
             Vector dir = startPt.DirectionTo(endPt);
             dir = dir.Normalize();
 
-            IPointEntity midPt = HostFactory.Factory.CreatePoint((startPt.X + endPt.X) / 2, (startPt.Y + endPt.Y) / 2, (startPt.Z + endPt.Z) / 2);
+            IPointEntity midPt = Point.ByCoordinates((startPt.X + endPt.X)/2, (startPt.Y + endPt.Y)/2,
+                (startPt.Z + endPt.Z)/2).PointEntity;
 
             //  get the perpendicular plane to plane of circle at mid point of segment[startPt, endPt]
             //
-            IPlaneEntity perpPlane = HostFactory.Factory.PlaneByOriginNormal(midPt, dir.IVector);
+            IPlaneEntity perpPlane = HostFactory.Factory.PlaneByOriginNormal(midPt, dir.VectorEntity);
 
             //  this intersection results in line perp to segment[startPt, endPt] & plane normal
             //  and happens to be the perpBisector of mentioned segment in planeOfCircle
             //
-            ILineEntity perpBisector = planeOfCircle.IntersectWith(perpPlane);
+            var perpBisector = (ILineEntity) planeOfCircle.Intersect(perpPlane).First();
             return perpBisector;
         }
 
@@ -127,14 +129,15 @@ namespace Autodesk.DesignScript.Geometry
             var two = secondPt.PointEntity;
             var thr = thirdPt.PointEntity;
 
-            using (IPlaneEntity planeOfCircle = HostFactory.Factory.PlaneByOriginNormal(one, normal.IVector))
+            using (IPlaneEntity planeOfCircle = HostFactory.Factory.PlaneByOriginNormal(one, normal.VectorEntity))
             {
                 using (ILineEntity perpBisector1 = GetPerpBisector(firstPt, secondPt, planeOfCircle))
                 {
                     using (ILineEntity perpBisector2 = GetPerpBisector(secondPt, thirdPt, planeOfCircle))
                     {
-                        IPointEntity[] circumCntr = perpBisector1.IntersectWith(perpBisector2);
-                        if (circumCntr == null || circumCntr.Length < 1)
+                        var circumCntr =
+                            perpBisector1.Intersect(perpBisector2).Cast<IPointEntity>().ToArray();
+                        if (circumCntr.Length < 1)
                         {
                             return null;
                         }
@@ -194,7 +197,7 @@ namespace Autodesk.DesignScript.Geometry
         [Browsable(false)]
         public static IPointEntity Add(this IPointEntity point, Vector direction)
         {
-            return HostFactory.Factory.CreatePoint(point.X + direction.X, point.Y + direction.Y, point.Z + direction.Z);
+            return Point.ByCoordinates(point.X + direction.X, point.Y + direction.Y, point.Z + direction.Z).PointEntity;
         }
 
         [Browsable(false)]
@@ -511,9 +514,9 @@ namespace Autodesk.DesignScript.Geometry
             return host.ToGeometry<Surface, ISurfaceEntity>(persist, context);
         }
 
-        internal static BSplineSurface ToBSurf(this IBSplineSurfaceEntity host, bool persist, Geometry context)
+        internal static NurbsSurface ToNurbsSurf(this INurbsSurfaceEntity host, bool persist, Geometry context)
         {
-            return host.ToGeometry<BSplineSurface, IBSplineSurfaceEntity>(persist, context);
+            return host.ToGeometry<NurbsSurface, INurbsSurfaceEntity>(persist, context);
         }
 
         internal static Plane ToPlane(this IPlaneEntity host, bool persist, Geometry context)
@@ -533,7 +536,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <param name="distance"></param>
         /// <param name="direction"></param>
         /// <returns></returns>
-        internal static IBSplineSurfaceEntity[] ExtrudeAsBSplineSurfaces(this ICurveEntity profile, double distance, Vector direction)
+        internal static INurbsSurfaceEntity ExtrudeAsNurbsSurfaces(this ICurveEntity profile, double distance, Vector direction)
         {
             if (null == profile || direction.IsZeroVector())
                 return null;
@@ -541,13 +544,13 @@ namespace Autodesk.DesignScript.Geometry
             using (IPointEntity startPt = profile.PointAtParameter(0.5))
             {
                 Vector offset = direction.Normalize().Scale(distance);
-                using (IPointEntity endPt = startPt.CopyAndTranslate(offset.IVector) as IPointEntity)
+                using (IPointEntity endPt = startPt.CopyAndTranslate(offset.VectorEntity) as IPointEntity)
                 {
                     using (ILineEntity path = HostFactory.Factory.LineByStartPointEndPoint(startPt, endPt))
                     {
                         using (ISurfaceEntity surf = HostFactory.Factory.SurfaceBySweep(profile, path))
                         {
-                            return surf.ConvertToBSplineSurface();
+                            return surf.ToNurbsSurface();
                         }
                     }
                 }

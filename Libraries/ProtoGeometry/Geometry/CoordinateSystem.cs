@@ -107,13 +107,20 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public static CoordinateSystem Identity()
         {
-            var cs = HostFactory.Factory.CoordinateSystemByData(null); //create identity matrix
-            if (null == cs)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "CoordinateSystem.Identity"));
+            var xaxis = Vector.ByCoordinates(1, 0, 0);
+            var yaxis = Vector.ByCoordinates(0, 1, 0);
+            var origin = Point.ByCoordinates(0, 0, 0);
 
-            CoordinateSystem coordSys = new CoordinateSystem(cs, true);
-            
-            coordSys.IsNormalized = true;
+            var cs = HostFactory.Factory.CoordinateSystemByOriginVectors(origin.PointEntity, xaxis.VectorEntity,
+                yaxis.VectorEntity);
+            if (null == cs)
+                throw new System.Exception(string.Format(Properties.Resources.OperationFailed,
+                    "CoordinateSystem.Identity"));
+
+            var coordSys = new CoordinateSystem(cs, true)
+            {
+                IsNormalized = true
+            };
 
             return coordSys;
         }
@@ -259,11 +266,9 @@ namespace Autodesk.DesignScript.Geometry
                 zAxis = zAxis.Normalize();
             }
 
-            var cs = HostFactory.Factory.CoordinateSystemByData(null); //create identity matrix
-            if (null == cs)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "CoordinateSystem.ByOriginVectors"));
+            var cs = HostFactory.Factory.CoordinateSystemByOriginVectors(origin.PointEntity, xAxis.VectorEntity,
+                yAxis.VectorEntity, zAxis.VectorEntity );
 
-            cs.Set(origin.PointEntity, xAxis.IVector, yAxis.IVector, zAxis.IVector);
             var coordSys = new CoordinateSystem(cs, visible);
 
             return coordSys;
@@ -403,6 +408,9 @@ namespace Autodesk.DesignScript.Geometry
             }
         }
 
+        #region Deprecated ByUniversalTransform
+
+        /*
         /// <summary>
         /// Constructs a CoordinateSystem by transforming a parent CoordinateSystem, by a resultant transformation matrix of scaling [S], rotation [R] and transformation [T] matrices. 'translationSequence' = false implies [S][R][T] otherwise means [S][T][R].
         /// </summary>
@@ -505,8 +513,8 @@ namespace Autodesk.DesignScript.Geometry
             else if (rotationSequence.Length < 3)
                 throw new System.ArgumentException(string.Format(Properties.Resources.LessThan, "number of rotation sequences", "three"), "rotationSequence");
 
-            using (var localCSEntity = HostFactory.Factory.CoordinateSystemByUniversalTransform(contextCoordinateSystem.CSEntity, scaleFactors,
-                                            rotationAngles, rotationSequence, translationVector.IVector, translationSequence))
+            using (ICoordinateSystemEntity localCSEntity = HostFactory.Factory.CoordinateSystemByUniversalTransform(contextCoordinateSystem.CSEntity, scaleFactors,
+                                            rotationAngles, rotationSequence, translationVector.VectorEntity, translationSequence))
             {
                 if (null == localCSEntity)
                     throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "CoordinateSystem.ByUniversalTransform"));
@@ -521,6 +529,9 @@ namespace Autodesk.DesignScript.Geometry
                 return cs;
             }
         }
+
+        */
+        #endregion
 
         /// <summary>
         /// Constructs a a CoordinateSystem with its origin at the given parameter on the given curve. Its x-axis is tangential to the curve, 
@@ -621,7 +632,7 @@ namespace Autodesk.DesignScript.Geometry
             else if (data.Length != 16)
                 throw new System.ArgumentException(string.Format(Properties.Resources.NotEqual, "number of datas", 16), "data");
 
-            var cs = HostFactory.Factory.CoordinateSystemByData(data);
+            ICoordinateSystemEntity cs = HostFactory.Factory.CoordinateSystemByData(data);
             if (null == cs)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "CoordinateSystem.ByData"));
 
@@ -705,16 +716,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns>Returns a rotated CoordinateSystem</returns>
         public CoordinateSystem Rotate(double rotationAngle, Vector axis)
         {
-            if (axis == null)
-                throw new System.ArgumentNullException("axis");
-            else if (axis.IsZeroVector())
-                throw new System.ArgumentException(string.Format(Properties.Resources.IsZeroVector, "axis"), "axis");
-
-            ICoordinateSystemEntity rotatedCSEntity = null;            
-            rotatedCSEntity = CSEntity.Rotation(rotationAngle, axis.IVector, Origin.PointEntity);           
-
-            var cs = new CoordinateSystem(rotatedCSEntity, true);
-            return cs;
+            return this.Rotate(rotationAngle, axis, Origin);
         }
 
         /// <summary>
@@ -734,9 +736,9 @@ namespace Autodesk.DesignScript.Geometry
             else if (axis.IsZeroVector())
                 throw new System.ArgumentException(string.Format(Properties.Resources.IsZeroVector, "axis"), "axis");
 
-            var rotatedCSEntity = CSEntity.Rotation(rotationAngle, axis.IVector, origin.PointEntity);
-            var cs = new CoordinateSystem(rotatedCSEntity, true);
-            return cs;
+            ICoordinateSystemEntity rotatedCSEntity = this.CSEntity.Clone();
+            rotatedCSEntity.Rotate(Origin.PointEntity, axis.VectorEntity, rotationAngle);
+            return new CoordinateSystem(rotatedCSEntity, true);
         }
 
         /// <summary>
@@ -754,23 +756,27 @@ namespace Autodesk.DesignScript.Geometry
             else if (rotationSequence == null)
                 throw new System.ArgumentNullException("rotationSequence");
 
-            double[] scaleFactors = { 1.0, 1.0, 1.0 };
-            Vector translationVector = new Vector(origin.X, origin.Y, origin.Z);
-            using (var localCSEntity = HostFactory.Factory.CoordinateSystemByUniversalTransform(WCS.CSEntity, scaleFactors,
-                                            rotationAngles, rotationSequence, translationVector.IVector, true))
+            // apply rotation in order
+            ICoordinateSystemEntity rotatedCSEntity = this.CSEntity.Clone();
+
+            for (var i = 0; i < rotationSequence.Length; i++)
             {
-                if (null == localCSEntity)
-                    throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "CoordinateSystem.ByUniversalTransform"));
-
-                var cs = CreateCoordinateSystem(this, localCSEntity, true);
-                cs.ScaleFactors = scaleFactors;
-                cs.RotationAngles = rotationAngles;
-                cs.RotationSequence = rotationSequence;
-                cs.TranslationVector = translationVector;
-                cs.TranslationSequence = true;
-
-                return cs;
+                switch (rotationSequence[i])
+                {
+                    case 0:
+                        rotatedCSEntity.Rotate(origin.PointEntity, this.XAxis.VectorEntity, rotationAngles[i]);
+                        continue;
+                    case 1:
+                        rotatedCSEntity.Rotate(origin.PointEntity, this.YAxis.VectorEntity, rotationAngles[i]);
+                        continue;
+                    case 2:
+                        rotatedCSEntity.Rotate(origin.PointEntity, this.ZAxis.VectorEntity, rotationAngles[i]);
+                        continue;
+                    // by default, perform no rotation
+                }
             }
+
+            return new CoordinateSystem(rotatedCSEntity, true);
         }
 
         /// <summary>
@@ -813,8 +819,9 @@ namespace Autodesk.DesignScript.Geometry
                 throw new System.ArgumentException(string.Format(Properties.Resources.IsZero, "scale z"), "scaleZ");
             }
 
-            var scaledCsEntity = CSEntity.Scale(scaleX, scaleY, scaleZ);
-            var cs = new CoordinateSystem(scaledCsEntity, true);
+            ICoordinateSystemEntity clone = this.CSEntity.Clone();
+            clone.Scale(scaleX, scaleY, scaleZ);
+            var cs = new CoordinateSystem(clone, true);
 
             return cs;
         }
@@ -832,8 +839,10 @@ namespace Autodesk.DesignScript.Geometry
                 throw new System.ArgumentNullException("translationVector");
             }
             translationVector = translationVector.Normalize().MultiplyBy(distance);
-            var translatedCSEntity = CSEntity.Translate(translationVector.IVector);
-            var cs = new CoordinateSystem(translatedCSEntity, true);
+
+            ICoordinateSystemEntity clone = this.CSEntity.Clone();
+            clone.Translate(translationVector.VectorEntity);
+            var cs = new CoordinateSystem(clone, true);
 
             return cs;
         }
@@ -861,7 +870,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public bool IsSingular()
         {
-            return CSEntity.IsSingular();
+            return CSEntity.IsSingular;
         }
 
         /// <summary>
@@ -870,7 +879,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public bool IsScaledOrtho()
         {
-            return CSEntity.IsScaledOrtho();
+            return CSEntity.IsScaledOrtho;
         }
 
         /// <summary>
@@ -879,7 +888,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public bool IsUniscaledOrtho()
         {
-            return CSEntity.IsUniscaledOrtho();
+            return CSEntity.IsUniscaledOrtho;
         }
 
         /// <summary>
@@ -888,7 +897,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public double GetDeterminant()
         {
-            return CSEntity.GetDeterminant();
+            return CSEntity.Determinant;
         }
 
         /// <summary>
@@ -962,7 +971,7 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         public bool IsSheared 
         {
-            get { return !CSEntity.IsScaledOrtho(); }
+            get { return !CSEntity.IsScaledOrtho; }
         }
 
         /// <summary>
