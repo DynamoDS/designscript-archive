@@ -246,7 +246,7 @@ namespace Autodesk.DesignScript.Geometry
             if (pointOnSurface == null)
                 throw new System.ArgumentNullException("pointOnSurface");
             var uv = SurfaceEntity.UVParameterAtPoint(pointOnSurface.PointEntity);
-            var normal = SurfaceEntity.NormalAtParameter( uv.Item1, uv.Item2 );
+            var normal = SurfaceEntity.NormalAtParameter( uv.U, uv.V );
             if(normal == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.NormalAtPoint"));
             return new Vector(normal);

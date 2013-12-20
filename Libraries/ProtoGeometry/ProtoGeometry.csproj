@@ -101,6 +101,7 @@
     <Compile Include="Geometry\SurfaceCurvature.cs" />
     <Compile Include="Geometry\SweptSurface.cs" />
     <Compile Include="Geometry\Text.cs" />
+    <Compile Include="Geometry\UV.cs" />
     <Compile Include="ObjHandler\Group.cs">
       <SubType>Code</SubType>
     </Compile>

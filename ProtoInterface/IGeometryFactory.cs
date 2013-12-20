@@ -73,9 +73,9 @@ namespace Autodesk.DesignScript.Interfaces
         ICuboidEntity CuboidByLengths(ICoordinateSystemEntity cs, double width, double length, double height);
         ICuboidEntity CuboidByCorners(IPointEntity lowPoint, IPointEntity highPoint);
 
-        IUV UVByUV(double u, double v);
+        IUVEntity UVByUV(double u, double v);
 
-        ICurveEntity CurveByParameterLineOnSurface(ISurfaceEntity baseSurface, IUV startParams, IUV endParams);
+        ICurveEntity CurveByParameterLineOnSurface(ISurfaceEntity baseSurface, IUVEntity startParams, IUVEntity endParams);
 
         IEllipseEntity EllipseByOriginRadii(IPointEntity origin, double xAxisRadius, double yAxisRadius);
         IEllipseEntity EllipseByOriginVectors(IPointEntity origin, IVectorEntity xAxisRadius, IVectorEntity yAxisRadius);

@@ -230,7 +230,7 @@ namespace Autodesk.DesignScript.Interfaces
     }
 
     [Browsable(false)]
-    public interface IUV
+    public interface IUVEntity
     {
         double U { get; }
         double V { get; }
@@ -311,7 +311,6 @@ namespace Autodesk.DesignScript.Interfaces
         ICoordinateSystemEntity GetNoTwistFrameAtParameter(double param);
 
         double DistanceAtParameter(double param);
-
         double ParameterAtDistance(double distance);
 
         double StartParameter();
@@ -494,7 +493,7 @@ namespace Autodesk.DesignScript.Interfaces
         IPointEntity MinPoint { get; }
         IPointEntity MaxPoint { get; }
 
-        IBoundingBoxEntity Intersection(IBoundingBoxEntity other);
+        IBoundingBoxEntity Intersection (IBoundingBoxEntity other);
         bool Intersects(IBoundingBoxEntity other);
 
         bool IsEmpty();
@@ -545,7 +544,7 @@ namespace Autodesk.DesignScript.Interfaces
         IGeometryEntity[] SubtractFrom(ISolidEntity trimmingEntity);
 
         // Implememnt
-        IUV UVParameterAtPoint(IPointEntity point);
+        IUVEntity UVParameterAtPoint(IPointEntity point);
 
         /// <summary>
         /// Gets a Nurbs representation of the Surface. This method may approximate
