@@ -99,7 +99,7 @@ namespace ProtoScript.Runners
         
     }
 
-    public partial class LiveRunner : ILiveRunner
+    public partial class LiveRunner : ILiveRunner, IDisposable
     {
         /// <summary>
         ///  These are configuration parameters passed by host application to be consumed by geometry library and persistent manager implementation. 
@@ -164,6 +164,8 @@ namespace ProtoScript.Runners
 
         private Thread workerThread;
 
+        private bool terminating;
+
         public LiveRunner()
         {
             InitRunner(new Options());
@@ -174,6 +176,35 @@ namespace ProtoScript.Runners
             InitRunner(options);
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (runnerCore != null)
+                {
+                    runnerCore.FFIPropertyChangedMonitor.FFIPropertyChangedEventHandler -= FFIPropertyChanged;
+                    runnerCore.Cleanup();
+                }
+
+                terminating = true;
+
+                lock (taskQueue)
+                {
+                    taskQueue.Clear();
+                }
+
+                // waiting for thread to finish
+                if (workerThread.IsAlive)
+                {
+                    workerThread.Join();
+                }
+            }
+        }
 
         private void InitRunner(Options options)
         {
@@ -197,6 +228,8 @@ namespace ProtoScript.Runners
             staticContext = new ProtoCore.CompileTime.Context();
 
             currentSubTreeList = new Dictionary<Guid, Subtree>();
+
+            terminating = false;
         }
 
         private void InitOptions()
@@ -499,7 +532,7 @@ namespace ProtoScript.Runners
         //Secondary thread
         private void TaskExecMethod()
         {
-            while (true)
+            while (!terminating)
             {
                 Task task = null;
 
@@ -517,9 +550,7 @@ namespace ProtoScript.Runners
                 }
 
                 Thread.Sleep(50);
-
             }
-
         }
 
 
