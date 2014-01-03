@@ -12,20 +12,15 @@ namespace Autodesk.DesignScript.Geometry
     public class BoundingBox
     {
 
+        public BoundingBox Intersection(BoundingBox box)
+        {
+            return new BoundingBox(BoundingBoxEntity.Intersection(box.BoundingBoxEntity));
+        }
 
-        //IPointEntity MinPoint { get; }
-        //IPointEntity MaxPoint { get; }
-
-        //IBoundingBoxEntity Intersection(IBoundingBoxEntity other);
-        //bool Intersects(IBoundingBoxEntity other);
-
-        //bool IsEmpty();
-
-        //bool Contains(IPointEntity point);
-
-        //ICuboidEntity ToCuboid();
-        //IPolySurfaceEntity ToPolySurface();
-
+        public bool Intersects(BoundingBox box)
+        {
+            return BoundingBoxEntity.Intersects(box.BoundingBoxEntity);
+        }
 
         #region Internal properties
 
