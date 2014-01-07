@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Linq;
+using System.Net.Configuration;
 using Autodesk.DesignScript.Interfaces;
 
 namespace Autodesk.DesignScript.Geometry
@@ -101,7 +103,7 @@ namespace Autodesk.DesignScript.Geometry
             get
             {
                 if (null == mVertices)
-                    mVertices = PolygonEntity.GetVertices().CreatePoints();
+                    mVertices = PolygonEntity.GetPoints().CreatePoints();
 
                 return mVertices;
             }
@@ -119,7 +121,7 @@ namespace Autodesk.DesignScript.Geometry
             get
             {
                 if (null == mPlane)
-                    mPlane = PolygonEntity.GetPlane().ToPlane(false, this);
+                    mPlane = PolygonEntity.Plane.ToPlane(false, this);
                 return mPlane;
             }
         }
@@ -130,14 +132,14 @@ namespace Autodesk.DesignScript.Geometry
         public Vector Normal { get { return Plane.Normal; } }
 
         /// <summary>
-        /// 
+        /// Returns maximum deviation from average plane of polygon.
         /// </summary>
-        public double OutOfPlane 
+        public double PlaneDeviation 
         {
             get
             {
                 if (!mOutOfPlane.HasValue)
-                    mOutOfPlane = PolygonEntity.GetOutOfPlane();
+                    mOutOfPlane = PolygonEntity.PlaneDeviation;
                 return mOutOfPlane.Value;
             }
         }
@@ -169,7 +171,7 @@ namespace Autodesk.DesignScript.Geometry
             if (hosts.ArePointsColinear())
                 throw new System.ArgumentException(string.Format(Properties.Resources.PointsColinear, "vertices"), "vertices");
 
-            IPolygonEntity entity = HostFactory.Factory.PolygonByVertices(hosts);
+            IPolygonEntity entity = HostFactory.Factory.PolygonByPoints(hosts);
             if (null == entity)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Polygon.ByVertices"));
             return entity;
@@ -183,19 +185,14 @@ namespace Autodesk.DesignScript.Geometry
         /// Returns trimmed polygon after trimming this polygon using the 
         /// given array of planes as half spaces.
         /// </summary>
-        /// <param name="halfSpaces">Trimming planes.</param>
+        /// <param name="trimPlanes">Trimming planes.</param>
         /// <returns>Trimmed Polygon</returns>
-        public Polygon Trim(Plane[] halfSpaces)
+        public Polygon[] Trim(Plane[] trimPlanes, Point pickPoint)
         {
-            IPlaneEntity[] hosts = halfSpaces.ConvertAll(GeometryExtension.ToEntity<Plane, IPlaneEntity>);
-            IPolygonEntity entity = PolygonEntity.Trim(hosts);
-            if (null == entity)
-                return null;
+            var hosts = trimPlanes.ConvertAll( GeometryExtension.ToEntity<Plane, IPlaneEntity> );
+            var entities = PolygonEntity.Trim( hosts, pickPoint.PointEntity );
 
-            Hide(this);
-            Hide(halfSpaces);
-
-            return new Polygon(entity, true);
+            return entities.Select(x => new Polygon((IPolygonEntity) x)).ToArray();
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Runtime;
 
@@ -57,7 +58,7 @@ namespace Autodesk.DesignScript.Geometry
         {
             get
             {
-                return CurveEntity.GetLength();
+                return CurveEntity.Length;
             } 
         }
 
@@ -347,7 +348,7 @@ namespace Autodesk.DesignScript.Geometry
             if (!IsPlanar)
                 throw new System.InvalidOperationException(Properties.Resources.CurveNotPlanar);
 
-            ISurfaceEntity extrude = CurveEntity.Extrude(direction.IVector, distance);
+            ISurfaceEntity extrude = CurveEntity.Extrude(direction.VectorEntity, distance);
             return extrude.ToSurf(true, this);
         }
 
@@ -540,7 +541,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null == point)
                 throw new System.ArgumentNullException("point");
 
-            IPointEntity closestPt = CurveEntity.GetClosestPointTo(point.PointEntity, false);
+            IPointEntity closestPt = CurveEntity.GetClosestPoint(point.PointEntity);
             return closestPt.ToPoint(true, this);
         }
 
@@ -560,11 +561,11 @@ namespace Autodesk.DesignScript.Geometry
             else if (direction.IsZeroVector())
                 throw new System.ArgumentException(string.Format(Properties.Resources.IsZeroVector, direction), "direction");
 
-            IPointEntity projectedPt = CurveEntity.Project(point.PointEntity, direction.IVector);
+            var projectedPt = CurveEntity.Project(point.PointEntity, direction.VectorEntity);
             if (projectedPt == null)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
-            return projectedPt.ToPoint(true, this);
+            return projectedPt.Cast<IPointEntity>().Select(x => x.ToPoint(true, this)).FirstOrDefault();
         }
 
         /// <summary>
@@ -579,11 +580,11 @@ namespace Autodesk.DesignScript.Geometry
             if (null == contextPlane)
                 throw new System.ArgumentNullException("contextPlane");
 
-            ICurveEntity entity = CurveEntity.ProjectOn(contextPlane.PlaneEntity, contextPlane.Normal.IVector);
-            if (entity == null)
+            var entities = CurveEntity.Project(contextPlane.PlaneEntity, contextPlane.Normal.VectorEntity);
+            if (entities == null)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
-            return entity.ToCurve(true, this);
+            return entities.Cast<ICurveEntity>().Select(x => x.ToCurve(true, this)).FirstOrDefault();
         }
 
         /// <summary>
@@ -594,7 +595,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <param name="contextPlane">Projection plane</param>
         /// <param name="direction">Projection direction</param>
         /// <returns>Projected curve on the context plane</returns>
-        public Curve Project(Plane contextPlane, Vector direction)
+        public Curve[] Project(Plane contextPlane, Vector direction)
         {
             string kMethodName = "Curve.Project";
             if (null == contextPlane)
@@ -606,11 +607,11 @@ namespace Autodesk.DesignScript.Geometry
             if (direction.IsPerpendicular(contextPlane.Normal))
                 return null;
 
-            ICurveEntity entity = CurveEntity.ProjectOn(contextPlane.PlaneEntity, direction.IVector);
+            var entity = CurveEntity.Project(contextPlane.PlaneEntity, direction.VectorEntity);
             if (null == entity)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
-            return entity.ToCurve(true, this);
+            return entity.Select(x => (ICurveEntity) x).Select(x => x.ToNurbsCurve()).Select(x => new NurbsCurve(x, true) ).ToArray();
         }
 
         /// <summary>
@@ -630,7 +631,7 @@ namespace Autodesk.DesignScript.Geometry
             else if (null == direction)
                 throw new System.ArgumentNullException("direction");
 
-            IGeometryEntity[] entities = CurveEntity.ProjectOn(surface.SurfaceEntity, direction.IVector);
+            IGeometryEntity[] entities = CurveEntity.Project(surface.SurfaceEntity, direction.VectorEntity);
             if(null == entities)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
@@ -648,7 +649,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null == splitParameters)
                 throw new System.ArgumentNullException("splitParameters");
 
-            ICurveEntity[] entities = CurveEntity.Split(splitParameters);
+            ICurveEntity[] entities = CurveEntity.ParameterSplit(splitParameters);
             if (null == entities)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
@@ -689,13 +690,31 @@ namespace Autodesk.DesignScript.Geometry
         public Curve[] Trim(double startParameter, double endParameter, bool discardBetweenParameters)
         {
             string kMethodName = "Curve.Trim";
-            ICurveEntity[] entities = CurveEntity.Trim(startParameter, endParameter, discardBetweenParameters);
+
+            ICurveEntity[] entities;
+
+            if (discardBetweenParameters)
+            {
+                entities = CurveEntity.ParameterTrimInterior(startParameter, endParameter); 
+            }
+            else
+            {
+                var entity = CurveEntity.ParameterTrim(startParameter, endParameter);
+                if (null == entity)
+                    throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed,
+                        kMethodName));
+
+                entities = new ICurveEntity[]{entity};
+            }
+
             if (null == entities)
-                throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
+                throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed,
+                    kMethodName));
 
             Hide(this);
 
             return entities.ToArray<Curve, ICurveEntity>(true);
+            
         }
 
         /// <summary>
@@ -711,7 +730,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null == parameters)
                 throw new System.ArgumentNullException("parameters");
 
-            ICurveEntity[] entities = CurveEntity.Trim(parameters, deleteEvenSegments);
+            ICurveEntity[] entities = CurveEntity.ParameterTrimSegments(parameters, deleteEvenSegments);
             if (null == entities)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
@@ -720,54 +739,56 @@ namespace Autodesk.DesignScript.Geometry
             return entities.ToArray<Curve, ICurveEntity>(true);
         }
 
-        /// <summary>
-        /// Returns the composite curve by joining a given set of input curves 
-        /// Argument Requirement:
-        ///     no input curves can be closed
-        /// </summary>
-        /// <param name="contextCurves"></param>
-        /// <returns></returns>
-        public static Curve Composite(Curve[] contextCurves)
-        {
-            string kMethodName = "Curve.Composite";
-            if (null == contextCurves)
-                throw new System.ArgumentNullException("contextCurves");
+        //PB: to be superceded by PolyCurve
 
-            ICurveEntity firstCurve;
-            List<ICurveEntity> hostCurves = GetHostCurves(contextCurves, out firstCurve);
-            if (hostCurves.Count == 0)
-                return firstCurve.ToCurve(false, null);
+        ///// <summary>
+        ///// Returns the composite curve by joining a given set of input curves 
+        ///// Argument Requirement:
+        /////     no input curves can be closed
+        ///// </summary>
+        ///// <param name="contextCurves"></param>
+        ///// <returns></returns>
+        //public static Curve Composite(Curve[] contextCurves)
+        //{
+        //    string kMethodName = "Curve.Composite";
+        //    if (null == contextCurves)
+        //        throw new System.ArgumentNullException("contextCurves");
 
-            IBSplineCurveEntity entity = firstCurve.JoinWith(hostCurves.ToArray());
-            if (null == entity)
-                throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
+        //    ICurveEntity firstCurve;
+        //    List<ICurveEntity> hostCurves = GetHostCurves(contextCurves, out firstCurve);
+        //    if (hostCurves.Count == 0)
+        //        return firstCurve.ToCurve(false, null);
 
-            return entity.ToCurve(true, null) as Curve;
-        }
+        //    INurbsCurveEntity entity = firstCurve.JoinWith(hostCurves.ToArray());
+        //    if (null == entity)
+        //        throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
-        /// <summary>
-        /// Returns the composite curve by joining a given set of input curves within a given tolerance
-        /// Argument Requirement:
-        ///     no input curves can be closed
-        /// </summary>
-        /// <param name="contextCurves"></param>
-        /// <param name="bridgeTolerance"></param>
-        /// <returns></returns>
-        [AllowRankReduction]
-        public static Curve[] Composite(Curve[] contextCurves, double bridgeTolerance)
-        {
-            string kMethodName = "Curve.Composite";
-            ICurveEntity firstCurve;
-            List<ICurveEntity> hostCurves = GetHostCurves(contextCurves, out firstCurve);
-            if (hostCurves.Count == 0)
-                return new Curve[] { firstCurve.ToCurve(false, null) };
+        //    return entity.ToCurve(true, null) as Curve;
+        //}
 
-            ICurveEntity[] entities = firstCurve.JoinWith(hostCurves.ToArray(), bridgeTolerance);
-            if (null == entities)
-                throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
+        ///// <summary>
+        ///// Returns the composite curve by joining a given set of input curves within a given tolerance
+        ///// Argument Requirement:
+        /////     no input curves can be closed
+        ///// </summary>
+        ///// <param name="contextCurves"></param>
+        ///// <param name="bridgeTolerance"></param>
+        ///// <returns></returns>
+        //[AllowRankReduction]
+        //public static Curve[] Composite(Curve[] contextCurves, double bridgeTolerance)
+        //{
+        //    string kMethodName = "Curve.Composite";
+        //    ICurveEntity firstCurve;
+        //    List<ICurveEntity> hostCurves = GetHostCurves(contextCurves, out firstCurve);
+        //    if (hostCurves.Count == 0)
+        //        return new Curve[] { firstCurve.ToCurve(false, null) };
 
-            return entities.ToArray<Curve, ICurveEntity>(true);
-        }
+        //    ICurveEntity[] entities = firstCurve.JoinWith(hostCurves.ToArray(), bridgeTolerance);
+        //    if (null == entities)
+        //        throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
+
+        //    return entities.ToArray<Curve, ICurveEntity>(true);
+        //}
 
         /// <summary>
         /// Return a closest point on another curve to the curve.
@@ -780,7 +801,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null == other)
                 throw new System.ArgumentNullException("other");
 
-            IPointEntity closestPt = CurveEntity.GetClosestPointTo(other.CurveEntity);
+            IPointEntity closestPt = CurveEntity.GetClosestPoint(other.CurveEntity);
             if (null == closestPt)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
@@ -808,7 +829,7 @@ namespace Autodesk.DesignScript.Geometry
             if (distance.EqualsTo(0.0))
                 throw new System.ArgumentException(string.Format(Properties.Resources.IsZero, "distance"), "distance");
 
-            ICurveEntity curveEntity = CurveEntity.GetOffsetCurve(distance);
+            ICurveEntity curveEntity = CurveEntity.Offset(distance);
             if (null == curveEntity)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
@@ -1199,55 +1220,39 @@ namespace Autodesk.DesignScript.Geometry
 
         internal override IGeometryEntity[] IntersectWithCurve(Curve curve)
         {
-            return CurveEntity.IntersectWith(curve.CurveEntity);
+            return CurveEntity.Intersect(curve.CurveEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithPlane(Plane plane)
         {
-            return CurveEntity.IntersectWith(plane.PlaneEntity);
+            return CurveEntity.Intersect(plane.PlaneEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithSurface(Surface surf)
         {
-            return CurveEntity.IntersectWith(surf.SurfaceEntity);
+            return CurveEntity.Intersect(surf.SurfaceEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithSolid(Solid solid)
         {
-            return CurveEntity.IntersectWith(solid.SolidEntity);
+            return CurveEntity.Intersect(solid.SolidEntity);
         }
 
         internal override IPointEntity ClosestPointTo(IPointEntity otherPoint)
         {
-            return CurveEntity.GetClosestPointTo(otherPoint, false);
+            return CurveEntity.GetClosestPoint(otherPoint);
         }
 
         internal override IGeometryEntity[] ProjectOn(Geometry other, Vector direction)
         {
-            IVector dir = direction.IVector;
-            //Only point can be projected on curve.
-            Surface surf = other as Surface;
-            if (null != surf)
-                return CurveEntity.ProjectOn(surf.SurfaceEntity, dir);
-
-            Plane plane = other as Plane;
-            if (null != plane)
-            {
-                ICurveEntity curve = CurveEntity.ProjectOn(plane.PlaneEntity, dir);
-                return new IGeometryEntity[] { curve };
-            }
-
-            Solid solid = other as Solid;
-            if (null != solid)
-                return solid.SolidEntity.Project(CurveEntity, dir);
-
-            return base.ProjectOn(other, direction);
+            var dir = direction.VectorEntity;
+            return CurveEntity.Project(other.GeomEntity, dir);
         }
 
         internal static List<ICurveEntity> GetHostCurves(Curve[] contextCurves, out ICurveEntity firstCurve)
         {
             firstCurve = null;
-            List<ICurveEntity> hostCurves = new List<ICurveEntity>();
+            var hostCurves = new List<ICurveEntity>();
             foreach (var curve in contextCurves)
             {
                 if (null == curve)

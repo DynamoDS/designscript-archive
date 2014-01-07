@@ -73,7 +73,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new System.ArgumentException(string.Format(Properties.Resources.LessThanZero, "width"), "width");
             if (null == contextCoordinateSystem)
                 throw new System.ArgumentNullException("contextCoordinateSystem");
-            if(!contextCoordinateSystem.IsScaledOrtho())
+            if(!contextCoordinateSystem.IsScaledOrtho)
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "Shear CoordinateSystem", kMethod));
 
             ICuboidEntity entity = HostFactory.Factory.CuboidByLengths(contextCoordinateSystem, length, width, height);
@@ -96,7 +96,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!length.HasValue)
                 {
-                    length = CuboidEntity.GetLength();
+                    length = CuboidEntity.Length;
                 }
                 return length.Value;
             }
@@ -116,7 +116,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!width.HasValue)
                 {
-                    width = CuboidEntity.GetWidth();
+                    width = CuboidEntity.Width;
                 }
                 return width.Value;
             }
@@ -136,7 +136,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!height.HasValue)
                 {
-                    height = CuboidEntity.GetHeight();
+                    height = CuboidEntity.Height;
                 }
                 return height.Value;
             }

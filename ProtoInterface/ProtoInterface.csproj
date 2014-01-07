@@ -97,6 +97,7 @@
     <Compile Include="Attributes.cs" />
     <Compile Include="GeometryFactory.cs" />
     <Compile Include="GeometryInterfaces.cs" />
+    <Compile Include="IGeometryFactory.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GraphicsDataInterfaces.cs" />

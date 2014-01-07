@@ -57,7 +57,7 @@ namespace Autodesk.DesignScript.Geometry
 
         protected override Geometry Translate(Vector offset)
         {
-            IConeEntity clone = GeomEntity.CopyAndTranslate(offset.IVector) as IConeEntity;
+            IConeEntity clone = GeomEntity.CopyAndTranslate(offset.VectorEntity) as IConeEntity;
             if (null == clone)
                 throw new System.InvalidOperationException("Failed to clone and translate geometry.");
 
@@ -178,7 +178,7 @@ namespace Autodesk.DesignScript.Geometry
                     throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "Shear CoordinateSystem", kMethod));
             }
 
-            IConeEntity entity = HostFactory.Factory.ConeByRadiusLength(contextCoordinateSystem.CSEntity, startRadius, endRadius, height);
+            IConeEntity entity = HostFactory.Factory.ConeByCoordinateSystemHeightRadii(contextCoordinateSystem.CSEntity, height, startRadius, endRadius );
             if (null == entity)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, kMethod));
             return entity;
@@ -197,7 +197,7 @@ namespace Autodesk.DesignScript.Geometry
             if (startPoint.DistanceTo(endPoint).EqualsTo(0.0))
                 throw new System.ArgumentException(string.Format(Properties.Resources.IsZeroDistance, "start point", "end point"), "startPoint, endPoint");
 
-            IConeEntity entity = HostFactory.Factory.ConeByPointsRadius(startPoint.PointEntity, endPoint.PointEntity, startRadius, endRadius);
+            IConeEntity entity = HostFactory.Factory.ConeByPointsRadii(startPoint.PointEntity, endPoint.PointEntity, startRadius, endRadius);
             if (null == entity)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Cone.ByStartPointEndPointRadius"));
             return entity;
@@ -215,7 +215,7 @@ namespace Autodesk.DesignScript.Geometry
             get
             {
                 if (null == mStartPoint)
-                    mStartPoint = ConeEntity.GetStartPoint().ToPoint(false, this);
+                    mStartPoint = ConeEntity.StartPoint.ToPoint(false, this);
                 return mStartPoint;
             }
             private set
@@ -232,7 +232,7 @@ namespace Autodesk.DesignScript.Geometry
             get
             {
                 if (null == mEndPoint)
-                    mEndPoint = ConeEntity.GetEndPoint().ToPoint(false, this);
+                    mEndPoint = ConeEntity.EndPoint.ToPoint(false, this);
                 return mEndPoint;
             }
             private set
@@ -250,7 +250,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!mStartRadius.HasValue)
                 {
-                    mStartRadius = ConeEntity.GetStartRadius();
+                    mStartRadius = ConeEntity.StartRadius;
                 }
                 return mStartRadius.Value;
             }
@@ -269,7 +269,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!mEndRadius.HasValue)
                 {
-                    mEndRadius = ConeEntity.GetRadiusRatio() * StartRadius;
+                    mEndRadius = ConeEntity.RadiusRatio * StartRadius;
                 }
                 return mEndRadius.Value;
             }
@@ -312,7 +312,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!mHeight.HasValue)
                 {
-                    mHeight = ConeEntity.GetHeight();
+                    mHeight = ConeEntity.Height;
                 }
                 return mHeight.Value;
             }

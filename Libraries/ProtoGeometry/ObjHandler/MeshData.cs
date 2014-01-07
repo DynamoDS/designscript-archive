@@ -100,42 +100,50 @@ namespace Autodesk.DesignScript.Geometry
             //    AddGroup("Default");
             //currentGroup.material = Materials.SingleOrDefault(x => x.Name.Equals(rawData));
         }
-        public SubDivisionMesh[] ConvertToSubDivisionMesh()
+
+        //PB: move to separate library
+        //public SubDivisionMesh[] ConvertToSubDivisionMesh()
+        //{
+        //    List<SubDivisionMesh> importedMeshes = new List<SubDivisionMesh>();
+        //    foreach (var group in this.Groups)
+        //    {
+        //        List<int[]> faces = new List<int[]>();
+        //        SortedList<int, Point> sortedIndexPointList = new SortedList<int, Point>();
+        //        //create the used points list
+        //        foreach (var face in group.Faces)
+        //        {
+        //            foreach (var vertex in face.VertexArray)
+        //                sortedIndexPointList[vertex] = this.Vertices[vertex];
+        //        }
+
+        //        //get the indices from the used point list and add face
+        //        foreach (var face in group.Faces)
+        //        {
+        //            int[] newVertexArray = new int[face.VertexArray.Length];
+        //            for (int i = 0; i < face.VertexArray.Length; ++i)
+        //                newVertexArray[i] = sortedIndexPointList.IndexOfKey(face.VertexArray[i]);
+        //            faces.Add(newVertexArray);
+        //        }
+
+        //        if (faces.Count == 0)
+        //            continue;
+        //        Point[] usedPointsList = new Point[sortedIndexPointList.Count];
+        //        sortedIndexPointList.Values.CopyTo(usedPointsList, 0);
+        //        try
+        //        {
+        //            importedMeshes.Add(new SubDivisionMesh(usedPointsList, faces.ToArray(), 0, true));
+        //        }
+        //        catch (System.InvalidOperationException)
+        //        {
+        //        }
+        //    }
+        //    return importedMeshes.ToArray();
+        //}
+
+
+        internal Mesh[] ToMesh()
         {
-            List<SubDivisionMesh> importedMeshes = new List<SubDivisionMesh>();
-            foreach (var group in this.Groups)
-            {
-                List<int[]> faces = new List<int[]>();
-                SortedList<int, Point> sortedIndexPointList = new SortedList<int, Point>();
-                //create the used points list
-                foreach (var face in group.Faces)
-                {
-                    foreach (var vertex in face.VertexArray)
-                        sortedIndexPointList[vertex] = this.Vertices[vertex];
-                }
-
-                //get the indices from the used point list and add face
-                foreach (var face in group.Faces)
-                {
-                    int[] newVertexArray = new int[face.VertexArray.Length];
-                    for (int i = 0; i < face.VertexArray.Length; ++i)
-                        newVertexArray[i] = sortedIndexPointList.IndexOfKey(face.VertexArray[i]);
-                    faces.Add(newVertexArray);
-                }
-
-                if (faces.Count == 0)
-                    continue;
-                Point[] usedPointsList = new Point[sortedIndexPointList.Count];
-                sortedIndexPointList.Values.CopyTo(usedPointsList, 0);
-                try
-                {
-                    importedMeshes.Add(new SubDivisionMesh(usedPointsList, faces.ToArray(), 0, true));
-                }
-                catch (System.InvalidOperationException)
-                {
-                }
-            }
-            return importedMeshes.ToArray();
+            throw new NotImplementedException();
         }
     }
 }

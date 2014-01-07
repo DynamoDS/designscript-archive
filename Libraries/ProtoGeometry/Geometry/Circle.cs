@@ -311,9 +311,9 @@ namespace Autodesk.DesignScript.Geometry
 
             var fptPos = firstPoint.PointEntity;
             var sptPos = secondPoint.PointEntity;
-            var cptPos = HostFactory.Factory.CreatePoint((fptPos.X + sptPos.X) / 2.0,
-                                                                (fptPos.Y + sptPos.Y) / 2.0,
-                                                                (fptPos.Z + sptPos.Z) / 2.0);
+            var cptPos = Point.ByCoordinates((fptPos.X + sptPos.X)/2.0,
+                (fptPos.Y + sptPos.Y)/2.0,
+                (fptPos.Z + sptPos.Z)/2.0).PointEntity;
             var centerPt = cptPos.ToPoint(false, null);
             var circleEntity = Circle.ByCenterPointRadiusCore(centerPt, cptPos.DistanceTo(fptPos), ref normal);
             if (circleEntity == null)
@@ -364,7 +364,7 @@ namespace Autodesk.DesignScript.Geometry
                 return null;
             }
             */
-            var entity = HostFactory.Factory.CircleByPointsOnCurve(firstPoint.PointEntity,
+            var entity = HostFactory.Factory.CircleByThreePoints(firstPoint.PointEntity,
                                                         secondPoint.PointEntity, thirdPoint.PointEntity);
             if (null == entity)
                 throw new Exception(string.Format(Properties.Resources.OperationFailed, "Circle.ByPointsOnCurve"));
@@ -383,7 +383,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new ArgumentException(Properties.Resources.IsZeroRadius);
 
             normal = normal.IsNormalized ? normal : normal.Normalize();
-            ICircleEntity entity = HostFactory.Factory.CircleByCenterPointRadius(centerPoint.PointEntity, radius, normal.IVector);
+            ICircleEntity entity = HostFactory.Factory.CircleByCenterPointRadiusNormal(centerPoint.PointEntity, radius, normal.VectorEntity);
             if (null == entity)
                 throw new Exception(string.Format(Properties.Resources.OperationFailed, "Circle.ByCenterPointRadius"));
             return entity;

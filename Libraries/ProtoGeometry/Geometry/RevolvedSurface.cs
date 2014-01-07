@@ -103,7 +103,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null == axisDirection)
                 throw new System.ArgumentException(string.Format(Properties.Resources.NullArgument, "axis direction"), "axisDirection");
 
-            ISurfaceEntity entity = HostFactory.Factory.SurfaceByRevolve(profile.CurveEntity, axisOrigin.PointEntity, axisDirection.IVector, startAngle, sweepAngle);
+            ISurfaceEntity entity = HostFactory.Factory.SurfaceByRevolve(profile.CurveEntity, axisOrigin.PointEntity, axisDirection.VectorEntity, startAngle, sweepAngle);
             if (entity == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.Revolve"));
             return entity;

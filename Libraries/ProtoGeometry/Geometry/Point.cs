@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.DesignScript.Interfaces;
 using System.ComponentModel;
 using System.Text;
@@ -245,16 +246,15 @@ namespace Autodesk.DesignScript.Geometry
 
         internal override IGeometryEntity[] ProjectOn(Geometry other, Vector direction)
         {
-            IVector dir = direction.IVector;
-            Surface surf = other as Surface;
+            var dir = direction.VectorEntity;
+            var surf = other as Surface;
             if (null != surf)
                 return surf.SurfaceEntity.Project(PointEntity, dir);
 
             Curve curve = other as Curve;
             if (null != curve)
             {
-                IPointEntity pt = curve.CurveEntity.Project(PointEntity, dir);
-                return new IGeometryEntity[] { pt };
+                return curve.CurveEntity.Project(PointEntity, dir);
             }
 
             Plane plane = other as Plane;
@@ -268,7 +268,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null != solid)
                 return solid.SolidEntity.Project(PointEntity, dir);
 
-            return base.ProjectOn(other, direction);
+            return base.Project(other, direction).Select(x=>x.GeomEntity).ToArray();
         }
 
         #endregion
@@ -505,7 +505,7 @@ namespace Autodesk.DesignScript.Geometry
 
         private static IPointEntity ByCoordinatesCore(double xx, double yy, double zz)
         {
-            var position = HostFactory.Factory.CreatePoint(xx, yy, zz);
+            IPointEntity position = HostFactory.Factory.PointByCoordinates(xx, yy, zz);
             return position;
         }
 
@@ -516,7 +516,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new ArgumentNullException("refPoint");
             }
 
-            var pt = HostFactory.Factory.CreatePoint(refPoint.X + deltaX, refPoint.Y + deltaY, refPoint.Z + deltaZ);
+            var pt = HostFactory.Factory.PointByCoordinates(refPoint.X + deltaX, refPoint.Y + deltaY, refPoint.Z + deltaZ);
             return pt;
         }
         

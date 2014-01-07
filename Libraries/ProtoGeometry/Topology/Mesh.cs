@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using Autodesk.DesignScript.Interfaces;
 using System.Collections;
@@ -10,22 +12,26 @@ namespace Autodesk.DesignScript.Geometry
     public class Mesh : Topology
     {
         #region DATA MEMBERS
+
         private Point[] mVertexPositions;
         private Vertex[] mVertices;
         private Edge[] mEdges;
         private Face[] mFaces;
         private Vector[] mNormals;
+
         #endregion
 
         #region PRIVATE CONSTRUCTORS
 
-        private IMeshEntity MeshEntity { get { return HostImpl as IMeshEntity; } }
+        private IPolyMeshEntity MeshEntity { get { return HostImpl as IPolyMeshEntity; } }
 
-        internal Mesh(IMeshEntity mesh) : base(mesh)
+        internal Mesh(IPolyMeshEntity mesh)
+            : base( mesh )
         {
         }
 
-        internal Mesh(IMeshEntity mesh, bool isVisible) : base(mesh)
+        internal Mesh(IPolyMeshEntity mesh, bool isVisible)
+            : base( mesh )
         {
             SetVisibility(isVisible);
         }
@@ -59,31 +65,33 @@ namespace Autodesk.DesignScript.Geometry
         /// <param name="vertices"></param>
         /// <param name="faceIndices"></param>
         /// <returns></returns>
-        public static Mesh ByVerticesFaceIndices(Point[] vertices, int[][] faceIndices)
+        public static Mesh ByVerticesFaceIndices(Point[] vertices, IIndexGroup[] faceIndices)
         {
-            IPointEntity[] points = vertices.ConvertAll(GeometryExtension.ToEntity<Point, IPointEntity>);
-            IMeshEntity entity = ByVerticesFaceIndicesCore(points, faceIndices);
-            Mesh mesh = new Mesh(entity, true);
+            var points = vertices.ConvertAll(GeometryExtension.ToEntity<Point, IPointEntity>);
+            var entity = ByVerticesFaceIndicesCore(points, faceIndices);
+            var mesh = new Mesh(entity, true);
             mesh.FaceIndices = faceIndices;
             mesh.VertexPositions = vertices;
             return mesh;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="edgeIndices"></param>
-        /// <returns></returns>
-        private static Mesh ByVerticesEdgeIndices(Point[] vertices, int[] edgeIndices)
-        {
-            IPointEntity[] points = vertices.ConvertAll(GeometryExtension.ToEntity<Point, IPointEntity>);
-            IMeshEntity entity = ByVerticesEdgeIndicesCore(points, edgeIndices);
-            Mesh mesh = new Mesh(entity);
-            mesh.EdgeIndices = edgeIndices;
-            mesh.VertexPositions = vertices;
-            return mesh;
-        }
+        // PB: I don't understand this method
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="vertices"></param>
+        ///// <param name="edgeIndices"></param>
+        ///// <returns></returns>
+        //private static Mesh ByVerticesEdgeIndices(Point[] vertices, int[] edgeIndices)
+        //{
+        //    var points = vertices.ConvertAll(GeometryExtension.ToEntity<Point, IPointEntity>);
+        //    var entity = ByVerticesEdgeIndicesCore(points, edgeIndices);
+        //    var mesh = new Mesh(entity);
+        //    mesh.EdgeIndices = edgeIndices;
+        //    mesh.VertexPositions = vertices;
+        //    return mesh;
+        //}
 
         #endregion
 
@@ -112,7 +120,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <summary>
         /// 
         /// </summary>
-        public int[][] FaceIndices { get; protected set; }
+        public IIndexGroup[] FaceIndices { get; protected set; }
 
         /// <summary>
         /// 
@@ -122,7 +130,7 @@ namespace Autodesk.DesignScript.Geometry
             get
             {
                 if (null == mNormals)
-                    mNormals = GetVertexNormals().ConvertAll((IVector v) => new Vector(v));
+                    mNormals = GetVertexNormals().ConvertAll((IVectorEntity v) => new Vector(v));
                 return mNormals;
             }
         }
@@ -136,8 +144,8 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (null == mVertices)
                 {
-                    IVertexEntity[] vertices = MeshEntity.GetVertices();
-                    mVertices = ConvertAll(vertices, (IVertexEntity host) => new Vertex(host));
+                    var vertices = MeshEntity.GetVertices();
+                    mVertices = vertices.Select(x => new Vertex(x)).ToArray();
                 }
 
                 return mVertices;
@@ -188,39 +196,39 @@ namespace Autodesk.DesignScript.Geometry
         /// <param name="points"></param>
         /// <param name="faceIndices"></param>
         /// <returns></returns>
-        internal static IMeshEntity ByVerticesFaceIndicesCore(IPointEntity[] points, int[][] faceIndices)
+        internal static IPolyMeshEntity ByVerticesFaceIndicesCore(IPointEntity[] points, IIndexGroup[] faceIndices)
         {
             string kMethodName = "Mesh.ByVerticesFaceIndices";
 
             if (points.Length < 3 || points.ArePointsColinear())
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "vertices", kMethodName));
 
-            IMeshEntity entity = HostFactory.Factory.MeshByVerticesFaceIndices(points, faceIndices);
+            var entity = HostFactory.Factory.PolyMeshByVerticesFaceIndices(points, faceIndices);
             if (null == entity)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
             return entity;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="points"></param>
-        /// <param name="edgeIndices"></param>
-        /// <returns></returns>
-        internal static IMeshEntity ByVerticesEdgeIndicesCore(IPointEntity[] points, int[] edgeIndices)
-        {
-            string kMethodName = "Mesh.ByVerticesEdgeIndices";
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="points"></param>
+        ///// <param name="edgeIndices"></param>
+        ///// <returns></returns>
+        //internal static IPolyMeshEntity ByVerticesEdgeIndicesCore(IPointEntity[] points, int[] edgeIndices)
+        //{
+        //    string kMethodName = "Mesh.ByVerticesEdgeIndices";
 
-            if (points.Length < 3 || points.ArePointsColinear())
-                throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "vertices", kMethodName));
+        //    if (points.Length < 3 || points.ArePointsColinear())
+        //        throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "vertices", kMethodName));
 
-            IMeshEntity entity = HostFactory.Factory.MeshByVerticesEdgeIndices(points, edgeIndices);
-            if (null == entity)
-                throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
+        //    var entity = HostFactory.Factory.PolyMeshByVerticesEdgeIndices(points, edgeIndices);
+        //    if (null == entity)
+        //        throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
-            return entity;
-        }
+        //    return entity;
+        //}
 
         private static TOutput[] ConvertAll<TInput, TOutput>(TInput[] array, Converter<TInput, TOutput> converter)
         {
@@ -243,18 +251,37 @@ namespace Autodesk.DesignScript.Geometry
             return retArray;
         }
 
-        private IVector[] GetVertexNormals()
+        private IVectorEntity[] GetVertexNormals()
         {
             if (null == mVertexPositions || null == FaceIndices)
                 return null;
 
-            IPointEntity[] points = mVertexPositions.ConvertAll(GeometryExtension.ToEntity<Point, IPointEntity>);
-            using (ISubDMeshEntity mesh = HostFactory.Factory.SubDMeshByVerticesFaceIndices(points, FaceIndices, 0))
-            {
-                return mesh.GetVertexNormals();
-            }
+            return this.VertexNormals.Select(x => x.VectorEntity).ToArray();
         }
 
         #endregion
+
+
+        /// <summary>
+        /// Creates an array of Sub Division Mesh from the .Obj file given by the user.
+        /// Each Group within the .Obj file is represented by one SubDivsion Mesh. 
+        /// </summary>
+        /// <param name="filePath">The file to be imported</param>
+        /// <returns></returns>
+        public static Geometry[] ImportFromOBJ(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new System.ArgumentNullException("filePath");
+            filePath = GeometryExtension.LocateFile(filePath);
+            if (!File.Exists(filePath))
+                throw new System.ArgumentException(string.Format(Properties.Resources.FileNotFound, filePath), "filePath");
+            var result = ObjHandler.Import(filePath);
+            return result.ToMesh().Select(x =>
+            {
+                var autodispose = true;
+                return x.GetGeometryCore(out autodispose);
+            }).ToArray();
+        }
+
     }
 }

@@ -38,7 +38,7 @@ namespace Autodesk.DesignScript.Geometry
 
         static bool IsCylinder(IConeEntity cone)
         {
-            return cone.GetRadiusRatio().EqualsTo(1.0);
+            return cone.RadiusRatio.EqualsTo(1.0);
         }
 
         private Cylinder(IConeEntity entity, bool persist = false)
@@ -89,16 +89,16 @@ namespace Autodesk.DesignScript.Geometry
                 throw new System.ArgumentException(string.Format(Properties.Resources.LessThanZero, "height"), "height");
             if (null == contextCoordinateSystem)
                 throw new System.ArgumentNullException("contextCoordinateSystem");
-            if (!contextCoordinateSystem.IsUniscaledOrtho())
+            if (!contextCoordinateSystem.IsUniscaledOrtho)
             {
-                if(contextCoordinateSystem.IsScaledOrtho())
+                if(contextCoordinateSystem.IsScaledOrtho)
                     throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "Non Uniform Scaled CoordinateSystem", kMethod));
                 else
                     throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "Shear CoordinateSystem", kMethod));
             }
 
-            IConeEntity entity = HostFactory.Factory.ConeByRadiusLength(contextCoordinateSystem,
-                                                                        radius, radius, height);
+            IConeEntity entity = HostFactory.Factory.ConeByCoordinateSystemHeightRadii(contextCoordinateSystem, height,
+                                                                        radius, radius);
             if (null == entity)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, kMethod));
             return entity;
@@ -118,7 +118,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!radius.HasValue)
                 {
-                    radius = CylinderEntity.GetStartRadius();
+                    radius = CylinderEntity.StartRadius;
                 }
                 return radius.Value;
             }
@@ -138,7 +138,7 @@ namespace Autodesk.DesignScript.Geometry
             {
                 if (!height.HasValue)
                 {
-                    height = CylinderEntity.GetHeight();
+                    height = CylinderEntity.Height;
                 }
                 return height.Value;
             }
