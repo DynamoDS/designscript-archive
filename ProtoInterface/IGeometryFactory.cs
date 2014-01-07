@@ -10,19 +10,6 @@ namespace Autodesk.DesignScript.Interfaces
     [Browsable(false)]
     public interface IGeometryFactory
     {
-        // PB: not sure if new or need refactoring into new library
-        ISurfaceEntity SurfaceBySweep(ICurveEntity iCurveEntity, ICurveEntity iCurveEntity_2);
-        ISurfaceEntity SurfacePatchFromCurve(ICurveEntity iCurveEntity);
-        ISurfaceEntity SurfaceByLoftCrossSectionsPath(ICurveEntity[] hostXCurves, ICurveEntity iCurveEntity);
-        ISurfaceEntity SurfaceByLoftCrossSectionsGuides(ICurveEntity[] hostXCurves, ICurveEntity[] hostGuides);
-        ISurfaceEntity SurfaceByLoftCrossSections(ICurveEntity[] hostXCurves);
-        ISolidEntity SolidByLoftCrossSections(ICurveEntity[] xsections);
-        ISolidEntity SolidByLoftCrossSectionsPath(ICurveEntity[] xsections, ICurveEntity iCurveEntity);
-        ISolidEntity SolidByLoftCrossSectionsGuides(ICurveEntity[] xsections, ICurveEntity[] iCurveEntity);
-        ISolidEntity SolidBySweep(ICurveEntity iCurveEntity, ICurveEntity iCurveEntity_2);
-        INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] hosts, bool makePeriodic);
-        // ICoordinateSystemEntity CoordinateSystemByUniversalTransform(ICoordinateSystemEntity iCoordinateSystemEntity, double[] scaleFactors, double[] rotationAngles, int[] rotationSequence, IVectorEntity iVectorEntity, bool translationSequence);
-
         IArcEntity ArcByPointsOnCurve(IPointEntity firstPoint, IPointEntity secondPoint, IPointEntity thirdPoint);
         IArcEntity ArcByCenterPointRadiusAngle(IPointEntity center, double radius, double startAngle, double endAngle, IVectorEntity normal);
         IArcEntity ArcByCenterPointStartPointSweepAngle(IPointEntity centerPoint, IPointEntity startPoint, double sweepAngle, IVectorEntity normal);
@@ -40,7 +27,9 @@ namespace Autodesk.DesignScript.Interfaces
         // knot array: the array size must be num_control_points + degree + 1
         INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree, double[] weights, double[] knots);
         INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points);
+        INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points, bool closeCurve);
         INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points, int degree);
+        INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points, int degree, bool closeCurve);
         INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] pts, IVectorEntity startTangent, IVectorEntity endTangent);
 
         INurbsSurfaceEntity NurbsSurfaceByPoints(IPointEntity[][] points, int uDegree, int vDegree);
@@ -57,6 +46,13 @@ namespace Autodesk.DesignScript.Interfaces
         IConeEntity ConeByCoordinateSystemHeightRadius(ICoordinateSystemEntity cs, double height, double startRadius);
         IConeEntity ConeByCoordinateSystemHeightRadii(ICoordinateSystemEntity cs, double height, double startRadius, double endRadius);
 
+        /// <summary>
+        /// Create a CoordinateSystem from a "4x4 transformation matrix given in
+        /// pre-multiplier form." (From ASM Docs) Input should be 16 doubles 
+        /// long, representing a 4x4 matrix in form: r1c1, r1c2, r1c3, r1c4, 
+        /// r2c1, ...
+        /// </summary>
+        ICoordinateSystemEntity CoordinateSystemByMatrix(double[] matrix);
         ICoordinateSystemEntity CoordinateSystemByOrigin(double x, double y);
         ICoordinateSystemEntity CoordinateSystemByOrigin(double x, double y, double z);
         ICoordinateSystemEntity CoordinateSystemByOrigin(IPointEntity origin);
@@ -117,12 +113,17 @@ namespace Autodesk.DesignScript.Interfaces
 
         ISurfaceEntity SurfaceByLoft(ICurveEntity[] crossSections);
         ISurfaceEntity SurfaceByLoft(ICurveEntity[] crossSections, ICurveEntity guideCurve);
+        ISurfaceEntity SurfaceByLoft(ICurveEntity[] crossSections, ICurveEntity[] guideCurves);
+        ISurfaceEntity SurfaceBySweep1Rail(ICurveEntity rail, ICurveEntity crossSection);
         ISurfaceEntity SurfaceBySweep1Rail(ICurveEntity rail, ICurveEntity[] crossSections);
         ISurfaceEntity SurfaceBySweep2Rails(ICurveEntity rail1, ICurveEntity rail2, ICurveEntity[] crossSections);
         ISurfaceEntity SurfaceByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVectorEntity axisDirection, double startAngle, double sweepAngle);
+        ISurfaceEntity SurfaceByPatch(ICurveEntity closedCurve);
+        ISurfaceEntity SurfaceByPatch(ICurveEntity[] curves);
 
         ISolidEntity SolidByLoft(ICurveEntity[] crossSections);
         ISolidEntity SolidByLoft(ICurveEntity[] crossSections, ICurveEntity guideCurve);
+        ISolidEntity SolidByLoft(ICurveEntity[] crossSections, ICurveEntity[] guideCurves);
         ISolidEntity SolidBySweep1Rail(ICurveEntity rail, ICurveEntity[] crossSections);
         ISolidEntity SolidBySweep2Rails(ICurveEntity rail1, ICurveEntity rail2, ICurveEntity[] crossSections);
         ISolidEntity SolidByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVectorEntity axisDirection, double startAngle, double sweepAngle);
@@ -154,9 +155,7 @@ namespace Autodesk.DesignScript.Interfaces
         IGeometryEntity[] LoadSat(string satFile);
         bool SaveSat(string satFile, Object[] ffiObjects);
 
-
         IGeometrySettings GetSettings();
-
 
         // NOTE: (by Patrick) I don't think we should support SubDMeshes for the 
         // first pass of this API. They are not easily supported by ASM, and
@@ -176,12 +175,5 @@ namespace Autodesk.DesignScript.Interfaces
         /// Constructs a quad SubDMesh from Surface or Solid geometry.
         /// </summary>
         //ISubDMeshEntity SubDMeshFromGeometry(IGeometryEntity geometry, double maxEdgeLength);
-
-
-
-
-
-
-        ICoordinateSystemEntity CoordinateSystemByData(double[] data);
     }
 }

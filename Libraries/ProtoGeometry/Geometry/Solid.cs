@@ -237,7 +237,7 @@ namespace Autodesk.DesignScript.Geometry
             if (xsections == null || xsections.Length < 2)
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "cross sections"), "crossSections");
 
-            ISolidEntity entity = HostFactory.Factory.SolidByLoftCrossSections(xsections);
+            ISolidEntity entity = HostFactory.Factory.SolidByLoft(xsections);
             if (entity == null)
                 throw new InvalidOperationException(string.Format(Properties.Resources.OperationFailed, "Solid.LoftFromCrossSections"));
             return entity;
@@ -252,7 +252,7 @@ namespace Autodesk.DesignScript.Geometry
             if (path == null)
                 throw new ArgumentNullException("path");
 
-            ISolidEntity entity = HostFactory.Factory.SolidByLoftCrossSectionsPath(xsections, path.CurveEntity);
+            ISolidEntity entity = HostFactory.Factory.SolidByLoft(xsections, path.CurveEntity);
             if (entity == null)
                 throw new InvalidOperationException(string.Format(Properties.Resources.OperationFailed, "Solid.LoftFromCrossSectionsPath"));
             return entity;
@@ -265,7 +265,7 @@ namespace Autodesk.DesignScript.Geometry
             if (xsections == null || xsections.Length < 2)
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "cross sections"), "crossSections");
 
-            ISolidEntity entity = HostFactory.Factory.SolidByLoftCrossSectionsGuides(xsections, guides.ConvertAll(GeometryExtension.ToEntity<Curve, ICurveEntity>));
+            ISolidEntity entity = HostFactory.Factory.SolidByLoft(xsections, guides.ConvertAll(GeometryExtension.ToEntity<Curve, ICurveEntity>));
             if (entity == null)
                 throw new InvalidOperationException(string.Format(Properties.Resources.OperationFailed, "Solid.LoftFromCrossSectionsGuides"));
             return entity;
@@ -273,17 +273,21 @@ namespace Autodesk.DesignScript.Geometry
 
         private static ISolidEntity SweepCore(Curve profile, Curve path)
         {
-            if (profile == null)
-                throw new ArgumentNullException("profile");
-            if (path == null)
-                throw new ArgumentNullException("path");
-            if (!profile.IsClosed)
-                throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "profile"), "profile");
+            // NOTE Patrick: LibG / ProtoInterface expects an array of profiles
+            //               (the array could be length 1) and one path curve
+            throw new NotImplementedException();
 
-            ISolidEntity entity = HostFactory.Factory.SolidBySweep(profile.CurveEntity, path.CurveEntity);
-            if (entity == null)
-                throw new InvalidOperationException(string.Format(Properties.Resources.OperationFailed, "Solid.Sweep"));
-            return entity;
+            //if (profile == null)
+            //    throw new ArgumentNullException("profile");
+            //if (path == null)
+            //    throw new ArgumentNullException("path");
+            //if (!profile.IsClosed)
+            //    throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "profile"), "profile");
+
+            //ISolidEntity entity = HostFactory.Factory.SolidBySweep(profile.CurveEntity, path.CurveEntity);
+            //if (entity == null)
+            //    throw new InvalidOperationException(string.Format(Properties.Resources.OperationFailed, "Solid.Sweep"));
+            //return entity;
         }
 
         private static ISolidEntity RevolveCore(Curve profile, Line axis, double startAngle, double sweepAngle)

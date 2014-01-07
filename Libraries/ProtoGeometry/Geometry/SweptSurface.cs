@@ -82,7 +82,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null == path)
                 throw new System.ArgumentNullException("path");
 
-            ISurfaceEntity entity = HostFactory.Factory.SurfaceBySweep(profile.CurveEntity, path.CurveEntity);
+            ISurfaceEntity entity = HostFactory.Factory.SurfaceBySweep1Rail(path.CurveEntity, profile.CurveEntity);
             if (entity == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "SweptSurface.ByProfilePath"));
             return entity;

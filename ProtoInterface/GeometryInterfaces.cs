@@ -460,10 +460,10 @@ namespace Autodesk.DesignScript.Interfaces
     }
 
     [Browsable(false)]
-    public interface IRectangleEntity : ICurveEntity
+    public interface IRectangleEntity : IPolyCurveEntity
     {
         double Width { get; }
-        double Height { get; }
+        double Length { get; }
 
         IPointEntity Center { get; }
 

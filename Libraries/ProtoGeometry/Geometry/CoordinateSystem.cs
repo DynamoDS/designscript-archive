@@ -632,7 +632,7 @@ namespace Autodesk.DesignScript.Geometry
             else if (data.Length != 16)
                 throw new System.ArgumentException(string.Format(Properties.Resources.NotEqual, "number of datas", 16), "data");
 
-            ICoordinateSystemEntity cs = HostFactory.Factory.CoordinateSystemByData(data);
+            ICoordinateSystemEntity cs = HostFactory.Factory.CoordinateSystemByMatrix(data);
             if (null == cs)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "CoordinateSystem.ByData"));
 
