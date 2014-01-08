@@ -10,22 +10,16 @@ namespace Autodesk.DesignScript.Interfaces
     /// </summary>
     public interface IRenderPackage
     {
-        void PushPointVertex(double x, double y, double z);
-        void PushPointVertexColor(byte red, byte green, byte blue, byte alpha);
+        List<double> PointVertices { get; }
+        List<byte> PointVertexColors { get; }
 
-        void PushTriangleVertex(double x, double y, double z);
-        void PushTriangleVertexNormal(double x, double y, double z);
-        void PushTriangleVertexColor(byte red, byte green, byte blue, byte alpha);
+        List<double> LineStripVertices { get; }
+        List<byte> LineStripVertexColors { get; }
+        List<int> LineStripVertexCounts { get; }
 
-        void PushLineStripVertex(double x, double y, double z);
-        void PushLineStripVertexCount(int n);
-        void PushLineStripVertexColor(byte red, byte green, byte blue, byte alpha);
-
-        /// <summary>
-        /// Returns pointer to abstract C++ class RenderPackage, which is 
-        /// actually the implementation class for this interface.
-        /// </summary>
-        IntPtr NativeRenderPackage { get; }
+        List<double> TriangleVertices { get; }
+        List<byte> TriangleVertexColors { get; }
+        List<double> TriangleNormals { get; }
     }
 
     /// <summary>
