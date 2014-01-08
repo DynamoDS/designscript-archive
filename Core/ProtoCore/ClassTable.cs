@@ -162,7 +162,7 @@ namespace ProtoCore.DSASM
                 return ProtoCore.DSASM.Constants.kInvalidIndex;
             }
 
-            HashSet<SymbolNode> allSymbols = symbols.GetNodeForName(name);
+            IEnumerable<SymbolNode> allSymbols = symbols.GetNodeForName(name);
             if (allSymbols == null)
             {                
                 return ProtoCore.DSASM.Constants.kInvalidIndex;
@@ -238,7 +238,7 @@ namespace ProtoCore.DSASM
 
         public int GetFirstVisibleSymbolNoAccessCheck(string name)
         {
-            HashSet<SymbolNode> allSymbols = symbols.GetNodeForName(name);
+            IEnumerable<SymbolNode> allSymbols = symbols.GetNodeForName(name);
             if (allSymbols == null)
             {
                 return ProtoCore.DSASM.Constants.kInvalidIndex;

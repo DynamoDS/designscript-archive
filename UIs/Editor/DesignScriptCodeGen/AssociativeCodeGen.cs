@@ -116,7 +116,7 @@ namespace DesignScript.Editor.CodeGen
             symbolnode.isArgument = false;
             symbolnode.memregion = region;
             symbolnode.classScope = classScope;
-            symbolnode.runtimeTableIndex = codeBlock.symbolTable.runtimeIndex;
+            symbolnode.runtimeTableIndex = codeBlock.symbolTable.RuntimeIndex;
             symbolnode.isStatic = isStatic;
             symbolnode.access = access;
 
@@ -161,7 +161,7 @@ namespace DesignScript.Editor.CodeGen
                     staticSymbolnode.isArgument = false;
                     staticSymbolnode.memregion = region;
                     staticSymbolnode.classScope = classScope;
-                    staticSymbolnode.runtimeTableIndex = codeBlock.symbolTable.runtimeIndex;
+                    staticSymbolnode.runtimeTableIndex = codeBlock.symbolTable.RuntimeIndex;
                     staticSymbolnode.isStatic = isStatic;
                     staticSymbolnode.access = access;
 
@@ -230,7 +230,7 @@ namespace DesignScript.Editor.CodeGen
                 size,
                 datasize,
                 true,
-                codeBlock.symbolTable.runtimeIndex,
+                codeBlock.symbolTable.RuntimeIndex,
                 region,
                 false,
                 null,
@@ -261,29 +261,6 @@ namespace DesignScript.Editor.CodeGen
                 symbolindex = codeBlock.symbolTable.Append(node);
             }
             return symbolindex;
-        }
-
-        private void InferTypes()
-        {
-            int size = astNodes.Count;
-            for (int n = 0; n < size; ++n)
-            {
-                if (astNodes[n] is BinaryExpressionNode)
-                {
-                    ProtoCore.Type type = new ProtoCore.Type();
-                    type.UID = (int)ProtoCore.PrimitiveType.kTypeVoid;
-                    type.IsIndexable = false;
-
-                    BinaryExpressionNode b = astNodes[n] as BinaryExpressionNode;
-                    InferDFSTraverse(b.RightNode, ref type);
-
-                    // Do we even need to update lhs?
-                    Debug.Assert(b.LeftNode is IdentifierNode);
-                    IdentifierNode t = b.LeftNode as IdentifierNode;
-
-                    codeBlock.symbolTable.SetDataType(t.Name, globalProcIndex, type);
-                }
-            }
         }
 
         private void InferDFSTraverse(AssociativeNode node, ref ProtoCore.Type inferedType)
@@ -711,7 +688,7 @@ namespace DesignScript.Editor.CodeGen
             int dimensions = 0;
 
             ProtoCore.DSASM.SymbolNode symbolnode = null;
-            int runtimeIndex = codeBlock.symbolTable.runtimeIndex;
+            int runtimeIndex = codeBlock.symbolTable.RuntimeIndex;
 
             ProtoCore.Type type = new ProtoCore.Type();
             type.UID = (int)ProtoCore.PrimitiveType.kTypeVoid;
@@ -2320,7 +2297,7 @@ namespace DesignScript.Editor.CodeGen
                     //int type = (int)ProtoCore.PrimitiveType.kTypeVoid;
                     bool isAccessible = false;
                     bool isAllocated = VerifyAllocation(t.Name, globalClassIndex, out symbolnode, out isAccessible);
-                    int runtimeIndex = (!isAllocated || !isAccessible) ? codeBlock.symbolTable.runtimeIndex : symbolnode.runtimeTableIndex;
+                    int runtimeIndex = (!isAllocated || !isAccessible) ? codeBlock.symbolTable.RuntimeIndex : symbolnode.runtimeTableIndex;
 
                     int dimensions = 0;
                     if (null != t.ArrayDimensions)

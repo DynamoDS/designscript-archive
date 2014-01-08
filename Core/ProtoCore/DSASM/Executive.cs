@@ -1343,7 +1343,7 @@ namespace ProtoCore.DSASM
             {
                 foreach (ProtoCore.AssociativeGraph.GraphNode graphNode in graphNodes)
                 {
-                    if (!graphNode.isDirty)
+                    if (!graphNode.isDirty || !graphNode.isActive)
                     {
                         continue;
                     }
@@ -3266,7 +3266,7 @@ namespace ProtoCore.DSASM
 
         public SymbolNode GetGlobalSymbolNode(string variable)
         {
-            HashSet<SymbolNode> symbols = exe.runtimeSymbols[0].GetNodeForName(variable);
+            IEnumerable<SymbolNode> symbols = exe.runtimeSymbols[0].GetNodeForName(variable);
             foreach (var symbol in symbols)
             {
                 if (symbol.functionIndex == Constants.kGlobalScope &&

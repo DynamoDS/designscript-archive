@@ -257,7 +257,7 @@ namespace DesignScript.Editor.CodeGen
                 size,
                 datasize,
                 false,
-                codeBlock.symbolTable.runtimeIndex,
+                codeBlock.symbolTable.RuntimeIndex,
                 region,
                 false,
                 null,
@@ -317,7 +317,7 @@ namespace DesignScript.Editor.CodeGen
                 size,
                 datasize,
                 true,
-                codeBlock.symbolTable.runtimeIndex,
+                codeBlock.symbolTable.RuntimeIndex,
                 region);
 
 
@@ -578,7 +578,7 @@ namespace DesignScript.Editor.CodeGen
 
             int dimensions = 0;
 
-            int runtimeIndex = codeBlock.symbolTable.runtimeIndex;
+            int runtimeIndex = codeBlock.symbolTable.RuntimeIndex;
 
             ProtoCore.Type type = new ProtoCore.Type();
             type.UID = (int)ProtoCore.PrimitiveType.kTypeVoid;
@@ -1397,7 +1397,7 @@ namespace DesignScript.Editor.CodeGen
 
                     bool isAccessible = false;
                     bool isAllocated = VerifyAllocation(t.Value, globalClassIndex, out symbolnode, out isAccessible);
-                    int runtimeIndex = (!isAllocated) ? codeBlock.symbolTable.runtimeIndex : symbolnode.runtimeTableIndex;
+                    int runtimeIndex = (!isAllocated) ? codeBlock.symbolTable.RuntimeIndex : symbolnode.runtimeTableIndex;
 
                     // TODO Jun: Update mechanism work in progress - a flag to manually enable update 
                     bool enableUpdate = false;

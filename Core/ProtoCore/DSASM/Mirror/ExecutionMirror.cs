@@ -968,7 +968,7 @@ namespace ProtoCore.DSASM.Mirror
 
             Dictionary<string, Obj> ret = new Dictionary<string, Obj>();
             int classIndex = (int)obj.DsasmValue.metaData.type;
-            Dictionary<int,SymbolNode> symbolList = core.ClassTable.ClassNodes[classIndex].symbols.symbolList;
+            IDictionary<int,SymbolNode> symbolList = core.ClassTable.ClassNodes[classIndex].symbols.symbolList;
             StackValue[] svs = core.Heap.Heaplist[(int)obj.DsasmValue.opdata].Stack;
             int index = 0;
             for (int ix = 0; ix < svs.Length; ++ix)

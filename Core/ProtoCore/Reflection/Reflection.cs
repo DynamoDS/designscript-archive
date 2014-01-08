@@ -1,4 +1,6 @@
-﻿namespace ProtoCore
+﻿using System.Collections.Generic;
+
+namespace ProtoCore
 {
     namespace Mirror
     {
@@ -20,14 +22,19 @@
             ///  The ClassMirror is intended to be used at statically at compile time
             /// </summary>
             /// <returns></returns>
-            //public static ClassMirror Reflect(string className, ProtoCore.Core core)
-            //{
-            //    return new ClassMirror(className, core);
-            //}
-
-            public static LibraryMirror Reflect(string assemblyName, ProtoCore.Core core)
+            public static ClassMirror Reflect(string className, ProtoCore.Core core)
             {
-                return new LibraryMirror(assemblyName, core);
+                return new ClassMirror(className, core);
+            }
+
+            /// <summary>
+            ///  Returns a library mirror that can be reflected upon
+            ///  The LibraryMirror is  used for static reflection of classes etc.
+            /// </summary>
+            /// <returns></returns>
+            public static LibraryMirror Reflect(string assemblyName, IList<ProtoCore.DSASM.ClassNode> classNodes, ProtoCore.Core core)
+            {
+                return new LibraryMirror(core, assemblyName, classNodes);
             }
         }
     }
