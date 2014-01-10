@@ -8,7 +8,7 @@ using Autodesk.DesignScript.Geometry;
 
 namespace DSGeometry
 {
-    class PersistentHostManager : PersistenceManager
+    class PersistentHostManager : AbstractPersistenceManager
     {
         public override IPersistentObject Persist(IDesignScriptEntity entity)
         {
