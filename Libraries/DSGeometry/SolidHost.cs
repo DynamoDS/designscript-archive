@@ -99,7 +99,7 @@ namespace DSGeometry
             return new SolidEntity();
         }
 
-        public IGeometryEntity[] Project(IGeometryEntity geometry, IVector direction)
+        public IGeometryEntity[] Project(IGeometryEntity geometry, IVectorEntity direction)
         {
             return new IGeometryEntity[2] { new GeometryEntity(), new GeometryEntity() };
         }

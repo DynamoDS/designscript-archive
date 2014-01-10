@@ -1,4 +1,5 @@
-﻿using Autodesk.DesignScript.Interfaces;
+﻿using System.Linq;
+using Autodesk.DesignScript.Interfaces;
 
 namespace Autodesk.DesignScript.Geometry
 {
@@ -44,7 +45,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <param name="internalFaceThickness"></param>
         /// <param name="externalFaceThickness"></param>
         /// <returns></returns>
-        public Solid ThinShell(double internalFaceThickness, double externalFaceThickness)
+        public Solid[] ThinShell(double internalFaceThickness, double externalFaceThickness)
         {
             if (internalFaceThickness.EqualsTo(0.0) || internalFaceThickness < 0)
                 return null;
@@ -52,11 +53,11 @@ namespace Autodesk.DesignScript.Geometry
             if (externalFaceThickness.EqualsTo(0.0) || externalFaceThickness < 0)
                 return null;
 
-            ISolidEntity host = SolidEntity.ThinShell(internalFaceThickness, externalFaceThickness);
-            if (null == host)
+            ISolidEntity[] hosts = SolidEntity.ThinShell(internalFaceThickness, externalFaceThickness);
+            if (null == hosts)
                 return null;
 
-            return host.ToSolid(true, this);
+            return hosts.Select(x => x.ToSolid(true, this)).ToArray();
         }
 
         /// <summary>

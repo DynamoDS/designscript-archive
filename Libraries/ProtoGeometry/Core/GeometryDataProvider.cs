@@ -27,7 +27,7 @@ namespace Autodesk.DesignScript.Geometry
                 switch (param.Key)
                 {
                     case "OBJ":
-                        geometry = SubDivisionMesh.ImportFromOBJ(Convert.ToString(param.Value));
+                        geometry = Mesh.ImportFromOBJ(Convert.ToString(param.Value));
                         break;
                     case "SAT":
                         geometry = Geometry.ImportFromSAT(Convert.ToString(param.Value));

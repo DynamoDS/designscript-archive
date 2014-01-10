@@ -17,8 +17,6 @@ namespace ProtoFFITests
             core.Executives.Add(ProtoCore.Language.kImperative, new ProtoImperative.Executive(core));
             DLLFFIHandler.Register(FFILanguage.CSharp, new CSModuleHelper());
             CLRModuleType.ClearTypes();
-            core.Options.Verbose = true;
-            core.Options.DumpByteCode = true;
             return core;
         }
         protected struct ValidationData

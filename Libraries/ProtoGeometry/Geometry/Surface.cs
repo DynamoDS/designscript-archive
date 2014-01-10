@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Autodesk.DesignScript.Interfaces;
 using Autodesk.DesignScript.Runtime;
 
@@ -19,7 +20,7 @@ namespace Autodesk.DesignScript.Geometry
 
         protected virtual bool GetIsClosed()
         {
-            return SurfaceEntity.GetIsClosed();
+            return SurfaceEntity.Closed;
         }
 
         protected override void Dispose(bool disposing)
@@ -42,7 +43,7 @@ namespace Autodesk.DesignScript.Geometry
             base.Dispose(disposing);
         }
 
-        private BSplineSurface[] mPatches = null;
+        private NurbsSurface[] mPatches = null;
         #endregion
 
         #region SPECIALISED SURFACE CONSTRUCTORS "STATIC METHODS"
@@ -177,13 +178,13 @@ namespace Autodesk.DesignScript.Geometry
         [Category("Primary")]
         public double Area
         {
-            get { return SurfaceEntity.GetArea(); }
+            get { return SurfaceEntity.Area; }
         }
 
         [Category("Primary")]
         public double Perimeter
         {
-            get { return SurfaceEntity.GetPerimeter(); }
+            get { return SurfaceEntity.Perimeter; }
         }
 
         [Category("Primary")]
@@ -195,16 +196,16 @@ namespace Autodesk.DesignScript.Geometry
         [Category("Primary")]
         public bool IsClosedInU 
         {
-            get { return SurfaceEntity.GetIsClosedInU(); }
+            get { return SurfaceEntity.ClosedInU; }
         }
 
         [Category("Primary")]
         public bool IsClosedInV 
         {
-            get { return SurfaceEntity.GetIsClosedInV(); }
+            get { return SurfaceEntity.ClosedInV; }
         }
 
-        public BSplineSurface[] Patches
+        public NurbsSurface[] Patches
         {
             get
             {
@@ -244,7 +245,8 @@ namespace Autodesk.DesignScript.Geometry
         {
             if (pointOnSurface == null)
                 throw new System.ArgumentNullException("pointOnSurface");
-            IVector normal = SurfaceEntity.GetNormalAtPoint(pointOnSurface.PointEntity);
+            var uv = SurfaceEntity.UVParameterAtPoint(pointOnSurface.PointEntity);
+            var normal = SurfaceEntity.NormalAtParameter( uv.U, uv.V );
             if(normal == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.NormalAtPoint"));
             return new Vector(normal);
@@ -276,7 +278,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns>Array of surfaces.</returns>
         public Surface[] Split(Plane splittingPlane)
         {
-            ISurfaceEntity[] splitSurfaces = SurfaceEntity.Split(splittingPlane.HostImpl as IPlaneEntity);
+            ISurfaceEntity[] splitSurfaces = SurfaceEntity.Split(splittingPlane.HostImpl as IPlaneEntity).Cast<ISurfaceEntity>().ToArray();
 
             if (null == splitSurfaces || splitSurfaces.Length < 1)
             {
@@ -293,7 +295,8 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns>Array of surfaces.</returns>
         public Surface[] Split(Surface splittingSurface)
         {
-            ISurfaceEntity[] splitSurfaces = SurfaceEntity.Split(splittingSurface.SurfaceEntity);
+            ISurfaceEntity[] splitSurfaces =
+                SurfaceEntity.Split(splittingSurface.SurfaceEntity).Cast<ISurfaceEntity>().ToArray();
 
             if (null == splitSurfaces || splitSurfaces.Length < 1)
             {
@@ -318,17 +321,20 @@ namespace Autodesk.DesignScript.Geometry
             if (null == selectPoint)
                 throw new System.ArgumentNullException("selectPoint");
 
-            ICurveEntity[] hostCurves = curves.ConvertAll(GeometryExtension.ToEntity<Curve, ICurveEntity>);
-            IPlaneEntity[] hostPlanes = planes.ConvertAll(GeometryExtension.ToEntity<Plane, IPlaneEntity>);
-            ISurfaceEntity[] hostSurfaces = surfaces.ConvertAll(GeometryExtension.ToEntity<Surface, ISurfaceEntity>);
-            ISolidEntity[] hostSolids = solids.ConvertAll(GeometryExtension.ToEntity<Solid, ISolidEntity>);
+            var geom = new IGeometryEntity[][]
+            {
+                curves.ConvertAll(GeometryExtension.ToEntity<Curve, ICurveEntity >),
+                planes.ConvertAll(GeometryExtension.ToEntity<Plane, IPlaneEntity >),
+                surfaces.ConvertAll(GeometryExtension.ToEntity<Surface,ISurfaceEntity >),
+                solids.ConvertAll(GeometryExtension.ToEntity<Solid,ISolidEntity>)
+            };
+
+            var geomArray = geom.SelectMany(x => x.Cast<IGeometryEntity>()).ToArray();
+            
 
             IPointEntity hostPoint = selectPoint.PointEntity;
 
-            if (hostCurves == null && hostPlanes == null && hostSurfaces == null && hostSolids == null)
-                throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "Geometry", "Surface.Trim"));
-
-            ISurfaceEntity trimSurface = SurfaceEntity.Trim(hostCurves, hostPlanes, hostSurfaces, hostSolids, hostPoint, autoExtend);
+            IGeometryEntity[] trimSurface = SurfaceEntity.Trim(geomArray, hostPoint);
 
             //For trim operation, if the return value is not null, hide the original tools and surfaces.
             if (null != trimSurface)
@@ -340,7 +346,12 @@ namespace Autodesk.DesignScript.Geometry
                 SetVisibility(false);
             }
 
-            return trimSurface.ToSurf(true, this);
+            if (trimSurface.Length == 0)
+            {
+                return null;
+            }
+
+            return (Surface) ToGeometry( trimSurface.First() );
         }
 
         /// <summary>
@@ -560,7 +571,7 @@ namespace Autodesk.DesignScript.Geometry
             if (null == toolSolid)
                 throw new System.ArgumentNullException("toolSolid");
 
-            IGeometryEntity[] geoms = SurfaceEntity.SubtractFrom(toolSolid.SolidEntity);
+            IGeometryEntity[] geoms = SurfaceEntity.Difference(toolSolid.SolidEntity);
             if (null == geoms)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethod));
 
@@ -618,10 +629,10 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns>double[] == the first element is U, the second double is V</returns>
         public double[] ParameterAtPoint(Point point)
         {
-            System.Tuple<double, double> parametersTuple = SurfaceEntity.GetUVParameterAtPoint(point.PointEntity);
-            List<double> parameters = new List<double>();
-            parameters.Add(parametersTuple.Item1);
-            parameters.Add(parametersTuple.Item2);
+            var parametersTuple = SurfaceEntity.UVParameterAtPoint(point.PointEntity);
+            var parameters = new List<double>();
+            parameters.Add(parametersTuple.U);
+            parameters.Add(parametersTuple.V);
             return parameters.ToArray();
         }
 
@@ -641,7 +652,7 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <returns>Array of BSplineSurface.</returns>
         [AllowRankReduction]
-        public BSplineSurface[] ConvertToBSplineSurface()
+        public NurbsSurface[] ConvertToBSplineSurface()
         {
             return ConvertToBSplineSurface(true);
         }
@@ -651,25 +662,26 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <param name="persist"></param>
         /// <returns></returns>
-        protected BSplineSurface[] ConvertToBSplineSurface(bool persist)
+        protected NurbsSurface[] ConvertToBSplineSurface(bool persist)
         {
-            if (SurfaceEntity is IBSplineSurfaceEntity)
+            if (SurfaceEntity is INurbsSurfaceEntity)
             {
-                return new BSplineSurface[] { this as BSplineSurface };                
+                return new NurbsSurface[] { this as NurbsSurface };                
             }
 
-            IBSplineSurfaceEntity[] entities = SurfaceEntity.ConvertToBSplineSurface();
-            return entities.ConvertAll((IBSplineSurfaceEntity h) => h.ToBSurf(persist, this));
+            return new NurbsSurface[] {}; 
+            //var entities = SurfaceEntity.ConvertToBSplineSurface();
+            //return entities.ConvertAll((INurbsSurfaceEntity h) => h.ToBSurf(persist, this));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        private BSplineSurface ApproxBSplineSurface()
+        private NurbsSurface ApproxBSplineSurface()
         {
-            IBSplineSurfaceEntity surface = SurfaceEntity.ApproxBSpline(-1.0);
-            return new BSplineSurface(surface, true);
+            var surface = SurfaceEntity.ApproximateWithTolerance(-1.0);
+            return new NurbsSurface(surface, true);
         }
 
         /// <summary>
@@ -677,10 +689,10 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <param name="tol"></param>
         /// <returns></returns>
-        private BSplineSurface ApproxBSplineSurface(double tol)
+        private NurbsSurface ApproxBSplineSurface(double tol)
         {
-            IBSplineSurfaceEntity surface = SurfaceEntity.ApproxBSpline(tol);
-            return new BSplineSurface(surface, true);
+            var surface = SurfaceEntity.ApproximateWithTolerance(tol);
+            return new NurbsSurface(surface, true);
         }
 
         #endregion
@@ -701,35 +713,35 @@ namespace Autodesk.DesignScript.Geometry
             //throw new System.ArgumentException(string.Format(Properties.Resources.InvalidInput, "u or v parameter", "Surface.PointAtParameters"));
 
             IPointEntity pt = SurfaceEntity.PointAtParameter(u, v);
-            if (!offset.EqualsTo(0.0))
-            {
-                Vector normal = new Vector(SurfaceEntity.NormalAtPoint(pt));
-                Vector translation = normal.Normalize().Scale(offset);
-                IPointEntity offsetPt = pt.Add(translation);
-                pt.Dispose();
-                pt = offsetPt;
-            }
+            //if (!offset.EqualsTo(0.0))
+            //{
+            //    Vector normal = new Vector(SurfaceEntity.NormalAtPoint(pt));
+            //    Vector translation = normal.Normalize().Scale(offset);
+            //    IPointEntity offsetPt = pt.Add(translation);
+            //    pt.Dispose();
+            //    pt = offsetPt;
+            //}
             return pt.ToPoint(true, this);
         }
 
         internal override IGeometryEntity[] IntersectWithCurve(Curve curve)
         {
-            return curve.CurveEntity.IntersectWith(SurfaceEntity);
+            return curve.CurveEntity.Intersect(SurfaceEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithPlane(Plane plane)
         {
-            return SurfaceEntity.IntersectWith(plane.PlaneEntity);
+            return SurfaceEntity.Intersect(plane.PlaneEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithSolid(Solid solid)
         {
-            return solid.SolidEntity.IntersectWith(SurfaceEntity);
+            return solid.SolidEntity.Intersect(SurfaceEntity);
         }
 
         internal override IGeometryEntity[] IntersectWithSurface(Surface surf)
         {
-            return SurfaceEntity.IntersectWith(surf.SurfaceEntity);
+            return SurfaceEntity.Intersect(surf.SurfaceEntity);
         }
 
         internal override IPointEntity ClosestPointTo(IPointEntity otherPoint)
@@ -739,11 +751,7 @@ namespace Autodesk.DesignScript.Geometry
 
         internal override IGeometryEntity[] ProjectOn(Geometry other, Vector direction)
         {
-            //Solid solid = other as Solid;
-            //if (null != solid)
-            //    return solid.SolidEntity.Project(SurfaceEntity, direction);
-
-            return base.ProjectOn(other, direction);
+            return base.Project(other, direction).Select(x => x.GeomEntity).ToArray();
         }
 
         internal CoordinateSystem GetCSAtParameters(double u, double v)
@@ -768,7 +776,7 @@ namespace Autodesk.DesignScript.Geometry
             foreach (var surf in surfacehosts)
             {
                 if (keepInside)
-                    geometries.AddRange(trimmingEntity.IntersectWith(surf));
+                    geometries.AddRange(trimmingEntity.Intersect(surf));
                 else
                 {
                     IGeometryEntity[] trimmedSurfaces = surf.SubtractFrom(trimmingEntity);

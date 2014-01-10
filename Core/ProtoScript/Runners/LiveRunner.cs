@@ -12,6 +12,7 @@ using ProtoFFI;
 using ProtoCore.AssociativeGraph;
 using ProtoCore.AST.AssociativeAST;
 using ProtoCore.Mirror;
+using System.Linq;
 
 namespace ProtoScript.Runners
 {
@@ -101,7 +102,7 @@ namespace ProtoScript.Runners
         
     }
 
-    public partial class LiveRunner : ILiveRunner
+    public partial class LiveRunner : ILiveRunner, IDisposable
     {
         /// <summary>
         ///  These are configuration parameters passed by host application to be consumed by geometry library and persistent manager implementation. 
@@ -166,6 +167,8 @@ namespace ProtoScript.Runners
 
         private Thread workerThread;
 
+        private bool terminating;
+
         public LiveRunner()
         {
             InitRunner(new Options());
@@ -176,6 +179,35 @@ namespace ProtoScript.Runners
             InitRunner(options);
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (runnerCore != null)
+                {
+                    runnerCore.FFIPropertyChangedMonitor.FFIPropertyChangedEventHandler -= FFIPropertyChanged;
+                    runnerCore.Cleanup();
+                }
+
+                terminating = true;
+
+                lock (taskQueue)
+                {
+                    taskQueue.Clear();
+                }
+
+                // waiting for thread to finish
+                if (workerThread.IsAlive)
+                {
+                    workerThread.Join();
+                }
+            }
+        }
 
         private void InitRunner(Options options)
         {
@@ -199,6 +231,8 @@ namespace ProtoScript.Runners
             staticContext = new ProtoCore.CompileTime.Context();
 
             currentSubTreeList = new Dictionary<Guid, Subtree>();
+
+            terminating = false;
         }
 
         private void InitOptions()
@@ -213,8 +247,6 @@ namespace ProtoScript.Runners
 
             coreOptions.WebRunner = false;
             coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;
-            //coreOptions.DumpByteCode = true;
-            //coreOptions.Verbose = true;
 
             // This should have been set in the consturctor
             Validity.Assert(executionOptions != null);
@@ -536,7 +568,7 @@ namespace ProtoScript.Runners
         //Secondary thread
         private void TaskExecMethod()
         {
-            while (true)
+            while (!terminating)
             {
                 Task task = null;
 
@@ -554,9 +586,7 @@ namespace ProtoScript.Runners
                 }
 
                 Thread.Sleep(50);
-
             }
-
         }
 
 
@@ -797,21 +827,12 @@ namespace ProtoScript.Runners
         /// </summary>
         /// <param name="subtree"></param>
         /// <returns></returns>
-        private List<AssociativeNode> UpdateFunctionDefinition(Subtree subtree)
+        private void UndefineFunctions(IEnumerable<AssociativeNode> functionDefintions)
         {
-            List<AssociativeNode> astNodeList = new List<AssociativeNode>();
-            foreach (var node in subtree.AstNodes)
+            foreach (var funcDef in functionDefintions)
             {
-                FunctionDefinitionNode fNode = node as FunctionDefinitionNode;
-                if (fNode != null)
-                {
-                    runnerCore.SetFunctionInactive(fNode);
-
-                    // Add the modified function    
-                    astNodeList.Add(fNode);
-                }
+                runnerCore.SetFunctionInactive(funcDef as FunctionDefinitionNode);
             }
-            return astNodeList;
         }
 
         /// <summary>
@@ -964,7 +985,16 @@ namespace ProtoScript.Runners
                             }
                         }
                     }
-                    currentSubTreeList.Remove(st.GUID);
+
+                    Subtree oldSubTree;
+                    if (currentSubTreeList.TryGetValue(st.GUID, out oldSubTree))
+                    {
+                        if (oldSubTree.AstNodes != null)
+                        {
+                            UndefineFunctions(oldSubTree.AstNodes.Where(n => n is FunctionDefinitionNode));
+                        }
+                        currentSubTreeList.Remove(st.GUID);
+                    }
                 }
                 
             }
@@ -982,11 +1012,20 @@ namespace ProtoScript.Runners
                         }
                         deltaAstList.AddRange(st.AstNodes);
 
-                        UpdateFunctionDefinition(st);
+                        UndefineFunctions(st.AstNodes.Where(n => n is FunctionDefinitionNode));
+                    }
+
+                    Subtree oldSubTree;
+                    if (currentSubTreeList.TryGetValue(st.GUID, out oldSubTree))
+                    {
+                        if (oldSubTree.AstNodes != null)
+                        {
+                            UndefineFunctions(oldSubTree.AstNodes.Where(n => n is FunctionDefinitionNode));
+                        }
+                        currentSubTreeList[st.GUID] = st;
                     }
                 }
             }
-
 
             if (syncData.AddedSubtrees != null)
             {
@@ -1215,8 +1254,6 @@ namespace ProtoScript.Runners
 
                 coreOptions.WebRunner = false;
                 coreOptions.ExecutionMode = ProtoCore.ExecutionMode.Serial;
-                //coreOptions.DumpByteCode = true;
-                //coreOptions.Verbose = true;
 
                 // This should have been set in the consturctor
                 Validity.Assert(executionOptions != null);

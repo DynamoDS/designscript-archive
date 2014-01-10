@@ -129,7 +129,7 @@ namespace Autodesk.DesignScript.Geometry
             if (hostXCurves == null || hostXCurves.Length < 2)
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "cross sections"), "crossSections");
 
-            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoftCrossSectionsPath(hostXCurves, path.CurveEntity);
+            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoft(hostXCurves, path.CurveEntity);
             if (entity == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.LoftFromCrossSectionsPath"));
             return entity;
@@ -147,7 +147,7 @@ namespace Autodesk.DesignScript.Geometry
             if (hostGuides == null || hostGuides.Length < 1)
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "guides"), "guides");
 
-            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoftCrossSectionsGuides(hostXCurves, hostGuides);
+            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoft(hostXCurves, hostGuides);
             if (entity == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.LoftFromCrossSectionsGuides"));
             return entity;
@@ -161,7 +161,7 @@ namespace Autodesk.DesignScript.Geometry
             if (hostXCurves == null || hostXCurves.Length < 2)
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "cross sections"), "crossSections");
 
-            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoftCrossSections(hostXCurves);
+            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoft(hostXCurves);
             if (entity == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.LoftFromCrossSections"));
             return entity;

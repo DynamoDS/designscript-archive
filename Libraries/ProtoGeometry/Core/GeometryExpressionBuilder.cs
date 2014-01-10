@@ -21,7 +21,7 @@ namespace Autodesk.DesignScript.Geometry
             mWriters.Add(typeof(ILineEntity), WriteEntity<ILineEntity>);
             mWriters.Add(typeof(ICircleEntity), WriteEntity<ICircleEntity>);
             mWriters.Add(typeof(IArcEntity), WriteEntity<IArcEntity>);
-            mWriters.Add(typeof(IBSplineCurveEntity), WriteEntity<IBSplineCurveEntity>);
+            mWriters.Add(typeof(INurbsCurveEntity), WriteEntity<INurbsCurveEntity>);
             mWriters.Add(typeof(ISurfaceEntity), WriteEntity<ISurfaceEntity>);
             mWriters.Add(typeof(ISolidEntity), WriteEntity<ISolidEntity>);
         }
@@ -46,7 +46,7 @@ namespace Autodesk.DesignScript.Geometry
             return paramName;
         }
 
-        public string WriteEntity(IVector vector, string paramName = null)
+        public string WriteEntity(IVectorEntity vector, string paramName = null)
         {
             if (string.IsNullOrEmpty(paramName))
                 paramName = string.Format("__vec_{0}", ++id);
@@ -107,7 +107,7 @@ namespace Autodesk.DesignScript.Geometry
             return paramName;
         }
 
-        public string WriteEntity(IBSplineCurveEntity bspline, string paramName = null)
+        public string WriteEntity(INurbsCurveEntity bspline, string paramName = null)
         {
             if (string.IsNullOrEmpty(paramName))
                 paramName = string.Format("__bspline_{0}", ++id);
@@ -115,7 +115,7 @@ namespace Autodesk.DesignScript.Geometry
             IPointEntity[] points = bspline.GetControlVertices();
             string cp = WriteEntities(points);
 
-            mExpression.AppendFormat("{0} = BSplineCurve.ByControlVertices({1}, {2}, {3});", paramName, cp, bspline.GetDegree(), bspline.GetIsPeriodic());
+            mExpression.AppendFormat("{0} = BSplineCurve.ByControlVertices({1}, {2}, {3});", paramName, cp, bspline.Degree, bspline.IsPeriodic);
             mExpression.AppendLine();
             return paramName;
         }

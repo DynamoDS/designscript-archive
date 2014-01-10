@@ -76,7 +76,7 @@ namespace Autodesk.DesignScript.Geometry
             if (!profile.IsClosed || profile.IsSelfIntersecting)
                 throw new System.ArgumentException(string.Format(Properties.Resources.CurveNotClosed), "profile");
 
-            ISurfaceEntity entity = HostFactory.Factory.SurfacePatchFromCurve(profile.CurveEntity);
+            ISurfaceEntity entity = HostFactory.Factory.SurfaceByPatch(profile.CurveEntity);
             if (entity == null)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.CreateFromCurve"));
             return entity;

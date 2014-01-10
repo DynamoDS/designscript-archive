@@ -465,7 +465,7 @@ namespace Autodesk.DesignScript.Geometry
             }
             normal = normal.IsNormalized ? normal : normal.Normalize();
             var entity = HostFactory.Factory.ArcByCenterPointStartPointSweepAngle(centerPoint.PointEntity,
-                            startPoint.PointEntity, GeometryExtension.DegreesToRadians(sweepAngle), normal.IVector);
+                            startPoint.PointEntity, GeometryExtension.DegreesToRadians(sweepAngle), normal.VectorEntity);
             if (null == entity)
                 throw new Exception(string.Format(Properties.Resources.OperationFailed, "Arc.ByCenterPointStartPointSweepAngle"));
             return entity;
@@ -490,7 +490,7 @@ namespace Autodesk.DesignScript.Geometry
             }
             normal = normal.IsNormalized ? normal : normal.Normalize();
             var endAngle = (startAngle + sweepAngle);
-            IArcEntity entity = HostFactory.Factory.ArcByCenterPointRadiusAngle(centerPoint.PointEntity, radius, GeometryExtension.DegreesToRadians(startAngle), GeometryExtension.DegreesToRadians(endAngle), normal.IVector);
+            IArcEntity entity = HostFactory.Factory.ArcByCenterPointRadiusAngle(centerPoint.PointEntity, radius, GeometryExtension.DegreesToRadians(startAngle), GeometryExtension.DegreesToRadians(endAngle), normal.VectorEntity);
             if (null == entity)
                 throw new Exception(string.Format(Properties.Resources.OperationFailed, "Arc.ByCenterPointRadiusAngle"));
             return entity;
