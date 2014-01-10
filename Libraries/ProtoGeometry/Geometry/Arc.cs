@@ -432,7 +432,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new ArgumentException(string.Format(Properties.Resources.PointsColinear, "first, second and thrid points"), "firstPoint, secondPoint, thridPoint");
             }
 
-            IArcEntity entity = HostFactory.Factory.ArcByPointsOnCurve(firstPoint.PointEntity, secondPoint.PointEntity, thirdPoint.PointEntity);
+            IArcEntity entity = HostFactory.Factory.ArcByThreePoints(firstPoint.PointEntity, secondPoint.PointEntity, thirdPoint.PointEntity);
             if (null == entity)
                 throw new Exception(string.Format(Properties.Resources.OperationFailed, "Arc.ByPointsOnCurve"));
             return entity;
@@ -518,7 +518,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new ArgumentException(string.Format(Properties.Resources.EqualGeometry, "start point", "center point"), "startPoint, centerPoint");
             }
 
-            var arcEntity = HostFactory.Factory.ArcByCenterPointStartPointSweepPoint(centerPoint.PointEntity, startPoint.PointEntity, sweepPoint.PointEntity);
+            var arcEntity = HostFactory.Factory.ArcByCenterPointStartPointEndPoint(centerPoint.PointEntity, startPoint.PointEntity, sweepPoint.PointEntity);
             if (null == arcEntity)
                 throw new Exception(string.Format(Properties.Resources.OperationFailed, "Arc.ByCenterPointStartPointSweepPoint"));
             return arcEntity;
