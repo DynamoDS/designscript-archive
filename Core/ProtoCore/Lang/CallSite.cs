@@ -1700,13 +1700,5 @@ namespace ProtoCore
     }
 
 
-    public class MethodResolutionException : Exception
-    {
-        public string MethodNotFound { get; private set; }
 
-        public MethodResolutionException(string methodNotFound)
-        {
-            MethodNotFound = methodNotFound;
-        }
-    }
 }
