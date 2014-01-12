@@ -5,6 +5,7 @@ using System.Linq;
 using ProtoCore.DSASM;
 using ProtoCore.DSASM.Mirror;
 using ProtoCore.Lang;
+using ProtoCore.Utils;
 
 namespace ProtoScript.Runners
 {
@@ -523,7 +524,7 @@ namespace ProtoScript.Runners
 
                             if (di.Location.StartInclusive.LineNo != lastLineMarker)
                             {
-                                System.Diagnostics.Debug.Assert(di.Location.StartInclusive.LineNo > lastLineMarker);
+                                Validity.Assert(di.Location.StartInclusive.LineNo > lastLineMarker);
                                 lastDiList = new Dictionary<DebugInfo, Instruction>();
                                 lastDiList.Add(di, instrStream.instrList[i]);
                                 ret.Add(lastDiList);

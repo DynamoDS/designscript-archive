@@ -120,8 +120,8 @@ namespace ProtoCore
 
         public void SetClassTable(ProtoCore.DSASM.ClassTable table)
         {
-            Debug.Assert(null != table);
-            Debug.Assert(0 == table.ClassNodes.Count);
+            Validity.Assert(null != table);
+            Validity.Assert(0 == table.ClassNodes.Count);
 
             if (0 != table.ClassNodes.Count)
             {
@@ -153,7 +153,7 @@ namespace ProtoCore
 
         public void SetTypeSystem()
         {
-            Debug.Assert(null == classTable);
+            Validity.Assert(null == classTable);
             if (null != classTable)
             {
                 return;
@@ -274,8 +274,8 @@ namespace ProtoCore
         public bool IsHigherRank(int t1, int t2)
         {
             // TODO Jun: Refactor this when we implement operator overloading
-            Debug.Assert(null != classTable);
-            Debug.Assert(null != classTable.ClassNodes);
+            Validity.Assert(null != classTable);
+            Validity.Assert(null != classTable.ClassNodes);
             if (t1 == (int)PrimitiveType.kInvalidType || t1 >= classTable.ClassNodes.Count)
             {
                 return true;
@@ -312,7 +312,7 @@ namespace ProtoCore
 
         public string GetType(int UID)
         {
-            Debug.Assert(null != classTable);
+            Validity.Assert(null != classTable);
             return classTable.GetTypeName(UID);
         }
 
@@ -324,7 +324,7 @@ namespace ProtoCore
 
         public int GetType(string ident)
         {
-            Debug.Assert(null != classTable);
+            Validity.Assert(null != classTable);
             return classTable.IndexOf(ident);
         }
 
