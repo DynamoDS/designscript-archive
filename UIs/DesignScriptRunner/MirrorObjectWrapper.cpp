@@ -187,6 +187,18 @@ std::vector<DesignScriptMethod*>* ClassMirrorWrapper::getMethods() const
     return methodList;
 }
 
+ std::vector<DesignScriptMethod*>* ClassMirrorWrapper::getOverloads(const wchar_t* methodName) const
+ {
+    List<MethodMirror^>^ methodMirrors = wrapper()->GetOverloads(WcharToString(methodName));
+    std::vector<DesignScriptMethod*>* methodList = new std::vector<DesignScriptMethod*>();
+
+    for(int i=0; i < methodMirrors->Count; ++i)
+    {
+        methodList->push_back(new MethodMirrorWrapper(methodMirrors[i]));
+    }
+    return methodList;
+ }
+
 ///////////////////////////////////////////////////
 //
 // MethodMirrorWrapper implementation
@@ -202,6 +214,11 @@ const wchar_t* MethodMirrorWrapper::name() const
 {
     String^ name = wrapper()->MethodName;
     return StringToWchar(name);
+}
+
+bool MethodMirrorWrapper::isConstructor() const
+{
+    return wrapper()->IsConstructor;
 }
 
 std::vector<const wchar_t*> MethodMirrorWrapper::getArgumentNames() const

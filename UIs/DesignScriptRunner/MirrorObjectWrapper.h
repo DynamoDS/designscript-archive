@@ -57,7 +57,7 @@ public:
     virtual DesignScriptClass* parent() const;
     virtual std::vector<DesignScriptMethod*>* getConstructors() const;
     virtual std::vector<DesignScriptMethod*>* getMethods() const;
-
+    virtual std::vector<DesignScriptMethod*>* getOverloads(const wchar_t* methodName) const;
 };
 
 class MethodMirrorWrapper : public WrapperObject<MethodMirror, DesignScriptMethod>
@@ -67,6 +67,7 @@ public:
     virtual ~MethodMirrorWrapper() {}
 
     virtual const wchar_t* name() const;
+    virtual bool isConstructor() const;
     virtual std::vector<const wchar_t*> getArgumentNames() const;
     virtual std::vector<DesignScriptClass*> getArgumentTypes(ProtoCore::Core^ core) const;
     
