@@ -23,8 +23,8 @@ namespace ProtoCore
 
         public CallSite(int classScope, string methodName, FunctionTable globalFunctionTable, ExecutionMode execMode)
         {
-            Debug.Assert(methodName != null);
-            Debug.Assert(globalFunctionTable != null);
+            Validity.Assert(methodName != null);
+            Validity.Assert(globalFunctionTable != null);
 
             executionMode = execMode;
             this.classScope = classScope;
@@ -1700,13 +1700,5 @@ namespace ProtoCore
     }
 
 
-    public class MethodResolutionException : Exception
-    {
-        public string MethodNotFound { get; private set; }
 
-        public MethodResolutionException(string methodNotFound)
-        {
-            MethodNotFound = methodNotFound;
-        }
-    }
 }

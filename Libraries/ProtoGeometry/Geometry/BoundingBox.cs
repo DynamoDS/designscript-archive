@@ -79,19 +79,19 @@ namespace Autodesk.DesignScript.Geometry
 
         public static BoundingBox ByGeometry( Geometry[] geoms )
         {
-            var bbox = HostFactory.Factory.BoundingBoxByGeometries(geoms.Select(x => x.GeomEntity).ToArray());
+            var bbox = HostFactory.Factory.BoundingBoxByGeometry(geoms.Select(x => x.GeomEntity).ToArray());
             return new BoundingBox(bbox);
         }
 
         public static BoundingBox ByGeometryAndCoordinateSystem( Geometry geom, CoordinateSystem orientation )
         {
-            var bbox = HostFactory.Factory.BoundingBoxByGeometry(geom.GeomEntity, orientation.CSEntity);
+            var bbox = HostFactory.Factory.BoundingBoxByGeometryCoordinateSystem(geom.GeomEntity, orientation.CSEntity);
             return new BoundingBox(bbox);
         }
 
         public static BoundingBox ByGeometryAndCoordinateSystem( Geometry[] geoms, CoordinateSystem orientation )
         {
-            var bbox = HostFactory.Factory.BoundingBoxByGeometries(geoms.Select(x => x.GeomEntity).ToArray(), orientation.CSEntity );
+            var bbox = HostFactory.Factory.BoundingBoxByGeometryCoordinateSystem(geoms.Select(x => x.GeomEntity).ToArray(), orientation.CSEntity);
             return new BoundingBox(bbox);
         }
 

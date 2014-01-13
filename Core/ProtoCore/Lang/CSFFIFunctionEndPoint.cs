@@ -65,7 +65,7 @@ namespace ProtoCore.Lang
         //    if (ProtoCore.DSASM.Constants.kInvalidIndex != ActivationRecord.JILRecord.classIndex)
         //    {
         //        DSASM.ClassTable classtable = core.executable.classTable;
-        //        Debug.Assert(null != classtable);
+        //        Validity.Assert(null != classtable);
         //        int members = classtable.list[ActivationRecord.JILRecord.classIndex].symbols.symbolList.Count;
         //        for (int n = 0; n < members; ++n)
         //        {
@@ -126,7 +126,7 @@ namespace ProtoCore.Lang
             if (ProtoCore.DSASM.Constants.kInvalidIndex != ActivationRecord.JILRecord.classIndex)
             {
                 DSASM.ClassTable classtable = core.DSExecutable.classTable;
-                Debug.Assert(null != classtable);
+                Validity.Assert(null != classtable);
                 int members = classtable.list[ActivationRecord.JILRecord.classIndex].symbols.symbolList.Count;
                 for (int n = 0; n < members; ++n)
                 {

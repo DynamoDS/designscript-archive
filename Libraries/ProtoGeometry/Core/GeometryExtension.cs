@@ -548,7 +548,7 @@ namespace Autodesk.DesignScript.Geometry
                 {
                     using (ILineEntity path = HostFactory.Factory.LineByStartPointEndPoint(startPt, endPt))
                     {
-                        using (ISurfaceEntity surf = HostFactory.Factory.SurfaceBySweep1Rail(path, profile))
+                        using (ISurfaceEntity surf = HostFactory.Factory.SurfaceBySweep(path, profile))
                         {
                             return surf.ToNurbsSurface();
                         }

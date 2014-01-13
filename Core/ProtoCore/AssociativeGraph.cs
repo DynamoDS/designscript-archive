@@ -243,7 +243,7 @@ namespace ProtoCore.AssociativeGraph
 
         public bool PushDependent(GraphNode dependent)
         {
-            Debug.Assert(null != dependentList);
+            Validity.Assert(null != dependentList);
 
             if (allowDependents)
             {
@@ -282,8 +282,8 @@ namespace ProtoCore.AssociativeGraph
 
         public void PushSymbolReference(ProtoCore.DSASM.SymbolNode symbol, ProtoCore.AssociativeGraph.UpdateNodeType type = UpdateNodeType.kSymbol)
         {
-            Debug.Assert(null != symbol);
-            Debug.Assert(null != updateNodeRefList);
+            Validity.Assert(null != symbol);
+            Validity.Assert(null != updateNodeRefList);
             UpdateNode updateNode = new UpdateNode();
             updateNode.symbol = symbol;
             updateNode.nodeType = type;
@@ -296,8 +296,8 @@ namespace ProtoCore.AssociativeGraph
 
         public void PushSymbolReference(ProtoCore.DSASM.SymbolNode symbol)
         {
-            Debug.Assert(null != symbol);
-            Debug.Assert(null != updateNodeRefList);
+            Validity.Assert(null != symbol);
+            Validity.Assert(null != updateNodeRefList);
             UpdateNode updateNode = new UpdateNode();
             updateNode.symbol = symbol;
             updateNode.nodeType = UpdateNodeType.kSymbol;
@@ -311,8 +311,8 @@ namespace ProtoCore.AssociativeGraph
 
         public void PushProcReference(ProtoCore.DSASM.ProcedureNode proc)
         {
-            Debug.Assert(null != proc);
-            Debug.Assert(null != updateNodeRefList);
+            Validity.Assert(null != proc);
+            Validity.Assert(null != updateNodeRefList);
             UpdateNode updateNode = new UpdateNode();
             updateNode.procNode = proc;
             updateNode.nodeType = UpdateNodeType.kMethod;

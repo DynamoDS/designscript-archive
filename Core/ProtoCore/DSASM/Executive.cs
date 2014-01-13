@@ -95,7 +95,7 @@ namespace ProtoCore.DSASM
         public Executive(Core core, bool isFep = false)
         {
             isExplicitCall = false;
-            Debug.Assert(core != null);
+            Validity.Assert(core != null);
             this.core = core;
             enableLogging = core.Options.Verbose;
 
@@ -288,8 +288,8 @@ namespace ProtoCore.DSASM
             }
 
             istream = exe.instrStreamList[exeblock];
-            Debug.Assert(null != istream);
-            Debug.Assert(null != istream.instrList);
+            Validity.Assert(null != istream);
+            Validity.Assert(null != istream.instrList);
 
             pc = (int)rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexReturnAddress).opdata;
         }
@@ -325,9 +325,9 @@ namespace ProtoCore.DSASM
             executingBlock = exeblock;
 
             istream = exe.instrStreamList[exeblock];
-            Debug.Assert(null != istream);
+            Validity.Assert(null != istream);
 
-            Debug.Assert(null != istream.instrList);
+            Validity.Assert(null != istream.instrList);
 
             if (!fepRun)
             {
@@ -382,7 +382,7 @@ namespace ProtoCore.DSASM
                 pc = entry;
             }
 
-            Debug.Assert(null != rmem);
+            Validity.Assert(null != rmem);
             rmem.Executable = exe;
             rmem.ClassTable = exe.classTable;
         }
@@ -412,8 +412,8 @@ namespace ProtoCore.DSASM
 
 
             istream = exe.instrStreamList[exeblock];
-            Debug.Assert(null != istream);
-            Debug.Assert(null != istream.instrList);
+            Validity.Assert(null != istream);
+            Validity.Assert(null != istream.instrList);
 
             pc = entry;
 
@@ -1506,7 +1506,7 @@ namespace ProtoCore.DSASM
 
         private bool IsExecutedTooManyTimes(ProtoCore.AssociativeGraph.GraphNode node, int limit)
         {
-            Debug.Assert(null != node);
+            Validity.Assert(null != node);
             if (node.counter > limit)
             {
 
@@ -2909,18 +2909,18 @@ namespace ProtoCore.DSASM
             // exe need to be assigned at the constructor, 
             // for function call with replication, gc is triggered to handle the parameter and return value at FunctionEndPoint
             // gc requirs exe to be not null but at that point, Execute has not been called
-            //Debug.Assert(exe == null);
+            //Validity.Assert(exe == null);
             exe = core.DSExecutable;
             executingBlock = exeblock;
 
             core.DebugProps.CurrentBlockId = exeblock;
 
             istream = exe.instrStreamList[exeblock];
-            Debug.Assert(null != istream);
+            Validity.Assert(null != istream);
             core.DebugProps.DebugEntryPC = entry;
 
             List<Instruction> instructions = istream.instrList;
-            Debug.Assert(null != instructions);
+            Validity.Assert(null != instructions);
 
             // Restore the previous state
             rmem = core.Rmem;
@@ -2991,7 +2991,7 @@ namespace ProtoCore.DSASM
                 }
             }
 
-            Debug.Assert(null != rmem);
+            Validity.Assert(null != rmem);
             rmem.Executable = exe;
             rmem.ClassTable = exe.classTable;
         }
@@ -3023,7 +3023,7 @@ namespace ProtoCore.DSASM
                 }
                 else
                 {
-                    Debug.Assert(breakpoints.Contains(runningInstructions[currentPC]));
+                    Validity.Assert(breakpoints.Contains(runningInstructions[currentPC]));
                     core.ReasonForExecutionSuspend = ReasonForExecutionSuspend.Breakpoint;
                     logVMMessage("Breakpoint at: " + runningInstructions[currentPC]);
 
@@ -3698,7 +3698,7 @@ namespace ProtoCore.DSASM
             {
                 case AddressType.VarIndex:
                 case AddressType.MemVarIndex:
-                    Debug.Assert(false);
+                    Validity.Assert(false);
                     rmem.SetStackData(0, (int)opdest.opdata, -1, stackdata);
 
                     if (IsDebugRun())
@@ -5911,7 +5911,7 @@ namespace ProtoCore.DSASM
                 if (listInfo[n].Sv.optype == AddressType.StaticMemVarIndex)
                 {
                     StackValue block = rmem.Pop();
-                    Debug.Assert(block.optype == AddressType.BlockIndex);
+                    Validity.Assert(block.optype == AddressType.BlockIndex);
                     listInfo[n].BlockId = (int)block.opdata;
                 }
                 int dim = (int)rmem.Pop().opdata;
@@ -6080,7 +6080,7 @@ namespace ProtoCore.DSASM
             //    int dimensions = (int)svDim.opdata;
             //    for (int i = 0; i < dimensions; ++i)
             //    {
-            //        Debug.Assert(false, "To implement: Indexing into function calls.");
+            //        Validity.Assert(false, "To implement: Indexing into function calls.");
             //    }
             //}
 
@@ -7029,7 +7029,7 @@ namespace ProtoCore.DSASM
                 svThisPointer = rmem.GetAtRelative(ProtoCore.DSASM.StackFrame.kFrameIndexThisPtr);
                 // how many instruction offset? basically it should be 1 to skip ALLOCC
                 pcoffset = (int)instruction.op3.opdata;
-                // Debug.Assert(pcoffset == 1);
+                // Validity.Assert(pcoffset == 1);
 
                 // To simulate CALLR. We have to retrive the param values from the
                 // stack and reverse these values and save back to the stack. Otherwise
