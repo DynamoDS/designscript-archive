@@ -22,6 +22,8 @@ public:
     virtual const wchar_t* getCoreDumpCmdLineREPL();
     virtual void reInitializeLiveRunner();
     virtual GraphNode* buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString);
+    virtual GraphNode* buildArrayNode(const std::vector<const wchar_t*>& arrayInputs);
+
     virtual void getFunctionArgs(DesignScriptMethod* methodMirror, std::vector<const wchar_t*>& argNames, std::vector<DesignScriptClass*>& argTypes);
 
     virtual std::vector<DesignScriptObject*>* resetAndImportLibrary(const std::vector<const wchar_t*>& libraries);
@@ -36,6 +38,7 @@ class GraphNodeWrapper : public WrapperObject<AssociativeNode, GraphNode>
 {
 public:
     GraphNodeWrapper(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString, ProtoCore::Core^ core);
+    GraphNodeWrapper(const std::vector<const wchar_t*>& arrayInputs);
 
     virtual ~GraphNodeWrapper();
     virtual const wchar_t* getNodeName() const;

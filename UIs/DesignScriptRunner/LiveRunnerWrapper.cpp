@@ -122,6 +122,11 @@ GraphNode* LiveRunnerWrapper::buildAst(const wchar_t* type, void* hostInstancePt
     return gNode;
 }
 
+GraphNode* LiveRunnerWrapper::buildArrayNode(const std::vector<const wchar_t*>& arrayInputs)
+{
+    return new GraphNodeWrapper(arrayInputs);
+}
+
 void LiveRunnerWrapper::getFunctionArgs(DesignScriptMethod* methodMirror, std::vector<const wchar_t*>& argNames, std::vector<DesignScriptClass*>& argTypes)
 {
     MethodMirrorWrapper* mWrapper = dynamic_cast<MethodMirrorWrapper*>(methodMirror);
@@ -158,6 +163,30 @@ GraphNodeWrapper::GraphNodeWrapper(const wchar_t* type, void* hostInstancePtr, c
     }
 
     AssociativeNode^ pAssocNode = ProtoCore::ASTCompilerUtils::BuildAST(WcharToString(type), (long int)hostInstancePtr, WcharToString(methodName), selectionList, inputList, WcharToString(formatString), core, symbolName, code);
+
+    this->setWrapper(pAssocNode);
+    if(symbolName != nullptr)
+        m_symbolName = StringToWchar(symbolName);
+    else
+        m_symbolName = NULL;
+
+    if(code != nullptr)
+        m_code = StringToWchar(code);
+    else
+        m_code = NULL;
+}
+
+GraphNodeWrapper::GraphNodeWrapper(const std::vector<const wchar_t*>& arrayInputs)
+{
+    List<System::String^>^ inputList = gcnew List<System::String^>();
+    for(std::vector<const wchar_t*>::const_iterator it = arrayInputs.begin(); it != arrayInputs.end(); ++it)    
+    {
+        inputList->Add(WcharToString(*it));
+    }
+
+    System::String^ symbolName = nullptr;
+    System::String^ code = nullptr;
+    AssociativeNode^ pAssocNode = ProtoCore::ASTCompilerUtils::BuildArrayNode(inputList, symbolName, code);
 
     this->setWrapper(pAssocNode);
     if(symbolName != nullptr)
