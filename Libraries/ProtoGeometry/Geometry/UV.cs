@@ -11,29 +11,28 @@ namespace Autodesk.DesignScript.Geometry
     /// </summary>
     public class UV
     {
-        private UV(double u, double v)
+        private IUVEntity _uvEntity;
+
+        private UV( IUVEntity uvEntity )
         {
-            this._u = u;
-            this._v = v;
+            this._uvEntity = uvEntity;
         }
 
         #region Public properties
 
-        private double _u = 0;
         public double U
         {
             get
             {
-                return _u;
+                return _uvEntity.U;
             }
         }
 
-        private double _v = 0;
         public double V
         {
             get
             {
-                return _v;
+                return _uvEntity.V;
             }
         }
 
@@ -43,7 +42,7 @@ namespace Autodesk.DesignScript.Geometry
 
         public static UV ByCoordinates(double u, double v)
         {
-            return new UV(u,v);
+            return new UV(HostFactory.Factory.UVByCoordinates(u, v));
         }
 
         #endregion

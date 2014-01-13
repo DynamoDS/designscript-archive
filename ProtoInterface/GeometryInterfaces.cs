@@ -413,8 +413,6 @@ namespace Autodesk.DesignScript.Interfaces
 
         ICurveEntity[] ApproximateWithArcAndLineSegments();
 
-        IGeometryEntity[] Project(IGeometryEntity otherGeom, IVectorEntity vec);
-
         /// <summary>
         /// Converts the Curve to a NurbsCurve, if needs be
         /// </summary>
@@ -1077,7 +1075,7 @@ namespace Autodesk.DesignScript.Interfaces
         int GetAdjacentFaceCount();
     }
 
-    public interface IIndexGroup
+    public interface IIndexGroupEntity
     {
         /// <summary>
         /// Either 3 or 4, depending if it represents a triangle or a quad

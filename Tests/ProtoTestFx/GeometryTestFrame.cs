@@ -90,8 +90,8 @@ namespace ProtoTestFx
 
             core = new ProtoCore.Core(options);
             core.Configurations.Add(ConfigurationKeys.GeometryXmlProperties, true);
-            core.Configurations.Add(ConfigurationKeys.GeometryFactory, geometryFactory);
-            core.Configurations.Add(ConfigurationKeys.PersistentManager, persistentManager);
+            //core.Configurations.Add(ConfigurationKeys.GeometryFactory, geometryFactory);
+            //core.Configurations.Add(ConfigurationKeys.PersistentManager, persistentManager);
 
             // By specifying this option we inject a mock Executive ('InjectionExecutive')
             // that prints stackvalues at every assignment statement
@@ -477,7 +477,7 @@ namespace ProtoTestFx
         public static Core RunAndGenerateBase(string scriptDir, string scriptFile, string outputDir)
         {
             GeometryTestFrame.ScriptDir = outputDir;
-            return GeometryTestFrame.RunAndGenerateBase(Path.Combine(scriptDir, Path.GetFileName(scriptFile)), outputDir, "ProtoAcadGeometry.dll", "ProtoAcadGeometry.dll");
+            return GeometryTestFrame.RunAndGenerateBase(Path.Combine(scriptDir, Path.GetFileName(scriptFile)), outputDir, "ComputationGeometry.dll", "");
         }
     }
 }

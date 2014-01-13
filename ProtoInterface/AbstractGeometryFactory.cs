@@ -428,7 +428,7 @@ namespace Autodesk.DesignScript.Geometry
             throw new NotImplementedException();
         }
 
-        public virtual IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroup[] indices)
+        public virtual IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroupEntity[] indices)
         {
             throw new NotImplementedException();
         }
@@ -449,6 +449,17 @@ namespace Autodesk.DesignScript.Geometry
         }
 
         public virtual IGeometrySettings GetSettings()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public IIndexGroupEntity IndexGroupByIndices(int a, int b, int c, int d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IIndexGroupEntity IndexGroupByIndices(int a, int b, int c)
         {
             throw new NotImplementedException();
         }
