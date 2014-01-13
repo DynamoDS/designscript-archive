@@ -72,6 +72,19 @@ namespace ProtoCore
             return CoreUtils.GenerateCallDotNode(inode, fNode, core);
         }
 
+        /// <summary>
+        /// API used by external host to build AST for any function call
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="hostInstancePtr"></param>
+        /// <param name="functionName"></param>
+        /// <param name="userDefinedArgs"></param>
+        /// <param name="primitiveArgs"></param>
+        /// <param name="formatString"></param>
+        /// <param name="core"></param>
+        /// <param name="symbolName"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public static AssociativeNode BuildAST(string type, long hostInstancePtr, string functionName, List<IntPtr> userDefinedArgs, List<string> primitiveArgs, string formatString, ProtoCore.Core core, ref string symbolName, ref string code)
         {
             symbolName = string.Empty;
@@ -122,6 +135,31 @@ namespace ProtoCore
             code = codeGen.GenerateCode();
 
             return codeBlockNode;
+        }
+
+        /// <summary>
+        /// API for external hosts to build an identifier array assignment node, e.g.: var = {var1, var2, ...}
+        /// </summary>
+        /// <param name="arrayInputs"></param>
+        /// <param name="symbolName"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static AssociativeNode BuildArrayNode(List<string> arrayInputs, ref string symbolName, ref string code)
+        {
+            ExprListNode arrayNode = AstFactory.BuildExprList(arrayInputs);
+            BinaryExpressionNode bNode = CreateAssignmentNode(arrayNode);
+
+            if (bNode.LeftNode is IdentifierNode)
+            {
+                symbolName = (bNode.LeftNode as IdentifierNode).Value;
+            }
+
+            List<AssociativeNode> astNodes = new List<AssociativeNode>();
+            astNodes.Add(bNode);
+            ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(astNodes);
+            code = codeGen.GenerateCode();
+
+            return bNode;
         }
     }
 
