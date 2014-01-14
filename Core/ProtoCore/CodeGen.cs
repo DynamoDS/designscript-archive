@@ -100,7 +100,7 @@ namespace ProtoCore
 
         public CodeGen(Core coreObj, ProtoCore.DSASM.CodeBlock parentBlock = null)
         {
-            Debug.Assert(coreObj != null);
+            Validity.Assert(coreObj != null);
             core = coreObj;
             buildStatus = core.BuildStatus;
             isEntrySet = false;
@@ -180,7 +180,7 @@ namespace ProtoCore
             }
             else
             {
-                Debug.Assert(false);
+                Validity.Assert(false);
             }
             return optype;
         }
@@ -830,7 +830,7 @@ namespace ProtoCore
                     else
                     {
                         isAllocated = VerifyAllocation(identnode.Value, contextClassScope, globalProcIndex, out symbolnode, out isAccessible);
-                        Debug.Assert(null == firstSymbol);
+                        Validity.Assert(null == firstSymbol);
                         firstSymbol = symbolnode;
                     }
 
@@ -1094,7 +1094,7 @@ namespace ProtoCore
         protected int DfsEmitArrayIndexHeap(Node node, AssociativeGraph.GraphNode graphNode = null, ProtoCore.AST.Node parentNode = null, ProtoCore.DSASM.AssociativeSubCompilePass subPass = ProtoCore.DSASM.AssociativeSubCompilePass.kNone)
         {
             int indexCnt = 0;
-            Debug.Assert(node is ProtoCore.AST.AssociativeAST.ArrayNode || node is ProtoCore.AST.ImperativeAST.ArrayNode);
+            Validity.Assert(node is ProtoCore.AST.AssociativeAST.ArrayNode || node is ProtoCore.AST.ImperativeAST.ArrayNode);
 
             IsAssociativeArrayIndexing = true;
 
@@ -1399,13 +1399,13 @@ namespace ProtoCore
             if (ProtoCore.DSASM.OpCode.JMP == codeBlock.instrStream.instrList[bp].opCode
                 && ProtoCore.DSASM.AddressType.LabelIndex == codeBlock.instrStream.instrList[bp].op1.optype)
             {
-                Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == codeBlock.instrStream.instrList[bp].op1.opdata);
+                Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == codeBlock.instrStream.instrList[bp].op1.opdata);
                 codeBlock.instrStream.instrList[bp].op1.opdata = pc;
             }
             else if (ProtoCore.DSASM.OpCode.CJMP == codeBlock.instrStream.instrList[bp].opCode
                 && ProtoCore.DSASM.AddressType.LabelIndex == codeBlock.instrStream.instrList[bp].op3.optype)
             {
-                Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == codeBlock.instrStream.instrList[bp].op3.opdata);
+                Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == codeBlock.instrStream.instrList[bp].op3.opdata);
                 codeBlock.instrStream.instrList[bp].op3.opdata = pc;
             }
         }
@@ -1816,7 +1816,7 @@ namespace ProtoCore
 
 
             // For debugging, assert here but these should raise runtime errors in the VM
-            Debug.Assert(ProtoCore.DSASM.AddressType.VarIndex == op.optype
+            Validity.Assert(ProtoCore.DSASM.AddressType.VarIndex == op.optype
                 || ProtoCore.DSASM.AddressType.MemVarIndex == op.optype
                 || ProtoCore.DSASM.AddressType.Register == op.optype);
 
@@ -1831,7 +1831,7 @@ namespace ProtoCore
             int eline = ProtoCore.DSASM.Constants.kInvalidIndex, 
             int ecol = ProtoCore.DSASM.Constants.kInvalidIndex)
         {
-            Debug.Assert(symbol != null);
+            Validity.Assert(symbol != null);
             if (symbol == null)
             {
                 return;
@@ -1869,7 +1869,7 @@ namespace ProtoCore
             int eline = ProtoCore.DSASM.Constants.kInvalidIndex,
             int ecol = ProtoCore.DSASM.Constants.kInvalidIndex)
         {
-            Debug.Assert(symbol != null);
+            Validity.Assert(symbol != null);
             if (symbol == null)
             {
                 return;
@@ -2241,7 +2241,7 @@ namespace ProtoCore
             instr.op2 = op2;
 
             // For debugging, assert here but these should raise runtime errors in the VM
-            Debug.Assert(ProtoCore.DSASM.AddressType.VarIndex == op1.optype || ProtoCore.DSASM.AddressType.Register == op1.optype);
+            Validity.Assert(ProtoCore.DSASM.AddressType.VarIndex == op1.optype || ProtoCore.DSASM.AddressType.Register == op1.optype);
 
             ++pc;
             instr.debug = GetDebugObject(line, col, eline, ecol, pc);
@@ -2257,7 +2257,7 @@ namespace ProtoCore
             instr.op1 = op1;
 
             // For debugging, assert here but these should raise runtime errors in the VM
-            Debug.Assert(ProtoCore.DSASM.AddressType.VarIndex == op1.optype || ProtoCore.DSASM.AddressType.Register == op1.optype);
+            Validity.Assert(ProtoCore.DSASM.AddressType.VarIndex == op1.optype || ProtoCore.DSASM.AddressType.Register == op1.optype);
 
             ++pc;
             instr.debug = GetDebugObject(line, col, eline, ecol, pc);
@@ -2605,7 +2605,7 @@ namespace ProtoCore
                 for (int n = 0; n < replicationGuides; ++n)
                 {
                     ProtoCore.DSASM.StackValue opguide = new ProtoCore.DSASM.StackValue();
-                    Debug.Assert(replicationGuidesList[n] is ProtoCore.AST.AssociativeAST.IdentifierNode);
+                    Validity.Assert(replicationGuidesList[n] is ProtoCore.AST.AssociativeAST.IdentifierNode);
                     ProtoCore.AST.AssociativeAST.IdentifierNode nodeGuide = replicationGuidesList[n] as ProtoCore.AST.AssociativeAST.IdentifierNode;
 
                     EmitInstrConsole(ProtoCore.DSASM.kw.push, nodeGuide.Value);
@@ -2725,7 +2725,7 @@ namespace ProtoCore
                     }
 
                     ProtoCore.DSASM.ClassNode typeNode = core.classTable.list[inferedType.UID];
-                    Debug.Assert(null != typeNode);
+                    Validity.Assert(null != typeNode);
 
                     bool diableRankCheck = localProcedure.returntype.UID == (int)PrimitiveType.kTypeVar || localProcedure.returntype.rank == -1 || inferedType.UID == (int)PrimitiveType.kTypeVar || inferedType.rank == -1;
                     bool notMatchedRank = diableRankCheck ? false : localProcedure.returntype.rank != inferedType.rank;
@@ -3117,7 +3117,7 @@ namespace ProtoCore
             List<ProtoCore.DSASM.AttributeEntry> attributes = new List<DSASM.AttributeEntry>();
             if (attributenodes == null)
                 return attributes;
-            Debug.Assert(attributenodes is List<ProtoCore.AST.AssociativeAST.AssociativeNode> || attributenodes is List<ProtoCore.AST.ImperativeAST.ImperativeNode>);
+            Validity.Assert(attributenodes is List<ProtoCore.AST.AssociativeAST.AssociativeNode> || attributenodes is List<ProtoCore.AST.ImperativeAST.ImperativeNode>);
             foreach (dynamic anode in attributenodes)
             {
                 ProtoCore.DSASM.AttributeEntry entry = PopulateAttribute(anode);
@@ -3129,7 +3129,7 @@ namespace ProtoCore
 
         protected ProtoCore.DSASM.AttributeEntry PopulateAttribute(dynamic anode)
         {
-            Debug.Assert(anode is ProtoCore.AST.AssociativeAST.FunctionCallNode || anode is ProtoCore.AST.ImperativeAST.FunctionCallNode);
+            Validity.Assert(anode is ProtoCore.AST.AssociativeAST.FunctionCallNode || anode is ProtoCore.AST.ImperativeAST.FunctionCallNode);
             int cix = core.ClassTable.IndexOf(string.Format("{0}Attribute", anode.Function.Name));
             if (cix == ProtoCore.DSASM.Constants.kInvalidIndex)
             {

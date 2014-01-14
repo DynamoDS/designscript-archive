@@ -1806,7 +1806,7 @@ namespace ProtoCore
 
         public SymbolNode GetSymbolInFunction(string name, int classScope, int functionScope, CodeBlock codeBlock)
         {
-            Debug.Assert(functionScope != Constants.kGlobalScope);
+            Validity.Assert(functionScope != Constants.kGlobalScope);
             if (Constants.kGlobalScope == functionScope)
             {
                 return null;
@@ -1865,7 +1865,7 @@ namespace ProtoCore
             //  
             //
 
-            Debug.Assert(null != codeblock);
+            Validity.Assert(null != codeblock);
             if (null == codeblock)
             {
                 return null;
@@ -1975,7 +1975,7 @@ namespace ProtoCore
         {
             // Determine if the immediate block is a function block
             // Construct blocks are ignored
-            Debug.Assert(null != cblock);
+            Validity.Assert(null != cblock);
             while (null != cblock)
             {
                 if (ProtoCore.DSASM.CodeBlockType.kFunction == cblock.blockType)
@@ -1993,7 +1993,7 @@ namespace ProtoCore
 
         public ProcedureNode GetFirstVisibleProcedure(string name, List<Type> argTypeList, CodeBlock codeblock)
         {
-            Debug.Assert(null != codeblock);
+            Validity.Assert(null != codeblock);
             if (null == codeblock)
             {
                 return null;
@@ -2101,7 +2101,7 @@ namespace ProtoCore
                 || DSASM.CodeBlockType.kFunction == codeBlock.blockType
                 || DSASM.CodeBlockType.kConstruct == codeBlock.blockType)
             {
-                Debug.Assert(codeBlock.symbolTable.RuntimeIndex < RuntimeTableIndex);
+                Validity.Assert(codeBlock.symbolTable.RuntimeIndex < RuntimeTableIndex);
                 runtimeSymbols[codeBlock.symbolTable.RuntimeIndex] = codeBlock.symbolTable;
             }
 
@@ -2115,7 +2115,7 @@ namespace ProtoCore
         {
             if (DSASM.CodeBlockType.kLanguage == codeBlock.blockType || DSASM.CodeBlockType.kFunction == codeBlock.blockType)
             {
-                Debug.Assert(codeBlock.procedureTable.runtimeIndex < RuntimeTableIndex);
+                Validity.Assert(codeBlock.procedureTable.runtimeIndex < RuntimeTableIndex);
                 procTable[codeBlock.procedureTable.runtimeIndex] = codeBlock.procedureTable;
             }
 
@@ -2131,7 +2131,7 @@ namespace ProtoCore
             {
                 if (DSASM.CodeBlockType.kLanguage == codeBlock.blockType || DSASM.CodeBlockType.kFunction == codeBlock.blockType)
                 {
-                    Debug.Assert(codeBlock.codeBlockId < CodeBlockIndex);
+                    Validity.Assert(codeBlock.codeBlockId < CodeBlockIndex);
                     istreamList[codeBlock.codeBlockId] = codeBlock.instrStream;
                 }
 
@@ -2184,7 +2184,7 @@ namespace ProtoCore
 
         public void GenerateExecutable()
         {
-            Debug.Assert(CodeBlockList.Count >= 0);
+            Validity.Assert(CodeBlockList.Count >= 0);
 
             // Retrieve the class table directly since it is a global table
             DSExecutable.classTable = ClassTable;

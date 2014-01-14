@@ -159,7 +159,8 @@ namespace ProtoFFI
                     {
                         bool dummyClassNode = IsEmptyClassNode(classNode);
                         bool dummyImportClass = IsEmptyClassNode(importedClass);
-                        System.Diagnostics.Debug.Assert(dummyImportClass || dummyClassNode, string.Format("{0} is imported more than once!!", classNode.className));
+
+                        Validity.Assert(dummyImportClass || dummyClassNode, string.Format("{0} is imported more than once!!", classNode.className));
                         if (dummyImportClass && !dummyClassNode)
                         {
                             importedNode.CodeNode.Body.Remove(importedClass);

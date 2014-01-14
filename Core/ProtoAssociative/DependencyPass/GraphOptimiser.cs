@@ -72,7 +72,7 @@ namespace ProtoCore.AST.AssociativeAST
 				{
 					
 					//Disabled for Mono
-					//Debug.Assert(tracker.DirectContingents[tracker.DirectDependents[walkerNode]] == 1);
+					//Validity.Assert(tracker.DirectContingents[tracker.DirectDependents[walkerNode]] == 1);
 					
 					accNodeList.Add(walkerNode);
 					
@@ -80,7 +80,7 @@ namespace ProtoCore.AST.AssociativeAST
 						break;
 					
 					//Disabled for Mono
-					//Debug.Assert(tracker.DirectDependents[walkerNode].Count == 1);
+					//Validity.Assert(tracker.DirectDependents[walkerNode].Count == 1);
 					
 					walkerNode = tracker.DirectDependents[walkerNode][0];
 					

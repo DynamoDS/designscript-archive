@@ -129,9 +129,9 @@ namespace ProtoCore.DSASM
        
         public int GetDistance(string name, List<ProtoCore.Type> args, ProtoCore.DSASM.ClassTable classtable)
         {
-            Debug.Assert(null != classtable);
+            Validity.Assert(null != classtable);
             int defaultArgNum = argInfoList.Count(X => X.isDefault);
-            Debug.Assert(argTypeList.Count - args.Count <= defaultArgNum);
+            Validity.Assert(argTypeList.Count - args.Count <= defaultArgNum);
 
             int distance = (int)ProcedureDistance.kMaxDistance;
 

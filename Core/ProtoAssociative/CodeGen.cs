@@ -551,7 +551,7 @@ namespace ProtoAssociative
 
                 if (isStatic)
                 {
-                    Debug.Assert(funcIndex == ProtoCore.DSASM.Constants.kGlobalScope);
+                    Validity.Assert(funcIndex == ProtoCore.DSASM.Constants.kGlobalScope);
                     ProtoCore.DSASM.SymbolNode staticSymbolnode = new ProtoCore.DSASM.SymbolNode();
                     staticSymbolnode.name = ident;
                     staticSymbolnode.isTemp = ident.StartsWith("%");
@@ -1610,7 +1610,7 @@ namespace ProtoAssociative
 
                     if (memProcNode != null)
                     {
-                        Debug.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
+                        Validity.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
                         procCallNode = memProcNode;
                         inferedType = procCallNode.returntype;
                         type = realType;
@@ -1914,7 +1914,7 @@ namespace ProtoAssociative
 
                 if (procNode != null)
                 {
-                    Debug.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
+                    Validity.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
                     type = lefttype = realType;
 
                     if (!isAccessible)
@@ -1981,7 +1981,7 @@ namespace ProtoAssociative
 
                     if (memProcNode != null)
                     {
-                        Debug.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
+                        Validity.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
                         procNode = memProcNode;
                         inferedType = procNode.returntype;
                         type = realType;
@@ -2789,7 +2789,7 @@ namespace ProtoAssociative
         */   
         private void DFSEmitSSA_AST(AssociativeNode node, Stack<AssociativeNode> ssaStack, ref List<AssociativeNode> astlist)
         {
-            Debug.Assert(null != astlist && null != ssaStack);
+            Validity.Assert(null != astlist && null != ssaStack);
             if (node is BinaryExpressionNode)
             {
                 BinaryExpressionNode astBNode = node as BinaryExpressionNode;
@@ -3441,7 +3441,7 @@ namespace ProtoAssociative
                             // Set the unique expression id for this range of SSA nodes
                             foreach (AssociativeNode aNode in newASTList)
                             {
-                                Debug.Assert(aNode is BinaryExpressionNode);
+                                Validity.Assert(aNode is BinaryExpressionNode);
 
                                 // Set the exprID of the SSA's node
                                 BinaryExpressionNode ssaNode = aNode as BinaryExpressionNode;
@@ -3533,7 +3533,7 @@ namespace ProtoAssociative
                                         // Set the unique expression id for this range of SSA nodes
                                         foreach (AssociativeNode aNode in elementList)
                                         {
-                                            Debug.Assert(aNode is BinaryExpressionNode);
+                                            Validity.Assert(aNode is BinaryExpressionNode);
                                             BinaryExpressionNode bnode = aNode as BinaryExpressionNode;
                                             bnode.exprUID = core.ExpressionUID;
                                             bnode.modBlkUID = core.ModifierBlockUID;
@@ -3609,7 +3609,7 @@ namespace ProtoAssociative
 
         private AssociativeNode DFSEmitSplitAssign_AST(AssociativeNode node, ref List<AssociativeNode> astList)
         {
-            Debug.Assert(null != astList && null != node);
+            Validity.Assert(null != astList && null != node);
 
             if (node is BinaryExpressionNode)
             {
@@ -4138,7 +4138,7 @@ namespace ProtoAssociative
                     for (int n = 0; n < replicationGuides; ++n)
                     {
                         ProtoCore.DSASM.StackValue opguide = new ProtoCore.DSASM.StackValue();
-                        Debug.Assert(t.ReplicationGuides[n] is IdentifierNode);
+                        Validity.Assert(t.ReplicationGuides[n] is IdentifierNode);
                         IdentifierNode nodeGuide = t.ReplicationGuides[n] as IdentifierNode;
 
                         EmitInstrConsole(ProtoCore.DSASM.kw.push, nodeGuide.Value);
@@ -4334,7 +4334,7 @@ namespace ProtoAssociative
                         // TODO Jun: Refactor Allocate() to just return the symbol node itself
                         ProtoCore.DSASM.SymbolNode symnode = Allocate(globalClassIndex, globalClassIndex, globalProcIndex, t.Value, varType, ProtoCore.DSASM.Constants.kPrimitiveSize,
                             false, ProtoCore.DSASM.AccessSpecifier.kPublic, ProtoCore.DSASM.MemoryRegion.kMemStack, t.line, t.col, graphNode);
-                        Debug.Assert(symnode != null);
+                        Validity.Assert(symnode != null);
 
                         int symbolindex = symnode.symbolTableIndex;
                         if (ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex)
@@ -4685,7 +4685,7 @@ namespace ProtoAssociative
 
                 LanguageBlockNode langblock = node as LanguageBlockNode;
 
-                //Debug.Assert(ProtoCore.Language.kInvalid != langblock.codeblock.language);
+                //Validity.Assert(ProtoCore.Language.kInvalid != langblock.codeblock.language);
                 if (ProtoCore.Language.kInvalid == langblock.codeblock.language)
                     throw new BuildHaltException("Invalid language block type (D1B95A65)");
 
@@ -4728,7 +4728,7 @@ namespace ProtoAssociative
 
                 setBlkId(blockId);
                 inferedType = core.InferedType;
-                //Debug.Assert(codeBlock.children[codeBlock.children.Count - 1].blockType == ProtoCore.DSASM.CodeBlockType.kLanguage);
+                //Validity.Assert(codeBlock.children[codeBlock.children.Count - 1].blockType == ProtoCore.DSASM.CodeBlockType.kLanguage);
                 codeBlock.children[codeBlock.children.Count - 1].Attributes = PopulateAttributes(langblock.Attributes);
 
 #if ENABLE_EXCEPTION_HANDLING
@@ -4761,7 +4761,7 @@ namespace ProtoAssociative
 
                 LanguageBlockNode langblock = node as LanguageBlockNode;
 
-                //Debug.Assert(ProtoCore.Language.kInvalid != langblock.codeblock.language);
+                //Validity.Assert(ProtoCore.Language.kInvalid != langblock.codeblock.language);
                 if (ProtoCore.Language.kInvalid == langblock.codeblock.language)
                     throw new BuildHaltException("Invalid language block type (B1C57E37)");
 
@@ -4912,7 +4912,7 @@ namespace ProtoAssociative
                             // It is a member variables
                             if (ProtoCore.DSASM.Constants.kGlobalScope == symnode.functionIndex)
                             {
-                                Debug.Assert(!symnode.isArgument);
+                                Validity.Assert(!symnode.isArgument);
                                 int symbolIndex = AllocateMemberVariable(thisClassIndex, symnode.isStatic ? symnode.classScope : baseClassIndex, symnode.name, symnode.datatype.rank, symnode.access, symnode.isStatic);
 
                                 if (symbolIndex != ProtoCore.DSASM.Constants.kInvalidIndex)
@@ -4922,7 +4922,7 @@ namespace ProtoAssociative
                     }
                     else
                     {
-                        Debug.Assert(false, "n-pass compile error, fixme Jun....");
+                        Validity.Assert(false, "n-pass compile error, fixme Jun....");
                     }
                 }
             }
@@ -4998,7 +4998,7 @@ namespace ProtoAssociative
                 }
                 else
                 {
-                    Debug.Assert(false, "Check generated AST");
+                    Validity.Assert(false, "Check generated AST");
                 }
 
                 // It is possible that fail to allocate variable. In that 
@@ -5007,7 +5007,7 @@ namespace ProtoAssociative
                 int symbolIndex = AllocateMemberVariable(thisClassIndex, thisClassIndex, varIdent.Value, vardecl.ArgumentType.rank, vardecl.access, vardecl.IsStatic);
                 if (symbolIndex == ProtoCore.DSASM.Constants.kInvalidIndex)
                 {
-                    Debug.Assert(thisClass.defaultArgExprList.Count > 0);
+                    Validity.Assert(thisClass.defaultArgExprList.Count > 0);
                     thisClass.defaultArgExprList.RemoveAt(thisClass.defaultArgExprList.Count - 1);
                 }
                 // Only generate getter/setter for non-ffi class
@@ -5400,7 +5400,7 @@ namespace ProtoAssociative
                     // class for which we always generate a default constructor.
                     if (!core.ClassTable.ClassNodes[bidx].IsImportedClass)
                     { 
-                        Debug.Assert(cidx != ProtoCore.DSASM.Constants.kInvalidIndex);
+                        Validity.Assert(cidx != ProtoCore.DSASM.Constants.kInvalidIndex);
                     }
                     ctorIndex = cidx;
                     baseIndex = bidx;
@@ -5435,7 +5435,7 @@ namespace ProtoAssociative
 
             if (IsParsingMemberFunctionSig())
             {
-                Debug.Assert(null == localProcedure);
+                Validity.Assert(null == localProcedure);
                 localProcedure = new ProtoCore.DSASM.ProcedureNode();
 
                 localProcedure.name = funcDef.Name;
@@ -5446,7 +5446,7 @@ namespace ProtoAssociative
                 localProcedure.isConstructor = true;
                 localProcedure.runtimeIndex = 0;
                 localProcedure.isExternal = funcDef.IsExternLib;
-                Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex, "A constructor node must be associated with class");
+                Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex != globalClassIndex, "A constructor node must be associated with class");
                 localProcedure.localCount = 0;
                 localProcedure.classScope = globalClassIndex;
 
@@ -5479,7 +5479,7 @@ namespace ProtoAssociative
                         }
                         else
                         {
-                            Debug.Assert(false, "Check generated AST");
+                            Validity.Assert(false, "Check generated AST");
                         }
 
                         ProtoCore.Type argType = BuildArgumentTypeFromVarDeclNode(argNode);
@@ -5495,7 +5495,7 @@ namespace ProtoAssociative
                 // Comment Jun: Catch this assert given the condition as this type of mismatch should never occur
                 if (ProtoCore.DSASM.Constants.kInvalidIndex != findex)
                 {
-                    Debug.Assert(peekFunctionindex == localProcedure.procId);
+                    Validity.Assert(peekFunctionindex == localProcedure.procId);
                     argsToBeAllocated.ForEach(arg =>
                     {
                         int symbolIndex = AllocateArg(arg.Key, findex, arg.Value);
@@ -5528,13 +5528,13 @@ namespace ProtoAssociative
 
                 globalProcIndex = core.ClassTable.ClassNodes[globalClassIndex].vtable.IndexOfExact(funcDef.Name, argList);
 
-                Debug.Assert(null == localProcedure);
+                Validity.Assert(null == localProcedure);
                 localProcedure = core.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
 
-                Debug.Assert(null != localProcedure);
+                Validity.Assert(null != localProcedure);
                 localProcedure.Attributes = PopulateAttributes(funcDef.Attributes);
                 // Its only on the parse body pass where the real pc is determined. Update this procedures' pc
-                //Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == localProcedure.pc);
+                //Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == localProcedure.pc);
                 localProcedure.pc = pc;
 
                 EmitInstrConsole(ProtoCore.DSASM.kw.allocc, localProcedure.name);
@@ -5759,7 +5759,7 @@ namespace ProtoAssociative
             codeBlock.blockType = ProtoCore.DSASM.CodeBlockType.kFunction;
             if (IsParsingGlobalFunctionSig() || IsParsingMemberFunctionSig())
             {
-                Debug.Assert(null == localProcedure);
+                Validity.Assert(null == localProcedure);
                 localProcedure = new ProtoCore.DSASM.ProcedureNode();
 
                 localProcedure.name = funcDef.Name;
@@ -5825,7 +5825,7 @@ namespace ProtoAssociative
                         }
                         else
                         {
-                            Debug.Assert(false, "Check generated AST");
+                            Validity.Assert(false, "Check generated AST");
                         }
 
                         ProtoCore.Type argType = BuildArgumentTypeFromVarDeclNode(argNode);
@@ -5914,12 +5914,12 @@ namespace ProtoAssociative
                     localProcedure = core.ClassTable.ClassNodes[globalClassIndex].vtable.procList[globalProcIndex];
                 }
 
-                Debug.Assert(null != localProcedure);
+                Validity.Assert(null != localProcedure);
 
                 // code gen the attribute 
                 localProcedure.Attributes = PopulateAttributes(funcDef.Attributes);
                 // Its only on the parse body pass where the real pc is determined. Update this procedures' pc
-                //Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == localProcedure.pc);
+                //Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == localProcedure.pc);
                 localProcedure.pc = pc;
 
                 // Copy the active function to the core so nested language blocks can refer to it
@@ -6448,7 +6448,7 @@ namespace ProtoAssociative
                 else
                 {
                     // We should never get here. Fix it!
-                    System.Diagnostics.Debug.Assert(null != "Unknown node type!");
+                    Validity.Assert(null != "Unknown node type!");
                 }
 
                 DebugProperties.BreakpointOptions oldOptions = core.DebugProps.breakOptions;
@@ -6558,7 +6558,7 @@ namespace ProtoAssociative
              * */
             // Else-body     
 
-            Debug.Assert(null != ifnode.ElseBody);
+            Validity.Assert(null != ifnode.ElseBody);
             if (0 != ifnode.ElseBody.Count)
             {
                 // Create a new symboltable for this block
@@ -6812,7 +6812,7 @@ namespace ProtoAssociative
             }
             else
             {
-                Debug.Assert(false, "Invalid operation, this method is used to retrive the first symbol in an identifier list. It only accepts either an identlist or an ident");
+                Validity.Assert(false, "Invalid operation, this method is used to retrive the first symbol in an identifier list. It only accepts either an identlist or an ident");
             }
         }
 
@@ -8249,7 +8249,7 @@ namespace ProtoAssociative
                 return;
             }
 
-            Debug.Assert(null != graphNode);
+            Validity.Assert(null != graphNode);
             if (!isTempExpression)
             {
                 /*if (core.Options.IsDeltaExecution)
@@ -8290,7 +8290,7 @@ namespace ProtoAssociative
                 string s = t.Value;
                 if (s == ProtoCore.DSDefinitions.Keyword.Return)
                 {
-                    Debug.Assert(null == symbolnode);
+                    Validity.Assert(null == symbolnode);
                     symbolnode = new ProtoCore.DSASM.SymbolNode();
                     symbolnode.name = s;
                     symbolnode.isTemp = s.StartsWith("%");
@@ -8425,7 +8425,7 @@ namespace ProtoAssociative
                                     core.watchSymbolList.Add(symbolnode);
                                 }
 
-                                Debug.Assert(symbolnode != null);
+                                Validity.Assert(symbolnode != null);
                             }
                             else
                             {
@@ -8822,7 +8822,7 @@ namespace ProtoAssociative
 
             exceptionHandler.StartPc = pc;
             TryBlockNode tryNode = exceptionNode.tryBlock;
-            Debug.Assert(tryNode != null);
+            Validity.Assert(tryNode != null);
             foreach (var subnode in tryNode.body)
 	        {
 		        ProtoCore.Type inferedType = new ProtoCore.Type();
@@ -8843,7 +8843,7 @@ namespace ProtoAssociative
                 exceptionHandler.AddCatchHandler(catchHandler);
 
                 CatchFilterNode filterNode = catchBlock.catchFilter;
-                Debug.Assert(filterNode != null);
+                Validity.Assert(filterNode != null);
                 catchHandler.FilterTypeUID = core.TypeSystem.GetType(filterNode.type.Name);
                 if (catchHandler.FilterTypeUID == (int)PrimitiveType.kInvalidType)
                 {
@@ -9124,7 +9124,7 @@ namespace ProtoAssociative
                 }
                 else
                 {
-                    Debug.Assert(false, "an unassignable object used as left-value.");
+                    Validity.Assert(false, "an unassignable object used as left-value.");
                 }
             }
             else

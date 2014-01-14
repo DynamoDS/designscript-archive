@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using ProtoCore.Utils;
 
 namespace ProtoCore.Exceptions
 {
@@ -313,7 +314,7 @@ namespace ProtoCore.Exceptions
                         return;
                     }
                 }
-                Debug.Assert(false, "Cannot find try-block's parent block");
+                Validity.Assert(false, "Cannot find try-block's parent block");
             }
         }
     }
@@ -403,7 +404,7 @@ namespace ProtoCore.Exceptions
         public ExceptionHandler FindExceptionHandler(ExceptionContext context)
         {
             int regIndex = IndexOf(context.codeBlockId, context.functionScope, context.classScope);
-            Debug.Assert(regIndex != ProtoCore.DSASM.Constants.kInvalidIndex);
+            Validity.Assert(regIndex != ProtoCore.DSASM.Constants.kInvalidIndex);
 
             ExceptionRegistration registration = Registrations[regIndex];
             int pc = context.pc;
@@ -412,7 +413,7 @@ namespace ProtoCore.Exceptions
                 int handlerIndex;
                 if (registration.HandleIt(pc, context.typeUID, out handlerIndex))
                 {
-                    Debug.Assert(handlerIndex != ProtoCore.DSASM.Constants.kInvalidIndex);
+                    Validity.Assert(handlerIndex != ProtoCore.DSASM.Constants.kInvalidIndex);
                     return registration.Handlers[handlerIndex];
                 }
                 else
@@ -547,7 +548,7 @@ namespace ProtoCore.Exceptions
             if (registration == null)
             {
                 registration = this.ExceptionTable.Register(blockId, procIndex, classIndex);
-                Debug.Assert(registration != null);
+                Validity.Assert(registration != null);
             }
             return registration;
         }
