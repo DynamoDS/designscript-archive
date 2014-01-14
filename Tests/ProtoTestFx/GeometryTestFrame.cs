@@ -170,10 +170,10 @@ namespace ProtoTestFx
                 Assert.Fail(e.Message);
                 return;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 core.Cleanup();
-                Assert.Fail("Error: an exception is thrown!");
+                Assert.Fail("Error: an exception is thrown!\n\n\t" + e.Message );
                 return;
             }
 
