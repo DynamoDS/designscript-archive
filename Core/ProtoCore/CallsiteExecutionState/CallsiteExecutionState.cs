@@ -17,6 +17,30 @@ namespace ProtoCore
         }
     }
 
+    /// <summary>
+    /// This data structure contains the exection state of a single callsite
+    /// </summary>
+    public class CallsiteExecutionStateNode
+    {
+        public string ID { get; set; }
+        public string Data { get; set; }
+        public int RunID { get; set; }
+
+        public CallsiteExecutionStateNode()
+        {
+            ID = string.Empty;
+            Data = string.Empty;
+            RunID = 0;
+        }
+
+        public CallsiteExecutionStateNode(string csID, string csData)
+        {
+            ID = csID;
+            Data = csData;
+            RunID = 0;
+        }
+    }
+
     public class CallsiteExecutionState
     {
 
@@ -28,13 +52,14 @@ namespace ProtoCore
         private static FileStream fileStream = null;
         private static string filePath = GetThisSessionFileName();
 
+
         /// <summary>
         /// Generate a callsite guid, given a functiongroup ID and the expression ID
         /// </summary>
         /// <param name="functionUID"></param>
         /// <param name="ExprUID"></param>
         /// <returns></returns>
-        public static string GenerateCallsiteGUID(string functionUID, int ExprUID)
+        public static string GetCallsiteGUID(string functionUID, int ExprUID)
         {
             // This is a naive implementation, explore a better one
             MD5 md5 = System.Security.Cryptography.MD5.Create();
@@ -114,97 +139,134 @@ namespace ProtoCore
         public CallsiteExecutionState()
         {
             //CallsiteDataMap = new Dictionary<string, string>();
-            key = new List<string>();
-            value = new List<string>();
+            //key = new List<string>();
+            //value = new List<string>();
+            CallsiteDataMap = new List<CallsiteExecutionStateNode>();
         }
 
         /// <summary>
         /// CallsiteDataMap is the mapping between a unique callsite ID and the associated data
         /// This data is updated for every call to a callsite
-        /// Determine why this needs to be public in order to serialize
         /// </summary>
         //public Dictionary<string, string> CallsiteDataMap { get; set; }
-
-        public List<string> key { get; set; }
-        public List<string> value { get; set; }
+        public List<CallsiteExecutionStateNode> CallsiteDataMap { get; set; }
 
 
-        //public void Store(string callsiteID, string data)
+        //public List<string> key { get; set; }
+        //public List<string> value { get; set; }
+
+        /// <summary>
+        /// Stores the data given a callsite ID
+        /// This does not increment the runID
+        /// Adds a new entry if the callsite ID does not exist
+        /// </summary>
+        /// <param name="callsiteID"></param>
+        /// <param name="dataObj"></param>
+        public void Store(string callsiteID, Object dataObj)
+        {
+            Validity.Assert(null != CallsiteDataMap);
+            string data = dataObj as string;
+
+            CallsiteExecutionStateNode csNode = CallsiteDataMap.Find(x => x.ID == callsiteID);
+            if (null != csNode)
+            {
+                // Modify node data if it exists
+                csNode.Data = data;
+            }
+            else
+            {
+                // Add new entry otherwise
+                CallsiteDataMap.Add(new CallsiteExecutionStateNode(callsiteID, data));
+            }
+        }
+
+        /// <summary>
+        /// Stores the data given a callsite ID
+        /// This increments the runID
+        /// Adds a new entry if the callsite ID does not exist
+        /// Returns the runid associated with the callsiteID
+        /// </summary>
+        /// <param name="callsiteID"></param>
+        /// <param name="dataObj"></param>
+        public int StoreAndUpdateRunId(string callsiteID, Object dataObj)
+        {
+            Validity.Assert(null != CallsiteDataMap);
+            string data = dataObj as string;
+            CallsiteExecutionStateNode csNode = CallsiteDataMap.Find(x => x.ID == callsiteID);
+            int runid = ProtoCore.DSASM.Constants.kInvalidIndex;
+            if (null != csNode)
+            {
+                // Modify node data if it exists
+                csNode.Data = data;
+                runid = ++csNode.RunID;
+            }
+            else
+            {
+                // Add new entry otherwise
+                csNode = new CallsiteExecutionStateNode(callsiteID, data);
+                CallsiteDataMap.Add(csNode);
+
+                // A new entry means the run id is always 0
+                runid = csNode.RunID;
+            }
+            return runid;
+        }
+
+        public string LoadData(string callsiteID)
+        {
+            Validity.Assert(null != CallsiteDataMap);
+            CallsiteExecutionStateNode csNode = CallsiteDataMap.Find(x => x.ID == callsiteID);
+            if (null != csNode)
+            {
+                return csNode.Data;
+            }
+            return null;
+        }
+
+        public int LoadRunID(string callsiteID)
+        {
+            Validity.Assert(null != CallsiteDataMap);
+            CallsiteExecutionStateNode csNode = CallsiteDataMap.Find(x => x.ID == callsiteID);
+            if (null != csNode)
+            {
+                return csNode.RunID;
+            }
+            return ProtoCore.DSASM.Constants.kInvalidIndex;
+        }
+
+        //public void Store(string callsiteID, Object dataObj)
         //{
-        //    Validity.Assert(null != CallsiteDataMap);
-        //    if (CallsiteDataMap.ContainsKey(callsiteID))
+        //    // TODO Jun: implement serializable object
+        //    string data = dataObj as string;
+
+        //    int valueIndex = -1;
+        //    if (key.Contains(callsiteID))
         //    {
-        //        CallsiteDataMap[callsiteID] = data;
+        //        valueIndex = key.IndexOf(callsiteID);
+        //        value[valueIndex] = data;
         //    }
         //    else
         //    {
-        //        CallsiteDataMap.Add(callsiteID, data);
+        //        key.Add(callsiteID);
+        //        value.Add(data);
         //    }
         //}
 
         //public string Load(string callsiteID)
         //{
-        //    Validity.Assert(null != CallsiteDataMap);
-        //    if (CallsiteDataMap.ContainsKey(callsiteID))
+        //    int valueIndex = -1;
+        //    if (key.Contains(callsiteID))
         //    {
-        //        return CallsiteDataMap[callsiteID];
+        //        valueIndex = key.IndexOf(callsiteID);
+        //        return value[valueIndex];
         //    }
         //    return null;
         //}
 
-        public void Store(string callsiteID, Object dataObj)
+        public int GetCSStateCount()
         {
-            // TODO Jun: implement serializable object
-            string data = dataObj as string;
-
-            int valueIndex = -1;
-            if (key.Contains(callsiteID))
-            {
-                valueIndex = key.IndexOf(callsiteID);
-                value[valueIndex] = data;
-            }
-            else
-            {
-                key.Add(callsiteID);
-                value.Add(data);
-            }
-        }
-
-        public string Load(string callsiteID)
-        {
-            int valueIndex = -1;
-            if (key.Contains(callsiteID))
-            {
-                valueIndex = key.IndexOf(callsiteID);
-                return value[valueIndex];
-            }
-            return null;
-        }
-
-        public int GetVMStateCount()
-        {
-            Validity.Assert(null != key);
-            return key.Count;
-        }
-
-        /// <summary>
-        /// This method builds a dictionary given the Lsit of keys and values
-        /// This will be obsolete if once the serializable dictionary is implemented
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<string, string> BuildCSStateDictionary()
-        {
-            Validity.Assert(null != key);
-            Validity.Assert(null != value);
-            Validity.Assert(key.Count == value.Count);
-
-            Dictionary<string, string> vmstate = new Dictionary<string, string>();
-            int index = 0;
-            foreach(string id in key)
-            {
-                vmstate.Add(id, value[index++]);
-            }
-            return vmstate;
+            Validity.Assert(null != CallsiteDataMap);
+            return CallsiteDataMap.Count;
         }
     }
 }

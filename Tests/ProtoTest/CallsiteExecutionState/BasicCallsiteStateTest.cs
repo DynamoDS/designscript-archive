@@ -56,8 +56,8 @@ p = Point.ByCoordinates(1, 1, 1);
 
             ExecutionMirror mirror = runner.Execute(code, core);
 
-            ProtoCore.CallsiteExecutionState vmstate = core.csExecutionState;
-            int entries = vmstate.GetVMStateCount();
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
             Assert.IsTrue(entries == 1);
             RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
         }
@@ -78,8 +78,8 @@ p = Point.ByCoordinates(x, 1, 1);
 
             ExecutionMirror mirror = runner.Execute(code, core);
 
-            ProtoCore.CallsiteExecutionState vmstate = core.csExecutionState;
-            int entries = vmstate.GetVMStateCount();
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
             Assert.IsTrue(entries == 1);
             RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
         }
@@ -103,8 +103,8 @@ p2 = Point.ByCoordinates(x, y, z);
 
             ExecutionMirror mirror = runner.Execute(code, core);
 
-            ProtoCore.CallsiteExecutionState vmstate = core.csExecutionState;
-            int entries = vmstate.GetVMStateCount();
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
             Assert.IsTrue(entries == 2);
             RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
         }
@@ -125,10 +125,161 @@ p = Point.ByCoordinates(x, 1, 1);
 
             ExecutionMirror mirror = runner.Execute(code, core);
 
-            ProtoCore.CallsiteExecutionState vmstate = core.csExecutionState;
-            int entries = vmstate.GetVMStateCount();
+            // Verify entries in the callsite map
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
             Assert.IsTrue(entries == 1);
+            RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
+        }
+
+        [Test]
+        public void TestGetRunId01()
+        {
+
+            String code =
+@"
+def f(i : int)
+{
+	return = i + 1;
+}
+
+x = 0;
+y = f(x);
+
+";
+
+            ProtoCore.Core core = SetupTestCore("TestGetRunId01");
+            ProtoScript.Runners.ProtoScriptTestRunner runner = new ProtoScript.Runners.ProtoScriptTestRunner();
+
+            ExecutionMirror mirror = runner.Execute(code, core);
+
+
+            // Verify entries in the callsite map
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
+            Assert.IsTrue(entries == 1);
+
+            // Verify run id of each callsite
+            Assert.IsTrue(core.csExecutionState.CallsiteDataMap[0].RunID == 0);
+            RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
+        }   
+        
+        [Test]
+        public void TestGetRunId02()
+        {
+
+            String code =
+@"
+def f(i : int)
+{
+	return = i + 1;
+}
+
+x = 0;
+y = f(x);
+x = 1;
+
+";
+
+            ProtoCore.Core core = SetupTestCore("TestGetRunId02");
+            ProtoScript.Runners.ProtoScriptTestRunner runner = new ProtoScript.Runners.ProtoScriptTestRunner();
+
+            ExecutionMirror mirror = runner.Execute(code, core);
+
+
+            // Verify entries in the callsite map
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
+            Assert.IsTrue(entries == 1);
+
+            // Verify run id of each callsite
+            Assert.IsTrue(core.csExecutionState.CallsiteDataMap[0].RunID == 1);
+            RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
+        }
+
+        [Test]
+        public void TestGetRunId03()
+        {
+
+            String code =
+@"
+def f(i : int)
+{
+	return = i + 1;
+}
+
+x = 0;
+y = f(x);
+x = {1,2,3}; // Replicated call to 'f' should still yield runId of 1
+
+";
+
+            ProtoCore.Core core = SetupTestCore("TestGetRunId03");
+            ProtoScript.Runners.ProtoScriptTestRunner runner = new ProtoScript.Runners.ProtoScriptTestRunner();
+
+            ExecutionMirror mirror = runner.Execute(code, core);
+
+
+            // Verify entries in the callsite map
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
+            Assert.IsTrue(entries == 1);
+
+            // Verify run id of each callsite
+            Assert.IsTrue(core.csExecutionState.CallsiteDataMap[0].RunID == 1);
+
+            RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
+        }
+
+        [Test]
+        public void TestGetRunId04()
+        {
+
+            String code =
+@"
+    def f(i : int)
+    {
+          return = i + 1;
+    } 
+
+    def g(i : int)
+    {
+          return = i + 2;
+    }
+
+
+    x = 0;
+    y = f(x);   // 1st run: f.runID = 0
+                // 2nd run: f.runID = 1
+    x = 10;     // update ‘x’ to trigger call to f
+
+    a = 0;
+    y = g(a);       // 1st run: g.runID = 0
+                    // 2nd run: g.runID = 1
+    a = {10,11,12}; // update ‘a’ to an array to trigger replicated call to g
+
+
+";
+
+            ProtoCore.Core core = SetupTestCore("TestGetRunId04");
+            ProtoScript.Runners.ProtoScriptTestRunner runner = new ProtoScript.Runners.ProtoScriptTestRunner();
+
+            ExecutionMirror mirror = runner.Execute(code, core);
+
+
+            // Verify entries in the callsite map
+            ProtoCore.CallsiteExecutionState csState = core.csExecutionState;
+            int entries = csState.GetCSStateCount();
+            Assert.IsTrue(entries == 2);
+
+            // Verify run id of each callsite
+            Assert.IsTrue(core.csExecutionState.CallsiteDataMap[0].RunID == 1);
+            Assert.IsTrue(core.csExecutionState.CallsiteDataMap[1].RunID == 1);
+
             RemoveTestCallsiteStateFile(ProtoCore.CallsiteExecutionState.GetThisSessionFileName());
         }
     }
 }
+
+    
+
