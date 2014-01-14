@@ -4,101 +4,8 @@ using Autodesk.DesignScript.Interfaces;
 
 namespace Autodesk.DesignScript.Geometry
 {
-    internal class DsVector : IVectorEntity
-    {
-        public static IVectorEntity ByCoordinates(double x, double y, double z)
-        {
-            return new DsVector() { X = x, Y = y, Z = z };
-        }
-
-        public double X { get; set; }
-
-        public double Y { get; set; }
-
-        public double Z { get; set; }
-
-
-        public bool IsAlmostEqualTo(IVectorEntity other)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object Owner
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public void SetOwner(object owner)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Translate(double x, double y, double z)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Translate(IVectorEntity vec)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TransformBy(ICoordinateSystemEntity cs)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void TransformFromTo(ICoordinateSystemEntity from, ICoordinateSystemEntity to)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Rotate(IPointEntity origin, IVectorEntity axis, double degrees)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Rotate(IPlaneEntity origin, double degrees)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Scale(double amount)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Scale(double xamount, double yamount, double zamount)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Scale(IPointEntity from, IPointEntity to)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Scale1D(IPointEntity from, IPointEntity to)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Scale2D(IPointEntity from, IPointEntity to)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class Vector
     {
-        #region INSTANCE_VARIABLES
-        DsVector _vectorEntity = new DsVector();
-        #endregion
 
         #region PROPERTIES
 
@@ -106,7 +13,8 @@ namespace Autodesk.DesignScript.Geometry
         static internal Vector YAxis = new Vector(0.0, 1.0, 0.0);
         static internal Vector ZAxis = new Vector(0.0, 0.0, 1.0);
 
-        internal IVectorEntity VectorEntity { get { return _vectorEntity; } }
+        internal IVectorEntity VectorEntity { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -115,11 +23,11 @@ namespace Autodesk.DesignScript.Geometry
         {
             get
             {
-                return _vectorEntity.X;
+                return VectorEntity.X;
             }
             private set
             {
-                _vectorEntity.X = value;
+                VectorEntity.X = value;
             }
         }
 
@@ -131,11 +39,11 @@ namespace Autodesk.DesignScript.Geometry
         {
             get
             {
-                return _vectorEntity.Y;
+                return VectorEntity.Y;
             }
             private set
             {
-                _vectorEntity.Y = value;
+                VectorEntity.Y = value;
             }
         }
 
@@ -147,11 +55,11 @@ namespace Autodesk.DesignScript.Geometry
         {
             get
             {
-                return _vectorEntity.Z;
+                return VectorEntity.Z;
             }
             private set
             {
-                _vectorEntity.Z = value;
+                VectorEntity.Z = value;
             }
         }
 
@@ -210,38 +118,17 @@ namespace Autodesk.DesignScript.Geometry
 
         internal Vector(double x, double y, double z)
         {
-            X = x;
-            Y = y;
-            Z = z;
-            
-            //ParentCoordinateSystem = null;
+            this.VectorEntity = HostFactory.Factory.VectorByCoordinates(x, y, z);
         }
 
         internal Vector(double x, double y, double z, bool normalize)
         {
-            X = x;
-            Y = y;
-            Z = z;
-
-            if (normalize)
-            {
-                var len = GetLength();
-                if (len.EqualsTo(0.0))
-                    return;
-                this.X /= len;
-                this.Y /= len;
-                this.Z /= len;
-
-                IsNormalized = normalize;
-            }
-            
+            this.VectorEntity = HostFactory.Factory.VectorByCoordinates(x, y, z, normalize);            
         }
 
         internal Vector(IVectorEntity vector)
         {
-            this.X = vector.X;
-            this.Y = vector.Y;
-            this.Z = vector.Z;
+            this.VectorEntity = vector;
         }
 
         //  this is stand-in for ByCoordinates
@@ -322,7 +209,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public Vector Normalize()
         {
-            return Vector.ByCoordinates(_vectorEntity.X, _vectorEntity.Y, _vectorEntity.Z, true);
+            return Vector.ByCoordinates(VectorEntity.X, VectorEntity.Y, VectorEntity.Z, true);
         }
 
         /// <summary>
@@ -331,7 +218,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public double GetSquaredLength()
         {
-            return _vectorEntity.X * _vectorEntity.X + _vectorEntity.Y * _vectorEntity.Y + _vectorEntity.Z * _vectorEntity.Z;
+            return VectorEntity.X * VectorEntity.X + VectorEntity.Y * VectorEntity.Y + VectorEntity.Z * VectorEntity.Z;
         }
 
         /// <summary>
@@ -427,7 +314,7 @@ namespace Autodesk.DesignScript.Geometry
                 throw new ArgumentNullException("fromCoordinateSystem");
             if (contextCoordinateSystem == null)
                 throw new ArgumentNullException("contextCoordinateSystem");
-            using (IPointEntity translatedPt = fromCoordinateSystem.Origin.PointEntity.CopyAndTranslate(_vectorEntity) as IPointEntity)
+            using (IPointEntity translatedPt = fromCoordinateSystem.Origin.PointEntity.CopyAndTranslate(VectorEntity) as IPointEntity)
             {
                 using (IPointEntity transformedPt = translatedPt.CopyAndTransform(fromCoordinateSystem.CSEntity, contextCoordinateSystem.CSEntity) as IPointEntity)
                 {

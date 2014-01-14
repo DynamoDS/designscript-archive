@@ -95,7 +95,6 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Attributes.cs" />
-    <Compile Include="AbstractGeometryFactory.cs" />
     <Compile Include="GeometryInterfaces.cs" />
     <Compile Include="IGeometryFactory.cs" />
     <Compile Include="Interfaces.cs" />

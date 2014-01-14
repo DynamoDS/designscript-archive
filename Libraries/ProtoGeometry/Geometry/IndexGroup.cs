@@ -20,7 +20,7 @@ namespace Autodesk.DesignScript.Geometry
 
         #region Public properties
 
-        public int A
+        public uint A
         {
             get
             {
@@ -28,7 +28,7 @@ namespace Autodesk.DesignScript.Geometry
             }
         }
 
-        public int B
+        public uint B
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Autodesk.DesignScript.Geometry
             }
         }
 
-        public int C
+        public uint C
         {
             get
             {
@@ -44,7 +44,7 @@ namespace Autodesk.DesignScript.Geometry
             }
         }
 
-        public int D
+        public uint D
         {
             get
             {
@@ -52,7 +52,7 @@ namespace Autodesk.DesignScript.Geometry
             }
         }
 
-        public int Count
+        public uint Count
         {
             get
             {
@@ -64,12 +64,12 @@ namespace Autodesk.DesignScript.Geometry
 
         #region Public static constructors
 
-        public static IndexGroup ByIndices(int a, int b, int c, int d)
+        public static IndexGroup ByIndices(uint a, uint b, uint c, uint d)
         {
             return new IndexGroup(HostFactory.Factory.IndexGroupByIndices(a, b, c, d));
         }
 
-        public static IndexGroup ByIndices(int a, int b, int c)
+        public static IndexGroup ByIndices(uint a, uint b, uint c)
         {
             return new IndexGroup(HostFactory.Factory.IndexGroupByIndices(a, b, c));
         }

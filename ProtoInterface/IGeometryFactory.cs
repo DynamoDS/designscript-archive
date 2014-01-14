@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Autodesk.DesignScript.Interfaces;
 
@@ -54,8 +55,8 @@ namespace Autodesk.DesignScript.Interfaces
 
         IHelixEntity HelixByAxis(IPointEntity axisPoint, IVectorEntity axisDirection, IPointEntity startPoint, double pitch, double angleTurns);
 
-        IIndexGroupEntity IndexGroupByIndices(int a, int b, int c, int d);
-        IIndexGroupEntity IndexGroupByIndices(int a, int b, int c);
+        IIndexGroupEntity IndexGroupByIndices(uint a, uint b, uint c, uint d);
+        IIndexGroupEntity IndexGroupByIndices(uint a, uint b, uint c);
 
         ILineEntity LineByStartPointEndPoint(IPointEntity startPoint, IPointEntity endPoint);
         ILineEntity LineByBestFit(IPointEntity[] bestFitPoints);
@@ -121,17 +122,15 @@ namespace Autodesk.DesignScript.Interfaces
 
         IUVEntity UVByCoordinates(double u, double v);
 
+        IVectorEntity VectorByCoordinates(double x, double y, double z);
+        IVectorEntity VectorByCoordinates(double x, double y, double z, bool normalized);
+
         IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroupEntity[] indices);
 
         IBlockHelper GetBlockHelper();
         IGeometryEntity[] LoadSat(string satFile);
         bool SaveSat(string satFile, Object[] ffiObjects);
         IGeometrySettings GetSettings();
-
-
-
-
-
 
     }
 }
