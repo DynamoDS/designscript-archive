@@ -249,7 +249,6 @@ namespace ProtoTestFx
             string line;
 
             int lineNo = 0;
-            int colNo = 0;
 
             // split code into program statements and loop thro' them            
             while ((line = file.ReadLine()) != null)

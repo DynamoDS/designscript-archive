@@ -435,7 +435,7 @@ namespace Autodesk.DesignScript.Geometry
 
         public IVectorEntity ReadVector()
         {
-            return DsVector.ByCoordinates(this.ReadDouble("X"), this.ReadDouble("Y"), this.ReadDouble("Z"));
+            return HostFactory.Factory.VectorByCoordinates(this.ReadDouble("X"), this.ReadDouble("Y"), this.ReadDouble("Z"));
         }
 
         public void WriteObject(IVectorEntity vector)

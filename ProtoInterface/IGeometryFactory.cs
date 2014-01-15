@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Autodesk.DesignScript.Interfaces;
 
@@ -45,8 +46,6 @@ namespace Autodesk.DesignScript.Interfaces
         ICuboidEntity CuboidByLengths(ICoordinateSystemEntity cs, double width, double length, double height);
         ICuboidEntity CuboidByCorners(IPointEntity lowPoint, IPointEntity highPoint);
 
-        IUVEntity UVByCoordinates(double u, double v);
-
         ICurveEntity CurveByParameterLineOnSurface(ISurfaceEntity baseSurface, IUVEntity startParams, IUVEntity endParams);
 
         IEllipseEntity EllipseByOriginRadii(IPointEntity origin, double xAxisRadius, double yAxisRadius);
@@ -55,6 +54,9 @@ namespace Autodesk.DesignScript.Interfaces
         IEllipseEntity EllipseByPlaneRadii(IPlaneEntity plane, double xAxisRadius, double yAxisRadius);
 
         IHelixEntity HelixByAxis(IPointEntity axisPoint, IVectorEntity axisDirection, IPointEntity startPoint, double pitch, double angleTurns);
+
+        IIndexGroupEntity IndexGroupByIndices(uint a, uint b, uint c, uint d);
+        IIndexGroupEntity IndexGroupByIndices(uint a, uint b, uint c);
 
         ILineEntity LineByStartPointEndPoint(IPointEntity startPoint, IPointEntity endPoint);
         ILineEntity LineByBestFit(IPointEntity[] bestFitPoints);
@@ -118,15 +120,17 @@ namespace Autodesk.DesignScript.Interfaces
         ITextEntity TextByPoint(IPointEntity origin, string textString, double textHeight);
         ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity cs, string textString, double textHeight);
 
-        IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroup[] indices);
+        IUVEntity UVByCoordinates(double u, double v);
+
+        IVectorEntity VectorByCoordinates(double x, double y, double z);
+        IVectorEntity VectorByCoordinates(double x, double y, double z, bool normalized);
+
+        IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroupEntity[] indices);
 
         IBlockHelper GetBlockHelper();
         IGeometryEntity[] LoadSat(string satFile);
         bool SaveSat(string satFile, Object[] ffiObjects);
         IGeometrySettings GetSettings();
 
-
-
-       
     }
 }

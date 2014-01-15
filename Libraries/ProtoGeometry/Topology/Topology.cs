@@ -54,7 +54,7 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <param name="color">Color to be assigned to extracted geometry.</param>
         /// <returns>Geometry</returns>
-        public Geometry _ExtractGeometry(Color color)
+        public Geometry ExtractGeometry(Color color)
         {
             Geometry geom = this.Geometry;
             if (null != geom)
@@ -74,9 +74,9 @@ namespace Autodesk.DesignScript.Geometry
         /// topology object, if there was some color applied to it.
         /// </summary>
         /// <returns>Geometry</returns>
-        public Geometry _ExtractGeometry()
+        public Geometry ExtractGeometry()
         {
-            return _ExtractGeometry(null);
+            return ExtractGeometry(null);
         }
 
         #endregion
