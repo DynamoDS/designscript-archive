@@ -28,7 +28,7 @@ namespace ProtoCore.Lang
         /// Get a map of TraceID -> Objects
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<String, Object> GetObjectFromTrace()
+        public static Dictionary<String, Object> GetObjectFromTLS()
         {
             Dictionary<String, Object> objs = new Dictionary<String, Object>();
 
@@ -45,7 +45,7 @@ namespace ProtoCore.Lang
         /// Set the data associated with trace
         /// </summary>
         /// <param name="objs"></param>
-        public static void SetObjectToTrace(Dictionary<String, Object> objs)
+        public static void SetObjectToTLS(Dictionary<String, Object> objs)
         {
             foreach (String k in objs.Keys)
                 Thread.SetData(Thread.GetNamedDataSlot(k), objs[k]);

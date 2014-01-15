@@ -23,11 +23,11 @@ namespace ProtoTest.TD
              Dictionary<String,Object> data = new Dictionary<string, object>();
             data.Add(keys[0], testStr1);
 
-            TraceUtils.SetObjectToTrace(data);
+            TraceUtils.SetObjectToTLS(data);
 
             //Set complete, readback test
 
-            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTrace();
+            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTLS();
             Assert.IsTrue((String)readback[keys[0]] == testStr1);
         }
 
@@ -50,20 +50,20 @@ namespace ProtoTest.TD
             data2.Add(keys[0], testStr2);
 
 
-            TraceUtils.SetObjectToTrace(data);
+            TraceUtils.SetObjectToTLS(data);
 
             //Set complete, readback test
 
-            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTrace();
+            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTLS();
             Assert.IsTrue((String)readback[keys[0]] == testStr1);
 
 
 
-            TraceUtils.SetObjectToTrace(data2);
+            TraceUtils.SetObjectToTLS(data2);
 
             //Set complete, readback test
 
-            readback = TraceUtils.GetObjectFromTrace();
+            readback = TraceUtils.GetObjectFromTLS();
             Assert.IsTrue((String)readback[keys[0]] == testStr2);
         }
 
