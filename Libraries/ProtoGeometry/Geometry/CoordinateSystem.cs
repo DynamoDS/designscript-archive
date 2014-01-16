@@ -113,6 +113,7 @@ namespace Autodesk.DesignScript.Geometry
 
             var cs = HostFactory.Factory.CoordinateSystemByOriginVectors(origin.PointEntity, xaxis.VectorEntity,
                 yaxis.VectorEntity);
+
             if (null == cs)
                 throw new System.Exception(string.Format(Properties.Resources.OperationFailed,
                     "CoordinateSystem.Identity"));

@@ -65,10 +65,10 @@ namespace Autodesk.DesignScript.Geometry
         /// <param name="vertices"></param>
         /// <param name="faceIndices"></param>
         /// <returns></returns>
-        public static Mesh ByVerticesFaceIndices(Point[] vertices, IIndexGroup[] faceIndices)
+        public static Mesh ByVerticesFaceIndices(Point[] vertices, IndexGroup[] faceIndices)
         {
             var points = vertices.ConvertAll(GeometryExtension.ToEntity<Point, IPointEntity>);
-            var entity = ByVerticesFaceIndicesCore(points, faceIndices);
+            var entity = ByVerticesFaceIndicesCore(points, faceIndices.Select(x => x.IndexGroupEntity).ToArray());
             var mesh = new Mesh(entity, true);
             mesh.FaceIndices = faceIndices;
             mesh.VertexPositions = vertices;
@@ -120,7 +120,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <summary>
         /// 
         /// </summary>
-        public IIndexGroup[] FaceIndices { get; protected set; }
+        public IndexGroup[] FaceIndices { get; protected set; }
 
         /// <summary>
         /// 
@@ -196,7 +196,7 @@ namespace Autodesk.DesignScript.Geometry
         /// <param name="points"></param>
         /// <param name="faceIndices"></param>
         /// <returns></returns>
-        internal static IPolyMeshEntity ByVerticesFaceIndicesCore(IPointEntity[] points, IIndexGroup[] faceIndices)
+        internal static IPolyMeshEntity ByVerticesFaceIndicesCore(IPointEntity[] points, IIndexGroupEntity[] faceIndices)
         {
             string kMethodName = "Mesh.ByVerticesFaceIndices";
 

@@ -80,6 +80,19 @@ namespace ProtoCore.AST.ImperativeAST
             };
         }
 
+        public IdentifierNode(string identName = null)
+        {
+            ArrayDimensions = null;
+            datatype = new ProtoCore.Type
+            {
+                UID = (int)PrimitiveType.kInvalidType,
+                rank = 0,
+                IsIndexable = false,
+                Name = null
+            };
+            Value = Name = identName;
+        }
+
 
         public IdentifierNode(IdentifierNode rhs) : base(rhs)
         {
@@ -110,6 +123,12 @@ namespace ProtoCore.AST.ImperativeAST
         {
             value = string.Empty;
         }
+
+        public IntNode(string val = null)
+        {
+            value = val;
+        }
+
         public IntNode(IntNode rhs)
             : base(rhs)
         {
@@ -343,6 +362,13 @@ namespace ProtoCore.AST.ImperativeAST
 
         public BinaryExpressionNode()
         {
+        }
+
+        public BinaryExpressionNode(ImperativeNode left = null, ImperativeNode right = null, ProtoCore.DSASM.Operator optr = DSASM.Operator.none)
+        {
+            LeftNode = left;
+            Optr = optr;
+            RightNode = right;
         }
 
         public BinaryExpressionNode(BinaryExpressionNode rhs) : base(rhs)
