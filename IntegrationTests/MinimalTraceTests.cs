@@ -61,7 +61,8 @@ namespace IntegrationTests
         public void SanityCheckVMExecution()
         {
             var mirror = thisTest.RunScriptSource("a = 4 + 5;");
-            Assert.IsTrue((int)mirror.GetFirstValue("a").Payload == 9);
+            var a = mirror.GetFirstValue("a").Payload;
+            Assert.IsTrue((Int64)a == 9);
         }
 
         [Test]
