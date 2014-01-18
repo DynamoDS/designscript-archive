@@ -366,7 +366,7 @@ namespace ProtoCore
         }
 
 
-        public StackValue DispatchNew(ProtoCore.Runtime.Context context, List<StackValue> arguments,
+        private StackValue DispatchNew(ProtoCore.Runtime.Context context, List<StackValue> arguments,
                                       List<List<int>> partialReplicationGuides, StackFrame stackFrame, Core core)
         {
 
@@ -495,25 +495,6 @@ namespace ProtoCore
         }
 
 
-        /// <summary>
-        /// Fast Dispatch handles the whole of a function call internally without allowing replicated debugging
-        /// This should be used in Run Mode and Parallel execution mode
-        /// This is the fastest way of dispatching to a callsite
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="arguments"></param>
-        /// <param name="partialReplicationGuides"></param>
-        /// <param name="stackFrame"></param>
-        /// <param name="core"></param>
-        /// <returns></returns>
-        public StackValue FastDispatch(ProtoCore.Runtime.Context context, List<StackValue> arguments,
-                                       List<List<int>> partialReplicationGuides, StackFrame stackFrame, Core core)
-        {
-            return DispatchNew(context, arguments, partialReplicationGuides, stackFrame, core);
-        }
-
-
-
 
         /// <summary>
         /// This is the function that should be executed next, passing the same arugments as previously
@@ -563,54 +544,7 @@ namespace ProtoCore
             return testFep;
             
         }
-
-        public StackValue ExecuteContinuation(FunctionEndPoint jilFep, StackFrame stackFrame, Core core)
-        {
-            // Pushing a dummy stackframe onto the Stack for the current fep
-            int ci = -1;
-            int fi = 0;
-
-            // Hardcoded for Increment as member function
-            if (jilFep.procedureNode == null)
-            {
-                ci = 14;
-                jilFep.procedureNode = core.DSExecutable.classTable.ClassNodes[ci].vtable.procList[fi];
-            }
-            Validity.Assert(jilFep.procedureNode != null);
-
-            if (core.Options.IDEDebugMode)
-            {
-                DebugFrame debugFrame = core.DebugProps.DebugStackFrame.Peek();
-                debugFrame.FinalFepChosen = jilFep;
-            }
-
-            ProtoCore.DSASM.StackValue svThisPtr = stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kThisPtr);
-            ProtoCore.DSASM.StackValue svBlockDecl = stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kFunctionBlock);
-            int blockCaller = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kFunctionCallerBlock).opdata;
-            int depth = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kStackFrameDepth).opdata;
-            DSASM.StackFrameType type = (DSASM.StackFrameType)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
-
-            int locals = 0; 
-            int returnAddr = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
-            int framePointer = core.Rmem.FramePointer;
-            DSASM.StackFrameType callerType = (DSASM.StackFrameType)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
-
-            StackValue svCallConvention = ProtoCore.DSASM.StackUtils.BuildNode(ProtoCore.DSASM.AddressType.CallingConvention, (long)ProtoCore.DSASM.CallingConvention.CallType.kExplicit);
-            // Set TX register 
-            stackFrame.SetAt(DSASM.StackFrame.AbsoluteIndex.kRegisterTX, svCallConvention);
-
-            // Set SX register 
-            stackFrame.SetAt(DSASM.StackFrame.AbsoluteIndex.kRegisterSX, svBlockDecl);
-
-            List<ProtoCore.DSASM.StackValue> registers = new List<DSASM.StackValue>();
-            registers.AddRange(stackFrame.GetRegisters());
-
-            core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, (int)svBlockDecl.opdata, blockCaller, callerType, type, depth, framePointer, registers, locals, 0);
-
-            return StackUtils.BuildNode(AddressType.ExplicitCall, jilFep.procedureNode.pc);
-
-        }
-
+        
         public StackValue JILDispatchViaNewInterpreter(ProtoCore.Runtime.Context context, List<StackValue> arguments, List<List<int>> replicationGuides,
                                                        StackFrame stackFrame, Core core)
         {
@@ -1454,6 +1388,9 @@ namespace ProtoCore
             return true; //It'll replicate if it suceeds
         }
 
+
+
+        // ======== UNUSED =======
         /*
             public FunctionEndPoint GetFep(ProtoCore.Runtime.Context context, List<StackValue> arguments, StackFrame stackFrame, List<List<int>> partialReplicationGuides, Core core)
             {
@@ -1697,6 +1634,77 @@ namespace ProtoCore
             */
 
 
+        /*
+
+        /// <summary>
+        /// Fast Dispatch handles the whole of a function call internally without allowing replicated debugging
+        /// This should be used in Run Mode and Parallel execution mode
+        /// This is the fastest way of dispatching to a callsite
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="arguments"></param>
+        /// <param name="partialReplicationGuides"></param>
+        /// <param name="stackFrame"></param>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public StackValue FastDispatch(ProtoCore.Runtime.Context context, List<StackValue> arguments,
+                                       List<List<int>> partialReplicationGuides, StackFrame stackFrame, Core core)
+        {
+            return DispatchNew(context, arguments, partialReplicationGuides, stackFrame, core);
+        }
+
+        */
+
+        /*
+         * REMOVED as not used
+         * 
+        public StackValue ExecuteContinuation(FunctionEndPoint jilFep, StackFrame stackFrame, Core core)
+        {
+            // Pushing a dummy stackframe onto the Stack for the current fep
+            int ci = -1;
+            int fi = 0;
+
+            // Hardcoded for Increment as member function
+            if (jilFep.procedureNode == null)
+            {
+                ci = 14;
+                jilFep.procedureNode = core.DSExecutable.classTable.ClassNodes[ci].vtable.procList[fi];
+            }
+            Validity.Assert(jilFep.procedureNode != null);
+
+            if (core.Options.IDEDebugMode)
+            {
+                DebugFrame debugFrame = core.DebugProps.DebugStackFrame.Peek();
+                debugFrame.FinalFepChosen = jilFep;
+            }
+
+            ProtoCore.DSASM.StackValue svThisPtr = stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kThisPtr);
+            ProtoCore.DSASM.StackValue svBlockDecl = stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kFunctionBlock);
+            int blockCaller = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kFunctionCallerBlock).opdata;
+            int depth = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kStackFrameDepth).opdata;
+            DSASM.StackFrameType type = (DSASM.StackFrameType)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kStackFrameType).opdata;
+
+            int locals = 0; 
+            int returnAddr = (int)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kReturnAddress).opdata;
+            int framePointer = core.Rmem.FramePointer;
+            DSASM.StackFrameType callerType = (DSASM.StackFrameType)stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kCallerStackFrameType).opdata;
+
+            StackValue svCallConvention = ProtoCore.DSASM.StackUtils.BuildNode(ProtoCore.DSASM.AddressType.CallingConvention, (long)ProtoCore.DSASM.CallingConvention.CallType.kExplicit);
+            // Set TX register 
+            stackFrame.SetAt(DSASM.StackFrame.AbsoluteIndex.kRegisterTX, svCallConvention);
+
+            // Set SX register 
+            stackFrame.SetAt(DSASM.StackFrame.AbsoluteIndex.kRegisterSX, svBlockDecl);
+
+            List<ProtoCore.DSASM.StackValue> registers = new List<DSASM.StackValue>();
+            registers.AddRange(stackFrame.GetRegisters());
+
+            core.Rmem.PushStackFrame(svThisPtr, ci, fi, returnAddr, (int)svBlockDecl.opdata, blockCaller, callerType, type, depth, framePointer, registers, locals, 0);
+
+            return StackUtils.BuildNode(AddressType.ExplicitCall, jilFep.procedureNode.pc);
+
+        }
+        */
     
     }
 
