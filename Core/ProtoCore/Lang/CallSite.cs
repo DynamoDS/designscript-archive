@@ -375,8 +375,7 @@ namespace ProtoCore
             UpdateCallsiteExecutionState(SimulateGetData(), core);
 
 
-            //Clear the TLS
-            TraceUtils.ClearAllKnownTLSKeys();
+
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -1042,6 +1041,9 @@ namespace ProtoCore
             StackValue funcBlock = stackFrame.GetAt(DSASM.StackFrame.AbsoluteIndex.kFunctionBlock);
             funcBlock.opdata = finalFep.BlockScope;
             stackFrame.SetAt(DSASM.StackFrame.AbsoluteIndex.kFunctionBlock, funcBlock);
+
+            //Reset the TLS
+            TraceUtils.ClearAllKnownTLSKeys();
 
             StackValue ret = finalFep.Execute(c, coercedParameters, stackFrame, core);
 
