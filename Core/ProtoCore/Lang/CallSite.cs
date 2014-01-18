@@ -739,6 +739,41 @@ namespace ProtoCore
 
         #region Execution methods
 
+        
+        //Inbound methods
+
+        public StackValue JILDispatchViaNewInterpreter(ProtoCore.Runtime.Context context, List<StackValue> arguments, List<List<int>> replicationGuides,
+                                                       StackFrame stackFrame, Core core)
+        {
+#if DEBUG
+
+            ArgumentSanityCheck(arguments);
+#endif
+
+            // Dispatch method
+            context.IsImplicitCall = true;
+            return DispatchNew(context, arguments, replicationGuides, stackFrame, core);
+        }
+
+
+
+        public StackValue JILDispatch(List<StackValue> arguments, List<List<int>> replicationGuides,
+                                      StackFrame stackFrame, Core core, Runtime.Context context)
+        {
+#if DEBUG
+
+            ArgumentSanityCheck(arguments);
+#endif
+
+            // Dispatch method
+            return DispatchNew(context, arguments, replicationGuides, stackFrame, core);
+        }
+
+
+
+
+        //Dispatch
+
         private StackValue DispatchNew(ProtoCore.Runtime.Context context, List<StackValue> arguments,
                                       List<List<int>> partialReplicationGuides, StackFrame stackFrame, Core core)
         {
@@ -818,35 +853,49 @@ namespace ProtoCore
         }
 
 
-
-        public StackValue JILDispatchViaNewInterpreter(ProtoCore.Runtime.Context context, List<StackValue> arguments, List<List<int>> replicationGuides,
-                                                       StackFrame stackFrame, Core core)
+        private StackValue Execute(List<FunctionEndPoint> functionEndPoint, ProtoCore.Runtime.Context c,
+                                   List<StackValue> formalParameters,
+                                   List<ReplicationInstruction> replicationInstructions, DSASM.StackFrame stackFrame,
+                                   Core core, FunctionGroup funcGroup)
         {
-#if DEBUG
+            for (int i = 0; i < formalParameters.Count; ++i)
+            {
+                GCUtils.GCRetain(formalParameters[i], core);
+            }
 
-            ArgumentSanityCheck(arguments);
-#endif
+            StackValue ret;
 
-            // Dispatch method
-            context.IsImplicitCall = true;
-            return DispatchNew(context, arguments, replicationGuides, stackFrame, core);
+            if (replicationInstructions.Count == 0)
+            {
+                c.IsReplicating = false;
+                ret = ExecWithZeroRI(functionEndPoint, c, formalParameters, stackFrame, core, funcGroup);
+            }
+            else
+            {
+                c.IsReplicating = true;
+                ret = ExecWithRISlowPath(functionEndPoint, c, formalParameters, replicationInstructions, stackFrame,
+                                         core, funcGroup);
+            }
+
+            // Explicit calls require the GC of arguments in the function return instruction
+            if (ret.optype != AddressType.ExplicitCall)
+            {
+                for (int i = 0; i < formalParameters.Count; ++i)
+                {
+                    GCUtils.GCRelease(formalParameters[i], core);
+                }
+            }
+
+
+            if (ret.optype == AddressType.Null)
+                return ret; //It didn't return a value
+
+            return ret;
         }
 
 
 
-        public StackValue JILDispatch(List<StackValue> arguments, List<List<int>> replicationGuides,
-                                      StackFrame stackFrame, Core core, Runtime.Context context)
-        {
-#if DEBUG
-
-            ArgumentSanityCheck(arguments);
-#endif
-
-            // Dispatch method
-            return DispatchNew(context, arguments, replicationGuides, stackFrame, core);
-        }
-
-
+        //Repication
 
         /// <summary>
         /// Excecute an arbitrary depth replication using the full slow path algorithm
@@ -924,7 +973,6 @@ namespace ProtoCore
                         retSVs[i] = ExecWithRISlowPath(functionEndPoint, c, newFormalParams, newRIs, stackFrame, core,
                                                        funcGroup);
 
-                        //retSVs[i] = Execute(c, CoerceParameters(newFormalParams, core), stackFrame, core);
                     }
                 }
 
@@ -1058,6 +1106,8 @@ namespace ProtoCore
         }
 
 
+        //Single function call
+
         /// <summary>
         /// Dispatch without replication
         /// </summary>
@@ -1108,45 +1158,6 @@ namespace ProtoCore
         }
 
 
-        private StackValue Execute(List<FunctionEndPoint> functionEndPoint, ProtoCore.Runtime.Context c,
-                                   List<StackValue> formalParameters,
-                                   List<ReplicationInstruction> replicationInstructions, DSASM.StackFrame stackFrame,
-                                   Core core, FunctionGroup funcGroup)
-        {
-            for (int i = 0; i < formalParameters.Count; ++i)
-            {
-                GCUtils.GCRetain(formalParameters[i], core);
-            }
-
-            StackValue ret;
-
-            if (replicationInstructions.Count == 0)
-            {
-                c.IsReplicating = false;
-                ret = ExecWithZeroRI(functionEndPoint, c, formalParameters, stackFrame, core, funcGroup);
-            }
-            else
-            {
-                c.IsReplicating = true;
-                ret = ExecWithRISlowPath(functionEndPoint, c, formalParameters, replicationInstructions, stackFrame,
-                                         core, funcGroup);
-            }
-
-            // Explicit calls require the GC of arguments in the function return instruction
-            if (ret.optype != AddressType.ExplicitCall)
-            {
-                for (int i = 0; i < formalParameters.Count; ++i)
-                {
-                    GCUtils.GCRelease(formalParameters[i], core);
-                }
-            }
-
-
-            if (ret.optype == AddressType.Null)
-                return ret; //It didn't return a value
-
-            return ret;
-        }
 
 
         public static StackValue PerformReturnTypeCoerce(ProcedureNode procNode, Core core, StackValue ret)
