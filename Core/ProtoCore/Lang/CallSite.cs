@@ -374,6 +374,10 @@ namespace ProtoCore
             // TODO: Replace this with the real data
             UpdateCallsiteExecutionState(SimulateGetData(), core);
 
+
+            //Clear the TLS
+            TraceUtils.ClearAllKnownTLSKeys();
+
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
