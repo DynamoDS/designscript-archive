@@ -48,7 +48,13 @@ namespace ProtoCore.Lang
         public static void SetObjectToTLS(Dictionary<String, Object> objs)
         {
             foreach (String k in objs.Keys)
+            {
+                if (objs[k] == null)
+                    Thread.FreeNamedDataSlot(k);
+
                 Thread.SetData(Thread.GetNamedDataSlot(k), objs[k]);
+
+            }
         }
 
     }
