@@ -21,6 +21,13 @@ namespace ProtoCore
         private readonly FunctionTable globalFunctionTable;
         private readonly ExecutionMode executionMode;
 
+        //TODO(Luke): This should be loaded from the attribute
+        private string TRACE_KEY = TraceUtils.__TEMP_REVIT_TRACE_ID;
+
+        private List<Object> traceData = new List<object>();
+        private int invokeCount = 0; //Number of times the callsite has been executed within this run
+
+
 
         public CallSite(int classScope, string methodName, FunctionTable globalFunctionTable, ExecutionMode execMode)
         {
@@ -755,8 +762,6 @@ namespace ProtoCore
             return DispatchNew(context, arguments, replicationGuides, stackFrame, core);
         }
 
-
-
         public StackValue JILDispatch(List<StackValue> arguments, List<List<int>> replicationGuides,
                                       StackFrame stackFrame, Core core, Runtime.Context context)
         {
@@ -773,7 +778,6 @@ namespace ProtoCore
 
 
         //Dispatch
-
         private StackValue DispatchNew(ProtoCore.Runtime.Context context, List<StackValue> arguments,
                                       List<List<int>> partialReplicationGuides, StackFrame stackFrame, Core core)
         {
@@ -868,7 +872,46 @@ namespace ProtoCore
             if (replicationInstructions.Count == 0)
             {
                 c.IsReplicating = false;
+
+
+                //READ TRACE FOR NON-REPLICATED CALL
+
+                //Lookup the trace data in the cache
+                if (invokeCount < traceData.Count)
+                {
+                    Object specificTraceData = traceData[invokeCount];
+                    Dictionary<string, object> dataDict = new Dictionary<string, object>();
+                    dataDict.Add(TRACE_KEY, specificTraceData);
+
+                    TraceUtils.SetObjectToTLS(dataDict);
+                }
+                else
+                {
+                    //There was no trace data for this run
+                    TraceUtils.ClearAllKnownTLSKeys();
+                }
+
                 ret = ExecWithZeroRI(functionEndPoint, c, formalParameters, stackFrame, core, funcGroup);
+
+
+                //WRITE TRACE FOR NON-REPLICATED CALL
+                Dictionary<String, Object> traceRet = TraceUtils.GetObjectFromTLS();
+
+                if (traceRet.ContainsKey(TRACE_KEY))
+                {
+                    Object val = traceRet[TRACE_KEY];
+                    if (val != null)
+                    {
+                        while (invokeCount >= traceData.Count)
+                            traceData.Add(null);
+
+                        //Push the data into the trace cache
+                        traceData[invokeCount] = val;
+                    }
+                }
+
+
+
             }
             else
             {
@@ -886,6 +929,8 @@ namespace ProtoCore
                 }
             }
 
+
+            invokeCount++; //We've completed this invocation
 
             if (ret.optype == AddressType.Null)
                 return ret; //It didn't return a value
@@ -1119,10 +1164,6 @@ namespace ProtoCore
 
             FunctionEndPoint finalFep = SelectFinalFep(c, functionEndPoint, formalParameters, stackFrame, core);
 
-            /*functionEndPoint = ResolveFunctionEndPointWithoutReplication(c,funcGroup, formalParameters,
-                                                                         stackFrame, core);*/
-
-
             if (functionEndPoint == null)
             {
                 core.RuntimeStatus.LogWarning(ProtoCore.RuntimeData.WarningID.kMethodResolutionFailure,
@@ -1136,7 +1177,6 @@ namespace ProtoCore
                 debugFrame.FinalFepChosen = finalFep;
             }
 
-            //@TODO(Luke): Should this coerce?
             List<StackValue> coercedParameters = finalFep.CoerceParameters(formalParameters, core);
 
             // Correct block id where the function is defined. 
@@ -1144,8 +1184,6 @@ namespace ProtoCore
             funcBlock.opdata = finalFep.BlockScope;
             stackFrame.SetAt(DSASM.StackFrame.AbsoluteIndex.kFunctionBlock, funcBlock);
 
-            //Reset the TLS
-            TraceUtils.ClearAllKnownTLSKeys();
 
             StackValue ret = finalFep.Execute(c, coercedParameters, stackFrame, core);
 
@@ -1376,6 +1414,10 @@ namespace ProtoCore
 
             return true; //It'll replicate if it suceeds
         }
+
+
+
+
 
 
 
