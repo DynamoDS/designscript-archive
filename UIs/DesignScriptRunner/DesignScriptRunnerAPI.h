@@ -132,9 +132,14 @@ public:
     virtual void updateGraph(GraphNode* graphNode) = 0;
 
     /// <summary>
-    /// Compiles and executes the delta list of AST nodes in the LiveRunner
+    /// Builds a delta list of AST nodes for a function call in the LiveRunner
     /// </summary>
     virtual GraphNode* buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString) = 0;
+
+    /// <summary>
+    /// Builds a delta AST node for an array in the LiveRunner
+    /// </summary>
+    virtual GraphNode* buildArrayNode(const std::vector<const wchar_t*>& arrayInputs) = 0;
 
     virtual void getFunctionArgs(DesignScriptMethod* methodMirror, std::vector<const wchar_t*>& argNames, std::vector<DesignScriptClass*>& argTypes) = 0;
 };
@@ -192,6 +197,7 @@ public:
     virtual DesignScriptClass* parent() const = 0;
     virtual std::vector<DesignScriptMethod*>* getConstructors() const = 0;
     virtual std::vector<DesignScriptMethod*>* getMethods() const = 0;
+    virtual std::vector<DesignScriptMethod*>* getOverloads(const wchar_t* methodName) const = 0;
 };
 
 class __declspec(novtable) DesignScriptMethod
@@ -199,6 +205,7 @@ class __declspec(novtable) DesignScriptMethod
 public:
     virtual ~DesignScriptMethod() = 0 {}
     virtual const wchar_t* name() const = 0;
+    virtual bool isConstructor() const = 0;
     /*virtual std::vector<const wchar_t*> getArgumentNames() const = 0;
     virtual std::vector<DesignScriptClass*> getArgumentTypes(ProtoCore::Core^ core) const = 0; */
 };

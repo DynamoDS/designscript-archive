@@ -30,7 +30,7 @@ namespace ProtoCore.DSASM.Mirror
         /// <param name="exec"></param>
         public ExecutionMirror(ProtoCore.DSASM.Executive exec, ProtoCore.Core coreObj)
         {
-            Debug.Assert(exec != null, "Can't mirror a null executive");
+            Validity.Assert(exec != null, "Can't mirror a null executive");
 
             core = coreObj;
             MirrorTarget = exec;

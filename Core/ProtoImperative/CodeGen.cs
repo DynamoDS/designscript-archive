@@ -205,7 +205,7 @@ namespace ProtoImperative
             else if (node is BinaryExpressionNode)
             {
                 BinaryExpressionNode b = node as BinaryExpressionNode;
-                Debug.Assert(ProtoCore.DSASM.Operator.mul == b.Optr);
+                Validity.Assert(ProtoCore.DSASM.Operator.mul == b.Optr);
                 int left = DfsExprValue(b.LeftNode);
                 int right = DfsExprValue(b.RightNode);
                 return left * right;
@@ -251,7 +251,7 @@ namespace ProtoImperative
             }
             else
             {
-                Debug.Assert(false, "ast error ? check ast construction");
+                Validity.Assert(false, "ast error ? check ast construction");
             }
         }
 
@@ -331,7 +331,7 @@ namespace ProtoImperative
             }
             else
             {
-                Debug.Assert(false, "ast error ? check ast construction");
+                Validity.Assert(false, "ast error ? check ast construction");
             }
         }
 
@@ -407,7 +407,7 @@ namespace ProtoImperative
             }
             else
             {
-                Debug.Assert(false, "Invalid memory region");
+                Validity.Assert(false, "Invalid memory region");
             }
             SetStackIndex(symbol);
         }
@@ -447,7 +447,7 @@ namespace ProtoImperative
                 symbolnode.ExternLib = core.CurrentDSFileName;
 
 
-            Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == symbolnode.symbolTableIndex);
+            Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == symbolnode.symbolTableIndex);
 
             if (null == nodeArray)
             {
@@ -643,7 +643,7 @@ namespace ProtoImperative
                 return null;
             }
 
-            //Debug.Assert(null == graphNode);
+            //Validity.Assert(null == graphNode);
 
             FunctionCallNode funcCall = node as FunctionCallNode;
             string procName = funcCall.Function.Name;
@@ -694,7 +694,7 @@ namespace ProtoImperative
 
                     if (procNode != null)
                     {
-                        Debug.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
+                        Validity.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
                         isConstructor = procNode.isConstructor;
                         isStatic = procNode.isStatic;
                         type = lefttype = realType;
@@ -786,7 +786,7 @@ namespace ProtoImperative
 
                     if (memProcNode != null)
                     {
-                        Debug.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
+                        Validity.Assert(realType != ProtoCore.DSASM.Constants.kInvalidIndex);
                         procNode = memProcNode;
                         inferedType = procNode.returntype;
                         type = realType;
@@ -1279,7 +1279,7 @@ namespace ProtoImperative
                 LanguageBlockNode langblock = node as LanguageBlockNode;
                 //(Fuqiang, Ayush) : Throwing an assert stops NUnit. Negative tests expect to catch a 
                 // CompilerException, so we throw that instead.
-                //Debug.Assert(ProtoCore.Language.kInvalid != langblock.codeblock.language);
+                //Validity.Assert(ProtoCore.Language.kInvalid != langblock.codeblock.language);
 
                 if (ProtoCore.Language.kInvalid == langblock.codeblock.language)
                 {
@@ -1331,7 +1331,7 @@ namespace ProtoImperative
 
                 setBlkId(blockId);
                 inferedType = core.InferedType;
-                //Debug.Assert(codeBlock.children[codeBlock.children.Count - 1].blockType == ProtoCore.DSASM.CodeBlockType.kLanguage);
+                //Validity.Assert(codeBlock.children[codeBlock.children.Count - 1].blockType == ProtoCore.DSASM.CodeBlockType.kLanguage);
                 codeBlock.children[codeBlock.children.Count - 1].Attributes = PopulateAttributes(langblock.Attributes);
 
 #if ENABLE_EXCEPTION_HANDLING
@@ -1372,7 +1372,7 @@ namespace ProtoImperative
             codeBlock.blockType = ProtoCore.DSASM.CodeBlockType.kFunction;
             if (parseGlobalFunctionSig)
             {
-                Debug.Assert(null == localProcedure);
+                Validity.Assert(null == localProcedure);
 
 
                 // TODO jun: Add semantics for checking overloads (different parameter types)
@@ -1417,7 +1417,7 @@ namespace ProtoImperative
                         }
                         else
                         {
-                            Debug.Assert(false, "Check generated AST");
+                            Validity.Assert(false, "Check generated AST");
                         }
 
                         ProtoCore.Type argType = BuildArgumentTypeFromVarDeclNode(argNode);
@@ -1465,10 +1465,10 @@ namespace ProtoImperative
                 localProcedure = codeBlock.procedureTable.procList[globalProcIndex];
 
 
-                Debug.Assert(null != localProcedure);
+                Validity.Assert(null != localProcedure);
                 localProcedure.Attributes = PopulateAttributes(funcDef.Attributes);
                 // Its only on the parse body pass where the real pc is determined. Update this procedures' pc
-                //Debug.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == localProcedure.pc);
+                //Validity.Assert(ProtoCore.DSASM.Constants.kInvalidIndex == localProcedure.pc);
                 localProcedure.pc = pc;
 
                 // Copy the active function to the core so nested language blocks can refer to it
@@ -1838,7 +1838,7 @@ namespace ProtoImperative
                  * */
                 // Else-body     
 
-                Debug.Assert(null != ifnode.ElseBody);
+                Validity.Assert(null != ifnode.ElseBody);
                 if (0 != ifnode.ElseBody.Count)
                 {
                     // Create a new symboltable for this block
@@ -2043,8 +2043,8 @@ namespace ProtoImperative
                 BinaryExpressionNode bNode = varNode.NameNode as BinaryExpressionNode;
                 tVar = bNode.LeftNode as IdentifierNode;
 
-                Debug.Assert(null != tVar, "Check generated AST");
-                Debug.Assert(null != bNode.RightNode, "Check generated AST");
+                Validity.Assert(null != tVar, "Check generated AST");
+                Validity.Assert(null != bNode.RightNode, "Check generated AST");
 
                 ProtoCore.DSASM.SymbolNode symnode = null;
 
@@ -2099,7 +2099,7 @@ namespace ProtoImperative
             }
             else
             {
-                Debug.Assert(false, "Check generated AST");
+                Validity.Assert(false, "Check generated AST");
             }
 
             if (ProtoCore.DSASM.Constants.kInvalidIndex == symindex)
@@ -2516,7 +2516,7 @@ namespace ProtoImperative
                 // including the left-most property) with getters/setter.
                 // 
                 // If this case really happens, we need to look into that.
-                Debug.Assert(false, "The left hand of an assignment statement never will be an identifier list node");
+                Validity.Assert(false, "The left hand of an assignment statement never will be an identifier list node");
 
                 /*
                 int depth = 0;
@@ -3015,7 +3015,7 @@ namespace ProtoImperative
 
             exceptionHandler.StartPc = pc;
             TryBlockNode tryNode = exceptionNode.tryBlock;
-            Debug.Assert(tryNode != null);
+            Validity.Assert(tryNode != null);
             foreach (var subnode in tryNode.body)
             {
                 ProtoCore.Type inferedType = new ProtoCore.Type();
@@ -3036,7 +3036,7 @@ namespace ProtoImperative
                 exceptionHandler.AddCatchHandler(catchHandler);
 
                 CatchFilterNode filterNode = catchBlock.catchFilter;
-                Debug.Assert(filterNode != null);
+                Validity.Assert(filterNode != null);
                 catchHandler.FilterTypeUID = core.TypeSystem.GetType(filterNode.type.Name);
                 if (catchHandler.FilterTypeUID == (int)PrimitiveType.kInvalidType)
                 {

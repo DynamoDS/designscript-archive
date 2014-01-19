@@ -205,6 +205,7 @@ c = 1;";
         }
 
         [Test]
+        [Ignore]
         [Category("WatchFx Tests")]
         public void T003_Defect_1467629_Debugging_InlineCondition_With_Multiple_Return_Types()
         {

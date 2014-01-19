@@ -58,8 +58,8 @@ namespace ProtoCore.DSASM
 
         public bool ConvertibleTo(int type)
         {
-            Debug.Assert(null != coerceTypes);
-            Debug.Assert((int)PrimitiveType.kInvalidType != classId);
+            Validity.Assert(null != coerceTypes);
+            Validity.Assert((int)PrimitiveType.kInvalidType != classId);
 
             if ((int)PrimitiveType.kTypeNull == classId || coerceTypes.ContainsKey(type))
             { 
@@ -96,7 +96,7 @@ namespace ProtoCore.DSASM
 
         public int GetCoercionScore(int type)
         {
-            Debug.Assert(null != coerceTypes);
+            Validity.Assert(null != coerceTypes);
             int score = (int)ProtoCore.DSASM.ProcedureDistance.kNotMatchScore;
 
             if (type == classId)
@@ -125,7 +125,7 @@ namespace ProtoCore.DSASM
 
             foreach (int baseIndex in baseList)
             {
-                Debug.Assert(baseIndex != (int)PrimitiveType.kInvalidType);
+                Validity.Assert(baseIndex != (int)PrimitiveType.kInvalidType);
                 if (type == baseIndex)
                     return true;
 
@@ -491,7 +491,7 @@ namespace ProtoCore.DSASM
 
         public int IndexOf(string name)
         {
-            Debug.Assert(null != name);
+            Validity.Assert(null != name);
 
             int index = ProtoCore.DSASM.Constants.kInvalidIndex;
             if (!classIndexMap.TryGetValue(name, out index))

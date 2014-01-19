@@ -183,6 +183,7 @@
     <Compile Include="TD\MultiLangTests\UseCaseTesting.cs" />
     <Compile Include="TD\OtherMiscTests\MiscTest.cs" />
     <Compile Include="TD\ArrayUtilsTest.cs" />
+    <Compile Include="TD\TraceUtilsTests.cs" />
     <Compile Include="UtilsTests\ClassUtilsTest.cs" />
     <Compile Include="UtilsTests\CoreDump.cs" />
     <Compile Include="UtilsTests\TextFxTests.cs" />
@@ -216,6 +217,9 @@
       <Project>{2235F7CA-AB25-4177-92BC-4B574D2D5DF6}</Project>
       <Name>ProtoTestFx</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TraceTests\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!--

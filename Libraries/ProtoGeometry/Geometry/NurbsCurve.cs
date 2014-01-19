@@ -395,7 +395,7 @@ namespace Autodesk.DesignScript.Geometry
 
             INurbsCurveEntity ent = null;
             if (null != startTangent && null != endTangent)
-                ent = HostFactory.Factory.NurbsCurveByPoints(hosts, startTangent.VectorEntity, endTangent.VectorEntity);
+                ent = HostFactory.Factory.NurbsCurveByPointsTangents(hosts, startTangent.VectorEntity, endTangent.VectorEntity);
             else
                 ent = HostFactory.Factory.NurbsCurveByPoints(hosts, makePeriodic);
             if (ent == null)

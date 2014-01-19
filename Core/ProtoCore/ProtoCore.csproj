@@ -116,6 +116,7 @@
     <Compile Include="DSASM\Mirror\ExecutionMirror.cs" />
     <Compile Include="Exceptions\CompilerInternalException.cs" />
     <Compile Include="Exceptions\ExceptionHandling.cs" />
+    <Compile Include="Exceptions\MethodResolution.cs" />
     <Compile Include="Exceptions\ReplicationException.cs" />
     <Compile Include="FFI\ContextData.cs" />
     <Compile Include="FFI\ContextDataManager.cs" />
@@ -129,6 +130,7 @@
     <Compile Include="Lang\FunctionPointerEvaluator.cs" />
     <Compile Include="Lang\Replication\ReplicationInstruction.cs" />
     <Compile Include="Lang\Replication\Replicator.cs" />
+    <Compile Include="Lang\TraceUtils.cs" />
     <Compile Include="ParserUtils.cs" />
     <Compile Include="Reflection\GraphicDataProvider.cs" />
     <Compile Include="Reflection\Mirror.cs" />

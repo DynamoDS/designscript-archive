@@ -147,9 +147,9 @@ namespace Autodesk.DesignScript.Geometry
             if (hostGuides == null || hostGuides.Length < 1)
                 throw new System.ArgumentException(string.Format(Properties.Resources.InvalidArguments, "guides"), "guides");
 
-            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoft(hostXCurves, hostGuides);
+            ISurfaceEntity entity = HostFactory.Factory.SurfaceByLoftGuides(hostXCurves, hostGuides);
             if (entity == null)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.LoftFromCrossSectionsGuides"));
+                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Surface.SurfaceByLoftGuides"));
             return entity;
         }
         

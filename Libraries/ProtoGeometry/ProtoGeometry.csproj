@@ -92,6 +92,7 @@
     <Compile Include="Geometry\Arc.cs" />
     <Compile Include="Geometry\Block.cs" />
     <Compile Include="Geometry\BoundingBox.cs" />
+    <Compile Include="Geometry\IndexGroup.cs" />
     <Compile Include="Geometry\NurbsCurve.cs" />
     <Compile Include="Geometry\NurbsSurface.cs" />
     <Compile Include="Geometry\LoftedSurface.cs" />

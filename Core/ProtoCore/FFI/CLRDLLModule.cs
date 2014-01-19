@@ -929,7 +929,7 @@ namespace ProtoFFI
                     types = Module.FindTypes(myFilter, typeName);
                 }
 
-                System.Diagnostics.Debug.Assert(types.Length == 1, "More than one specified type found in the module.");
+                Validity.Assert(types.Length == 1, "More than one specified type found in the module.");
             }
             return types;
         }

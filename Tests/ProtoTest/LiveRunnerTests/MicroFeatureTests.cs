@@ -2191,5 +2191,109 @@ z=Point.ByCoordinates(y,a,a);
                 }
             }
         }
+
+        [Test]
+        public void TestSimpleFunctionRedefinition01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 5;} x = f();",
+                "def f() { return = 10; } x = f();"
+            };
+
+            Guid guid = System.Guid.NewGuid();
+
+            {
+                List<Subtree> added = new List<Subtree>();
+                added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("x", 5);
+            }
+
+            {
+                // Modify the function and verify
+                List<Subtree> modified = new List<Subtree>();
+                modified.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+                var syncData = new GraphSyncData(null, null, modified);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("x", 10);
+            }
+        }
+
+        [Test]
+        public void TestFunctionRedefinitionOnNewNode01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 5;} x = f();",
+                "def f() { return = 10; } y = f();"
+            };
+
+            Guid guid = System.Guid.NewGuid();
+            List<Subtree> added = new List<Subtree>();
+
+            {
+                added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("x", 5);
+            }
+
+            // Simualate creating a new CBN for a function definition
+            // This should still yield the same result as the codegen will not add the new function.
+            // This error will have been handled at the front-end (UI)
+            guid = System.Guid.NewGuid();
+            {
+                added = new List<Subtree>();
+                added.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("y", 5);
+            }
+        }
+
+        public void TestFunctionOverloadOnNewNode01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 5;} x = f();",
+                "def f(i : int) { return = i + 1; } y = f(5);"
+            };
+
+            Guid guid = System.Guid.NewGuid();
+            List<Subtree> added = new List<Subtree>();
+
+            {
+                added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("x", 5);
+            }
+
+            // Simualate creating a new CBN for a function definition
+            // This should still yield the same result as the codegen will not add the new function.
+            // This error will have been handled at the front-end (UI)
+            guid = System.Guid.NewGuid();
+            {
+                added = new List<Subtree>();
+                added.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+                var syncData = new GraphSyncData(null, added, null);
+                astLiveRunner.UpdateGraph(syncData);
+
+                AssertValue("y", 6);
+            }
+        }
     }
 }

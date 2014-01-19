@@ -41,9 +41,9 @@ namespace Autodesk.DesignScript.Interfaces
     [Browsable(false)]
     public interface IVectorEntity : IDesignScriptEntity, ITransformableEntity
     {
-        double X { get; }
-        double Y { get; }
-        double Z { get; }
+        double X { get; set; }
+        double Y { get; set; }
+        double Z { get; set; }
 
         /// <summary>
         /// Tolerance is set at the Host level
@@ -412,8 +412,6 @@ namespace Autodesk.DesignScript.Interfaces
         ICurveEntity ExtendEnd(double distance);
 
         ICurveEntity[] ApproximateWithArcAndLineSegments();
-
-        IGeometryEntity[] Project(IGeometryEntity otherGeom, IVectorEntity vec);
 
         /// <summary>
         /// Converts the Curve to a NurbsCurve, if needs be
@@ -1077,17 +1075,17 @@ namespace Autodesk.DesignScript.Interfaces
         int GetAdjacentFaceCount();
     }
 
-    public interface IIndexGroup
+    public interface IIndexGroupEntity
     {
         /// <summary>
         /// Either 3 or 4, depending if it represents a triangle or a quad
         /// </summary>
-        int Count { get; set; }
+        uint Count { get; set; }
 
-        int A { get; set; }
-        int B { get; set; }
-        int C { get; set; }
-        int D { get; set; }
+        uint A { get; set; }
+        uint B { get; set; }
+        uint C { get; set; }
+        uint D { get; set; }
     }
 
     [Browsable(false)]
