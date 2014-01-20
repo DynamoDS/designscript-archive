@@ -9,15 +9,16 @@ using System.Collections.Generic;
 
 namespace ProtoScript
 {
-	public class MainClass
-	{
-		public static void Main(string[] args)
+    public class MainClass
+    {
+        public static void Main(string[] args)
         {
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
 
+            bool testScript = string.Equals(args[0], "test") && args.Length == 2;
             var opts = new Options();
-            if (args.Length == 0)
+            if (args.Length == 0 || testScript)
             {
                 opts.WebRunner = false;
             }
@@ -34,9 +35,19 @@ namespace ProtoScript
 
             if (!opts.WebRunner)
             {
+                string fileName;
+                if (testScript)
+                {
+                    fileName = args[1];
+                }
+                else
+                {
+                    fileName = @"..\..\..\Scripts\defectverify.ds";
+                }
+
                 ProtoScriptTestRunner runner = new ProtoScriptTestRunner();
                 DLLFFIHandler.Register(FFILanguage.CSharp, new CSModuleHelper());
-                ExecutionMirror mirror = runner.LoadAndExecute(@"..\..\..\Scripts\defectverify.ds", core);
+                ExecutionMirror mirror = runner.LoadAndExecute(fileName, core);
                 string str = mirror.GetCoreDump();
                 //Console.WriteLine(str);
             }
@@ -51,7 +62,7 @@ namespace ProtoScript
                 {
                     string str = mirror.GetCoreDump();
                     // core.coreDumpWriter.WriteLine(str);
-                            
+
                 }
 
                 // @TODO(Gemeng): 'coreDumpWriter' has been removed, instead of 
@@ -61,7 +72,7 @@ namespace ProtoScript
                 // core.coreDumpWriter.Close();
             }
 
-            
+
             //runner.LoadAndExecute(@"..\..\..\Scripts\array.ds", core);
             //runner.LoadAndExecute(@"..\..\..\Scripts\arrayargs.ds", core);
             //runner.LoadAndExecute(@"..\..\..\Scripts\class.ds", core);
@@ -93,7 +104,7 @@ namespace ProtoScript
             //runner.LoadAndExecute(@"..\..\..\Scripts\importtest.ds", core);
 
             //ExecutionMirror mirror = null;   
-            
+
 
 
             //string str = mirror.GetCoreDump();
@@ -106,6 +117,6 @@ namespace ProtoScript
                 Console.ReadLine();
             }
         }
-	}
+    }
 }
 
