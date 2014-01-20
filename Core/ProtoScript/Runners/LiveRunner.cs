@@ -784,6 +784,44 @@ namespace ProtoScript.Runners
             }
         }
 
+        private List<AssociativeNode> GetASTNodesDependentOnFunctionList(List<FunctionDefinitionNode> fnodeList)
+        {
+            // Determine if the modified function was used in any of the current nodes
+            List<AssociativeNode> modifiedNodes = new List<AssociativeNode>();
+
+            // Iterate through the vm graphnodes at the global scope
+            foreach (ProtoCore.AssociativeGraph.GraphNode gnode in runnerCore.DSExecutable.instrStreamList[0].dependencyGraph.GraphList)
+            {
+                // For every function in the modified function list
+                foreach (FunctionDefinitionNode fnode in fnodeList)
+                {
+                    // Iterate through the current ast nodes 
+                    foreach (KeyValuePair<System.Guid, Subtree> kvp in currentSubTreeList)
+                    {
+                        foreach (AssociativeNode assocNode in kvp.Value.AstNodes)
+                        {
+                            if (assocNode is BinaryExpressionNode)
+                            {
+                                if (gnode.exprUID == (assocNode as BinaryExpressionNode).exprUID)
+                                {
+                                    // Check if the procedure associatied with this graphnode matches thename and arg count of the modified proc
+                                    if (null != gnode.firstProc)
+                                    {
+                                        if (gnode.firstProc.name == fnode.Name
+                                            && gnode.firstProc.argInfoList.Count == fnode.Signature.Arguments.Count)
+                                        {
+                                            // If it does, create a new ast tree for this graphnode and append it to deltaAstList
+                                            modifiedNodes.Add(assocNode);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return modifiedNodes;
+        }
 
         /// <summary>
         /// Takes in a Subtree to delete or modify and marks the corresponding gragh nodes in DS inactive.
@@ -1003,6 +1041,7 @@ namespace ProtoScript.Runners
             {
                 foreach (var st in syncData.ModifiedSubtrees)
                 {
+                    List<FunctionDefinitionNode> modifiedFunctions = new List<FunctionDefinitionNode>();
                     if (st.AstNodes != null)
                     {
                         var nullNodes = MarkGraphNodesInactive(st);
@@ -1013,6 +1052,15 @@ namespace ProtoScript.Runners
                         deltaAstList.AddRange(st.AstNodes);
 
                         UndefineFunctions(st.AstNodes.Where(n => n is FunctionDefinitionNode));
+
+                        // Get the modified function list
+                        foreach (AssociativeNode fnode in st.AstNodes)
+                        {
+                            if (fnode is FunctionDefinitionNode)
+                            {
+                                modifiedFunctions.Add(fnode as FunctionDefinitionNode);
+                            }
+                        }
                     }
 
                     Subtree oldSubTree;
@@ -1024,6 +1072,8 @@ namespace ProtoScript.Runners
                         }
                         currentSubTreeList[st.GUID] = st;
                     }
+
+                    deltaAstList.AddRange(GetASTNodesDependentOnFunctionList(modifiedFunctions));
                 }
             }
 
@@ -1039,6 +1089,7 @@ namespace ProtoScript.Runners
                     currentSubTreeList.Add(st.GUID, st);
                 }
             }
+
             CompileAndExecuteForDeltaExecution(deltaAstList);
         }
 
