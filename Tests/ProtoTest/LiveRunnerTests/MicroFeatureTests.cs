@@ -2261,6 +2261,94 @@ z=Point.ByCoordinates(y,a,a);
             }
         }
 
+
+        [Test]
+        public void TestFunctionRedefinitionOnExistingNode01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 5;}",
+                "x = f();",
+                "def f() { return = 10; }"
+            };
+
+            // Create 2 CBNs 
+
+            List<Subtree> added = new List<Subtree>();
+
+
+            // A CBN with function def f
+            Guid guid_func = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func, codes[0]));
+
+            // A new CBN that uses function f
+            Guid guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            AssertValue("x", 5);
+
+
+            // Redefine the CBN
+            List<Subtree> modified = new List<Subtree>();
+
+            // Mark the CBN that uses f as modified
+            modified.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+            modified.Add(CreateSubTreeFromCode(guid_func, codes[2]));
+
+            syncData = new GraphSyncData(null, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify that x must have automatically re-executed
+            AssertValue("x", 10);
+
+        }
+
+        [Test]
+        public void TestFunctionRedefinitionOnUnmodifiedNode01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "def f() { return = 5;}",
+                "x = f();",
+                "def f() { return = 10; }"
+            };
+
+            // Create 2 CBNs 
+
+            List<Subtree> added = new List<Subtree>();
+
+
+            // A CBN with function def f
+            Guid guid_func = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func, codes[0]));
+
+            // A new CBN that uses function f
+            Guid guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            AssertValue("x", 5);
+
+
+            // Redefine the CBN
+            List<Subtree> modified = new List<Subtree>();
+
+            modified.Add(CreateSubTreeFromCode(guid_func, codes[2]));
+
+            syncData = new GraphSyncData(null, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify that x must have automatically re-executed
+            AssertValue("x", 10);
+
+        }
+
         public void TestFunctionOverloadOnNewNode01()
         {
             List<string> codes = new List<string>() 
