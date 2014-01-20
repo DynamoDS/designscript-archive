@@ -18,6 +18,7 @@ namespace ProtoTest.ProtoAST
         {
         }
 
+
         [Test]
         public void TestProtoASTExecute_Assign01()
         {
@@ -1625,6 +1626,220 @@ namespace ProtoTest.ProtoAST
 
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             Assert.IsTrue((Int64)mirror.GetValue("a").Payload == 20);
+        }
+
+        [Test]
+        public void TestProtoASTExecute_Imperative_Assign01()
+        {
+            //
+            //  a = [Imperative]
+            //  {
+            //      return = 10;
+            //  }
+            //
+
+            List<ProtoCore.AST.ImperativeAST.ImperativeNode> imperativeList = new List<ProtoCore.AST.ImperativeAST.ImperativeNode>();
+
+            // return = 10
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode imperativeAssign = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("return"),
+                new ProtoCore.AST.ImperativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.assign);
+            imperativeList.Add(imperativeAssign);
+
+
+            // Build the language block
+            ProtoCore.AST.ImperativeAST.CodeBlockNode imperativeCodeBlock = new ProtoCore.AST.ImperativeAST.CodeBlockNode();
+            imperativeCodeBlock.Body = imperativeList;
+
+            ProtoCore.AST.AssociativeAST.LanguageBlockNode langblock = new ProtoCore.AST.AssociativeAST.LanguageBlockNode();
+            langblock.codeblock = new ProtoCore.LanguageCodeBlock(ProtoCore.Language.kImperative);
+            langblock.CodeBlockNode = imperativeCodeBlock;
+
+
+            // Build an assignment where the rhs is the imperative block
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                langblock,
+                ProtoCore.DSASM.Operator.assign);
+
+
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(assign);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Assert.IsTrue((Int64)o.Payload == 10);
+        }
+
+        [Test]
+        public void TestProtoASTExecute_Imperative_IfStatement01()
+        {
+            //
+            //  a = [Imperative]
+            //  {
+            //      b = 10;
+            //      if (b == 10)
+            //      {
+            //          b = 11;
+            //      }
+            //      return = b;
+            //  }
+            //
+
+            List<ProtoCore.AST.ImperativeAST.ImperativeNode> imperativeList = new List<ProtoCore.AST.ImperativeAST.ImperativeNode>();
+
+            // b = 10
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode imperativeAssign = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.ImperativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.assign);
+            imperativeList.Add(imperativeAssign);
+
+            // if (b == 10)
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode equality = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.ImperativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.eq);
+
+            ProtoCore.AST.ImperativeAST.IfStmtNode ifNode = new ProtoCore.AST.ImperativeAST.IfStmtNode();
+            ifNode.IfExprNode = equality;
+
+            // b = 11
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode ifCodeBlockStmt = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.ImperativeAST.IntNode("11"),
+                ProtoCore.DSASM.Operator.assign);
+            List<ProtoCore.AST.ImperativeAST.ImperativeNode> ifCodeBlock = new List<ProtoCore.AST.ImperativeAST.ImperativeNode>();
+            ifCodeBlock.Add(ifCodeBlockStmt);
+            ifNode.IfBody = ifCodeBlock;
+
+            imperativeList.Add(ifNode);
+
+            // return = b
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode returnStmt = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("return"),
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                ProtoCore.DSASM.Operator.assign);
+            imperativeList.Add(returnStmt);
+
+
+            // Build the language block
+            ProtoCore.AST.ImperativeAST.CodeBlockNode imperativeCodeBlock = new ProtoCore.AST.ImperativeAST.CodeBlockNode();
+            imperativeCodeBlock.Body = imperativeList;
+
+            ProtoCore.AST.AssociativeAST.LanguageBlockNode langblock = new ProtoCore.AST.AssociativeAST.LanguageBlockNode();
+            langblock.codeblock = new ProtoCore.LanguageCodeBlock(ProtoCore.Language.kImperative);
+            langblock.CodeBlockNode = imperativeCodeBlock;
+
+
+            // Build an assignment where the rhs is the imperative block
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                langblock,
+                ProtoCore.DSASM.Operator.assign);
+
+
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(assign);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Assert.IsTrue((Int64)o.Payload == 11);
+        }
+
+        [Test]
+        public void TestProtoASTExecute_Imperative_IfStatement02()
+        {
+            //
+            //  a = [Imperative]
+            //  {
+            //      b = 10;
+            //      if (b > 10)
+            //      {
+            //          b = 11;
+            //      }
+            //      else
+            //      {
+            //          b = 12
+            //      }
+            //      return = b;
+            //  }
+            //
+
+            List<ProtoCore.AST.ImperativeAST.ImperativeNode> imperativeList = new List<ProtoCore.AST.ImperativeAST.ImperativeNode>();
+
+            // b = 10
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode imperativeAssign = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.ImperativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.assign);
+            imperativeList.Add(imperativeAssign);
+
+            // if (b > 10)
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode equality = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.ImperativeAST.IntNode("10"),
+                ProtoCore.DSASM.Operator.gt);
+
+            ProtoCore.AST.ImperativeAST.IfStmtNode ifNode = new ProtoCore.AST.ImperativeAST.IfStmtNode();
+            ifNode.IfExprNode = equality;
+
+            // if body
+            // b = 11
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode ifCodeBlockStmt = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.ImperativeAST.IntNode("11"),
+                ProtoCore.DSASM.Operator.assign);
+            List<ProtoCore.AST.ImperativeAST.ImperativeNode> ifCodeBlock = new List<ProtoCore.AST.ImperativeAST.ImperativeNode>();
+            ifCodeBlock.Add(ifCodeBlockStmt);
+            ifNode.IfBody = ifCodeBlock;
+
+            // else body
+            // b = 12
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode elseCodeBlockStmt = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                new ProtoCore.AST.ImperativeAST.IntNode("12"),
+                ProtoCore.DSASM.Operator.assign);
+            List<ProtoCore.AST.ImperativeAST.ImperativeNode> elseCodeBlock = new List<ProtoCore.AST.ImperativeAST.ImperativeNode>();
+            elseCodeBlock.Add(elseCodeBlockStmt);
+            ifNode.ElseBody = elseCodeBlock;
+
+            imperativeList.Add(ifNode);
+
+            // return = b
+            ProtoCore.AST.ImperativeAST.BinaryExpressionNode returnStmt = new ProtoCore.AST.ImperativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("return"),
+                new ProtoCore.AST.ImperativeAST.IdentifierNode("b"),
+                ProtoCore.DSASM.Operator.assign);
+            imperativeList.Add(returnStmt);
+
+
+            // Build the language block
+            ProtoCore.AST.ImperativeAST.CodeBlockNode imperativeCodeBlock = new ProtoCore.AST.ImperativeAST.CodeBlockNode();
+            imperativeCodeBlock.Body = imperativeList;
+
+            ProtoCore.AST.AssociativeAST.LanguageBlockNode langblock = new ProtoCore.AST.AssociativeAST.LanguageBlockNode();
+            langblock.codeblock = new ProtoCore.LanguageCodeBlock(ProtoCore.Language.kImperative);
+            langblock.CodeBlockNode = imperativeCodeBlock;
+
+
+            // Build an assignment where the rhs is the imperative block
+            ProtoCore.AST.AssociativeAST.BinaryExpressionNode assign = new ProtoCore.AST.AssociativeAST.BinaryExpressionNode(
+                new ProtoCore.AST.AssociativeAST.IdentifierNode("a"),
+                langblock,
+                ProtoCore.DSASM.Operator.assign);
+
+
+            List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList = new List<ProtoCore.AST.AssociativeAST.AssociativeNode>();
+            astList.Add(assign);
+
+            // Verify the results
+            ExecutionMirror mirror = thisTest.RunASTSource(astList);
+            Obj o = mirror.GetValue("a");
+            Assert.IsTrue((Int64)o.Payload == 12);
         }
     }
 

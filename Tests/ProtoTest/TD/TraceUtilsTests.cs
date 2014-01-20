@@ -23,11 +23,11 @@ namespace ProtoTest.TD
              Dictionary<String,Object> data = new Dictionary<string, object>();
             data.Add(keys[0], testStr1);
 
-            TraceUtils.SetObjectToTrace(data);
+            TraceUtils.SetObjectToTLS(data);
 
             //Set complete, readback test
 
-            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTrace();
+            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTLS();
             Assert.IsTrue((String)readback[keys[0]] == testStr1);
         }
 
@@ -50,22 +50,56 @@ namespace ProtoTest.TD
             data2.Add(keys[0], testStr2);
 
 
-            TraceUtils.SetObjectToTrace(data);
+            TraceUtils.SetObjectToTLS(data);
 
             //Set complete, readback test
 
-            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTrace();
+            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTLS();
             Assert.IsTrue((String)readback[keys[0]] == testStr1);
 
 
 
-            TraceUtils.SetObjectToTrace(data2);
+            TraceUtils.SetObjectToTLS(data2);
 
             //Set complete, readback test
 
-            readback = TraceUtils.GetObjectFromTrace();
+            readback = TraceUtils.GetObjectFromTLS();
             Assert.IsTrue((String)readback[keys[0]] == testStr2);
         }
+
+
+        [Test]
+        [Category("Trace")]
+        public static void OverwriteNullTest()
+        {
+
+            List<String> keys = TraceUtils.TEMP_GetTraceKeys();
+
+            String testStr1 = "{0955D962-2936-4FB2-AAB3-635C6FF6E0AD}";
+
+
+            Dictionary<String, Object> data = new Dictionary<string, object>();
+            data.Add(keys[0], testStr1);
+
+
+            TraceUtils.SetObjectToTLS(data);
+
+            //Set complete, readback test
+
+            Dictionary<String, Object> readback = TraceUtils.GetObjectFromTLS();
+            Assert.IsTrue((String)readback[keys[0]] == testStr1);
+
+
+            data[keys[0]] = null;
+
+            TraceUtils.SetObjectToTLS(data);
+
+            //Set complete, readback test
+
+            readback = TraceUtils.GetObjectFromTLS();
+            Assert.IsTrue((String)readback[keys[0]] == null);
+        }
+
 
 
 
