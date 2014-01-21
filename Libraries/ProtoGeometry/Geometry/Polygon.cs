@@ -153,7 +153,7 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <param name="vertices">Array of Point.</param>
         /// <returns>Polygon</returns>
-        public static Polygon ByVertices(Point[] vertices)
+        public static Polygon ByPoints(Point[] vertices)
         {
             return new Polygon(vertices, true);
         }

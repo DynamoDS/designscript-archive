@@ -331,22 +331,25 @@ namespace Autodesk.DesignScript.Geometry
             return Solid.Sweep(this, path);
         }
 
-        /// <summary>
-        /// def ExtrudeAsSurface: Surface (distance : double, direction : Vector)
-        /// 
-        /// Returns an extruded surface upon extruding a curve in a given direction 
-        /// by an input distance. This surface may have multiple faces, if this 
-        /// curve is not C1 continuous.
-        /// </summary>
-        /// <param name="distance"></param>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        public Surface ExtrudeAsSurface(double distance, Vector direction)
+        public Surface Extrude(double distance)
+        {
+            ISurfaceEntity extrude = CurveEntity.Extrude(distance);
+            return extrude.ToSurf(true, this);
+        }
+
+        public Surface Extrude(Vector direction)
         {
             if (direction == null)
                 throw new System.ArgumentNullException("direction");
-            if (!IsPlanar)
-                throw new System.InvalidOperationException(Properties.Resources.CurveNotPlanar);
+
+            ISurfaceEntity extrude = CurveEntity.Extrude(direction.VectorEntity);
+            return extrude.ToSurf(true, this);
+        }
+
+        public Surface Extrude(double distance, Vector direction)
+        {
+            if (direction == null)
+                throw new System.ArgumentNullException("direction");
 
             ISurfaceEntity extrude = CurveEntity.Extrude(direction.VectorEntity, distance);
             return extrude.ToSurf(true, this);

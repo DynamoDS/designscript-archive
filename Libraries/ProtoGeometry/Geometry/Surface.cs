@@ -210,7 +210,7 @@ namespace Autodesk.DesignScript.Geometry
             get
             {
                 if (null == mPatches)
-                    mPatches = ConvertToBSplineSurface(false);
+                    mPatches = ConvertToNurbsSurface(false);
                 return mPatches;
             }
         }
@@ -652,9 +652,9 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <returns>Array of BSplineSurface.</returns>
         [AllowRankReduction]
-        public NurbsSurface[] ConvertToBSplineSurface()
+        public NurbsSurface[] ConvertToNurbsSurface()
         {
-            return ConvertToBSplineSurface(true);
+            return ConvertToNurbsSurface(true);
         }
 
         /// <summary>
@@ -662,7 +662,7 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <param name="persist"></param>
         /// <returns></returns>
-        protected NurbsSurface[] ConvertToBSplineSurface(bool persist)
+        protected NurbsSurface[] ConvertToNurbsSurface(bool persist)
         {
             if (SurfaceEntity is INurbsSurfaceEntity)
             {
