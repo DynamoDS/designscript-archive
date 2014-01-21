@@ -454,11 +454,10 @@ namespace ProtoCore.DSASM
         // It is a performance bottleneck for finding index of a class when
         // importing a HUGE extension dll. The other alternative is using 
         // Trie. - Yu Ke
-        private Dictionary<string, int> classIndexMap = new Dictionary<string, int>();
+        private NameSpace.SymbolTable symbolTable = new NameSpace.SymbolTable();
 
         public ClassTable()
         {
-            classIndexMap[ProtoCore.DSDefinitions.Keyword.Invalid] = ProtoCore.DSASM.Constants.kInvalidIndex;
         }
 
         public void Reserve(int size)
@@ -472,42 +471,48 @@ namespace ProtoCore.DSASM
 
         public int Append(ClassNode node)
         {
-            if (IndexOf(node.name) != ProtoCore.DSASM.Constants.kInvalidIndex)
+            NameSpace.Symbol symbol = symbolTable.AddSymbol(node.name);
+            if (null == symbol)
             {
                 return ProtoCore.DSASM.Constants.kInvalidIndex;
             }
 
             classNodes.Add(node);
             node.classId = classNodes.Count - 1;
-            classIndexMap[node.name] = node.classId;
+            symbol.Id = node.classId;
             return node.classId;
         }
 
         public void SetClassNodeAt(ClassNode node, int index)
         {
             classNodes[index] = node;
-            classIndexMap[node.name] = index;
+            NameSpace.Symbol symbol = null;
+            if (!symbolTable.TryGetExactSymbol(node.name, out symbol))
+                symbol = symbolTable.AddSymbol(node.name);
+
+            symbol.Id = index;
         }
 
         public int IndexOf(string name)
         {
             Validity.Assert(null != name);
 
-            int index = ProtoCore.DSASM.Constants.kInvalidIndex;
-            if (!classIndexMap.TryGetValue(name, out index))
-            {
-                return ProtoCore.DSASM.Constants.kInvalidIndex;
-            }
-            else
-            {
-                return index;
-            }
+            NameSpace.Symbol symbol = null;
+            if (symbolTable.TryGetUniqueSymbol(name, out symbol))
+                return symbol.Id;
+            
+            return ProtoCore.DSASM.Constants.kInvalidIndex;
         }
 
-        public bool DoesExist(string name)
+        public bool TryGetFullyQualifiedName(string name, out string fullName)
         {
             Validity.Assert(null != name);
-            return ProtoCore.DSASM.Constants.kInvalidIndex != IndexOf(name);
+            NameSpace.Symbol symbol = null;
+            fullName = string.Empty;
+            if (symbolTable.TryGetUniqueSymbol(name, out symbol))
+                fullName = symbol.FullName;
+
+            return !string.IsNullOrEmpty(fullName);
         }
 
         public string GetTypeName(int UID)
