@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ProtoCore.NameSpace
+namespace ProtoCore.Namespace
 {
     /// <summary>
     /// Symbol class : It represents a symbol with namespace.
@@ -15,7 +15,7 @@ namespace ProtoCore.NameSpace
         private string[] namespaces;
         private string symbolname;
         
-        private static string[] GetNameSpaces(string name, out string symbolname)
+        private static string[] GetNamespaces(string name, out string symbolname)
         {
             var names = name.Split('.');
             int size = names.Length;
@@ -35,7 +35,7 @@ namespace ProtoCore.NameSpace
         public Symbol(string fullname)
         {
             FullName = fullname;
-            namespaces = GetNameSpaces(fullname, out symbolname);
+            namespaces = GetNamespaces(fullname, out symbolname);
         }
 
         /// <summary>
@@ -71,12 +71,14 @@ namespace ProtoCore.NameSpace
         public bool Matches(string partialname)
         {
             string symbol;
-            var given = GetNameSpaces(partialname, out symbol);
+            string[] given = GetNamespaces(partialname, out symbol);
 
             //Match the symbold name first
             if (!this.Name.Equals(symbol))
                 return false;
 
+            //index is tracking which of the given names is currently being 
+            //tested to ensure that it's in the right order in the the namespace list
             int index = 0;
             for (int i = 0; i < namespaces.Length && index < given.Length; ++i)
             {

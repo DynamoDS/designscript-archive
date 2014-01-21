@@ -169,7 +169,7 @@ namespace ProtoFFI
         /// <summary>
         /// DesignScript Class name, together with Namespace name
         /// </summary>
-        public string FullName { get { return CLRType.FullName; } }
+        public string FullName { get { return ClassNode.className; } }
 
         /// <summary>
         /// CLRDLLModule from which this type was imported.
@@ -928,8 +928,6 @@ namespace ProtoFFI
                     TypeFilter myFilter = ClassFilter;
                     types = Module.FindTypes(myFilter, typeName);
                 }
-
-                //Validity.Assert(types.Length <= 1, "More than one specified type found in the module.");
             }
             return types;
         }
