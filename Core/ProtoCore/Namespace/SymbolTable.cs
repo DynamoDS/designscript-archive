@@ -197,8 +197,8 @@ namespace ProtoCore.NameSpace
         }
 
         /// <summary>
-        /// Finds a symbol in this table which has exactly same as given fully
-        /// qualified name.
+        /// Finds a symbol in this table which has exactly same name as given 
+        /// fully qualified name.
         /// </summary>
         /// <param name="fullName">Fully qualified name for lookup</param>
         /// <param name="symbol">Matching symbol for given fullName.</param>
@@ -215,11 +215,12 @@ namespace ProtoCore.NameSpace
         }
 
         /// <summary>
-        /// 
+        /// Finds a unique matching symbol for the given partial name.
         /// </summary>
-        /// <param name="partialName"></param>
-        /// <param name="symbol"></param>
-        /// <returns></returns>
+        /// <param name="partialName">Partial symbol name for lookup</param>
+        /// <param name="symbol">Matching symbol or null</param>
+        /// <returns>True if only one unique symbol could be found with given
+        /// partial name.</returns>
         public bool TryGetUniqueSymbol(string partialName, out Symbol symbol)
         {
             Symbol[] symbols = TryGetSymbols(partialName, (Symbol s) => s.Matches(partialName));
@@ -250,11 +251,11 @@ namespace ProtoCore.NameSpace
         #region Private Methods
 
         /// <summary>
-        /// 
+        /// Gets all symbols for the given name that satisfies the input predicate
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
+        /// <param name="name">symbol name for lookup</param>
+        /// <param name="predicate">predicate for lookup</param>
+        /// <returns>Array of matching symbols or empty array</returns>
         private Symbol[] TryGetSymbols(string name, Func<Symbol, bool> predicate)
         {
             string symbolName = name.Split('.').Last();
@@ -266,10 +267,10 @@ namespace ProtoCore.NameSpace
         }
 
         /// <summary>
-        /// 
+        /// Gets set of all symbols in this table for the given symbol name
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">Symbol name</param>
+        /// <returns>HashSet of Symbol</returns>
         private HashSet<Symbol> GetAllSymbols(string symbolName)
         {
             HashSet<Symbol> symbols = null;
