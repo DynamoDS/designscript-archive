@@ -1112,6 +1112,9 @@ namespace ProtoCore
         public bool EnableCallsiteExecutionState { get; set; }
         public CallsiteExecutionState csExecutionState { get; set; }
 
+        // A list of graphnodes that contain a function call
+        public List<AssociativeGraph.GraphNode> GraphNodeCallList { get; set; }
+
         /// <summary>
         /// Sets the function to an inactive state where it can no longer be used by the front-end and backend
         /// </summary>
@@ -1355,6 +1358,9 @@ namespace ProtoCore
             {
                 CodeBlockList[n].instrStream.instrList.Clear();
             }
+
+            // Remove inactive graphnodes in the list
+            GraphNodeCallList.RemoveAll(g => !g.isActive);
         }
 
         public void ResetForDeltaASTExecution()
@@ -1648,6 +1654,8 @@ namespace ProtoCore
                 csExecutionState = new CallsiteExecutionState();
             }
             ForLoopBlockIndex = ProtoCore.DSASM.Constants.kInvalidIndex;
+
+            GraphNodeCallList = new List<GraphNode>();
         }
 
         // The unique subscript for SSA temporaries
