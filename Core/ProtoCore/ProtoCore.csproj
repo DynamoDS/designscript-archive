@@ -131,6 +131,7 @@
     <Compile Include="Lang\Replication\ReplicationInstruction.cs" />
     <Compile Include="Lang\Replication\Replicator.cs" />
     <Compile Include="Lang\TraceUtils.cs" />
+    <Compile Include="Namespace\SymbolTable.cs" />
     <Compile Include="ParserUtils.cs" />
     <Compile Include="Reflection\GraphicDataProvider.cs" />
     <Compile Include="Reflection\Mirror.cs" />
