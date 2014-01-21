@@ -788,6 +788,13 @@ namespace ProtoCore.Lang
                         ret = StackUtils.BuildBoolean(result);
                         break;
                     }
+                case BuiltInMethods.MethodID.kEvaluateFunctionPointer:
+                    ret = ArrayUtilsForBuiltIns.EvaluateFunctionPointer(
+                        formalParameters[0], 
+                        formalParameters[1], 
+                        interpreter, 
+                        stackFrame);
+                    break;
                 default:
                     throw new ProtoCore.Exceptions.CompilerInternalException("Unknown built-in method. {AAFAE85A-2AEB-4E8C-90D1-BCC83F27C852}");
             }
@@ -2385,6 +2392,14 @@ namespace ProtoCore.Lang
             }
 
             return runtime.runtime.rmem.BuildArray(svList.ToArray());
+        }
+
+        internal static StackValue EvaluateFunctionPointer(StackValue function, StackValue parameters, Interpreter runtime, StackFrame stackFrame)
+        {
+            var args = runtime.runtime.rmem.GetArrayElements(parameters);
+            var evaluator = new FunctionPointerEvaluator(function, runtime);
+            StackValue ret = evaluator.Evaluate(args.ToList(), stackFrame);
+            return ret;
         }
     }
 
