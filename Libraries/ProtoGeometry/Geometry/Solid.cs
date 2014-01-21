@@ -466,11 +466,8 @@ namespace Autodesk.DesignScript.Geometry
             if (otherSolid == null)
                 throw new ArgumentNullException("otherSolid");
 
-            IGeometryEntity[] solids = SolidEntity.Intersect(otherSolid.SolidEntity);
-            if (solids == null || solids.Length == 0 || solids[0] == null)
-                throw new System.Exception(string.Format(Properties.Resources.OperationFailed, "Solid.Intersect"));
+            ISolidEntity host = SolidEntity.CSGIntersect(otherSolid.SolidEntity);
 
-            ISolidEntity host = solids[0] as ISolidEntity;
             return host.ToSolid(true, this);
         }
 

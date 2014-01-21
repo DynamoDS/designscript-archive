@@ -273,6 +273,11 @@ namespace Autodesk.DesignScript.Geometry
 
         #region DESIGNSCRIPT_CONSTRUCTORS
 
+        public static NurbsCurve ByControlVertices(Point[] controlVertices)
+        {
+            return ByControlVertices(controlVertices, 3, false);
+        }
+
         /// <summary>
         /// Constructs a non-periodic BSplineCurve with given control vertices and degree.
         /// </summary>

@@ -857,8 +857,11 @@ namespace Autodesk.DesignScript.Geometry
         /// <returns></returns>
         public CoordinateSystem Translate(double xTranslation, double yTranslation, double zTranslation)
         {
-            Vector direction = new Vector(xTranslation, yTranslation, zTranslation);
-            return Translate(direction, direction.GetLength());
+            ICoordinateSystemEntity clone = this.CSEntity.Clone();
+            clone.Translate(xTranslation, yTranslation, zTranslation);
+            var cs = new CoordinateSystem(clone, true);
+
+            return cs;
         }
 
         #endregion
