@@ -6257,7 +6257,8 @@ namespace ProtoAssociative
                         if (null != dotcall.staticLHSIdent)
                         {
                             string identName = dotcall.staticLHSIdent.Name;
-                            bool isClassName = core.ClassTable.DoesExist(identName);
+                            string fullClassName;
+                            bool isClassName = core.ClassTable.TryGetFullyQualifiedName(identName, out fullClassName);
                             if (isClassName)
                             {
                                 ProtoCore.DSASM.SymbolNode symbolnode = null;
@@ -8054,7 +8055,8 @@ namespace ProtoAssociative
                             // This is the first ssa statement of the transformed identifier list call
                             // The rhs is either a pointer or a classname
                             string identName = (bnode.RightNode as IdentifierNode).Name;
-                            bool isClassName = core.ClassTable.DoesExist(identName);
+                            string fullClassName;
+                            bool isClassName = core.ClassTable.TryGetFullyQualifiedName(identName, out fullClassName);
                             if (isClassName)
                             {
                                 ProtoCore.DSASM.SymbolNode symbolnode = null;

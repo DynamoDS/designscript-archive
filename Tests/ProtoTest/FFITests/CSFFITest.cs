@@ -868,7 +868,7 @@ namespace ProtoFFITests
         [Test]
         public void TestImportBrowsableClass()
         {
-            string code = @"                import(BSplineCurve from ""ProtoGeometry.dll"");                ";
+            string code = @"                import(NurbsCurve from ""ProtoGeometry.dll"");                ";
             TestFrameWork theTest = new TestFrameWork();
             ExecutionMirror mirror = theTest.RunScriptSource(code);
             //This import must import BSplineCurve and related classes.
@@ -881,7 +881,7 @@ namespace ProtoFFITests
             Assert.IsTrue(theTest.GetClassIndex("CoordinateSystem") != ProtoCore.DSASM.Constants.kInvalidIndex);
             Assert.IsTrue(theTest.GetClassIndex("CoordinateSystem") != ProtoCore.DSASM.Constants.kInvalidIndex);
             Assert.IsTrue(theTest.GetClassIndex("Curve") != ProtoCore.DSASM.Constants.kInvalidIndex);
-            Assert.IsTrue(theTest.GetClassIndex("BSplineCurve") != ProtoCore.DSASM.Constants.kInvalidIndex);
+            Assert.IsTrue(theTest.GetClassIndex("NurbsCurve") != ProtoCore.DSASM.Constants.kInvalidIndex);
             //Non-browsable as well as unrelated class should not be imported.
             Assert.IsTrue(theTest.GetClassIndex("DesignScriptEntity") == ProtoCore.DSASM.Constants.kInvalidIndex);
             Assert.IsTrue(theTest.GetClassIndex("Circle") == ProtoCore.DSASM.Constants.kInvalidIndex);

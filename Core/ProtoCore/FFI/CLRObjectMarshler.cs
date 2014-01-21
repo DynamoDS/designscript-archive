@@ -702,15 +702,20 @@ namespace ProtoFFI
         /// <returns></returns>
         public static string GetTypeName(Type type)
         {
+            return GetTypeName(type, true);
+        }
+
+        private static string GetTypeName(Type type, bool fullName)
+        {
             if (!type.IsGenericType)
             {
                 if (type.IsNestedPublic)
-                    return string.Format("{0}_{1}", type.DeclaringType.Name, type.Name);
+                    return string.Format("{0}_{1}", type.DeclaringType.FullName, type.Name);
 
-                return type.Name;
+                return fullName ? type.FullName : type.Name;
             }
 
-            string name = type.GetGenericTypeDefinition().Name;
+            string name = fullName ? type.GetGenericTypeDefinition().FullName : type.GetGenericTypeDefinition().Name;
             int trim = name.IndexOf('`');
             if (trim > 0)
                 name = name.Substring(0, trim);
@@ -718,7 +723,7 @@ namespace ProtoFFI
             for (int i = 0; i < args.Length; ++i)
             {
                 string prefix = (i == 0) ? "Of" : "And";
-                name = name + prefix + GetTypeName(args[i]);
+                name = name + prefix + GetTypeName(args[i], false);
             }
 
             return name;

@@ -57,11 +57,11 @@ namespace ProtoFFI
                         mtype = new CLRModuleType(type);
                         //Now check that a type with same name is not imported.
                         Type otherType;
-                        if (mTypeNames.TryGetValue(mtype.ClassName, out otherType))
+                        if (mTypeNames.TryGetValue(mtype.FullName, out otherType))
                             throw new InvalidOperationException(string.Format("Can't import {0}, {1} is already imported as {2}, namespace support needed.", type.FullName, type.Name, otherType.FullName));
 
                         mTypes.Add(type, mtype);
-                        mTypeNames.Add(mtype.ClassName, type);
+                        mTypeNames.Add(mtype.FullName, type);
                     }
                 }
             }
@@ -167,9 +167,9 @@ namespace ProtoFFI
         public ClassDeclNode ClassNode { get; private set; }
 
         /// <summary>
-        /// DesignScript Class name
+        /// DesignScript Class name, together with Namespace name
         /// </summary>
-        public string ClassName { get { return ClassNode.className; } }
+        public string FullName { get { return CLRType.FullName; } }
 
         /// <summary>
         /// CLRDLLModule from which this type was imported.
@@ -809,7 +809,7 @@ namespace ProtoFFI
             foreach (var item in moduleTypes)
             {
                 node.Body.Add(item.ClassNode);
-                mTypes[item.ClassName] = item; //update Type dictionary.
+                mTypes[item.FullName] = item; //update Type dictionary.
             }
 
             //Also add all the available empty class nodes.
@@ -929,7 +929,7 @@ namespace ProtoFFI
                     types = Module.FindTypes(myFilter, typeName);
                 }
 
-                Validity.Assert(types.Length == 1, "More than one specified type found in the module.");
+                //Validity.Assert(types.Length <= 1, "More than one specified type found in the module.");
             }
             return types;
         }
