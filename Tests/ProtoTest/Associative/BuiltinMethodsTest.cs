@@ -554,6 +554,71 @@ namespace ProtoTest.Associative
             thisTest.Verify("sort", new object[] { null, 1, 2, 2, 3 });
         }
 
+        [Test]
+        public void Test_EvaluateFunctionPointer01()
+        {
+            string code =
+@"
+def foo(x, y, z)
+{
+    return = x + y + z;
+}
+
+t = foo;
+param = { 2, 3, 4 };
+x = EvaluateFunctionPointer(t, param);
+";           
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", 9); 
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer02()
+        {
+            string code =
+@"
+def foo(x, y, z)
+{
+    return = x + y + z;
+}
+
+def foo(x, y)
+{
+    return = x * y;
+}
+
+t = foo;
+param = { 2, 3, 4 };
+x = EvaluateFunctionPointer(t, param);
+param = { 5, 6 };
+";           
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", 30); 
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer03()
+        {
+            string code =
+@"
+def foo(x, y, z)
+{
+    return = x + y + z;
+}
+
+def bar(x, y, z)
+{
+    return = x * y * z;
+}
+
+t = foo;
+param = { 2, 3, 4 };
+x = EvaluateFunctionPointer(t, param);
+t = bar;
+";           
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", 24); 
+        }
     }
     class MathematicalFunctionMethodsTest
     {
