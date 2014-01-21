@@ -22,34 +22,34 @@ namespace ProtoTest
         public void NameMatching()
         {
             Symbol symbol = new Symbol("Com.Autodesk.Designscript.ProtoGeometry.Point");
-            Assert.IsTrue(symbol.Match("Com.Autodesk.Designscript.ProtoGeometry.Point"));
-            Assert.IsTrue(symbol.Match("ProtoGeometry.Point"));
-            Assert.IsTrue(symbol.Match("Designscript.Point"));
-            Assert.IsTrue(symbol.Match("Autodesk.Point"));
-            Assert.IsTrue(symbol.Match("Com.Point"));
-            Assert.IsTrue(symbol.Match("Com.Autodesk.Point"));
-            Assert.IsTrue(symbol.Match("Com.Designscript.Point"));
-            Assert.IsTrue(symbol.Match("Com.ProtoGeometry.Point"));
-            Assert.IsTrue(symbol.Match("Autodesk.ProtoGeometry.Point"));
-            Assert.IsTrue(symbol.Match("Autodesk.Designscript.Point"));
-            Assert.IsTrue(symbol.Match("Designscript.ProtoGeometry.Point"));
-            Assert.IsTrue(symbol.Match("Point"));
-            Assert.IsFalse(symbol.Match("Autodesk.Com.Designscript.Point"));
-            Assert.IsFalse(symbol.Match("Com.ProtoGeometry.Autodesk.Point"));
-            Assert.IsFalse(symbol.Match("Com.Designscript.Autodesk.Point"));
-            Assert.IsFalse(symbol.Match("Autodesk"));
+            Assert.IsTrue(symbol.Matches("Com.Autodesk.Designscript.ProtoGeometry.Point"));
+            Assert.IsTrue(symbol.Matches("ProtoGeometry.Point"));
+            Assert.IsTrue(symbol.Matches("Designscript.Point"));
+            Assert.IsTrue(symbol.Matches("Autodesk.Point"));
+            Assert.IsTrue(symbol.Matches("Com.Point"));
+            Assert.IsTrue(symbol.Matches("Com.Autodesk.Point"));
+            Assert.IsTrue(symbol.Matches("Com.Designscript.Point"));
+            Assert.IsTrue(symbol.Matches("Com.ProtoGeometry.Point"));
+            Assert.IsTrue(symbol.Matches("Autodesk.ProtoGeometry.Point"));
+            Assert.IsTrue(symbol.Matches("Autodesk.Designscript.Point"));
+            Assert.IsTrue(symbol.Matches("Designscript.ProtoGeometry.Point"));
+            Assert.IsTrue(symbol.Matches("Point"));
+            Assert.IsFalse(symbol.Matches("Autodesk.Com.Designscript.Point"));
+            Assert.IsFalse(symbol.Matches("Com.ProtoGeometry.Autodesk.Point"));
+            Assert.IsFalse(symbol.Matches("Com.Designscript.Autodesk.Point"));
+            Assert.IsFalse(symbol.Matches("Autodesk"));
         }
 
         [Test]
         public void AddSymbols()
         {
             SymbolTable table = new SymbolTable();
-            Assert.IsTrue(table.AddSymbol("Com.Autodesk.Designscript.ProtoGeometry.Point"));
-            Assert.IsTrue(table.AddSymbol("Autodesk.Designscript.ProtoGeometry.Point"));
-            Assert.IsTrue(table.AddSymbol("Designscript.ProtoGeometry.Point"));
-            Assert.IsTrue(table.AddSymbol("ProtoGeometry.Point"));
-            Assert.IsTrue(table.AddSymbol("Designscript.Point"));
-            Assert.IsTrue(table.AddSymbol("Com.Autodesk.Designscript.ProtoGeometry.Vector"));
+            Assert.IsNotNull(table.AddSymbol("Com.Autodesk.Designscript.ProtoGeometry.Point"));
+            Assert.IsNotNull(table.AddSymbol("Autodesk.Designscript.ProtoGeometry.Point"));
+            Assert.IsNotNull(table.AddSymbol("Designscript.ProtoGeometry.Point"));
+            Assert.IsNotNull(table.AddSymbol("ProtoGeometry.Point"));
+            Assert.IsNotNull(table.AddSymbol("Designscript.Point"));
+            Assert.IsNotNull(table.AddSymbol("Com.Autodesk.Designscript.ProtoGeometry.Vector"));
             Assert.AreEqual(6, table.GetSymbolCount());
         }
 
@@ -82,6 +82,44 @@ namespace ProtoTest
 
             Assert.Throws<System.Collections.Generic.KeyNotFoundException>(()=>table.GetFullyQualifiedName("Point"));
             Assert.Throws<System.Collections.Generic.KeyNotFoundException>(() => table.GetFullyQualifiedName("Autodesk.Point"));
+        }
+
+        [Test]
+        public void TryGetSymbol()
+        {
+            SymbolTable table = new SymbolTable();
+            table.AddSymbol("Autodesk.ProtoGeometry.Point");
+            table.AddSymbol("Autodesk.Designscript.Point");
+            table.AddSymbol("Com.Autodesk.Point");
+            Assert.AreEqual(3, table.GetSymbolCount());
+            
+            Symbol symbol = null;
+            Assert.IsTrue(table.TryGetUniqueSymbol("Com.Point", out symbol));
+            Assert.IsNotNull(symbol);
+            Assert.AreEqual("Com.Autodesk.Point", symbol.FullName);
+            symbol.Id = 123;
+
+            Assert.IsTrue(table.TryGetUniqueSymbol("ProtoGeometry.Point", out symbol));
+            Assert.IsNotNull(symbol);
+            Assert.AreEqual("Autodesk.ProtoGeometry.Point", symbol.FullName);
+
+            Assert.IsTrue(table.TryGetUniqueSymbol("Designscript.Point", out symbol));
+            Assert.IsNotNull(symbol);
+            Assert.AreEqual("Autodesk.Designscript.Point", symbol.FullName);
+
+            Assert.IsFalse(table.TryGetUniqueSymbol("Point", out symbol));
+            Assert.IsNull(symbol);
+
+            Assert.IsFalse(table.TryGetUniqueSymbol("Autodesk.Point", out symbol));
+            Assert.IsNull(symbol);
+
+            Assert.IsFalse(table.TryGetUniqueSymbol("Autodesk.Designscript", out symbol));
+            Assert.IsNull(symbol);
+
+            Assert.IsTrue(table.TryGetExactSymbol("Com.Autodesk.Point", out symbol));
+            Assert.IsNotNull(symbol);
+            Assert.AreEqual("Com.Autodesk.Point", symbol.FullName);
+            Assert.AreEqual(123, symbol.Id);
         }
     }
 }

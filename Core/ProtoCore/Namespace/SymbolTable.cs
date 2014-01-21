@@ -6,12 +6,14 @@ using System.Text;
 namespace ProtoCore.NameSpace
 {
     /// <summary>
-    /// FullyQualifiedSymbolName class
+    /// Symbol class : It represents a symbol with namespace.
     /// </summary>
-    class Symbol
+    public class Symbol
     {
-        private string[] _namespaces;
-        private string _symbolname;
+        #region Private Members
+
+        private string[] namespaces;
+        private string symbolname;
         
         private static string[] GetNameSpaces(string name, out string symbolname)
         {
@@ -21,6 +23,10 @@ namespace ProtoCore.NameSpace
             return names;
         }
 
+        #endregion
+
+        #region Public Methods and Constructor
+
         /// <summary>
         /// Constructs a FullyQualifiedSymbolName with the given fullname.
         /// </summary>
@@ -29,7 +35,7 @@ namespace ProtoCore.NameSpace
         public Symbol(string fullname)
         {
             FullName = fullname;
-            _namespaces = GetNameSpaces(fullname, out _symbolname);
+            namespaces = GetNameSpaces(fullname, out symbolname);
         }
 
         /// <summary>
@@ -40,7 +46,7 @@ namespace ProtoCore.NameSpace
         /// <summary>
         /// Gets symbol name
         /// </summary>
-        public string Name { get { return _symbolname; } }
+        public string Name { get { return symbolname; } }
 
         /// <summary>
         /// Gets symbol id
@@ -62,7 +68,7 @@ namespace ProtoCore.NameSpace
         /// </summary>
         /// <param name="partialname">Partially qualified symbol name</param>
         /// <returns>returns true if partial name matches this</returns>
-        public bool Match(string partialname)
+        public bool Matches(string partialname)
         {
             string symbol;
             var given = GetNameSpaces(partialname, out symbol);
@@ -72,9 +78,9 @@ namespace ProtoCore.NameSpace
                 return false;
 
             int index = 0;
-            for (int i = 0; i < _namespaces.Length; ++i)
+            for (int i = 0; i < namespaces.Length && index < given.Length; ++i)
             {
-                if (_namespaces[i].Equals(given[index]))
+                if (namespaces[i].Equals(given[index]))
                     ++index;
             }
             return index == given.Length;
@@ -102,6 +108,8 @@ namespace ProtoCore.NameSpace
         {
             return this.FullName.GetHashCode();
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -109,21 +117,32 @@ namespace ProtoCore.NameSpace
     /// </summary>
     class SymbolTable
     {
-        private Dictionary<string, HashSet<Symbol>> _symbolTable;
+        /// <summary>
+        /// Table for all symbols
+        /// </summary>
+        private Dictionary<string, HashSet<Symbol>> symbolTable;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public SymbolTable()
         {
-            _symbolTable = new Dictionary<string, HashSet<Symbol>>();
+            symbolTable = new Dictionary<string, HashSet<Symbol>>();
         }
+
+        #region Public Methods
 
         /// <summary>
         /// Adds the given symbol to this symbol table
         /// </summary>
         /// <param name="fullname">Fully qualified name for the symbol</param>
-        /// <returns>True if symbol is added successfully, false if the symbol was 
-        /// already present in the table.</returns>
-        public bool AddSymbol(string fullname)
+        /// <returns>The newly added symbol if added successfully, else null.</returns>
+        public Symbol AddSymbol(string fullname)
         {
-            return AddSymbol(new Symbol(fullname));
+            Symbol symbol = new Symbol(fullname);
+            if (AddSymbol(symbol))
+                return symbol;
+            return null;
         }
 
         /// <summary>
@@ -137,10 +156,10 @@ namespace ProtoCore.NameSpace
             string symbolName = qualifiedSymbol.Name;
 
             HashSet<Symbol> container = null;
-            if (!_symbolTable.TryGetValue(symbolName, out container))
+            if (!symbolTable.TryGetValue(symbolName, out container))
             {
                 container = new HashSet<Symbol>();
-                _symbolTable.Add(symbolName, container);
+                symbolTable.Add(symbolName, container);
             }
             return container.Add(qualifiedSymbol);
         }
@@ -154,11 +173,11 @@ namespace ProtoCore.NameSpace
         public Symbol[] GetMatchingSymbols(string partialName)
         {
             string symbolName = partialName.Split('.').Last();
-            HashSet<Symbol> container = null;
-            if (!_symbolTable.TryGetValue(symbolName, out container))
+            HashSet<Symbol> symbols = GetAllSymbols(symbolName);
+            if (null == symbols)
                 throw new System.Collections.Generic.KeyNotFoundException(string.Format("Failed to get unique matching symbol for {0}.", partialName));
 
-            return container.Where((Symbol sym) => sym.Match(partialName)).ToArray();
+            return symbols.Where((Symbol sym) => sym.Matches(partialName)).ToArray();
         }
 
         /// <summary>
@@ -178,17 +197,86 @@ namespace ProtoCore.NameSpace
         }
 
         /// <summary>
+        /// Finds a symbol in this table which has exactly same as given fully
+        /// qualified name.
+        /// </summary>
+        /// <param name="fullName">Fully qualified name for lookup</param>
+        /// <param name="symbol">Matching symbol for given fullName.</param>
+        /// <returns>True if exact matching symbol is found.</returns>
+        public bool TryGetExactSymbol(string fullName, out Symbol symbol)
+        {
+            Symbol[] symbols = TryGetSymbols(fullName, (Symbol s) => s.FullName.Equals(fullName));
+            if (symbols.Length == 1)
+                symbol = symbols[0];
+            else
+                symbol = null;
+
+            return symbol != null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="partialName"></param>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        public bool TryGetUniqueSymbol(string partialName, out Symbol symbol)
+        {
+            Symbol[] symbols = TryGetSymbols(partialName, (Symbol s) => s.Matches(partialName));
+            if (symbols.Length == 1)
+                symbol = symbols[0];
+            else
+                symbol = null;
+
+            return symbol != null;
+        }
+
+        /// <summary>
         /// Gets total symbol count in the table
         /// </summary>
         /// <returns>Symbol count</returns>
         public int GetSymbolCount()
         {
             int count = 0;
-            foreach (var item in _symbolTable)
+            foreach (var item in symbolTable)
             {
                 count += item.Value.Count;
             }
             return count;
         }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        private Symbol[] TryGetSymbols(string name, Func<Symbol, bool> predicate)
+        {
+            string symbolName = name.Split('.').Last();
+            HashSet<Symbol> symbolSet = GetAllSymbols(symbolName);
+            if (null != symbolSet)
+                return symbolSet.Where(predicate).ToArray();
+
+            return new Symbol[0];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private HashSet<Symbol> GetAllSymbols(string symbolName)
+        {
+            HashSet<Symbol> symbols = null;
+            symbolTable.TryGetValue(symbolName, out symbols);
+            return symbols;
+        }
+
+        #endregion
     }
 }
