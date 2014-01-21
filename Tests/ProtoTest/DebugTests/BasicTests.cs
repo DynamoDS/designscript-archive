@@ -7838,7 +7838,8 @@ import(DummyBase from ""ProtoTest.dll"");
             fsr.Step();
             DebugRunner.VMState vms = fsr.Step();
             Obj o = vms.mirror.GetDebugValue("dummy");
-            Assert.IsTrue(vms.mirror.GetType(o) == "DummyBase");
+            //Verify the returned object type name is fully qualified name.
+            Assert.IsTrue(vms.mirror.GetType(o) == "ProtoFFITests.DummyBase");
 
             fsr.Step();
             vms = fsr.Step();
@@ -7864,7 +7865,8 @@ a = dummy.Value;";
             fsr.Step();
             DebugRunner.VMState vms = fsr.Step();
             Obj o = vms.mirror.GetDebugValue("dummy");
-            Assert.IsTrue(vms.mirror.GetType(o) == "DummyBase");
+            //Verify the returned object type name is fully qualified name.
+            Assert.IsTrue(vms.mirror.GetType(o) == "ProtoFFITests.DummyBase");
 
             fsr.Step();
             vms = fsr.Step();

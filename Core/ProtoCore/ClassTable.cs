@@ -451,10 +451,8 @@ namespace ProtoCore.DSASM
 
         private List<ClassNode> classNodes = new List<ClassNode>();
 
-        // It is a performance bottleneck for finding index of a class when
-        // importing a HUGE extension dll. The other alternative is using 
-        // Trie. - Yu Ke
-        private NameSpace.SymbolTable symbolTable = new NameSpace.SymbolTable();
+        //Symbol table to manage symbols with namespace
+        private Namespace.SymbolTable symbolTable = new Namespace.SymbolTable();
 
         public ClassTable()
         {
@@ -471,7 +469,7 @@ namespace ProtoCore.DSASM
 
         public int Append(ClassNode node)
         {
-            NameSpace.Symbol symbol = symbolTable.AddSymbol(node.name);
+            Namespace.Symbol symbol = symbolTable.AddSymbol(node.name);
             if (null == symbol)
             {
                 return ProtoCore.DSASM.Constants.kInvalidIndex;
@@ -486,7 +484,7 @@ namespace ProtoCore.DSASM
         public void SetClassNodeAt(ClassNode node, int index)
         {
             classNodes[index] = node;
-            NameSpace.Symbol symbol = null;
+            Namespace.Symbol symbol = null;
             if (!symbolTable.TryGetExactSymbol(node.name, out symbol))
                 symbol = symbolTable.AddSymbol(node.name);
 
@@ -497,7 +495,7 @@ namespace ProtoCore.DSASM
         {
             Validity.Assert(null != name);
 
-            NameSpace.Symbol symbol = null;
+            Namespace.Symbol symbol = null;
             if (symbolTable.TryGetUniqueSymbol(name, out symbol))
                 return symbol.Id;
             
@@ -507,7 +505,7 @@ namespace ProtoCore.DSASM
         public bool TryGetFullyQualifiedName(string name, out string fullName)
         {
             Validity.Assert(null != name);
-            NameSpace.Symbol symbol = null;
+            Namespace.Symbol symbol = null;
             fullName = string.Empty;
             if (symbolTable.TryGetUniqueSymbol(name, out symbol))
                 fullName = symbol.FullName;
