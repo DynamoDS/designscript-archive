@@ -3879,19 +3879,26 @@ namespace ProtoAssociative
                 // If this is an inner block where there can be no classes, we can start at parsing at the global function state
                 compilePass = ProtoCore.DSASM.AssociativeCompilePass.kGlobalFuncSig;
             }
-            codeblock.Body = SplitMulitpleAssignment(codeblock.Body);
-            codeblock.Body = BuildSSA(codeblock.Body, context);
 
-            if (core.Options.DumpIL)
-            {
-                CodeGenDS codegenDS = new CodeGenDS(codeblock.Body);
-                EmitCompileLog(codegenDS.GenerateCode());
-            }
+            codeblock.Body = SplitMulitpleAssignment(codeblock.Body);
             
             bool hasReturnStatement = false;
             ProtoCore.Type inferedType = new ProtoCore.Type();
+            bool ssaTransformed = false;
             while (ProtoCore.DSASM.AssociativeCompilePass.kDone != compilePass)
             {
+                // Emit SSA only after generating the class definitions
+                if (compilePass > AssociativeCompilePass.kClassName && !ssaTransformed)
+                {
+                    codeblock.Body = BuildSSA(codeblock.Body, context);
+                    ssaTransformed = true;
+                    if (core.Options.DumpIL)
+                    {
+                        CodeGenDS codegenDS = new CodeGenDS(codeblock.Body);
+                        EmitCompileLog(codegenDS.GenerateCode());
+                    }
+                }
+
                 foreach (AssociativeNode node in codeblock.Body)
                 {
                     inferedType = new ProtoCore.Type();
@@ -8706,7 +8713,8 @@ namespace ProtoAssociative
             if (codeBlockNode != null)
             {
                 // Only build SSA for the first time
-                if (ProtoCore.DSASM.AssociativeCompilePass.kClassName == compilePass)
+                // Transform after class name compile pass
+                if (ProtoCore.DSASM.AssociativeCompilePass.kClassName > compilePass)
                 {
                     codeBlockNode.Body = SplitMulitpleAssignment(codeBlockNode.Body);
                     codeBlockNode.Body = BuildSSA(codeBlockNode.Body, context);

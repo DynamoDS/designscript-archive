@@ -212,7 +212,7 @@ namespace Autodesk.DesignScript.Interfaces
         /// <summary>
         /// Returns a Vector containing the X, Y, and Z scale factors
         /// </summary>
-        IVectorEntity Scale();
+        IVectorEntity ScaleFactor();
 
         bool IsEqualTo(ICoordinateSystemEntity other);
 
