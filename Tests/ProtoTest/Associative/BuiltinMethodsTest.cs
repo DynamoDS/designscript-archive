@@ -660,6 +660,142 @@ x = Evaluate(foo, param);
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("x", new object[] { 15, 18, 21 });
         }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer06()
+        {
+            // replicated on function pointer
+            string code =
+@"
+def bar(x, y)
+{
+    return = x * y;
+}
+
+def foo(f : function, x, y)
+{
+    return = f(x, y);
+}
+
+x = Evaluate(foo, { bar, 2, 3 });
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", 6);
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer07()
+        {
+            // Nested call
+            string code =
+@"
+def multiplyBy2(z)
+{
+    return = 2 * z;
+}
+
+def bar(y, z)
+{
+    return = y * Evaluate(multiplyBy2, { z });
+}
+
+def foo(x, y, z)
+{
+    return = x + Evaluate(bar, { y, z });
+}
+
+x = Evaluate(foo, { 2, 3, 4 });
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", 26);
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer08()
+        {
+            // Nested call
+            string code =
+@"
+def f1(x)
+{
+    return = 2 * x;
+}
+
+def f2(x)
+{
+    return = 3 * x;
+}
+
+def foo(evalFunction : function, fptr : function, param : var[])
+{
+    return = evalFunction(fptr, param);
+}
+
+x = foo({ Evaluate, Evaluate }, { f1, f2 }, { { 41 }, { 42 } });
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new object[] {82, 126});
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer09()
+        {
+            // Nested call
+            string code =
+@"
+class Foo
+{
+    fptr : function;
+    params : var[]..[];
+    
+    constructor Foo(f : function, p: var[]..[])
+    {
+        fptr = f;
+        params = p;
+    }
+    
+    def DoEvaluate()
+    {
+        return = Evaluate(fptr, params);
+    }
+}
+
+def foo(x)
+{
+    return = 2 * x;
+}
+
+def constructFoo(f : function, p : var[]..[])
+{
+    return = Foo(f, p);
+}
+
+x = constructFoo(foo, { 42 });
+y = x.DoEvaluate();
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("y", 84);
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer10()
+        {
+            // Recursive call
+            string code =
+@"
+def foo(x)
+{
+    return = x == 0 ? 1 : x * Evaluate(foo, { x - 1 });
+}
+
+x = foo(5);
+";
+            // ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            // thisTest.Verify("x", 120);
+
+            // This case crashes nunit 
+            Assert.Fail("This test case crashes Nunit");
+        }
     }
     class MathematicalFunctionMethodsTest
     {
