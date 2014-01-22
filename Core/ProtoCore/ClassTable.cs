@@ -491,17 +491,46 @@ namespace ProtoCore.DSASM
             symbol.Id = index;
         }
 
-        public int IndexOf(string name)
+        /// <summary>
+        /// Find a matching class for given partial class name.
+        /// </summary>
+        /// <param name="partialName">Partial class name for lookup.</param>
+        /// <returns>Class Id if found, else ProtoCore.DSASM.Constants.kInvalidIndex</returns>
+        public int IndexOf(string partialName)
         {
-            Validity.Assert(null != name);
+            Validity.Assert(null != partialName);
 
             Namespace.Symbol symbol = null;
-            if (symbolTable.TryGetUniqueSymbol(name, out symbol))
+            if (symbolTable.TryGetUniqueSymbol(partialName, out symbol))
                 return symbol.Id;
             
             return ProtoCore.DSASM.Constants.kInvalidIndex;
         }
 
+        /// <summary>
+        /// Gets Class Id for the given fully qualified class name.
+        /// </summary>
+        /// <param name="fullname">Fully qualified class name</param>
+        /// <returns>Class Id if found, else ProtoCore.DSASM.Constants.kInvalidIndex</returns>
+        public int GetClassId(string fullname)
+        {
+            Validity.Assert(null != fullname);
+
+            Namespace.Symbol symbol = null;
+            if (symbolTable.TryGetExactSymbol(fullname, out symbol))
+                return symbol.Id;
+
+            return ProtoCore.DSASM.Constants.kInvalidIndex;
+        }
+
+        /// <summary>
+        /// Tries to get the fully qualified name for the given name from this
+        /// ClassTable.
+        /// </summary>
+        /// <param name="name">Partial name of the class for lookup</param>
+        /// <param name="fullName">Fully qualified class name</param>
+        /// <returns>True if the given name results a unique matching symbol in 
+        /// this ClassTable.</returns>
         public bool TryGetFullyQualifiedName(string name, out string fullName)
         {
             Validity.Assert(null != name);
@@ -511,6 +540,22 @@ namespace ProtoCore.DSASM
                 fullName = symbol.FullName;
 
             return !string.IsNullOrEmpty(fullName);
+        }
+
+        /// <summary>
+        /// Returns all matching classes for the given name from this ClassTable
+        /// </summary>
+        /// <param name="name">Partial name of the class for lookup</param>
+        /// <returns>Array of fully qualified name of all matching symbols</returns>
+        public string[] GetAllMatchingClasses(string name)
+        {
+            Namespace.Symbol[] symbols = symbolTable.TryGetSymbols(name, (Namespace.Symbol s) => s.Matches(name));
+            int size = symbols.Length;
+            string[] classes = new string[size];
+            for (int i = 0; i < size; ++i)
+                classes[i] = symbols[i].FullName;
+
+            return classes;
         }
 
         public string GetTypeName(int UID)
@@ -523,6 +568,33 @@ namespace ProtoCore.DSASM
             else
             {
                 return ClassNodes[UID].name; 
+            }
+        }
+
+        /// <summary>
+        /// Audits the class table for multiple symbol definition.
+        /// </summary>
+        /// <param name="status">BuildStatus to log the warnings if
+        /// multiple symbol found.</param>
+        public void AuditMultipleDefinition(BuildStatus status)
+        {
+            var names = symbolTable.GetAllSymbolNames();
+            if (names.Count == symbolTable.GetSymbolCount())
+                return;
+
+            foreach (var name in names)
+            {
+                var symbols = symbolTable.GetAllSymbols(name);
+                if (symbols.Count > 1)
+                {
+                    string message = string.Format(BuildData.WarningMessage.kMultipleSymbolFound, name, "");
+                    foreach (var symbol in symbols)
+                    {
+                        message += ", " + symbol.FullName;
+                    }
+
+                    status.LogWarning(BuildData.WarningID.kMultipleSymbolFound, message);
+                }
             }
         }
     }

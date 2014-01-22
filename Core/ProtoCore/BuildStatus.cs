@@ -44,6 +44,7 @@ namespace ProtoCore
             kPropertyNotFound,
             kFileNotFound,
             kAlreadyImported,
+            kMultipleSymbolFound,
             kWarnMax
         }
 
@@ -78,6 +79,7 @@ namespace ProtoCore
             public const string kUsingNonStaticMemberInStaticContext = "'{0}' is not a static property, so cannot be assigned to static properties or used in static methods.";
             public const string kFileNotFound = "File : '{0}' not found";
             public const string kAlreadyImported = "File : '{0}' is already imported";
+            public const string kMultipleSymbolFound = "Multiple definitions for '{0}' are found as {1}";
         }
 
         public struct ErrorEntry

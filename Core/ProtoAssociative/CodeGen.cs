@@ -2355,8 +2355,26 @@ namespace ProtoAssociative
             {
                 IdentifierListNode identList = node as IdentifierListNode;
 
-                // Recursively traversse the left of the ident list
-                SSAIdentList(identList.LeftNode, ref ssaStack, ref astlist);
+                //Check if the LeftNode for given IdentifierList represents a class.
+                string[] classNames = this.core.ClassTable.GetAllMatchingClasses(identList.LeftNode.ToString());
+                if (classNames.Length > 1)
+                {
+                    string message = string.Format(WarningMessage.kMultipleSymbolFound, identList.LeftNode.ToString(), classNames[0]);
+                    for(int i = 1; i < classNames.Length; ++i)
+                        message += ", " + classNames[i];
+                    this.core.BuildStatus.LogWarning(WarningID.kMultipleSymbolFound, message);
+                }
+
+                if(classNames.Length == 1)
+                {
+                    var leftNode = nodeBuilder.BuildIdentfier(classNames[0]);
+                    SSAIdentList(leftNode, ref ssaStack, ref astlist);
+                }
+                else
+                {
+                    // Recursively traversse the left of the ident list
+                    SSAIdentList(identList.LeftNode, ref ssaStack, ref astlist);
+                }
 
                 // Build the rhs identifier list containing the temp pointer
                 IdentifierListNode rhsIdentList = new IdentifierListNode();
@@ -3890,6 +3908,8 @@ namespace ProtoAssociative
                 // Emit SSA only after generating the class definitions
                 if (compilePass > AssociativeCompilePass.kClassName && !ssaTransformed)
                 {
+                    //Audit class table for multiple symbol definition and emit warning.
+                    this.core.ClassTable.AuditMultipleDefinition(this.core.BuildStatus);
                     codeblock.Body = BuildSSA(codeblock.Body, context);
                     ssaTransformed = true;
                     if (core.Options.DumpIL)
@@ -4887,7 +4907,7 @@ namespace ProtoAssociative
             // Class member variable pass
             // Populating each class entry symbols with their respective member variables
 
-            int thisClassIndex = core.ClassTable.IndexOf(classDecl.className);
+            int thisClassIndex = core.ClassTable.GetClassId(classDecl.className);
             globalClassIndex = thisClassIndex;
 
             if (!unPopulatedClasses.ContainsKey(thisClassIndex))
@@ -4901,7 +4921,7 @@ namespace ProtoAssociative
             {
                 for (int n = 0; n < classDecl.superClass.Count; ++n)
                 {
-                    int baseClassIndex = core.ClassTable.IndexOf(classDecl.superClass[n]);
+                    int baseClassIndex = core.ClassTable.GetClassId(classDecl.superClass[n]);
                     if (ProtoCore.DSASM.Constants.kInvalidIndex != baseClassIndex)
                     {
                         // To handle the case that a base class is defined after
@@ -5104,14 +5124,6 @@ namespace ProtoAssociative
                 }
 
 
-                if (ProtoCore.DSASM.Constants.kInvalidIndex != core.ClassTable.IndexOf(classDecl.className))
-                {
-                    string message = string.Format("Class redefinition '{0}' (BE1C3285).\n", classDecl.className);
-                    buildStatus.LogSemanticError(message, core.CurrentDSFileName, classDecl.line, classDecl.col);
-                    throw new BuildHaltException(message);
-                }
-                
-
                 ProtoCore.DSASM.ClassNode thisClass = new ProtoCore.DSASM.ClassNode();
                 thisClass.name = classDecl.className;
                 thisClass.size = classDecl.varlist.Count;
@@ -5124,6 +5136,13 @@ namespace ProtoAssociative
                     thisClass.ExternLib = Path.GetFileName(core.CurrentDSFileName);
 
                 globalClassIndex = core.ClassTable.Append(thisClass);
+                if (ProtoCore.DSASM.Constants.kInvalidIndex == globalClassIndex)
+                {
+                    string message = string.Format("Class redefinition '{0}' (BE1C3285).\n", classDecl.className);
+                    buildStatus.LogSemanticError(message, core.CurrentDSFileName, classDecl.line, classDecl.col);
+                    throw new BuildHaltException(message);
+                }
+
                 unPopulatedClasses.Add(globalClassIndex, classDecl);
 
                 //Always allow us to convert a class to a bool
@@ -5133,7 +5152,7 @@ namespace ProtoAssociative
             {
                 // Class heirarchy pass
                 // Populating each class entry with their respective base classes
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
+                globalClassIndex = core.ClassTable.GetClassId(classDecl.className);
 
                 ProtoCore.DSASM.ClassNode thisClass = core.ClassTable.ClassNodes[globalClassIndex];
 
@@ -5142,7 +5161,7 @@ namespace ProtoAssociative
                 {
                     for (int n = 0; n < classDecl.superClass.Count; ++n)
                     {
-                        int baseClass = core.ClassTable.IndexOf(classDecl.superClass[n]);
+                        int baseClass = core.ClassTable.GetClassId(classDecl.superClass[n]);
                         if (baseClass == globalClassIndex)
                         {
                             string message = string.Format("Class '{0}' cannot derive from itself (DED0A61F).\n", classDecl.className);
@@ -5205,7 +5224,7 @@ namespace ProtoAssociative
                 // Class member variable pass
                 // Populating each class entry vtables with their respective member variables signatures
 
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
+                globalClassIndex = core.ClassTable.GetClassId(classDecl.className);
                 List<AssociativeNode> thisPtrOverloadList = new List<AssociativeNode>();
                 foreach (AssociativeNode funcdecl in classDecl.funclist)
                 {
@@ -5287,7 +5306,7 @@ namespace ProtoAssociative
                 // before populate the attributes, we must know the attribute class constructor signatures
                 // in order to check the parameter 
                 // populate the attributes for the class and class member variable 
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
+                globalClassIndex = core.ClassTable.GetClassId(classDecl.className);
                 if (globalClassIndex != ProtoCore.DSASM.Constants.kInvalidIndex)
                 {
                     ProtoCore.DSASM.ClassNode thisClass = core.ClassTable.ClassNodes[globalClassIndex];
@@ -5332,7 +5351,7 @@ namespace ProtoAssociative
                 // Class member variable pass
                 // Populating the function body of each member function defined in the class vtables
 
-                globalClassIndex = core.ClassTable.IndexOf(classDecl.className);
+                globalClassIndex = core.ClassTable.GetClassId(classDecl.className);
 
                 foreach (AssociativeNode funcdecl in classDecl.funclist)
                 {

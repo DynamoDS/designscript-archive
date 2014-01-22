@@ -1067,6 +1067,39 @@ z1 = z.a;";
             ValidationData[] data = { new ValidationData { ValueName = "success", ExpectedValue = true, BlockIndex = 0 } };
             ExecuteAndVerify(code, data);
         }
+
+        [Test]
+        public void TestNamespaceImport()
+        {
+            string code =
+                @"import(MicroFeatureTests from ""ProtoTest.dll"");";
+            TestFrameWork theTest = new TestFrameWork();
+            var mirror = theTest.RunScriptSource(code);
+            TestFrameWork.VerifyBuildWarning(ProtoCore.BuildData.WarningID.kMultipleSymbolFound);
+            string[] classes = theTest.GetAllMatchingClasses("MicroFeatureTests");
+            Assert.True(classes.Length > 1, "More than one implementation of MicroFeatureTests class expected");
+        }
+
+        [Test]
+        public void TestNamespaceClassResolution()
+        {
+            string code =
+                @"import(Point from ""ProtoTest.dll"");
+                    x = 1..5;
+                    y = 6..10;
+                    z = 0;
+                    dsPoint = DesignScript.Point.XYZ(x, y, z);
+                    dyPoint = Dynamo.Point.XYZ(y, x, z);
+
+                    check = Equals(dsPoint.dX, dyPoint.Y);";
+
+            TestFrameWork theTest = new TestFrameWork();
+            var mirror = theTest.RunScriptSource(code);
+            theTest.Verify("check", true);
+            TestFrameWork.VerifyBuildWarning(ProtoCore.BuildData.WarningID.kMultipleSymbolFound);
+            string[] classes = theTest.GetAllMatchingClasses("Point");
+            Assert.True(classes.Length > 1, "More than one implementation of Point class expected");
+        }
     }
 
     // the following classes are used to test Dispose method call on FFI
@@ -1136,6 +1169,38 @@ z1 = z.a;";
             {
                 return obj._x == this._x;
             }
+        }
+    }
+
+    namespace DesignScript
+    {
+        public class Point
+        {
+            public static Point XYZ(double x, double y, double z)
+            {
+                var p = new Point { dX = x, dY = y, dZ = z };
+                return p;
+            }
+
+            public double dX { get; set; }
+            public double dY { get; set; }
+            public double dZ { get; set; }
+        }
+    }
+
+    namespace Dynamo
+    {
+        public class Point
+        {
+            public static Point XYZ(double x, double y, double z)
+            {
+                var p = new Point { X = x, Y = y, Z = z };
+                return p;
+            }
+
+            public double X { get; set; }
+            public double Y { get; set; }
+            public double Z { get; set; }
         }
     }
 }
