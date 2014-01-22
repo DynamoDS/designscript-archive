@@ -564,9 +564,8 @@ def foo(x, y, z)
     return = x + y + z;
 }
 
-t = foo;
 param = { 2, 3, 4 };
-x = EvaluateFunctionPointer(t, param);
+x = Evaluate(foo, param);
 ";           
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("x", 9); 
@@ -587,9 +586,8 @@ def foo(x, y)
     return = x * y;
 }
 
-t = foo;
 param = { 2, 3, 4 };
-x = EvaluateFunctionPointer(t, param);
+x = Evaluate(foo, param);
 param = { 5, 6 };
 ";           
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
@@ -613,11 +611,54 @@ def bar(x, y, z)
 
 t = foo;
 param = { 2, 3, 4 };
-x = EvaluateFunctionPointer(t, param);
+x = Evaluate(t, param);
 t = bar;
 ";           
             ExecutionMirror mirror = thisTest.RunScriptSource(code);
             thisTest.Verify("x", 24); 
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer04()
+        {
+            // replicated on function pointer
+            string code =
+@"
+def foo(x, y, z)
+{
+    return = x + y + z;
+}
+
+def bar(x, y, z)
+{
+    return = x * y * z;
+}
+
+param = {2, 3, 4 };
+x = Evaluate({ foo, bar }, param);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new object[] { 9, 24});
+        }
+
+        [Test]
+        public void Test_EvaluateFunctionPointer05()
+        {
+            // replicated on function pointer
+            string code =
+@"
+def foo(x, y, z)
+{
+    return = x + y + z;
+}
+
+param = {{2, 3, 4}, {5,6,7}, {8, 9, 10} };
+// e.q. 
+// foo({2,3,4}, {5,6,7}, {8, 9, 10});
+x = Evaluate(foo, param);
+";
+            ExecutionMirror mirror = thisTest.RunScriptSource(code);
+            thisTest.Verify("x", new object[] { 15, 18, 21 });
         }
     }
     class MathematicalFunctionMethodsTest

@@ -788,8 +788,8 @@ namespace ProtoCore.Lang
                         ret = StackUtils.BuildBoolean(result);
                         break;
                     }
-                case BuiltInMethods.MethodID.kEvaluateFunctionPointer:
-                    ret = ArrayUtilsForBuiltIns.EvaluateFunctionPointer(
+                case BuiltInMethods.MethodID.kEvaluate:
+                    ret = ArrayUtilsForBuiltIns.Evaluate(
                         formalParameters[0], 
                         formalParameters[1], 
                         interpreter, 
@@ -2394,7 +2394,7 @@ namespace ProtoCore.Lang
             return runtime.runtime.rmem.BuildArray(svList.ToArray());
         }
 
-        internal static StackValue EvaluateFunctionPointer(StackValue function, StackValue parameters, Interpreter runtime, StackFrame stackFrame)
+        internal static StackValue Evaluate(StackValue function, StackValue parameters, Interpreter runtime, StackFrame stackFrame)
         {
             var args = runtime.runtime.rmem.GetArrayElements(parameters);
             var evaluator = new FunctionPointerEvaluator(function, runtime);
