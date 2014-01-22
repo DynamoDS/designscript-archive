@@ -248,17 +248,13 @@ namespace ProtoCore.Namespace
             return count;
         }
 
-        #endregion
-
-        #region Private Methods
-
         /// <summary>
         /// Gets all symbols for the given name that satisfies the input predicate
         /// </summary>
         /// <param name="name">symbol name for lookup</param>
         /// <param name="predicate">predicate for lookup</param>
         /// <returns>Array of matching symbols or empty array</returns>
-        private Symbol[] TryGetSymbols(string name, Func<Symbol, bool> predicate)
+        public Symbol[] TryGetSymbols(string name, Func<Symbol, bool> predicate)
         {
             string symbolName = name.Split('.').Last();
             HashSet<Symbol> symbolSet = GetAllSymbols(symbolName);
@@ -269,11 +265,21 @@ namespace ProtoCore.Namespace
         }
 
         /// <summary>
+        /// Returns collection of names without namespace for all symbols in
+        /// this table.
+        /// </summary>
+        /// <returns>Collection of symbol names</returns>
+        public ICollection<string> GetAllSymbolNames()
+        {
+            return symbolTable.Keys;
+        }
+
+        /// <summary>
         /// Gets set of all symbols in this table for the given symbol name
         /// </summary>
         /// <param name="name">Symbol name</param>
         /// <returns>HashSet of Symbol</returns>
-        private HashSet<Symbol> GetAllSymbols(string symbolName)
+        internal HashSet<Symbol> GetAllSymbols(string symbolName)
         {
             HashSet<Symbol> symbols = null;
             symbolTable.TryGetValue(symbolName, out symbols);

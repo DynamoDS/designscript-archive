@@ -90,9 +90,7 @@ namespace ProtoTestFx.TD
                     errorString = "tested as import file";
                     
             }
-
-            
-              else if (testDebug)
+            else if (testDebug)
             {
                     Dictionary<int, List<string>> map = new Dictionary<int, List<string>>();
                     string fname = Path.Combine(directory, filename);
@@ -526,6 +524,11 @@ namespace ProtoTestFx.TD
             }
             else if(!doAssert)
                 Assert.Fail(string.Format("\tMethod \"{0}.{1}\" does exist \n{2}", className, methodName, mErrorMessage));
+        }
+
+        public string[] GetAllMatchingClasses(string name)
+        {
+            return testCore.ClassTable.GetAllMatchingClasses(name);
         }
 
         public int GetClassIndex(string className)
