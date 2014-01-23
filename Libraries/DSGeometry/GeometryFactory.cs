@@ -343,30 +343,6 @@ namespace DSGeometry
 
         public IVectorEntity VectorByCoordinates(double x, double y, double z, bool normalized) { throw new NotImplementedException(); }
 
-        /*
-         * Attention: ISubDMeshEntity is no longer included/declared in IGeometryFactory
-         * 
-
-        public ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] points, int[][] faceIndices, IVectorEntity[] vertexNormals, IColor[] vertexColors, int subDLevel)
-        {
-            DSGeometryApplication.Check();
-            return new SubDMeshEntity();
-        }
-
-        public ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices, int subDLevel)
-        {
-            DSGeometryApplication.Check();
-            return new SubDMeshEntity();
-        }
-
-        public ISubDMeshEntity SubDMeshFromGeometry(IGeometryEntity geometry, double maxEdgeLength)
-        {
-            DSGeometryApplication.Check();
-            return new SubDMeshEntity();
-        }
-        
-        */
-
         public IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroupEntity[] indices) { throw new NotImplementedException(); }
 
         public IBlockHelper GetBlockHelper()

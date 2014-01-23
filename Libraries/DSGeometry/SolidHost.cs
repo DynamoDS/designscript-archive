@@ -9,11 +9,6 @@ namespace DSGeometry
 {
     class SolidEntity : GeometryEntity, ISolidEntity
     {
-        public virtual double GetArea()
-        {
-            return Area;
-        }
-
         public virtual int GetCellCount()
         {
             return 1;
@@ -37,11 +32,6 @@ namespace DSGeometry
         public IShellEntity[] GetShells()
         {
             return new IShellEntity[3] { new ShellEntity(), new ShellEntity(), new ShellEntity() };
-        }
-
-        public virtual double GetVolume()
-        {
-            return Volume;
         }
 
         public IGeometryEntity[] IntersectWith(ISurfaceEntity geometry)
@@ -209,16 +199,15 @@ namespace DSGeometry
             return new IVertexEntity[4] { new VertexEntity(), new VertexEntity(), new VertexEntity(), new VertexEntity() };
         }
 
-        public double Area
+        public virtual double Area
         {
             get { return 100; }
         }
 
-        public double Volume
+        public virtual double Volume
         {
             get { return 400; }
         }
-
 
         public IPointEntity GetCenterOfGravity()
         {

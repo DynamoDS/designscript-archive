@@ -64,12 +64,6 @@ namespace DSGeometry
             this.Height = length;
         }
 
-        public override double GetArea()
-        {
-            return (Math.PI * (StartRadius + EndRadius) * Math.Sqrt((StartRadius - EndRadius) * (StartRadius - EndRadius) + Height * Height))
-                + (Math.PI * (StartRadius * StartRadius + EndRadius * EndRadius));
-        }
-
         public override int GetEdgeCount()
         {
             return 1;
@@ -85,9 +79,15 @@ namespace DSGeometry
             return 1;
         }
 
-        public override double GetVolume()
+        public override double Area
         {
-            return (1 / 3) * Math.PI * (StartRadius * StartRadius + StartRadius * EndRadius + EndRadius * EndRadius) * Height;
+            get { return (Math.PI * (StartRadius + EndRadius) * Math.Sqrt((StartRadius - EndRadius) * (StartRadius - EndRadius) + Height * Height))
+                + (Math.PI * (StartRadius * StartRadius + EndRadius * EndRadius)); }
+        }
+
+        public override double Volume
+        {
+            get { return (1 / 3) * Math.PI * (StartRadius * StartRadius + StartRadius * EndRadius + EndRadius * EndRadius) * Height; }
         }
 
         public double StartRadius { get; protected set; }
@@ -99,11 +99,6 @@ namespace DSGeometry
         public double EndRadius { get; protected set; }
 
         public IPointEntity EndPoint { get; protected set; }
-
-        public double GetRadiusRatio()
-        {
-            return RadiusRatio;
-        }
 
         public double RadiusRatio
         {
