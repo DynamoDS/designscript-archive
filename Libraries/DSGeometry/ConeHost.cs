@@ -98,10 +98,14 @@ namespace DSGeometry
 
         public IPointEntity EndPoint { get; protected set; }
 
-
         public double GetRadiusRatio()
         {
-            throw new NotImplementedException();
+            return RadiusRatio;
+        }
+
+        public double RadiusRatio
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

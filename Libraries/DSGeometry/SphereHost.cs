@@ -15,6 +15,13 @@ namespace DSGeometry
             this.CenterPoint = new PointEntity();
             this.Radius = 1;
         }
+
+        public SphereEntity(IPointEntity centerPoint, double radius)
+        {
+            this.CenterPoint = centerPoint;
+            this.Radius = radius;
+        }
+
         public IPointEntity GetCenterPoint()
         {
             return CenterPoint;
@@ -65,9 +72,6 @@ namespace DSGeometry
 
         public double Radius { get; protected set; }
 
-        public ICoordinateSystemEntity GetCoordinateSystem()
-        {
-            throw new NotImplementedException();
-        }
+        public ICoordinateSystemEntity GetCoordinateSystem() { throw new NotImplementedException(); }
     }
 }

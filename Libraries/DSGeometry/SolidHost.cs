@@ -11,7 +11,7 @@ namespace DSGeometry
     {
         public virtual double GetArea()
         {
-            return 100;
+            return Area;
         }
 
         public virtual int GetCellCount()
@@ -41,7 +41,7 @@ namespace DSGeometry
 
         public virtual double GetVolume()
         {
-            return 400;
+            return Volume;
         }
 
         public IGeometryEntity[] IntersectWith(ISurfaceEntity geometry)
@@ -169,7 +169,7 @@ namespace DSGeometry
             return false;
         }
 
-        public bool UpdateSolidByRevolve(ICurveEntity profileCurve, IPointEntity originPoint, IVector revolveAxis, double startAngle, double sweepAngle)
+        public bool UpdateSolidByRevolve(ICurveEntity profileCurve, IPointEntity originPoint, IVectorEntity revolveAxis, double startAngle, double sweepAngle)
         {
             return false;
         }
@@ -208,5 +208,27 @@ namespace DSGeometry
         {
             return new IVertexEntity[4] { new VertexEntity(), new VertexEntity(), new VertexEntity(), new VertexEntity() };
         }
+
+        public double Area
+        {
+            get { return 100; }
+        }
+
+        public double Volume
+        {
+            get { return 400; }
+        }
+
+        public IPointEntity GetCenterOfGravity() { throw new NotImplementedException(); }
+
+        public ISolidEntity CSGUnion(ISolidEntity geometry) { throw new NotImplementedException(); }
+
+        public ISolidEntity CSGDifference(ISolidEntity geometry) { throw new NotImplementedException(); }
+
+        public ISolidEntity CSGIntersect(ISolidEntity geometry) { throw new NotImplementedException(); }
+
+        ISolidEntity[] ISolidEntity.ThinShell(double internalFaceThickness, double externalFaceThickness) { throw new NotImplementedException(); }
+
+        public IGeometryEntity[] Project(IPointEntity PointEntity, IVectorEntity dir) { throw new NotImplementedException(); }
     }
 }

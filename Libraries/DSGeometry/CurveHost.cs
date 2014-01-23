@@ -31,7 +31,7 @@ namespace DSGeometry
             protected set;
         }
 
-        public virtual ISurfaceEntity Extrude(IVector direction, double distance)
+        public virtual ISurfaceEntity Extrude(IVectorEntity direction, double distance)
         {
             return new SurfaceEntity();
         }
@@ -41,7 +41,7 @@ namespace DSGeometry
             return this.StartPoint;
         }
 
-        public virtual IPointEntity GetClosestPointTo(IPointEntity point, IVector direction, bool extend)
+        public virtual IPointEntity GetClosestPointTo(IPointEntity point, IVectorEntity direction, bool extend)
         {
             return this.StartPoint;
         }
@@ -53,7 +53,7 @@ namespace DSGeometry
 
         public virtual double GetLength()
         {
-            return 1;
+            return Length;
         }
 
         public virtual ICurveEntity GetOffsetCurve(double distance)
@@ -96,12 +96,12 @@ namespace DSGeometry
             return new ICurveEntity[3] { new LineEntity(), new LineEntity(), new LineEntity() };
         }
 
-        public virtual IBSplineCurveEntity JoinWith(ICurveEntity[] curves)
+        public virtual INurbsCurveEntity JoinWith(ICurveEntity[] curves)
         {
-            return new BSplineCurveEntity();
+            return new NurbsCurveEntity();
         }
 
-        public virtual IVector NormalAtParameter(double param)
+        public virtual IVectorEntity NormalAtParameter(double param)
         {
             return DsVector.ByCoordinates(param, param, param);
         }
@@ -121,17 +121,17 @@ namespace DSGeometry
             return new PointEntity();
         }
 
-        public virtual IPointEntity Project(IPointEntity point, IVector direction)
+        public virtual IPointEntity Project(IPointEntity point, IVectorEntity direction)
         {
             return new PointEntity();
         }
 
-        public virtual IGeometryEntity[] ProjectOn(ISurfaceEntity surface, IVector direction)
+        public virtual IGeometryEntity[] ProjectOn(ISurfaceEntity surface, IVectorEntity direction)
         {
             return new IGeometryEntity[2] { new GeometryEntity(), new GeometryEntity() };
         }
 
-        public virtual ICurveEntity ProjectOn(IPlaneEntity plane, IVector direction)
+        public virtual ICurveEntity ProjectOn(IPlaneEntity plane, IVectorEntity direction)
         {
             return new LineEntity();
         }
@@ -157,7 +157,7 @@ namespace DSGeometry
             protected set;
         }
 
-        public virtual IVector TangentAtParameter(double param)
+        public virtual IVectorEntity TangentAtParameter(double param)
         {
             if(null != StartPoint && null != EndPoint)
                 return DsVector.ByCoordinates(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y, EndPoint.Z - StartPoint.Z);
@@ -174,5 +174,71 @@ namespace DSGeometry
         {
             return new ICurveEntity[3] { new LineEntity(), new LineEntity(), new LineEntity() };
         }
+
+        public ICoordinateSystemEntity CoordinateSystemAtParameter(double param) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity HorizontalFrameAtParameter(double param) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity GetNoTwistFrameAtParameter(double param) { throw new NotImplementedException(); }
+
+        public double Length
+        {
+            get { return 1; }
+        }
+
+        public double GetLength(double startParam, double endParam) { throw new NotImplementedException(); }
+
+        public IVectorEntity Normal
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public ICurveEntity Offset(double distance) { throw new NotImplementedException(); }
+
+        public bool IsAlmostEqualTo(IPointEntity other) { throw new NotImplementedException(); }
+
+        public ICurveEntity ParameterTrimStart(double startParameter) { throw new NotImplementedException(); }
+
+        public ICurveEntity ParameterTrimEnd(double endParameter) { throw new NotImplementedException(); }
+
+        public ICurveEntity ParameterTrim(double startParameter, double endParameter) { throw new NotImplementedException(); }
+
+        public ICurveEntity[] ParameterTrimInterior(double startParameter, double endParameter) { throw new NotImplementedException(); }
+
+        public ICurveEntity[] ParameterTrimSegments(double[] parameters) { throw new NotImplementedException(); }
+
+        public ICurveEntity[] ParameterTrimSegments(double[] parameters, bool discardEvenSegments) { throw new NotImplementedException(); }
+
+        public ICurveEntity[] ParameterSplit(double parameter) { throw new NotImplementedException(); }
+
+        public ICurveEntity[] ParameterSplit(double[] parameters) { throw new NotImplementedException(); }
+
+        public IPolyCurveEntity Join(ICurveEntity curve) { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity Merge(ICurveEntity curve) { throw new NotImplementedException(); }
+
+        public ISurfaceEntity Extrude(double distance) { throw new NotImplementedException(); }
+
+        public ISurfaceEntity Extrude(IVectorEntity direction) { throw new NotImplementedException(); }
+
+        public ISolidEntity ExtrudeAsSolid(double distance) { throw new NotImplementedException(); }
+
+        public ISolidEntity ExtrudeAsSolid(IVectorEntity direction) { throw new NotImplementedException(); }
+
+        public ISolidEntity ExtrudeAsSolid(IVectorEntity direction, double distance) { throw new NotImplementedException(); }
+
+        public ICurveEntity Extend(double distance, IPointEntity pickSide) { throw new NotImplementedException(); }
+
+        public ICurveEntity ExtendStart(double distance) { throw new NotImplementedException(); }
+
+        public ICurveEntity ExtendEnd(double distance) { throw new NotImplementedException(); }
+
+        public ICurveEntity[] ApproximateWithArcAndLineSegments() { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity ToNurbsCurve() { throw new NotImplementedException(); }
+
+        public ICurveEntity PullOntoPlane(IPlaneEntity plane) { throw new NotImplementedException(); }
+
+        public ISurfaceEntity Patch() { throw new NotImplementedException(); }
     }
 }

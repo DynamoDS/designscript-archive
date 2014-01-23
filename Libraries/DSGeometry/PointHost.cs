@@ -11,20 +11,21 @@ namespace DSGeometry
     {
         internal PointEntity()
         {
-            X = 0;
-            Y = 0;
-            Z = 0;
+            
         }
+
         internal PointEntity(double x, double y, double z)
         {
             this.X = x;
             this.Y = y;
             this.Z = z;
         }
-        internal IVector directionTo(IPointEntity point)
+
+        internal IVectorEntity directionTo(IPointEntity point)
         {
             return DsVector.ByCoordinates(point.X - this.X, point.Y - this.Y, point.Z - this.Z);
         }
+
         public double X
         {
             get;

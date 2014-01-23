@@ -122,7 +122,7 @@ namespace DSGeometry
         }
     }*/
 
-    class MeshEntity : TopologyEntity, IMeshEntity
+    class MeshEntity : TopologyEntity, IPolyMeshEntity
     {
         ISolidEntity mSolid = new SolidEntity();
         public IGeometryEntity Geometry
@@ -145,19 +145,61 @@ namespace DSGeometry
             return mSolid.GetVertices();
         }
 
-        public int GetVertexCount()
+        /*public int GetVertexCount()
         {
             return mSolid.GetVertexCount();
-        }
+        }*/
 
         public int GetEdgeCount()
         {
             return mSolid.GetEdgeCount();
         }
 
-        public int GetFaceCount()
+        /*public int GetFaceCount()
         {
             return mSolid.GetFaceCount();
+        }*/
+
+        public int NumVertices
+        {
+            get { return mSolid.GetVertexCount(); }
         }
+
+        public int NumFaces
+        {
+            get { return mSolid.GetFaceCount(); }
+        }
+
+        public int NumResultVertices
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public int NumResultFaces
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IColor[] GetVertexColors() { throw new NotImplementedException(); }
+
+        public IVectorEntity[] GetVertexNormals() { throw new NotImplementedException(); }
+
+        public int[][] GetFaceIndices() { throw new NotImplementedException(); }
+
+        public double Area
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public double Volume
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool GetIsClosed() { throw new NotImplementedException(); }
+
+        public ISurfaceEntity ConvertToSurface(bool bConvertAsSmooth) { throw new NotImplementedException(); }
+
+        public ISolidEntity ConvertToSolid(bool bConvertAsSmooth) { throw new NotImplementedException(); }
     }
 }

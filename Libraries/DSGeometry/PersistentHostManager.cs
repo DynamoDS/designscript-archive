@@ -8,11 +8,23 @@ using Autodesk.DesignScript.Geometry;
 
 namespace DSGeometry
 {
-    class PersistentHostManager : AbstractPersistenceManager
+    class PersistentHostManager : IPersistenceManager
     {
-        public override IPersistentObject Persist(IDesignScriptEntity entity)
+        public IPersistentObject Persist(IDesignScriptEntity entity)
         {
             return new PersistentObject(entity);
         }
+
+        public void UpdateDisplay() { throw new NotImplementedException(); }
+
+        public IPersistentObject GetPersistentObjectFromHandle(object handle) { throw new NotImplementedException(); }
+
+        public IGeometryFactory GeometryFactory { get; set; }
+
+        public bool SupportsGeometryCapture() { throw new NotImplementedException(); }
+
+        public IDesignScriptEntity[] CaptureGeometry() { throw new NotImplementedException(); }
+
+        public IPersistentObject FromObject(long ptr) { throw new NotImplementedException(); }
     }
 }

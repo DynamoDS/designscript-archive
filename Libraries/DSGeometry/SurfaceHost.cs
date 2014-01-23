@@ -9,14 +9,14 @@ namespace DSGeometry
 {
     class SurfaceEntity : GeometryEntity, ISurfaceEntity
     {
-        public IBSplineSurfaceEntity ApproxBSpline(double tol)
+        public INurbsSurfaceEntity ApproxBSpline(double tol)
         {
-            return new BSplineSurfaceEntity();
+            return new NurbsSurfaceEntity();
         }
 
-        public IBSplineSurfaceEntity[] ConvertToBSplineSurface()
+        public INurbsSurfaceEntity[] ConvertToBSplineSurface()
         {
-            return new IBSplineSurfaceEntity[3] { new BSplineSurfaceEntity(), new BSplineSurfaceEntity(), new BSplineSurfaceEntity() };
+            return new INurbsSurfaceEntity[3] { new NurbsSurfaceEntity(), new NurbsSurfaceEntity(), new NurbsSurfaceEntity() };
         }
 
         public virtual double GetArea()
@@ -24,9 +24,9 @@ namespace DSGeometry
             return 10;
         }
 
-        public IBSplineSurfaceEntity GetBsplineSurface()
+        public INurbsSurfaceEntity GetBsplineSurface()
         {
-            return new BSplineSurfaceEntity();
+            return new NurbsSurfaceEntity();
         }
 
         public override IPointEntity GetClosestPoint(IPointEntity point)
@@ -49,7 +49,7 @@ namespace DSGeometry
             return false;
         }
 
-        public IVector GetNormalAtPoint(IPointEntity point)
+        public IVectorEntity GetNormalAtPoint(IPointEntity point)
         {
             return DsVector.ByCoordinates(point.X, point.Y, point.Z);
         }
@@ -79,7 +79,7 @@ namespace DSGeometry
             return new IGeometryEntity[2] { new GeometryEntity(), new GeometryEntity() };
         }
 
-        public IVector NormalAtPoint(IPointEntity point)
+        public IVectorEntity NormalAtPoint(IPointEntity point)
         {
             return DsVector.ByCoordinates(point.X, point.Y, point.Z);
         }
@@ -94,7 +94,7 @@ namespace DSGeometry
             return new PointEntity();
         }
 
-        public IGeometryEntity[] Project(IGeometryEntity geometry, IVector direction)
+        public IGeometryEntity[] Project(IGeometryEntity geometry, IVectorEntity direction)
         {
             return new IGeometryEntity[2] { new GeometryEntity(), new GeometryEntity() };
         }
@@ -119,12 +119,12 @@ namespace DSGeometry
             return new IGeometryEntity[2] { new GeometryEntity(), new GeometryEntity() };
         }
 
-        public IVector TangentAtUParameter(double u, double v)
+        public IVectorEntity TangentAtUParameter(double u, double v)
         {
             return DsVector.ByCoordinates(0, u, v);
         }
 
-        public IVector TangentAtVParameter(double u, double v)
+        public IVectorEntity TangentAtVParameter(double u, double v)
         {
             return DsVector.ByCoordinates(0, u, v);
         }
@@ -139,7 +139,7 @@ namespace DSGeometry
             return this;
         }
 
-        public bool UpdateRevolve(ICurveEntity profile, IPointEntity origin, IVector revolveAxis, double startAngle, double sweepAngle)
+        public bool UpdateRevolve(ICurveEntity profile, IPointEntity origin, IVectorEntity revolveAxis, double startAngle, double sweepAngle)
         {
             return false;
         }
@@ -168,5 +168,62 @@ namespace DSGeometry
         {
             return null;
         }
+
+        public IGeometryEntity[] Project(IPointEntity PointEntity, IVectorEntity dir) { throw new NotImplementedException(); }
+
+        public IGeometryEntity[] Difference(ISolidEntity iSolidEntity) { throw new NotImplementedException(); }
+
+        public IGeometryEntity[] SubtractFrom(ISolidEntity trimmingEntity) { throw new NotImplementedException(); }
+
+        public IUVEntity UVParameterAtPoint(IPointEntity point) { throw new NotImplementedException(); }
+
+        public INurbsSurfaceEntity ToNurbsSurface() { throw new NotImplementedException(); }
+
+        public INurbsSurfaceEntity ApproximateWithTolerance(double tolerance) { throw new NotImplementedException(); }
+
+        public ISolidEntity Thicken(double thickness) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity CoordinateSystemAtParameter(double u, double v) { throw new NotImplementedException(); }
+
+        public IVectorEntity NormalAtParameter(double u, double v) { throw new NotImplementedException(); }
+
+        public IVectorEntity[] DerivativesAtParameter(double u, double v) { throw new NotImplementedException(); }
+
+        public double GaussianCurvatureAtParameter(double u, double v) { throw new NotImplementedException(); }
+
+        public double[] PrincipalCurvaturesAtParameter(double u, double v) { throw new NotImplementedException(); }
+
+        public IVectorEntity[] PrincipalDirectionsAtParameter(double u, double v) { throw new NotImplementedException(); }
+
+        public double Area
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public double Perimeter
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool ClosedInU
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool ClosedInV
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool Closed
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public ICurveEntity[] PerimeterCurves() { throw new NotImplementedException(); }
+
+        public ICurveEntity[] GetIsolines(int isoDirection, double parameter) { throw new NotImplementedException(); }
+
+        public ISurfaceEntity FlipNormalDirection() { throw new NotImplementedException(); }
     }
 }

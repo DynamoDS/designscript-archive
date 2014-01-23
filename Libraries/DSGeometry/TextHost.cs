@@ -10,45 +10,52 @@ namespace DSGeometry
 {
     class TextEntity : GeometryEntity, ITextEntity
     {
-        private  double fontSize;
-        private string textString;
         internal TextEntity()
         {
-            FontSize = 10;
-            String = "Hello World";
+            Height = 10;
+            Text = "Hello World";
             Orientation = 0;
         }
-        public double FontSize
+
+        private double height;
+        public double Height
         {
-            get { return fontSize; }
-            protected set { fontSize = value; }
+            get { return height; }
+            protected set { height = value; }
         }
-        public string String
+
+        private string text;
+        public string Text
         {
-            get { return textString; }
-            protected set { textString = value; }
+            get { return text; }
+            protected set { text = value; }
         }
+
+        private int orientation;
         public int Orientation
         {
-            get;
-            protected set;
+            get { return orientation; }
+            protected set { orientation = value; }
         }
+
         public double GetFontSize()
         {
-            return FontSize;
+            return Height;
         }
 
         public string GetString()
         {
-            return String;
+            return Text;
         }
 
         public bool UpdateByCoordinateSystem(ICoordinateSystemEntity cs, int orientation, string textString, double fontSize)
         {
             this.Orientation = orientation;
-            this.String = textString;
-            this.FontSize = fontSize;
+            this.Text = textString;
+            this.Height = fontSize;
             return true;
         }
+
+        public Encoding GetEncoding() { throw new NotImplementedException(); }
     }
 }
