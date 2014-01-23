@@ -193,52 +193,126 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public ICurveEntity Offset(double distance) { throw new NotImplementedException(); }
 
-        public bool IsAlmostEqualTo(IPointEntity other) { throw new NotImplementedException(); }
 
-        public ICurveEntity ParameterTrimStart(double startParameter) { throw new NotImplementedException(); }
+        public ICurveEntity Offset(double distance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity ParameterTrimEnd(double endParameter) { throw new NotImplementedException(); }
+        public bool IsAlmostEqualTo(IPointEntity other)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity ParameterTrim(double startParameter, double endParameter) { throw new NotImplementedException(); }
+        public ICurveEntity ParameterTrimStart(double startParameter)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity[] ParameterTrimInterior(double startParameter, double endParameter) { throw new NotImplementedException(); }
+        public ICurveEntity ParameterTrimEnd(double endParameter)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity[] ParameterTrimSegments(double[] parameters) { throw new NotImplementedException(); }
+        public ICurveEntity ParameterTrim(double startParameter, double endParameter)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity[] ParameterTrimSegments(double[] parameters, bool discardEvenSegments) { throw new NotImplementedException(); }
+        public ICurveEntity[] ParameterTrimInterior(double startParameter, double endParameter)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity[] ParameterSplit(double parameter) { throw new NotImplementedException(); }
+        public ICurveEntity[] ParameterTrimSegments(double[] parameters)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity[] ParameterSplit(double[] parameters) { throw new NotImplementedException(); }
+        public ICurveEntity[] ParameterTrimSegments(double[] parameters, bool discardEvenSegments)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IPolyCurveEntity Join(ICurveEntity curve) { throw new NotImplementedException(); }
+        public ICurveEntity[] ParameterSplit(double parameter)
+        {
+            throw new NotImplementedException();
+        }
 
-        public INurbsCurveEntity Merge(ICurveEntity curve) { throw new NotImplementedException(); }
+        public ICurveEntity[] ParameterSplit(double[] parameters)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISurfaceEntity Extrude(double distance) { throw new NotImplementedException(); }
+        public IPolyCurveEntity Join(ICurveEntity curve)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISurfaceEntity Extrude(IVectorEntity direction) { throw new NotImplementedException(); }
+        public INurbsCurveEntity Merge(ICurveEntity curve)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISolidEntity ExtrudeAsSolid(double distance) { throw new NotImplementedException(); }
+        public ISurfaceEntity Extrude(double distance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISolidEntity ExtrudeAsSolid(IVectorEntity direction) { throw new NotImplementedException(); }
+        public ISurfaceEntity Extrude(IVectorEntity direction)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISolidEntity ExtrudeAsSolid(IVectorEntity direction, double distance) { throw new NotImplementedException(); }
+        public ISolidEntity ExtrudeAsSolid(double distance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity Extend(double distance, IPointEntity pickSide) { throw new NotImplementedException(); }
+        public ISolidEntity ExtrudeAsSolid(IVectorEntity direction)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity ExtendStart(double distance) { throw new NotImplementedException(); }
+        public ISolidEntity ExtrudeAsSolid(IVectorEntity direction, double distance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity ExtendEnd(double distance) { throw new NotImplementedException(); }
+        public ICurveEntity Extend(double distance, IPointEntity pickSide)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity[] ApproximateWithArcAndLineSegments() { throw new NotImplementedException(); }
+        public ICurveEntity ExtendStart(double distance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public INurbsCurveEntity ToNurbsCurve() { throw new NotImplementedException(); }
+        public ICurveEntity ExtendEnd(double distance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity PullOntoPlane(IPlaneEntity plane) { throw new NotImplementedException(); }
+        public ICurveEntity[] ApproximateWithArcAndLineSegments()
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISurfaceEntity Patch() { throw new NotImplementedException(); }
+        public INurbsCurveEntity ToNurbsCurve()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ICurveEntity PullOntoPlane(IPlaneEntity plane)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISurfaceEntity Patch()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

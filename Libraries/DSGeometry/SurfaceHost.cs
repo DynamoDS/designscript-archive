@@ -169,31 +169,70 @@ namespace DSGeometry
             return null;
         }
 
-        public IGeometryEntity[] Project(IPointEntity PointEntity, IVectorEntity dir) { throw new NotImplementedException(); }
+        public IGeometryEntity[] Project(IPointEntity PointEntity, IVectorEntity dir)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IGeometryEntity[] Difference(ISolidEntity iSolidEntity) { throw new NotImplementedException(); }
+        public IGeometryEntity[] Difference(ISolidEntity iSolidEntity)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IGeometryEntity[] SubtractFrom(ISolidEntity trimmingEntity) { throw new NotImplementedException(); }
+        public IGeometryEntity[] SubtractFrom(ISolidEntity trimmingEntity)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IUVEntity UVParameterAtPoint(IPointEntity point) { throw new NotImplementedException(); }
+        public IUVEntity UVParameterAtPoint(IPointEntity point)
+        {
+            throw new NotImplementedException();
+        }
 
-        public INurbsSurfaceEntity ToNurbsSurface() { throw new NotImplementedException(); }
+        public INurbsSurfaceEntity ToNurbsSurface()
+        {
+            throw new NotImplementedException();
+        }
 
-        public INurbsSurfaceEntity ApproximateWithTolerance(double tolerance) { throw new NotImplementedException(); }
+        public INurbsSurfaceEntity ApproximateWithTolerance(double tolerance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISolidEntity Thicken(double thickness) { throw new NotImplementedException(); }
+        public ISolidEntity Thicken(double thickness)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICoordinateSystemEntity CoordinateSystemAtParameter(double u, double v) { throw new NotImplementedException(); }
+        public ICoordinateSystemEntity CoordinateSystemAtParameter(double u, double v)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IVectorEntity NormalAtParameter(double u, double v) { throw new NotImplementedException(); }
+        public IVectorEntity NormalAtParameter(double u, double v)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IVectorEntity[] DerivativesAtParameter(double u, double v) { throw new NotImplementedException(); }
+        public IVectorEntity[] DerivativesAtParameter(double u, double v)
+        {
+            throw new NotImplementedException();
+        }
 
-        public double GaussianCurvatureAtParameter(double u, double v) { throw new NotImplementedException(); }
+        public double GaussianCurvatureAtParameter(double u, double v)
+        {
+            throw new NotImplementedException();
+        }
 
-        public double[] PrincipalCurvaturesAtParameter(double u, double v) { throw new NotImplementedException(); }
+        public double[] PrincipalCurvaturesAtParameter(double u, double v)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IVectorEntity[] PrincipalDirectionsAtParameter(double u, double v) { throw new NotImplementedException(); }
+        public IVectorEntity[] PrincipalDirectionsAtParameter(double u, double v)
+        {
+            throw new NotImplementedException();
+        }
 
         public double Area
         {
@@ -220,10 +259,19 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public ICurveEntity[] PerimeterCurves() { throw new NotImplementedException(); }
+        public ICurveEntity[] PerimeterCurves()
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICurveEntity[] GetIsolines(int isoDirection, double parameter) { throw new NotImplementedException(); }
+        public ICurveEntity[] GetIsolines(int isoDirection, double parameter)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISurfaceEntity FlipNormalDirection() { throw new NotImplementedException(); }
+        public ISurfaceEntity FlipNormalDirection()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

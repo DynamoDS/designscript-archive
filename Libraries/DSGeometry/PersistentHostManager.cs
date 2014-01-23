@@ -15,16 +15,41 @@ namespace DSGeometry
             return new PersistentObject(entity);
         }
 
-        public void UpdateDisplay() { throw new NotImplementedException(); }
+        public void UpdateDisplay()
+        {
+            throw new NotImplementedException();
+        }
 
-        public IPersistentObject GetPersistentObjectFromHandle(object handle) { throw new NotImplementedException(); }
+        public IPersistentObject GetPersistentObjectFromHandle(object handle)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IGeometryFactory GeometryFactory { get; set; }
+        public IGeometryFactory GeometryFactory
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
 
-        public bool SupportsGeometryCapture() { throw new NotImplementedException(); }
+        public bool SupportsGeometryCapture()
+        {
+            throw new NotImplementedException();
+        }
 
-        public IDesignScriptEntity[] CaptureGeometry() { throw new NotImplementedException(); }
+        public IDesignScriptEntity[] CaptureGeometry()
+        {
+            throw new NotImplementedException();
+        }
 
-        public IPersistentObject FromObject(long ptr) { throw new NotImplementedException(); }
+        public IPersistentObject FromObject(long ptr)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

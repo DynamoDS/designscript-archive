@@ -56,6 +56,9 @@ namespace DSGeometry
             return true;
         }
 
-        public Encoding GetEncoding() { throw new NotImplementedException(); }
+        public Encoding GetEncoding()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

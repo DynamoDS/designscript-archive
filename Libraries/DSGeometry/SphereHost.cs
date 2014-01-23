@@ -72,6 +72,9 @@ namespace DSGeometry
 
         public double Radius { get; protected set; }
 
-        public ICoordinateSystemEntity GetCoordinateSystem() { throw new NotImplementedException(); }
+        public ICoordinateSystemEntity GetCoordinateSystem()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

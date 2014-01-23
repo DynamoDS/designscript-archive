@@ -11,7 +11,9 @@ namespace DSGeometry
     {
         internal PointEntity()
         {
-            
+            this.X = 0;
+            this.Y = 0;
+            this.Z = 0;
         }
 
         internal PointEntity(double x, double y, double z)

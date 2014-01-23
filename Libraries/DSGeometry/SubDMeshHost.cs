@@ -75,28 +75,6 @@ namespace DSGeometry
             get { return 2; }
         }
 
-        /*
-        public int GetNumFaces()
-        {
-            return NumFaces;
-        }
-
-        public int GetNumResultFaces()
-        {
-            return NumResultFaces;
-        }
-
-        public int GetNumResultVertices()
-        {
-            return NumResultVertices;
-        }
-
-        public int GetNumVertices()
-        {
-            return NumVertices;
-        }
-        */
-
         public int[][] GetResultFaceIndices()
         {
             return new int[][] { new int[] { 3, 2, 1 }, new int[] { 1, 2, 3 } };

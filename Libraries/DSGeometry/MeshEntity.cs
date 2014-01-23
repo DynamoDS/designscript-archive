@@ -180,11 +180,20 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public IColor[] GetVertexColors() { throw new NotImplementedException(); }
+        public IColor[] GetVertexColors()
+        {
+            throw new NotImplementedException();
+        }
 
-        public IVectorEntity[] GetVertexNormals() { throw new NotImplementedException(); }
+        public IVectorEntity[] GetVertexNormals()
+        {
+            throw new NotImplementedException();
+        }
 
-        public int[][] GetFaceIndices() { throw new NotImplementedException(); }
+        public int[][] GetFaceIndices()
+        {
+            throw new NotImplementedException();
+        }
 
         public double Area
         {
@@ -196,10 +205,19 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public bool GetIsClosed() { throw new NotImplementedException(); }
+        public bool GetIsClosed()
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISurfaceEntity ConvertToSurface(bool bConvertAsSmooth) { throw new NotImplementedException(); }
+        public ISurfaceEntity ConvertToSurface(bool bConvertAsSmooth)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISolidEntity ConvertToSolid(bool bConvertAsSmooth) { throw new NotImplementedException(); }
+        public ISolidEntity ConvertToSolid(bool bConvertAsSmooth)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

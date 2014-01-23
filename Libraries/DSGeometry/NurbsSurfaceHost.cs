@@ -141,6 +141,9 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public IPointEntity[][] GetControlPoints() { throw new NotImplementedException(); }
+        public IPointEntity[][] GetControlPoints()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

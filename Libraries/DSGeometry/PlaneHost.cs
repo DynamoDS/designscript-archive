@@ -64,17 +64,15 @@ namespace DSGeometry
             return iPointEntity;
         }
 
-        /*
-        public void Update(IPointEntity origin, IVectorEntity normal)
+        public ICoordinateSystemEntity ToCoordinateSystem()
         {
-            this.Origin = origin;
-            this.Normal = normal;
+            throw new NotImplementedException();
         }
-        */
 
-        public ICoordinateSystemEntity ToCoordinateSystem() { throw new NotImplementedException(); }
-
-        public IPlaneEntity Offset(double dist) { throw new NotImplementedException(); }
+        public IPlaneEntity Offset(double dist)
+        {
+            throw new NotImplementedException();
+        }
 
         public IVectorEntity XAxis
         {

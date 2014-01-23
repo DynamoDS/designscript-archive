@@ -133,9 +133,15 @@ namespace DSGeometry
             protected set;
         }
 
-        public ICoordinateSystemEntity Clone() { throw new NotImplementedException(); }
+        public ICoordinateSystemEntity Clone()
+        {
+            throw new NotImplementedException();
+        }
 
-        public ICoordinateSystemEntity Mirror(IPlaneEntity mirror_plane) { throw new NotImplementedException(); }
+        public ICoordinateSystemEntity Mirror(IPlaneEntity mirror_plane)
+        {
+            throw new NotImplementedException();
+        }
 
         bool ICoordinateSystemEntity.IsSingular
         {
@@ -157,7 +163,10 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public IVectorEntity Scale() { throw new NotImplementedException(); }
+        public IVectorEntity Scale()
+        {
+            throw new NotImplementedException();
+        }
 
         public double XScaleFactor
         {
@@ -174,26 +183,56 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public void Translate(double x, double y, double z) { throw new NotImplementedException(); }
+        public void Translate(double x, double y, double z)
+        {
+            throw new NotImplementedException();
+        }
 
-        void ITransformableEntity.Translate(IVectorEntity vec) { throw new NotImplementedException(); }
+        void ITransformableEntity.Translate(IVectorEntity vec)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void TransformBy(ICoordinateSystemEntity cs) { throw new NotImplementedException(); }
+        public void TransformBy(ICoordinateSystemEntity cs)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void TransformFromTo(ICoordinateSystemEntity from, ICoordinateSystemEntity to) { throw new NotImplementedException(); }
+        public void TransformFromTo(ICoordinateSystemEntity from, ICoordinateSystemEntity to)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void Rotate(IPointEntity origin, IVectorEntity axis, double degrees) { throw new NotImplementedException(); }
+        public void Rotate(IPointEntity origin, IVectorEntity axis, double degrees)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void Rotate(IPlaneEntity origin, double degrees) { throw new NotImplementedException(); }
+        public void Rotate(IPlaneEntity origin, double degrees)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Scale(double amount) { throw new NotImplementedException(); }
 
-        void ITransformableEntity.Scale(double xamount, double yamount, double zamount) { throw new NotImplementedException(); }
+        void ITransformableEntity.Scale(double xamount, double yamount, double zamount)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void Scale(IPointEntity from, IPointEntity to) { throw new NotImplementedException(); }
+        public void Scale(IPointEntity from, IPointEntity to)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void Scale1D(IPointEntity from, IPointEntity to) { throw new NotImplementedException(); }
+        public void Scale1D(IPointEntity from, IPointEntity to)
+        {
+            throw new NotImplementedException();
+        }
 
-        public void Scale2D(IPointEntity from, IPointEntity to) { throw new NotImplementedException(); }
+        public void Scale2D(IPointEntity from, IPointEntity to)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

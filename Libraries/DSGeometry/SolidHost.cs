@@ -219,16 +219,35 @@ namespace DSGeometry
             get { return 400; }
         }
 
-        public IPointEntity GetCenterOfGravity() { throw new NotImplementedException(); }
 
-        public ISolidEntity CSGUnion(ISolidEntity geometry) { throw new NotImplementedException(); }
+        public IPointEntity GetCenterOfGravity()
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISolidEntity CSGDifference(ISolidEntity geometry) { throw new NotImplementedException(); }
+        public ISolidEntity CSGUnion(ISolidEntity geometry)
+        {
+            throw new NotImplementedException();
+        }
 
-        public ISolidEntity CSGIntersect(ISolidEntity geometry) { throw new NotImplementedException(); }
+        public ISolidEntity CSGDifference(ISolidEntity geometry)
+        {
+            throw new NotImplementedException();
+        }
 
-        ISolidEntity[] ISolidEntity.ThinShell(double internalFaceThickness, double externalFaceThickness) { throw new NotImplementedException(); }
+        public ISolidEntity CSGIntersect(ISolidEntity geometry)
+        {
+            throw new NotImplementedException();
+        }
 
-        public IGeometryEntity[] Project(IPointEntity PointEntity, IVectorEntity dir) { throw new NotImplementedException(); }
+        ISolidEntity[] ISolidEntity.ThinShell(double internalFaceThickness, double externalFaceThickness)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IGeometryEntity[] Project(IPointEntity PointEntity, IVectorEntity dir)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

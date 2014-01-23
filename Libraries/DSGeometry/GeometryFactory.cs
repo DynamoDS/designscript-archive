@@ -88,17 +88,6 @@ namespace DSGeometry
             throw new NotImplementedException();
         }
         
-        //TODO not in the interface
-        public IConeEntity ConeByRadiusLength(ICoordinateSystemEntity cs, double startRadius, double endRadius, double height)
-        {
-            DSGeometryApplication.Check();
-            ConeEntity cone = new ConeEntity();
-            IPointEntity startPoint = cs.Origin;
-            IPointEntity endPoint = new PointEntity(cs.Origin.X, cs.Origin.Y, cs.Origin.Z + height);
-            cone.UpdateCone(startPoint, endPoint, startRadius, endRadius);
-            return cone;
-        }
-
         public ICoordinateSystemEntity CoordinateSystemByMatrix(double[] matrix) { throw new NotImplementedException(); }
 
         public ICoordinateSystemEntity CoordinateSystemByOrigin(double x, double y) { throw new NotImplementedException(); }
@@ -129,27 +118,6 @@ namespace DSGeometry
             CoordinateEntity cs = new CoordinateEntity();
             cs.Set(new PointEntity() { X = radius * Math.Sin(DegreeToRadian(theta)) * Math.Cos(DegreeToRadian(phi)), Y = radius * Math.Sin(DegreeToRadian(theta)) * Math.Sin(DegreeToRadian(phi)), Z = radius * Math.Cos(DegreeToRadian(theta)) }, contextCS.XAxis, contextCS.YAxis, contextCS.ZAxis);
             return cs;
-        }
-
-        //TODO not in the interface
-        public ICoordinateSystemEntity CoordinateSystemByData(double[] data)
-        {
-            DSGeometryApplication.Check();
-            return new CoordinateEntity();
-        }
-
-        //TODO not in the interface
-        public ICoordinateSystemEntity CoordinateSystemByUniversalTransform(ICoordinateSystemEntity contextCoordinateSys, double[] scaleFactors, double[] rotationAngles, int[] rotationSequence, double[] translationVector, bool translationSequence)
-        {
-            DSGeometryApplication.Check();
-            return new CoordinateEntity();
-        }
-
-        //TODO not in the interface
-        public ICoordinateSystemEntity CoordinateSystemByUniversalTransform(ICoordinateSystemEntity contextCoordinateSys, double[] scaleFactors, double[] rotationAngles, int[] rotationSequence, IVectorEntity translationVector, bool translationSequence)
-        {
-            DSGeometryApplication.Check();
-            return new CoordinateEntity();
         }
 
         public ICuboidEntity CuboidByLengths(double width, double length, double height) { throw new NotImplementedException(); }
@@ -254,16 +222,8 @@ namespace DSGeometry
 
         public IPlaneEntity PlaneByThreePoints(IPointEntity p1, IPointEntity p2, IPointEntity p3) { throw new NotImplementedException(); }
 
-        //TODO not in the interface
-        public IPointEntity CreatePoint(double x, double y, double z)
-        {
-            DSGeometryApplication.Check();
-            return new PointEntity(x, y, z);
-        }
-
         public IPointEntity PointByCoordinates(double x, double y) { throw new NotImplementedException(); }
 
-        //TODO this is my code
         public IPointEntity PointByCoordinates(double x, double y, double z)
         {
             DSGeometryApplication.Check();
@@ -334,20 +294,6 @@ namespace DSGeometry
 
         public ISurfaceEntity SurfaceByPatch(ICurveEntity iCurveEntity) { throw new NotImplementedException(); }
 
-        //TODO not in the interface
-        public ISurfaceEntity SurfaceByLoftCrossSectionsPath(ICurveEntity[] crossSections, ICurveEntity path)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
-
-        //TODO not in the interface
-        public ISurfaceEntity SurfacePatchFromCurve(ICurveEntity profile)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
-
         public ISolidEntity SolidByLoft(ICurveEntity[] crossSections)
         {
             DSGeometryApplication.Check();
@@ -388,14 +334,8 @@ namespace DSGeometry
         }
 
         public ITextEntity TextByPoint(IPointEntity origin, string textString, double textHeight) { throw new NotImplementedException(); }
+        
         public ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity cs, string textString, double textHeight) { throw new NotImplementedException(); }
-
-        //TODO not in the interface
-        public ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity contextCoordinateSystem, int orientation, string textString, double fontSize)
-        {
-            DSGeometryApplication.Check();
-            return new TextEntity();
-        }
 
         public IUVEntity UVByCoordinates(double u, double v) { throw new NotImplementedException(); }
 
@@ -404,6 +344,9 @@ namespace DSGeometry
         public IVectorEntity VectorByCoordinates(double x, double y, double z, bool normalized) { throw new NotImplementedException(); }
 
         /*
+         * Attention: ISubDMeshEntity is no longer included/declared in IGeometryFactory
+         * 
+
         public ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] points, int[][] faceIndices, IVectorEntity[] vertexNormals, IColor[] vertexColors, int subDLevel)
         {
             DSGeometryApplication.Check();
@@ -421,21 +364,10 @@ namespace DSGeometry
             DSGeometryApplication.Check();
             return new SubDMeshEntity();
         }
+        
         */
 
         public IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroupEntity[] indices) { throw new NotImplementedException(); }
-
-        //TODO not in the interface
-        public IPolyMeshEntity MeshByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices)
-        {
-            return new MeshEntity();
-        }
-
-        //TODO not in the interface
-        public IPolyMeshEntity MeshByVerticesEdgeIndices(IPointEntity[] vertices, int[] edgeIndices)
-        {
-            return new MeshEntity();
-        }
 
         public IBlockHelper GetBlockHelper()
         {

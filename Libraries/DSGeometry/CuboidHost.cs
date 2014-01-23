@@ -20,11 +20,11 @@ namespace DSGeometry
             ContextCoordinateSystem = new CoordinateEntity(origin, DsVector.ByCoordinates(length, 0, 0), DsVector.ByCoordinates(0, width, 0), DsVector.ByCoordinates(0, 0, height));
         }
 
-        /*public void UpdateCuboid(double[] data, double length, double width, double height)
+        public void UpdateCuboid(double[] data, double length, double width, double height)
         {
             PointEntity origin = new PointEntity(data[0], data[1], data[2]);
             ContextCoordinateSystem = new CoordinateEntity(origin, DsVector.ByCoordinates(length, 0, 0), DsVector.ByCoordinates(0, width, 0), DsVector.ByCoordinates(0, 0, height));
-        }*/
+        }
 
         public override double GetArea()
         {
@@ -62,21 +62,6 @@ namespace DSGeometry
             }
             protected set { mContextCoordinateSystem = value; }
         }
-
-        /*public double GetLength()
-        {
-            return Length;
-        }
-
-        public double GetWidth()
-        {
-            return Width;
-        }
-
-        public double GetHeight()
-        {
-            return Height;
-        }*/
 
         public double Length
         {
