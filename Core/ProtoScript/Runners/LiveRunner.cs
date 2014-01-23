@@ -784,16 +784,17 @@ namespace ProtoScript.Runners
             }
         }
 
-        private List<AssociativeNode> GetASTNodesDependentOnFunctionList(List<FunctionDefinitionNode> fnodeList)
+        private List<AssociativeNode> GetASTNodesDependentOnFunctionList(FunctionDefinitionNode functionNode)
         {
             // Determine if the modified function was used in any of the current nodes
             List<AssociativeNode> modifiedNodes = new List<AssociativeNode>();
 
-            // Iterate through the vm graphnodes at the global scope
-            foreach (ProtoCore.AssociativeGraph.GraphNode gnode in runnerCore.DSExecutable.instrStreamList[0].dependencyGraph.GraphList)
+            // Iterate through the vm graphnodes at the global scope that contain a function call
+            //foreach (ProtoCore.AssociativeGraph.GraphNode gnode in runnerCore.DSExecutable.instrStreamList[0].dependencyGraph.GraphList)
+            Validity.Assert(null != runnerCore.GraphNodeCallList);
+            foreach (ProtoCore.AssociativeGraph.GraphNode gnode in runnerCore.GraphNodeCallList)
             {
-                // For every function in the modified function list
-                foreach (FunctionDefinitionNode fnode in fnodeList)
+                if (gnode.isActive)
                 {
                     // Iterate through the current ast nodes 
                     foreach (KeyValuePair<System.Guid, Subtree> kvp in currentSubTreeList)
@@ -807,8 +808,8 @@ namespace ProtoScript.Runners
                                     // Check if the procedure associatied with this graphnode matches thename and arg count of the modified proc
                                     if (null != gnode.firstProc)
                                     {
-                                        if (gnode.firstProc.name == fnode.Name
-                                            && gnode.firstProc.argInfoList.Count == fnode.Signature.Arguments.Count)
+                                        if (gnode.firstProc.name == functionNode.Name
+                                            && gnode.firstProc.argInfoList.Count == functionNode.Signature.Arguments.Count)
                                         {
                                             // If it does, create a new ast tree for this graphnode and append it to deltaAstList
                                             modifiedNodes.Add(assocNode);
@@ -1073,7 +1074,13 @@ namespace ProtoScript.Runners
                         currentSubTreeList[st.GUID] = st;
                     }
 
-                    deltaAstList.AddRange(GetASTNodesDependentOnFunctionList(modifiedFunctions));
+                    
+                    // Get the AST's dependent on every function in the modified function list,
+                    // and append them to the list of AST's to be compiled and executed
+                    foreach (FunctionDefinitionNode fnode in modifiedFunctions)
+                    {
+                        deltaAstList.AddRange(GetASTNodesDependentOnFunctionList(fnode));
+                    }
                 }
             }
 

@@ -2397,6 +2397,132 @@ z=Point.ByCoordinates(y,a,a);
 
         }
 
+        [Test]
+        public void TestFunctionOverloadRedefinitionOnUnmodifiedNode01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "global = 0;",
+                "def f() { global = global + 1; return = global;}",
+                "def f(i : int) { return = i + 10;}",
+                "x = f();",
+                "y = f(2);",
+                "def f(i : int) { return = i + 100; }"  // redefine the overload, it should only re-execute the overload call f(2)
+            };
+
+            List<Subtree> added = new List<Subtree>();
+
+
+            // A new CBN for a global
+            Guid guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+            // A CBN with function def f
+            Guid guid_func1 = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func1, codes[1]));
+
+
+            // A CBN with function overload def f(i)
+            Guid guid_func2 = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func2, codes[2]));
+
+            // CBN for calling function f
+            guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[3]));
+
+
+            // CBN for calling overload function f(i)
+            guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[4]));
+
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            AssertValue("x", 1);
+            AssertValue("y", 12);
+
+
+            // Redefine the CBN
+            List<Subtree> modified = new List<Subtree>();
+
+            modified.Add(CreateSubTreeFromCode(guid_func2, codes[5]));
+
+            syncData = new GraphSyncData(null, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify that the call to the function f has not re-executed
+            AssertValue("x", 1);
+
+            // Verify that the call to the overload function f(i) has re-executed
+            AssertValue("y", 102);
+
+        }
+
+        [Test]
+        public void TestFunctionOverloadRedefinitionOnUnmodifiedNode02()
+        {
+            List<string> codes = new List<string>() 
+            {
+                "global = 0;",
+                "def f() { global = global + 1; return = global;}",
+                "def f(i : int) { return = i + 10;}",
+                "x = f();",
+                "y = f(2);",
+                "def f() { global = global + 1; return = global + 10;}",
+                "def f(i : int) { return = i + 100; }"
+            };
+
+            List<Subtree> added = new List<Subtree>();
+
+
+            // A new CBN for a global
+            Guid guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+            // A CBN with function def f
+            Guid guid_func1 = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func1, codes[1]));
+
+
+            // A CBN with function overload def f(i)
+            Guid guid_func2 = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func2, codes[2]));
+
+            // CBN for calling function f
+            guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[3]));
+
+
+            // CBN for calling overload function f(i)
+            guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[4]));
+
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            AssertValue("x", 1);
+            AssertValue("y", 12);
+
+
+            // Redefine both functions
+            List<Subtree> modified = new List<Subtree>();
+
+            modified.Add(CreateSubTreeFromCode(guid_func1, codes[5]));
+            modified.Add(CreateSubTreeFromCode(guid_func2, codes[6]));
+
+            syncData = new GraphSyncData(null, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify that the call to the function f has not re-executed
+            AssertValue("x", 12);
+
+            // Verify that the call to the overload function f(i) has re-executed
+            AssertValue("y", 102);
+
+        }
+
         public void TestFunctionOverloadOnNewNode01()
         {
             List<string> codes = new List<string>() 

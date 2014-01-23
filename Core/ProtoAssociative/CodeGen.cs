@@ -6329,6 +6329,12 @@ namespace ProtoAssociative
                 {
                     graphNode.firstProc = procNode;
                     graphNode.firstProcRefIndex = graphNode.dependentList.Count - 1;
+
+                    // Memoize the graphnode that contains a user-defined function call
+                    if (!procNode.isExternal)
+                    {
+                        core.GraphNodeCallList.Add(graphNode);
+                    }
                 }
             }
             IsAssociativeArrayIndexing = arrayIndexing;
@@ -7841,7 +7847,6 @@ namespace ProtoAssociative
                 // Dependency graph construction is complete for this expression
                 graphNode.updateBlock.endpc = pc - 1;
                 codeBlock.instrStream.dependencyGraph.Push(graphNode);
-
                 functionCallStack.Clear();
             }
         }
