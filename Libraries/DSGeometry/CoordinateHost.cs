@@ -163,7 +163,7 @@ namespace DSGeometry
             get { throw new NotImplementedException(); }
         }
 
-        public IVectorEntity Scale()
+        public IVectorEntity ScaleFactor()
         {
             throw new NotImplementedException();
         }
