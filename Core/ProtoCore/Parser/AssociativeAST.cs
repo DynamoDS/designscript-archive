@@ -1020,17 +1020,20 @@ namespace ProtoCore.AST.AssociativeAST
             buf.Append("(");
             if (Signature != null)
                 buf.Append(Signature.ToString());
-            buf.AppendLine(")");
+            buf.Append(")");
 
             if (baseConstr != null)
                 buf.Append(" : " + baseConstr.ToString());
 
             if (FunctionBody != null)
             {
-                buf.AppendLine("{");
+                buf.AppendLine("\n{");
                 FunctionBody.Body.ForEach(stmt => buf.Append(stmt.ToString()));
                 buf.AppendLine("}");
             }
+
+            if (baseConstr == null && FunctionBody == null)
+                buf.Append(Constants.termline);
 
             return buf.ToString();
         }
@@ -1140,14 +1143,16 @@ namespace ProtoCore.AST.AssociativeAST
             buf.Append("(");
             if (Signature != null)
                 buf.Append(Signature.ToString());
-            buf.AppendLine(")");
+            buf.Append(")");
 
             if (FunctionBody != null)
             {
-                buf.AppendLine("{");
+                buf.AppendLine("\n{");
                 FunctionBody.Body.ForEach(stmt => buf.Append(stmt.ToString()));
                 buf.AppendLine("}");
             }
+            else
+                buf.Append(Constants.termline);
 
             return buf.ToString();
         }
