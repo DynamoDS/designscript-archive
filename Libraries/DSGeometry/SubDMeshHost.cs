@@ -4,20 +4,30 @@ using System.Linq;
 using System.Text;
 
 using Autodesk.DesignScript.Interfaces;
-using Autodesk.DesignScript.Geometry;
+using ProtoGeometry = Autodesk.DesignScript.Geometry;
 
 namespace DSGeometry
 {
     class SubDMeshEntity : GeometryEntity, ISubDMeshEntity
     {
+        public double Area
+        {
+            get { return 100; }
+        }
+
+        public double Volume
+        {
+            get { return 400; }
+        }
+
         public double ComputeSurfaceArea()
         {
-            return 100;
+            return Area;
         }
 
         public double ComputeVolume()
         {
-            return 400;
+            return Volume;
         }
 
         public ISolidEntity ConvertToSolid(bool bConvertAsSmooth)
@@ -45,24 +55,24 @@ namespace DSGeometry
             return false;
         }
 
-        public int GetNumFaces()
+        public int NumVertices
         {
-            return 4;
+            get { return 8; }
         }
 
-        public int GetNumResultFaces()
+        public int NumFaces
         {
-            return 2;
+            get { return 4; }
         }
 
-        public int GetNumResultVertices()
+        public int NumResultVertices
         {
-            return 6;
+            get { return 6; }
         }
 
-        public int GetNumVertices()
+        public int NumResultFaces
         {
-            return 8;
+            get { return 2; }
         }
 
         public int[][] GetResultFaceIndices()
@@ -77,10 +87,10 @@ namespace DSGeometry
 
         public IColor[] GetVertexColors()
         {
-            return new IColor[2] { Color.Black.ToIColor(), Color.Blue.ToIColor() };
+            return new IColor[2] { ProtoGeometry.Color.Black.ToIColor(), ProtoGeometry.Color.Blue.ToIColor() };
         }
 
-        public IVector[] GetVertexNormals()
+        public IVectorEntity[] GetVertexNormals()
         {
             return new DsVector[2] { DsVector.ByCoordinates(0, 0, 1), DsVector.ByCoordinates(1, 0, 0) };
         }
@@ -100,14 +110,19 @@ namespace DSGeometry
             return false;
         }
 
-        public bool UpdateSubDMeshColors(IPointEntity[] vertices, IVector[] normals, IColor[] colors, int[][] faceIndices, int subDLevel)
+        public bool UpdateSubDMeshColors(IPointEntity[] vertices, IVectorEntity[] normals, IColor[] colors, int[][] faceIndices, int subDLevel)
         {
             return false;
         }
 
-        public bool UpdateSubDMeshNormals(IVector[] normals)
+        public bool UpdateSubDMeshNormals(IVectorEntity[] normals)
         {
             return false;
+        }
+
+        public IGeometryEntity Geometry
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

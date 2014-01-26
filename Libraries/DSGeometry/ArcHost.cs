@@ -18,7 +18,8 @@ namespace DSGeometry
             StartAngle = 30;
             SweepAngle = 60;
         }
-        internal ArcEntity(IPointEntity center, IVector normal, double radius, double startAngle, double sweepAngle)
+
+        internal ArcEntity(IPointEntity center, IVectorEntity normal, double radius, double startAngle, double sweepAngle)
         {
             this.CenterPoint = center;
             this.Normal = normal;
@@ -26,13 +27,14 @@ namespace DSGeometry
             this.StartAngle = startAngle;
             this.SweepAngle = sweepAngle;
         }
+
         public IPointEntity CenterPoint
         {
             get;
             protected set;
         }
 
-        public IVector Normal
+        public IVectorEntity Normal
         {
             get;
             protected set;
@@ -65,6 +67,7 @@ namespace DSGeometry
         {
             get { return true; }
         }
+
         public override double GetLength()
         {
             return Radius * SweepAngle/180*Math.PI;

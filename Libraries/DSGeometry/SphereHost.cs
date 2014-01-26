@@ -15,6 +15,13 @@ namespace DSGeometry
             this.CenterPoint = new PointEntity();
             this.Radius = 1;
         }
+
+        public SphereEntity(IPointEntity centerPoint, double radius)
+        {
+            this.CenterPoint = centerPoint;
+            this.Radius = radius;
+        }
+
         public IPointEntity GetCenterPoint()
         {
             return CenterPoint;
@@ -29,11 +36,6 @@ namespace DSGeometry
         {
             this.CenterPoint = centerPoint;
             this.Radius = radius;
-        }
-
-        public override double GetArea()
-        {
-            return Radius * Radius * Math.PI*4;
         }
 
         public override IPointEntity GetCentroid()
@@ -56,9 +58,14 @@ namespace DSGeometry
             return 0;
         }
 
-        public override double GetVolume()
+        public override double Area
         {
-            return (4 / 3) * Math.PI * Radius * Radius * Radius;
+            get { return Radius * Radius * Math.PI * 4; }
+        }
+
+        public override double Volume
+        {
+            get { return (4 / 3) * Math.PI * Radius * Radius * Radius; }
         }
 
         public IPointEntity CenterPoint { get; protected set; }

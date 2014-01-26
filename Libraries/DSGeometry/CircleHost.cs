@@ -16,19 +16,21 @@ namespace DSGeometry
             this.Radius = 3;
             this.Normal = DsVector.ByCoordinates(0, 0, 1);
         }
-        internal CircleEntity(IPointEntity center, double radius, IVector normal)
+
+        internal CircleEntity(IPointEntity center, double radius, IVectorEntity normal)
         {
             this.CenterPoint = center;
             this.Radius = radius;
             this.Normal = normal;
         }
+
         public IPointEntity CenterPoint
         {
             get;
             protected set;
         }
 
-        public IVector Normal
+        public IVectorEntity Normal
         {
             get;
             protected set;

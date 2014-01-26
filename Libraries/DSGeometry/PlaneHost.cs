@@ -16,7 +16,16 @@ namespace DSGeometry
             this.Normal = DsVector.ByCoordinates(0, 0, 1);
             this.contextCS = new CoordinateEntity();
         }
+
+        public PlaneEntity(IPointEntity origin, IVectorEntity normal)
+        {
+            this.Origin = origin;
+            this.Normal = normal;
+            this.contextCS = new CoordinateEntity();
+        }
+
         private ICoordinateSystemEntity contextCS = null;
+
         public ICoordinateSystemEntity ContextCS
         {
             get
@@ -27,6 +36,7 @@ namespace DSGeometry
             }
             protected set { contextCS = value; }
         }
+
         public ICoordinateSystemEntity GetCoordinateSystem()
         {
             return ContextCS;
@@ -37,7 +47,7 @@ namespace DSGeometry
             return new LineEntity();
         }
 
-        public IVector Normal
+        public IVectorEntity Normal
         {
             get;
             protected set;
@@ -49,15 +59,29 @@ namespace DSGeometry
             protected set;
         }
 
-        public IPointEntity Project(IPointEntity iPointEntity, IVector direction)
+        public IPointEntity Project(IPointEntity iPointEntity, IVectorEntity direction)
         {
             return iPointEntity;
         }
 
-        public void Update(IPointEntity origin, IVector normal)
+        public ICoordinateSystemEntity ToCoordinateSystem()
         {
-            this.Origin = origin;
-            this.Normal = normal;
+            throw new NotImplementedException();
+        }
+
+        public IPlaneEntity Offset(double dist)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IVectorEntity XAxis
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IVectorEntity YAxis
+        {
+            get { throw new NotImplementedException(); }
         }
     }
 }

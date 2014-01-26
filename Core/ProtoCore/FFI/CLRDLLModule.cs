@@ -320,7 +320,7 @@ namespace ProtoFFI
             }
 
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static;
-            bool isDerivedClass = classnode.superClass != null;
+            bool isDerivedClass = (classnode.superClass != null) && classnode.superClass.Count > 0;
             if (isDerivedClass) //has base class
                 flags |= BindingFlags.DeclaredOnly; //for derived class, parse only class declared methods.
 
