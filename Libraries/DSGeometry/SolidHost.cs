@@ -9,11 +9,6 @@ namespace DSGeometry
 {
     class SolidEntity : GeometryEntity, ISolidEntity
     {
-        public virtual double GetArea()
-        {
-            return 100;
-        }
-
         public virtual int GetCellCount()
         {
             return 1;
@@ -37,11 +32,6 @@ namespace DSGeometry
         public IShellEntity[] GetShells()
         {
             return new IShellEntity[3] { new ShellEntity(), new ShellEntity(), new ShellEntity() };
-        }
-
-        public virtual double GetVolume()
-        {
-            return 400;
         }
 
         public IGeometryEntity[] IntersectWith(ISurfaceEntity geometry)
@@ -169,7 +159,7 @@ namespace DSGeometry
             return false;
         }
 
-        public bool UpdateSolidByRevolve(ICurveEntity profileCurve, IPointEntity originPoint, IVector revolveAxis, double startAngle, double sweepAngle)
+        public bool UpdateSolidByRevolve(ICurveEntity profileCurve, IPointEntity originPoint, IVectorEntity revolveAxis, double startAngle, double sweepAngle)
         {
             return false;
         }
@@ -207,6 +197,46 @@ namespace DSGeometry
         public IVertexEntity[] GetVertices()
         {
             return new IVertexEntity[4] { new VertexEntity(), new VertexEntity(), new VertexEntity(), new VertexEntity() };
+        }
+
+        public virtual double Area
+        {
+            get { return 100; }
+        }
+
+        public virtual double Volume
+        {
+            get { return 400; }
+        }
+
+        public IPointEntity GetCenterOfGravity()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISolidEntity CSGUnion(ISolidEntity geometry)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISolidEntity CSGDifference(ISolidEntity geometry)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISolidEntity CSGIntersect(ISolidEntity geometry)
+        {
+            throw new NotImplementedException();
+        }
+
+        ISolidEntity[] ISolidEntity.ThinShell(double internalFaceThickness, double externalFaceThickness)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IGeometryEntity[] Project(IPointEntity PointEntity, IVectorEntity dir)
+        {
+            throw new NotImplementedException();
         }
     }
 }

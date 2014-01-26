@@ -7,7 +7,7 @@ using Autodesk.DesignScript.Geometry;
 
 namespace DSGeometry
 {
-    class DsVector : IVector
+    class DsVector : DesignScriptEntity, IVectorEntity
     {
         public static DsVector ByCoordinates(double x, double y, double z)
         {
@@ -19,6 +19,66 @@ namespace DSGeometry
         public double Y { get; set; }
 
         public double Z { get; set; }
+
+        public bool IsAlmostEqualTo(IVectorEntity other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Translate(double x, double y, double z)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Translate(IVectorEntity vec)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void TransformBy(ICoordinateSystemEntity cs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void TransformFromTo(ICoordinateSystemEntity from, ICoordinateSystemEntity to)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Rotate(IPointEntity origin, IVectorEntity axis, double degrees)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Rotate(IPlaneEntity origin, double degrees)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Scale(double amount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Scale(double xamount, double yamount, double zamount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Scale(IPointEntity from, IPointEntity to)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Scale1D(IPointEntity from, IPointEntity to)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Scale2D(IPointEntity from, IPointEntity to)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class DsColor : IColor
@@ -34,22 +94,22 @@ namespace DSGeometry
 
     static class Utils
     {
-        public static Vector ToVector(this IVector v)
+        public static Vector ToVector(this IVectorEntity v)
         {
             return Vector.ByCoordinates(v.X, v.Y, v.Z);
         }
 
-        public static IVector ToIVector(this Vector v)
+        public static IVectorEntity ToIVector(this Vector v)
         {
             return new DsVector { X = v.X, Y = v.Y, Z = v.Z };
         }
 
-        public static IVector Scale(this IVector v, double scale)
+        public static IVectorEntity Scale(this IVectorEntity v, double scale)
         {
             return v.ToVector().Scale(scale).ToIVector();
         }
 
-        public static double Length(this IVector v)
+        public static double Length(this IVectorEntity v)
         {
             return v.ToVector().Length;
         }

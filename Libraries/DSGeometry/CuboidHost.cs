@@ -14,16 +14,17 @@ namespace DSGeometry
             return ContextCoordinateSystem;
         }
 
-        public void UpdateCuboid(double[] data, double length, double width, double height)
+        public CuboidEntity(double[] data, double length, double width, double height)
         {
-            PointEntity origin = new PointEntity(data[0],data[1],data[2]);
-            ContextCoordinateSystem.Set(origin, DsVector.ByCoordinates(length, 0, 0), DsVector.ByCoordinates(0, width, 0), DsVector.ByCoordinates(0, 0, height));
-        }
-        public override double GetArea()
-        {
-            return (2 * GetLength() * GetWidth() + 2 * GetLength() * GetHeight() + 2 * GetWidth() * GetHeight());
+            PointEntity origin = new PointEntity(data[0], data[1], data[2]);
+            ContextCoordinateSystem = new CoordinateEntity(origin, DsVector.ByCoordinates(length, 0, 0), DsVector.ByCoordinates(0, width, 0), DsVector.ByCoordinates(0, 0, height));
         }
 
+        public void UpdateCuboid(double[] data, double length, double width, double height)
+        {
+            PointEntity origin = new PointEntity(data[0], data[1], data[2]);
+            ContextCoordinateSystem = new CoordinateEntity(origin, DsVector.ByCoordinates(length, 0, 0), DsVector.ByCoordinates(0, width, 0), DsVector.ByCoordinates(0, 0, height));
+        }
 
         public override int GetEdgeCount()
         {
@@ -40,10 +41,16 @@ namespace DSGeometry
             return 8;
         }
 
-        public override double GetVolume()
+        public override double Area
         {
-            return GetLength() * GetWidth()* GetHeight();
+            get { return (2 * Length * Width + 2 * Length * Height + 2 * Width * Height); }
         }
+
+        public override double Volume
+        {
+            get { return Length * Width * Height; }
+        }
+
         private ICoordinateSystemEntity mContextCoordinateSystem = null;
         public ICoordinateSystemEntity ContextCoordinateSystem
         {
@@ -56,19 +63,19 @@ namespace DSGeometry
             protected set { mContextCoordinateSystem = value; }
         }
 
-        public double GetLength()
+        public double Length
         {
-            return ContextCoordinateSystem.XAxis.Length();
+            get { return ContextCoordinateSystem.XAxis.Length(); }
         }
 
-        public double GetWidth()
+        public double Width
         {
-            return ContextCoordinateSystem.YAxis.Length();
+            get { return ContextCoordinateSystem.YAxis.Length(); }
         }
 
-        public double GetHeight()
+        public double Height
         {
-            return ContextCoordinateSystem.ZAxis.Length();
+            get { return ContextCoordinateSystem.ZAxis.Length(); }
         }
     }
 }

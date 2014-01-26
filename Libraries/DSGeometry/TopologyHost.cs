@@ -10,5 +10,9 @@ namespace DSGeometry
 {
     class TopologyEntity : DesignScriptEntity, ITopologyEntity
     {
+        public IGeometryEntity Geometry
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

@@ -8,14 +8,20 @@ namespace DSGeometry
 {
     public class GeometryFactory : IGeometryFactory
     {
-        public IArcEntity ArcByCenterPointRadiusAngle(IPointEntity center, double radius, double startAngle, double endAngle, IVector normal)
+        public IArcEntity ArcByThreePoints(IPointEntity firstPoint, IPointEntity secondPoint, IPointEntity thirdPoint)
+        {
+            DSGeometryApplication.Check();
+            return new ArcEntity();
+        }
+
+        public IArcEntity ArcByCenterPointRadiusAngle(IPointEntity center, double radius, double startAngle, double endAngle, IVectorEntity normal)
         {
             DSGeometryApplication.Check();
             double sweepAngle = endAngle - startAngle;
             return new ArcEntity(center, normal, radius, startAngle, sweepAngle);
         }
 
-        public IArcEntity ArcByCenterPointStartPointSweepAngle(IPointEntity centerPoint, IPointEntity startPoint, double sweepAngle, IVector normal)
+        public IArcEntity ArcByCenterPointStartPointSweepAngle(IPointEntity centerPoint, IPointEntity startPoint, double sweepAngle, IVectorEntity normal)
         {
             DSGeometryApplication.Check();
             double radius = startPoint.DistanceTo(centerPoint);
@@ -36,59 +42,35 @@ namespace DSGeometry
             return new ArcEntity(centerPoint, normal.ToIVector(), radius, startAngle, sweepAngle);
         }
 
-        public IArcEntity ArcByPointsOnCurve(IPointEntity firstPoint, IPointEntity secondPoint, IPointEntity thirdPoint)
-        {
-            DSGeometryApplication.Check();
-            return new ArcEntity();
-        }
+        public IArcEntity ArcByCenterPointStartPointEndPoint(IPointEntity centerPoint, IPointEntity startPoint, IPointEntity endPoint) { throw new NotImplementedException(); }
 
-        public IBSplineCurveEntity BSplineByControlVertices(IPointEntity[] controlVertices, int degree, bool makePeriodic)
-        {
-            DSGeometryApplication.Check();
-            return new BSplineCurveEntity(controlVertices,degree,makePeriodic);
-        }
+        public IBoundingBoxEntity BoundingBoxByGeometry(IGeometryEntity geom) { throw new NotImplementedException(); }
 
-        public IBSplineCurveEntity BSplineByPoints(IPointEntity[] pts, IVector startTangent, IVector endTangent)
-        {
-            DSGeometryApplication.Check();
-            return new BSplineCurveEntity();
-        }
+        public IBoundingBoxEntity BoundingBoxByGeometry(IGeometryEntity[] geom) { throw new NotImplementedException(); }
 
-        public IBSplineCurveEntity BSplineByPoints(IPointEntity[] pts, bool makePeriodic)
-        {
-            DSGeometryApplication.Check();
-            return new BSplineCurveEntity();
-        }
+        public IBoundingBoxEntity BoundingBoxByGeometryCoordinateSystem(IGeometryEntity geom, ICoordinateSystemEntity cs) { throw new NotImplementedException(); }
 
-        public IBSplineSurfaceEntity BSplineSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree)
-        {
-            DSGeometryApplication.Check();
-            IBSplineSurfaceEntity surface = new BSplineSurfaceEntity();
-            surface.UpdateByPoles(controlVertices, uDegree, vDegree);
-            return surface;
-        }
+        public IBoundingBoxEntity BoundingBoxByGeometryCoordinateSystem(IGeometryEntity[] geom, ICoordinateSystemEntity cs) { throw new NotImplementedException(); }
 
-        public IBSplineSurfaceEntity BSplineSurfaceByPoints(IPointEntity[][] points, int uDegree, int vDegree)
-        {
-            DSGeometryApplication.Check();
-            IBSplineSurfaceEntity surface = new BSplineSurfaceEntity();
-            surface.UpdateByPoints(points, uDegree, vDegree);
-            return surface;
-        }
+        public ICircleEntity CircleByCenterPointRadius(IPointEntity center, double radius) { throw new NotImplementedException(); }
 
-        public ICircleEntity CircleByCenterPointRadius(IPointEntity center, double radius, IVector normal)
+        public ICircleEntity CircleByCenterPointRadiusNormal(IPointEntity center, double radius, IVectorEntity normal)
         {
             DSGeometryApplication.Check();
             return new CircleEntity(center, radius, normal);
         }
 
-        public ICircleEntity CircleByPointsOnCurve(IPointEntity firstPoint, IPointEntity secondPoint, IPointEntity thirdPoint)
+        public ICircleEntity CircleByPlaneRadius(IPlaneEntity plane, double radius) { throw new NotImplementedException(); }
+
+        public ICircleEntity CircleByThreePoints(IPointEntity p1, IPointEntity p2, IPointEntity p3)
         {
             DSGeometryApplication.Check();
             return new CircleEntity();
         }
 
-        public IConeEntity ConeByPointsRadius(IPointEntity startPoint, IPointEntity endPoint, double startRadius, double endRadius)
+        public IConeEntity ConeByPointsRadius(IPointEntity startPoint, IPointEntity endPoint, double startRadius) { throw new NotImplementedException(); }
+
+        public IConeEntity ConeByPointsRadii(IPointEntity startPoint, IPointEntity endPoint, double startRadius, double endRadius)
         {
             DSGeometryApplication.Check();
             ConeEntity cone = new ConeEntity();
@@ -96,15 +78,29 @@ namespace DSGeometry
             return cone;
         }
 
-        public IConeEntity ConeByRadiusLength(ICoordinateSystemEntity cs, double startRadius, double endRadius, double height)
+        public IConeEntity ConeByCoordinateSystemHeightRadius(ICoordinateSystemEntity cs, double height, double startRadius)
         {
-            DSGeometryApplication.Check();
-            ConeEntity cone = new ConeEntity();
-            IPointEntity startPoint = cs.Origin;
-            IPointEntity endPoint = new PointEntity(cs.Origin.X, cs.Origin.Y, cs.Origin.Z + height);
-            cone.UpdateCone(startPoint, endPoint, startRadius, endRadius);
-            return cone;
+            throw new NotImplementedException();
         }
+
+        public IConeEntity ConeByCoordinateSystemHeightRadii(ICoordinateSystemEntity cs, double height, double startRadius, double endRadius)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public ICoordinateSystemEntity CoordinateSystemByMatrix(double[] matrix) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity CoordinateSystemByOrigin(double x, double y) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity CoordinateSystemByOrigin(double x, double y, double z) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity CoordinateSystemByOrigin(IPointEntity origin) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity CoordinateSystemByPlane(IPlaneEntity plane) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity CoordinateSystemByOriginVectors(IPointEntity origin, IVectorEntity xAxis, IVectorEntity yAxis) { throw new NotImplementedException(); }
+
+        public ICoordinateSystemEntity CoordinateSystemByOriginVectors(IPointEntity origin, IVectorEntity xAxis, IVectorEntity yAxis, IVectorEntity zAxis) { throw new NotImplementedException(); }
 
         public ICoordinateSystemEntity CoordinateSystemByCylindricalCoordinates(ICoordinateSystemEntity contextCS, double radius, double theta, double height)
         {
@@ -116,12 +112,6 @@ namespace DSGeometry
            // return new CoordinateEntity();
         }
 
-        public ICoordinateSystemEntity CoordinateSystemByData(double[] data)
-        {
-            DSGeometryApplication.Check();
-            return new CoordinateEntity();
-        }
-
         public ICoordinateSystemEntity CoordinateSystemBySphericalCoordinates(ICoordinateSystemEntity contextCS, double radius, double theta, double phi)
         {
             DSGeometryApplication.Check();
@@ -130,31 +120,34 @@ namespace DSGeometry
             return cs;
         }
 
-        public ICoordinateSystemEntity CoordinateSystemByUniversalTransform(ICoordinateSystemEntity contextCoordinateSys, double[] scaleFactors, double[] rotationAngles, int[] rotationSequence, double[] translationVector, bool translationSequence)
-        {
-            DSGeometryApplication.Check();
-            return new CoordinateEntity();
-        }
+        public ICuboidEntity CuboidByLengths(double width, double length, double height) { throw new NotImplementedException(); }
 
-        public ICoordinateSystemEntity CoordinateSystemByUniversalTransform(ICoordinateSystemEntity contextCoordinateSys, double[] scaleFactors, double[] rotationAngles, int[] rotationSequence, IVector translationVector, bool translationSequence)
-        {
-            DSGeometryApplication.Check();
-            return new CoordinateEntity();
-        }
-
-        public IPointEntity CreatePoint(double x, double y, double z)
-        {
-            DSGeometryApplication.Check();
-            return new PointEntity(x, y, z);
-        }
+        public ICuboidEntity CuboidByLengths(IPointEntity originPoint, double width, double length, double height) { throw new NotImplementedException(); }
 
         public ICuboidEntity CuboidByLengths(ICoordinateSystemEntity cs, double length, double width, double height)
         {
             DSGeometryApplication.Check();
-            ICuboidEntity cub = new CuboidEntity();
-            cub.UpdateCuboid(new double[] { cs.Origin.X, cs.Origin.Y, cs.Origin.Z }, length, width, height);
+            ICuboidEntity cub = new CuboidEntity(new double[] { cs.Origin.X, cs.Origin.Y, cs.Origin.Z }, length, width, height);
             return cub;
         }
+
+        public ICuboidEntity CuboidByCorners(IPointEntity lowPoint, IPointEntity highPoint) { throw new NotImplementedException(); }
+
+        public ICurveEntity CurveByParameterLineOnSurface(ISurfaceEntity baseSurface, IUVEntity startParams, IUVEntity endParams) { throw new NotImplementedException(); }
+
+        public IEllipseEntity EllipseByOriginRadii(IPointEntity origin, double xAxisRadius, double yAxisRadius) { throw new NotImplementedException(); }
+
+        public IEllipseEntity EllipseByOriginVectors(IPointEntity origin, IVectorEntity xAxisRadius, IVectorEntity yAxisRadius) { throw new NotImplementedException(); }
+
+        public IEllipseEntity EllipseByCoordinateSystemRadii(ICoordinateSystemEntity origin, double xAxisRadius, double yAxisRadius) { throw new NotImplementedException(); }
+
+        public IEllipseEntity EllipseByPlaneRadii(IPlaneEntity plane, double xAxisRadius, double yAxisRadius) { throw new NotImplementedException(); }
+
+        public IHelixEntity HelixByAxis(IPointEntity axisPoint, IVectorEntity axisDirection, IPointEntity startPoint, double pitch, double angleTurns) { throw new NotImplementedException(); }
+
+        public IIndexGroupEntity IndexGroupByIndices(uint a, uint b, uint c, uint d) { throw new NotImplementedException(); }
+
+        public IIndexGroupEntity IndexGroupByIndices(uint a, uint b, uint c) { throw new NotImplementedException(); }
 
         public ILineEntity LineByStartPointEndPoint(IPointEntity startPoint, IPointEntity endPoint)
         {
@@ -164,45 +157,156 @@ namespace DSGeometry
             return lnhost;
         }
 
-        public IPlaneEntity PlaneByOriginNormal(IPointEntity origin, IVector normal)
+        public ILineEntity LineByBestFit(IPointEntity[] bestFitPoints) { throw new NotImplementedException(); }
+
+        public ILineEntity LineByTangency(ICurveEntity curve, double parameter) { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points) { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree) { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree, bool close_curve)
         {
             DSGeometryApplication.Check();
-            IPlaneEntity plane = new PlaneEntity();
-            plane.Update(origin, normal);
+            return new NurbsCurveEntity(points, degree, close_curve);
+        }
+
+        public INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree, double[] weights, double[] knots) { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points) { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] hosts, bool makePeriodic)
+        {
+            DSGeometryApplication.Check();
+            return new NurbsCurveEntity();
+        }
+
+        public INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points, int degree) { throw new NotImplementedException(); }
+
+        public INurbsCurveEntity NurbsCurveByPointsTangents(IPointEntity[] pts, IVectorEntity startTangent, IVectorEntity endTangent)
+        {
+            DSGeometryApplication.Check();
+            return new NurbsCurveEntity();
+        }
+
+        public INurbsSurfaceEntity NurbsSurfaceByPoints(IPointEntity[][] points, int uDegree, int vDegree)
+        {
+            DSGeometryApplication.Check();
+            INurbsSurfaceEntity surface = new NurbsSurfaceEntity(points, uDegree, vDegree, 0);
+            return surface;
+        }
+
+        public INurbsSurfaceEntity NurbsSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree)
+        {
+            DSGeometryApplication.Check();
+            INurbsSurfaceEntity surface = new NurbsSurfaceEntity(controlVertices, uDegree, vDegree, 1);
+            return surface;
+        }
+
+        public INurbsSurfaceEntity NurbsSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree, double[][] weights, double[][] knots) { throw new NotImplementedException(); }
+
+        public IPlaneEntity PlaneByOriginNormal(IPointEntity origin, IVectorEntity normal)
+        {
+            DSGeometryApplication.Check();
+            IPlaneEntity plane = new PlaneEntity(origin, normal);
             return plane;
+        }
+
+        public IPlaneEntity PlaneByOriginNormalXAxis(IPointEntity origin, IVectorEntity normal, IVectorEntity xAxis) { throw new NotImplementedException(); }
+
+        public IPlaneEntity PlaneByOriginXAxisYAxis(IPointEntity origin, IVectorEntity xAxis, IVectorEntity yAxis) { throw new NotImplementedException(); }
+
+        public IPlaneEntity PlaneByBestFitThroughPoints(IPointEntity[] points) { throw new NotImplementedException(); }
+
+        public IPlaneEntity PlaneByLineAndPoint(ILineEntity line, IPointEntity point) { throw new NotImplementedException(); }
+
+        public IPlaneEntity PlaneByThreePoints(IPointEntity p1, IPointEntity p2, IPointEntity p3) { throw new NotImplementedException(); }
+
+        public IPointEntity PointByCoordinates(double x, double y) { throw new NotImplementedException(); }
+
+        public IPointEntity PointByCoordinates(double x, double y, double z)
+        {
+            DSGeometryApplication.Check();
+            return new PointEntity(x, y, z);
         }
 
         public IPointEntity PointByCartesianCoordinates(ICoordinateSystemEntity cs, double x, double y, double z)
         {
             DSGeometryApplication.Check();
-            return new PointEntity(cs.Origin.X + x,cs.Origin.Y + y,cs.Origin.Z + z);
+            return new PointEntity(cs.Origin.X + x, cs.Origin.Y + y, cs.Origin.Z + z);
         }
 
-        public IPolygonEntity PolygonByVertices(IPointEntity[] vertices)
+        public IPointEntity PointByCylindricalCoordinates(ICoordinateSystemEntity cs, double angle, double elevation, double offset) { throw new NotImplementedException(); }
+
+        public IPointEntity PointBySphericalCoordinates(ICoordinateSystemEntity cs, double phi, double theta, double radius) { throw new NotImplementedException(); }
+        
+        public IPolygonEntity PolygonByPoints(IPointEntity[] points)
         {
             DSGeometryApplication.Check();
             return new PolygonEntity();
         }
 
-        public ISolidEntity SolidByLoftCrossSections(ICurveEntity[] crossSections)
+        public IPolyCurveEntity PolyCurveByJoinedCurves(ICurveEntity[] curves)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IRectangleEntity RectangleByCornerPoints(IPointEntity[] points) { throw new NotImplementedException(); }
+
+        public IRectangleEntity RectangleByCornerPoints(IPointEntity p1, IPointEntity p2, IPointEntity p3, IPointEntity p4) { throw new NotImplementedException(); }
+
+        public IRectangleEntity RectangleByWidthHeight(double width, double length) { throw new NotImplementedException(); }
+
+        public IRectangleEntity RectangleByWidthHeight(IPlaneEntity plane, double width, double length) { throw new NotImplementedException(); }
+
+        public IRectangleEntity RectangleByWidthHeight(ICoordinateSystemEntity cs, double width, double length) { throw new NotImplementedException(); }
+
+        public ISurfaceEntity SurfaceByLoft(ICurveEntity[] crossSections)
+        {
+            DSGeometryApplication.Check();
+            return new SurfaceEntity();
+        }
+
+        public ISurfaceEntity SurfaceByLoft(ICurveEntity[] crossSections, ICurveEntity guides)
+        {
+            DSGeometryApplication.Check();
+            return new SurfaceEntity();
+        }
+
+        public ISurfaceEntity SurfaceByLoftGuides(ICurveEntity[] hostXCurves, ICurveEntity[] hostGuides)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISurfaceEntity SurfaceBySweep(ICurveEntity profile, ICurveEntity path)
+        {
+            DSGeometryApplication.Check();
+            return new SurfaceEntity();
+        }
+
+        public ISurfaceEntity SurfaceBySweep2Rails(ICurveEntity rail1, ICurveEntity rail2, ICurveEntity profile) { throw new NotImplementedException(); }
+
+        public ISurfaceEntity SurfaceByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVectorEntity axisDirection, double startAngle, double sweepAngle)
+        {
+            DSGeometryApplication.Check();
+            return new SurfaceEntity();
+        }
+
+        public ISurfaceEntity SurfaceByPatch(ICurveEntity iCurveEntity) { throw new NotImplementedException(); }
+
+        public ISolidEntity SolidByLoft(ICurveEntity[] crossSections)
         {
             DSGeometryApplication.Check();
             return new SolidEntity();
         }
 
-        public ISolidEntity SolidByLoftCrossSectionsGuides(ICurveEntity[] crossSections, ICurveEntity[] guides)
+        public ISolidEntity SolidByLoft(ICurveEntity[] crossSections, ICurveEntity path)
         {
             DSGeometryApplication.Check();
             return new SolidEntity();
         }
 
-        public ISolidEntity SolidByLoftCrossSectionsPath(ICurveEntity[] crossSections, ICurveEntity path)
-        {
-            DSGeometryApplication.Check();
-            return new SolidEntity();
-        }
-
-        public ISolidEntity SolidByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVector axisDirection, double startAngle, double sweepAngle)
+        public ISolidEntity SolidByLoftGuides(ICurveEntity[] crossSections, ICurveEntity[] guides)
         {
             DSGeometryApplication.Check();
             return new SolidEntity();
@@ -214,90 +318,38 @@ namespace DSGeometry
             return new SolidEntity();
         }
 
+        public ISolidEntity SolidBySweep2Rails(ICurveEntity rail1, ICurveEntity rail2, ICurveEntity profile) { throw new NotImplementedException(); }
+
+        public ISolidEntity SolidByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVectorEntity axisDirection, double startAngle, double sweepAngle)
+        {
+            DSGeometryApplication.Check();
+            return new SolidEntity();
+        }
+
         public ISphereEntity SphereByCenterPointRadius(IPointEntity centerPoint, double radius)
         {
             DSGeometryApplication.Check();
-            ISphereEntity sph = new SphereEntity();
-            sph.UpdateSphere(centerPoint, radius);
+            ISphereEntity sph = new SphereEntity(centerPoint, radius);
             return sph;
         }
 
-        public ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] points, int[][] faceIndices, IVector[] vertexNormals, IColor[] vertexColors, int subDLevel)
-        {
-            DSGeometryApplication.Check();
-            return new SubDMeshEntity();
-        }
+        public ITextEntity TextByPoint(IPointEntity origin, string textString, double textHeight) { throw new NotImplementedException(); }
+        
+        public ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity cs, string textString, double textHeight) { throw new NotImplementedException(); }
 
-        public ISubDMeshEntity SubDMeshByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices, int subDLevel)
-        {
-            DSGeometryApplication.Check();
-            return new SubDMeshEntity();
-        }
+        public IUVEntity UVByCoordinates(double u, double v) { throw new NotImplementedException(); }
 
-        public ISurfaceEntity SurfaceByLoftCrossSections(ICurveEntity[] crossSections)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
+        public IVectorEntity VectorByCoordinates(double x, double y, double z) { throw new NotImplementedException(); }
 
-        public ISurfaceEntity SurfaceByLoftCrossSectionsGuides(ICurveEntity[] crossSections, ICurveEntity[] guides)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
+        public IVectorEntity VectorByCoordinates(double x, double y, double z, bool normalized) { throw new NotImplementedException(); }
 
-        public ISurfaceEntity SurfaceByLoftCrossSectionsPath(ICurveEntity[] crossSections, ICurveEntity path)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
-
-        public ISurfaceEntity SurfaceByRevolve(ICurveEntity profile, IPointEntity axisOrigin, IVector axisDirection, double startAngle, double sweepAngle)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
-
-        public ISurfaceEntity SurfaceBySweep(ICurveEntity profile, ICurveEntity path)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
-
-        public ISurfaceEntity SurfacePatchFromCurve(ICurveEntity profile)
-        {
-            DSGeometryApplication.Check();
-            return new SurfaceEntity();
-        }
-
-        public ITextEntity TextByCoordinateSystem(ICoordinateSystemEntity contextCoordinateSystem, int orientation, string textString, double fontSize)
-        {
-            DSGeometryApplication.Check();
-            return new TextEntity();
-        }
-        internal static double DegreeToRadian(double angle)
-        {
-            return Math.PI * angle / 180.0;
-        }
-
+        public IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroupEntity[] indices) { throw new NotImplementedException(); }
 
         public IBlockHelper GetBlockHelper()
         {
             throw new NotImplementedException();
         }
         
-        public ISubDMeshEntity SubDMeshFromGeometry(IGeometryEntity geometry, double maxEdgeLength)
-        {
-            DSGeometryApplication.Check();
-            return new SubDMeshEntity();
-        }
-
-        public IGeometrySettings GetSettings()
-        {
-            return new Settings();
-        }
-
-
         public IGeometryEntity[] LoadSat(string satFile)
         {
             return new IGeometryEntity[] {new SolidEntity(), new SolidEntity(), new SolidEntity()};
@@ -308,14 +360,14 @@ namespace DSGeometry
             return false;
         }
 
-        public IMeshEntity MeshByVerticesFaceIndices(IPointEntity[] vertices, int[][] faceIndices)
+        public IGeometrySettings GetSettings()
         {
-            return new MeshEntity();
+            return new Settings();
         }
 
-        public IMeshEntity MeshByVerticesEdgeIndices(IPointEntity[] vertices, int[] edgeIndices)
+        internal static double DegreeToRadian(double angle)
         {
-            return new MeshEntity();
+            return Math.PI * angle / 180.0;
         }
     }
 
