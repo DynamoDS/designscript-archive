@@ -1,6 +1,6 @@
 class FunctionObject
 {
-    def DoEvaluate(v)
+    def DoEvaluate(v:var[]..[])
     {
         return = null;
     }
@@ -47,7 +47,7 @@ class SingleFunctionObject extends FunctionObject
         return = Evaluate(fptr, params);
     }
     
-    def DoEvaluate(param)
+    def DoEvaluate(param: var[]..[])
     {      
         return = [Imperative]
         {           
@@ -101,7 +101,7 @@ class ComposedFunctionObject extends FunctionObject
         __funcs = funcs;
     }
     
-    def DoEvaluate(param)
+    def DoEvaluate(param:var[]..[])
     {
         return = [Imperative]
         {
@@ -118,7 +118,7 @@ class ComposedFunctionObject extends FunctionObject
     }
 }
 
-def Apply(functionObject: FunctionObject, param: var)
+def Apply(functionObject: FunctionObject, param: var[]..[])
 {
     return = functionObject.DoEvaluate(param);
 }
