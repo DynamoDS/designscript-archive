@@ -41,7 +41,6 @@ class SingleFunctionObject extends FunctionObject
     }
     
     private def DoEvaluateImp(fptr : function, 
-                              argNumber: int, 
                               params : var[]..[])
     {
         return = Evaluate(fptr, params);
@@ -68,7 +67,7 @@ class SingleFunctionObject extends FunctionObject
                 _nextParamPosition = GetNextEmptyParamPos(_hasParamAt);
                 if (_nextParamPosition < 0)
                 {
-                    return = DoEvaluateImp(__functionPointers, __argumtNumber, _params);
+                    return = DoEvaluateImp(__functionPointers, _params);
                 }
                 else
                 {
