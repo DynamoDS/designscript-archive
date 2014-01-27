@@ -2010,6 +2010,34 @@ z=Point.ByCoordinates(y,a,a);
         }
 
         [Test]
+        public void TestFunctionDefinitionWithLanguageblocks01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                @"
+                def f(x:int) 
+                { 
+                    return = [Imperative]
+                    {
+                        return = x + 1; 
+                    }
+                } 
+                y = f(1);"
+            };
+
+            Guid guid = System.Guid.NewGuid();
+
+            List<Subtree> added = new List<Subtree>();
+            added.Add(CreateSubTreeFromCode(guid, codes[0]));
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            AssertValue("y", 2);
+        }
+
+
+        [Test]
         public void TestFunctionModification01()
         {
             List<string> codes = new List<string>() 
@@ -2361,7 +2389,6 @@ z=Point.ByCoordinates(y,a,a);
             };
 
             // Create 2 CBNs 
-
             List<Subtree> added = new List<Subtree>();
 
 
@@ -2394,6 +2421,115 @@ z=Point.ByCoordinates(y,a,a);
             // Verify that x must have automatically re-executed
             AssertValue("x", 10);
             AssertValue("y", 10);
+
+        }
+
+        [Test]
+        public void TestFunctionRedefinitionWithLanguageblocks01()
+        {
+            List<string> codes = new List<string>() 
+            {
+                @"
+                def f(x:int) 
+                { 
+                    return = [Imperative]
+                    {
+                        return = x + 1; 
+                    }
+                }",
+ 
+                @"y = f(1);",
+
+                @"def f(x:int) 
+                { 
+                    return = [Imperative]
+                    {
+                        return = x + 10; 
+                    }
+                }"
+            };
+
+            // Create 2 CBNs 
+            List<Subtree> added = new List<Subtree>();
+
+
+            // A CBN with function def f
+            Guid guid_func = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func, codes[0]));
+
+            // A new CBN that calls function f
+            Guid guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify
+            AssertValue("y", 2);
+
+            // Redefine the function
+            List<Subtree> modified = new List<Subtree>();
+
+            modified.Add(CreateSubTreeFromCode(guid_func, codes[2]));
+
+            syncData = new GraphSyncData(null, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify that x must have automatically re-executed
+            AssertValue("y", 11);
+
+        }
+
+        [Test]
+        public void TestFunctionRedefinitionWithLanguageblocks02()
+        {
+            List<string> codes = new List<string>() 
+            {
+                @"
+                def f(x:int) 
+                { 
+                    return = x + 1; 
+                }",
+ 
+                @"y = f(1);",
+
+                @"def f(x:int) 
+                { 
+                    return = [Imperative]
+                    {
+                        return = x + 10; 
+                    }
+                }"
+            };
+
+            // Create 2 CBNs 
+            List<Subtree> added = new List<Subtree>();
+
+
+            // A CBN with function def f
+            Guid guid_func = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid_func, codes[0]));
+
+            // A new CBN that calls function f
+            Guid guid = System.Guid.NewGuid();
+            added.Add(CreateSubTreeFromCode(guid, codes[1]));
+
+            var syncData = new GraphSyncData(null, added, null);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify
+            AssertValue("y", 2);
+
+            // Redefine the function
+            List<Subtree> modified = new List<Subtree>();
+
+            modified.Add(CreateSubTreeFromCode(guid_func, codes[2]));
+
+            syncData = new GraphSyncData(null, null, modified);
+            astLiveRunner.UpdateGraph(syncData);
+
+            // Verify that x must have automatically re-executed
+            AssertValue("y", 11);
 
         }
 
