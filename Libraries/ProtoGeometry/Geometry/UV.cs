@@ -13,7 +13,7 @@ namespace Autodesk.DesignScript.Geometry
     {
         private IUVEntity _uvEntity;
 
-        private UV( IUVEntity uvEntity )
+        internal UV( IUVEntity uvEntity )
         {
             this._uvEntity = uvEntity;
         }

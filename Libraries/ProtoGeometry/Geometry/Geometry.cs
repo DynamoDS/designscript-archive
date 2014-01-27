@@ -750,7 +750,7 @@ namespace Autodesk.DesignScript.Geometry
         }
         protected static void Hide(Geometry geometry)
         {
-            if (null != geometry)
+            if (null != geometry && geometry.Display != null)
                 geometry.Display.SetVisibility(false);
         }
         #endregion

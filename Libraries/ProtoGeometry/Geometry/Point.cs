@@ -698,12 +698,14 @@ namespace Autodesk.DesignScript.Geometry
 
             pt.Context = contextSurface;
             pt.ReferencePoint = this;
-            double[] parameters = contextSurface.ParameterAtPoint(pt);
+
+            var parameters = contextSurface.ParameterAtPoint(pt);
             if (null != parameters)
             {
-                pt.U = parameters[0];
-                pt.V = parameters[1];
+                pt.U = parameters.U;
+                pt.V = parameters.V;
             }
+            
             return pt;
         }
 
@@ -725,11 +727,11 @@ namespace Autodesk.DesignScript.Geometry
             pt.Context = contextSurface;
             pt.Direction = direction;
             pt.ReferencePoint = this;
-            double[] parameters = contextSurface.ParameterAtPoint(pt);
+            var parameters = contextSurface.ParameterAtPoint(pt);
             if (null != parameters)
             {
-                pt.U = parameters[0];
-                pt.V = parameters[1];
+                pt.U = parameters.U;
+                pt.V = parameters.V;
             }
 
             return pt;

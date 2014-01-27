@@ -730,47 +730,6 @@ namespace Autodesk.DesignScript.Interfaces
         ISurfaceEntity[] Surfaces();
     }
 
-    [Browsable(false)]
-    public interface IBlockEntity : IGeometryEntity
-    {
-        string GetBlockName();
-
-        string GetFileName();
-
-        IPointEntity GetCentroid();
-
-        IGeometryEntity[] ExtractGeometry();
-    }
-
-    [Browsable(false)]
-    public interface IBlockHelper
-    {
-        IBlockEntity InsertBlockFromFile(ICoordinateSystemEntity contextCoordinateSystem, string fileName, string blockName);
-
-        IBlockEntity InsertBlockFromCurrentDocument(ICoordinateSystemEntity contextCoordinateSystem, string blockName);
-
-        bool InsertBlockInTargetFile(ICoordinateSystemEntity contextCoordinateSystem, string blockName, string targetFileName);
-
-        string ImportBlockFromFile(string fileName, string blockName);
-
-        string[] ImportAllBlocksFromFile(string fileName);
-
-        string[] ListAllBlocksInCurrentDocument();
-
-        bool BlockExistsInCurrentDocument(string blockName);
-
-        string[] ListContentsOfBlock(string blockName);
-
-        bool DefineBlock(ICoordinateSystemEntity contextCoordinateSystem, string blockName, IGeometryEntity[] geometries);
-
-        bool RenameBlock(string oldName, string newName);
-
-        bool ExportBlock(string fileName, string sourceBlockName);
-
-        bool ExportBlockDefinition(string fileName, string sourceBlockName);
-
-        bool PurgeBlock(string blockName);
-    }
 
     [Browsable(false)]
     public interface ITopologyEntity : IDesignScriptEntity

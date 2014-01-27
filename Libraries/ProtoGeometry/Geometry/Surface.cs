@@ -627,13 +627,9 @@ namespace Autodesk.DesignScript.Geometry
         /// </summary>
         /// <param name="point"></param>
         /// <returns>double[] == the first element is U, the second double is V</returns>
-        public double[] ParameterAtPoint(Point point)
+        public UV ParameterAtPoint(Point point)
         {
-            var parametersTuple = SurfaceEntity.UVParameterAtPoint(point.PointEntity);
-            var parameters = new List<double>();
-            parameters.Add(parametersTuple.U);
-            parameters.Add(parametersTuple.V);
-            return parameters.ToArray();
+            return new UV(SurfaceEntity.UVParameterAtPoint(point.PointEntity));
         }
 
         /// <summary>

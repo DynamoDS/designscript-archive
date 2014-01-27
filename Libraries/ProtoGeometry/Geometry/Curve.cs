@@ -836,8 +836,10 @@ namespace Autodesk.DesignScript.Geometry
             if (null == curveEntity)
                 throw new System.InvalidOperationException(string.Format(Properties.Resources.OperationFailed, kMethodName));
 
+            
             Curve curve = curveEntity.ToCurve(true, this);
             curve.Context = this;
+
             return curve;
         }
 
