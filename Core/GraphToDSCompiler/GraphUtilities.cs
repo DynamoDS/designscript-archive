@@ -1286,21 +1286,25 @@ namespace GraphToDSCompiler
                 return;
 
             int stmtNumber = 1;
-            //List<VariableLine> variableLineList = new List<VariableLine>(warningVLList);
             foreach (var node in core.AstNodeList)
             {
-                Validity.Assert(node is ProtoCore.AST.AssociativeAST.BinaryExpressionNode);
-
-                List<VariableLine> variableLineList = new List<VariableLine>();
-                foreach (var warning in warningVLList)
+                // Only binary expression need warnings. 
+                // Function definition nodes do not have input and output ports
+                if (node is ProtoCore.AST.AssociativeAST.BinaryExpressionNode)
                 {
-                    if (warning.line >= node.line && warning.line <= node.endLine)
-                        variableLineList.Add(warning);
-                }
-                if(variableLineList.Count > 0)
-                    inputLines.Add(stmtNumber, variableLineList);
+                    List<VariableLine> variableLineList = new List<VariableLine>();
+                    foreach (var warning in warningVLList)
+                    {
+                        if (warning.line >= node.line && warning.line <= node.endLine)
+                            variableLineList.Add(warning);
+                    }
 
-                stmtNumber++;
+                    if (variableLineList.Count > 0)
+                    {
+                        inputLines.Add(stmtNumber, variableLineList);
+                    }
+                    stmtNumber++;
+                }
             }
         }
 
