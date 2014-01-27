@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="Assembler\MicroFeatureTests.cs" />
     <Compile Include="Associative\BuiltinMethodsTest.cs" />
+    <Compile Include="Associative\FunctionObject.cs" />
     <Compile Include="Associative\Inheritance.cs" />
     <Compile Include="Associative\MethodResolution.cs" />
     <Compile Include="Associative\MethodsFocusTeam.cs" />
