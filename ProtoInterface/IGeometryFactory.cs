@@ -65,7 +65,7 @@ namespace Autodesk.DesignScript.Interfaces
         INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points);
         INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree);
         INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree, bool close_curve);
-        INurbsCurveEntity NurbsCurveByControlVertices(IPointEntity[] points, int degree, double[] weights, double[] knots);
+        INurbsCurveEntity NurbsCurveByControlVerticesWeightsKnots(IPointEntity[] points, double[] weights, double[] knots, int degree );
 
         INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] points);
         INurbsCurveEntity NurbsCurveByPoints(IPointEntity[] hosts, bool makePeriodic);
@@ -74,7 +74,7 @@ namespace Autodesk.DesignScript.Interfaces
 
         INurbsSurfaceEntity NurbsSurfaceByPoints(IPointEntity[][] points, int uDegree, int vDegree);
         INurbsSurfaceEntity NurbsSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree);
-        INurbsSurfaceEntity NurbsSurfaceByControlVertices(IPointEntity[][] controlVertices, int uDegree, int vDegree, double[][] weights, double[][] knots);
+        INurbsSurfaceEntity NurbsSurfaceByControlVerticesWeightsKnots(IPointEntity[][] controlVertices,double[][] weights, double[] knotsU, double[] knotsV,  int uDegree, int vDegree  );
 
         IPlaneEntity PlaneByOriginNormal(IPointEntity origin, IVectorEntity normal);
         IPlaneEntity PlaneByOriginNormalXAxis(IPointEntity origin, IVectorEntity normal, IVectorEntity xAxis);
@@ -127,7 +127,6 @@ namespace Autodesk.DesignScript.Interfaces
 
         IPolyMeshEntity PolyMeshByVerticesFaceIndices(IPointEntity[] vertices, IIndexGroupEntity[] indices);
 
-        IBlockHelper GetBlockHelper();
         IGeometryEntity[] LoadSat(string satFile);
         bool SaveSat(string satFile, Object[] ffiObjects);
         IGeometrySettings GetSettings();

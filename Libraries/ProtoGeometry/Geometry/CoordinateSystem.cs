@@ -19,7 +19,6 @@ namespace Autodesk.DesignScript.Geometry
         private Point mYPoint;
         private Curve mContextCurve;
         private Surface mContextSurface;
-        private static CoordinateSystem mWCS;
         private bool? isNormalized;
         #endregion
 

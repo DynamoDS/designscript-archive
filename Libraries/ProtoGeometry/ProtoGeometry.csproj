@@ -90,7 +90,6 @@
     <Compile Include="Core\GeometryExpressionBuilder.cs" />
     <Compile Include="Core\GraphicDataProvider.cs" />
     <Compile Include="Geometry\Arc.cs" />
-    <Compile Include="Geometry\Block.cs" />
     <Compile Include="Geometry\BoundingBox.cs" />
     <Compile Include="Geometry\IndexGroup.cs" />
     <Compile Include="Geometry\NurbsCurve.cs" />
