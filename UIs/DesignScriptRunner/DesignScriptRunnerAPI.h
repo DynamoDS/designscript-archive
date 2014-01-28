@@ -30,16 +30,16 @@ class DesignScriptObject;
 class DesignScriptConfiguration;
 class DesignScriptRunnerCallback;
 class DesignScriptNode;
-class GraphNodeWrapper;
+//class GraphNodeWrapper;
 
-class __declspec(novtable) GraphNode
+class __declspec(novtable) AstNode
 {
 public:
-    /*DESIGNSCRIPTRUNNER_API static GraphNode* create(const wchar_t* type, void* host_ptr, const wchar_t* methodName, const std::vector<const wchar_t*> inputs);*/
+    /*DESIGNSCRIPTRUNNER_API static AstNode* create(const wchar_t* type, void* host_ptr, const wchar_t* methodName, const std::vector<const wchar_t*> inputs);*/
 
-    GraphNode::GraphNode() {}
-    DESIGNSCRIPTRUNNER_API GraphNode(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*> selectionInputs, const std::vector<const wchar_t*> cmdInputs);
-    virtual ~GraphNode() = 0 {}
+    AstNode::AstNode() {}
+    DESIGNSCRIPTRUNNER_API AstNode(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*> selectionInputs, const std::vector<const wchar_t*> cmdInputs);
+    virtual ~AstNode() = 0 {}
     virtual const wchar_t* getNodeName() const = 0;
     virtual const wchar_t* getCode() const = 0;
 private:
@@ -129,17 +129,17 @@ public:
     /// Builds a delta AST node, compiles and executes it in the LiveRunner
     /// </summary>
     //virtual void updateGraph(List<AssociativeNode^>^ astList) = 0;
-    virtual void updateGraph(GraphNode* graphNode) = 0;
+    virtual void updateGraph(AstNode* graphNode) = 0;
 
     /// <summary>
     /// Builds a delta list of AST nodes for a function call in the LiveRunner
     /// </summary>
-    virtual GraphNode* buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString) = 0;
+    virtual AstNode* buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString) = 0;
 
     /// <summary>
     /// Builds a delta AST node for an array in the LiveRunner
     /// </summary>
-    virtual GraphNode* buildArrayNode(const std::vector<const wchar_t*>& arrayInputs) = 0;
+    virtual AstNode* buildArrayNode(const std::vector<const wchar_t*>& arrayInputs) = 0;
 
     virtual void getFunctionArgs(DesignScriptMethod* methodMirror, std::vector<const wchar_t*>& argNames, std::vector<DesignScriptClass*>& argTypes) = 0;
 };

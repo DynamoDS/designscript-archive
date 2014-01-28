@@ -58,12 +58,12 @@ void LiveRunnerWrapper::updateCLInterpreter(const wchar_t* codesegment)
     wrapper()->UpdateCmdLineInterpreter(WcharToString(codesegment));
 }
 
-void LiveRunnerWrapper::updateGraph(GraphNode* graphNode)
+void LiveRunnerWrapper::updateGraph(AstNode* graphNode)
 {
-    //TODO: Move buildAst() to GraphNode class and add a LiveRunner member to it, 
-    // add an abstract method to GraphNode that is implemented in GraphNodeWrapper
+    //TODO: Move buildAst() to AstNode class and add a LiveRunner member to it, 
+    // add an abstract method to AstNode that is implemented in AssociativeNodeWrapper
     // that calls this function - this will avoid the need for a dynamic cast
-    GraphNodeWrapper* gNode = dynamic_cast<GraphNodeWrapper*>(graphNode);
+    AssociativeNodeWrapper* gNode = dynamic_cast<AssociativeNodeWrapper*>(graphNode);
     if(gNode != NULL)
     {
         AssociativeNode^ astNode = gNode->wrapper();
@@ -116,15 +116,15 @@ void LiveRunnerWrapper::reInitializeLiveRunner()
     wrapper()->ReInitializeLiveRunner();
 }
 
-GraphNode* LiveRunnerWrapper::buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString)
+AstNode* LiveRunnerWrapper::buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString)
 {
-    GraphNodeWrapper* gNode = new GraphNodeWrapper(type, hostInstancePtr, methodName, selectionInputs, cmdInputs, formatString, wrapper()->Core);
+    AssociativeNodeWrapper* gNode = new AssociativeNodeWrapper(type, hostInstancePtr, methodName, selectionInputs, cmdInputs, formatString, wrapper()->Core);
     return gNode;
 }
 
-GraphNode* LiveRunnerWrapper::buildArrayNode(const std::vector<const wchar_t*>& arrayInputs)
+AstNode* LiveRunnerWrapper::buildArrayNode(const std::vector<const wchar_t*>& arrayInputs)
 {
-    return new GraphNodeWrapper(arrayInputs);
+    return new AssociativeNodeWrapper(arrayInputs);
 }
 
 void LiveRunnerWrapper::getFunctionArgs(DesignScriptMethod* methodMirror, std::vector<const wchar_t*>& argNames, std::vector<DesignScriptClass*>& argTypes)
@@ -137,7 +137,7 @@ void LiveRunnerWrapper::getFunctionArgs(DesignScriptMethod* methodMirror, std::v
     }
 }
 
-GraphNode::GraphNode(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*> selectionInputs, const std::vector<const wchar_t*> cmdInputs)
+AstNode::AstNode(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*> selectionInputs, const std::vector<const wchar_t*> cmdInputs)
 {
     this->type = type;
     this->hostInstancePtr = hostInstancePtr;
@@ -145,7 +145,7 @@ GraphNode::GraphNode(const wchar_t* type, void* hostInstancePtr, const wchar_t* 
     
 }
 
-GraphNodeWrapper::GraphNodeWrapper(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString, ProtoCore::Core^ core) 
+AssociativeNodeWrapper::AssociativeNodeWrapper(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString, ProtoCore::Core^ core) 
 {
     List<System::IntPtr>^ selectionList = gcnew List<System::IntPtr>();
     List<System::String^>^ inputList = gcnew List<System::String^>();
@@ -176,7 +176,7 @@ GraphNodeWrapper::GraphNodeWrapper(const wchar_t* type, void* hostInstancePtr, c
         m_code = NULL;
 }
 
-GraphNodeWrapper::GraphNodeWrapper(const std::vector<const wchar_t*>& arrayInputs)
+AssociativeNodeWrapper::AssociativeNodeWrapper(const std::vector<const wchar_t*>& arrayInputs)
 {
     List<System::String^>^ inputList = gcnew List<System::String^>();
     for(std::vector<const wchar_t*>::const_iterator it = arrayInputs.begin(); it != arrayInputs.end(); ++it)    
@@ -200,7 +200,7 @@ GraphNodeWrapper::GraphNodeWrapper(const std::vector<const wchar_t*>& arrayInput
         m_code = NULL;
 }
 
-GraphNodeWrapper::~GraphNodeWrapper()
+AssociativeNodeWrapper::~AssociativeNodeWrapper()
 {
     if(m_symbolName != NULL)
     {
@@ -215,12 +215,12 @@ GraphNodeWrapper::~GraphNodeWrapper()
     }
 }
 
-const wchar_t* GraphNodeWrapper::getNodeName() const
+const wchar_t* AssociativeNodeWrapper::getNodeName() const
 {
     return m_symbolName;
 }
 
-const wchar_t* GraphNodeWrapper::getCode() const
+const wchar_t* AssociativeNodeWrapper::getCode() const
 {
     return m_code;
 }
