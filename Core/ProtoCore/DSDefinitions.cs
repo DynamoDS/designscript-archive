@@ -14,6 +14,7 @@
         public const string Else = "else";
         public const string While = "while";
         public const string For = "for";
+        public const string In = "in";
         public const string Import = "import";
         public const string From = "from";
         public const string Break = "break";

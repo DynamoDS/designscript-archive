@@ -72,6 +72,29 @@ namespace ProtoCore.AST.AssociativeAST
 
             return Enumerable.SequenceEqual(Attributes, otherNode.Attributes);
         }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            string strLang = ProtoCore.Utils.CoreUtils.GetLanguageString(codeblock.language);
+
+            buf.Append("[");
+            buf.Append(strLang);
+            buf.Append("]");
+
+            buf.Append("\n");
+            buf.Append("{");
+            buf.Append("\n");
+
+            buf.Append(CodeBlockNode.ToString());
+
+            buf.Append("\n");
+            buf.Append("}");
+            buf.Append("\n");
+
+            return buf.ToString();
+        }
     }
 
     /// <summary>
