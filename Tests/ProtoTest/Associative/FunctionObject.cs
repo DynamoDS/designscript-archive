@@ -22,7 +22,7 @@ import (""FunctionObject.ds"");
 def add(x,y) { return = x + y;}
 
 // fo = add(?, 42);
-fo = SingleFunctionObject(add, 2, {1}, {null, 42});
+fo = _SingleFunctionObject(add, 2, {1}, {null, 42});
 r = Apply(fo, 3);
 ";
             thisTest.RunScriptSource(code);
@@ -38,7 +38,7 @@ import (""FunctionObject.ds"");
 def add(x,y,z) { return = x + y + z;}
 
 // foo1 = add(?, 42, ?);
-fo1 = SingleFunctionObject(add, 3, {1}, {null, 42, null});
+fo1 = _SingleFunctionObject(add, 3, {1}, {null, 42, null});
 
 // foo2 = add(100, 42, ?);
 fo2 = Apply(fo1, 100);
@@ -58,7 +58,7 @@ import (""FunctionObject.ds"");
 def add(x,y) { return = x + y;}
 
 // fo = add(?, {100, 200});
-fo = SingleFunctionObject(add, 2, {1}, {null, {100, 200}});
+fo = _SingleFunctionObject(add, 2, {1}, {null, {100, 200}});
 r = Apply(fo, {1, 2});
 ";
             thisTest.RunScriptSource(code);
@@ -74,7 +74,7 @@ import (""FunctionObject.ds"");
 def add(x,y) { return = x + y;}
 
 // fo = add(?, {100, 200});
-fo = SingleFunctionObject(add, 2, {1}, {null, {100, 200}});
+fo = _SingleFunctionObject(add, 2, {1}, {null, {100, 200}});
 r = Apply(fo, 1);
 ";
             thisTest.RunScriptSource(code);
@@ -90,7 +90,7 @@ import (""FunctionObject.ds"");
 def add(x,y) { return = x + y;}
 
 // fo = add(?, {100, 200});
-fo = SingleFunctionObject(add, 2, {1}, {null, {100, 200}});
+fo = _SingleFunctionObject(add, 2, {1}, {null, {100, 200}});
 r = Apply(fo, {1});
 ";
             thisTest.RunScriptSource(code);
@@ -108,7 +108,7 @@ def add(x,y) { return = x + y;}
 
 def getFunctionObject()
 {
-    return = SingleFunctionObject(add, 2, {1}, {null, 100});
+    return = _SingleFunctionObject(add, 2, {1}, {null, 100});
 }
 
 fo = getFunctionObject();
@@ -131,7 +131,7 @@ def add(x,y) { return = x + y;}
 def mul(x,y) { return = x * y;}
 def getFunctionObject(f:function)
 {
-    return = SingleFunctionObject(f, 2, {1}, {null, 100});
+    return = _SingleFunctionObject(f, 2, {1}, {null, 100});
 }
 
 fo1 = getFunctionObject(add);
@@ -155,7 +155,7 @@ def add(x,y) { return = x + y;}
 def mul(x,y) { return = x * y;}
 def getFunctionObject(f:function)
 {
-    return = SingleFunctionObject(f, 2, {1}, {null, 100});
+    return = _SingleFunctionObject(f, 2, {1}, {null, 100});
 }
 
 fo = getFunctionObject({add, mul});
@@ -174,9 +174,9 @@ import (""FunctionObject.ds"");
 def add(x,y) { return = x + y;}
 def mul(x, y) { return = x * y;}
 
-fo1 = SingleFunctionObject(add, 2, {1}, {null, 100});
-fo2 = SingleFunctionObject(mul, 2, {0}, {3, null});
-fo3 = ComposedFunctionObject({fo1, fo2});
+fo1 = _SingleFunctionObject(add, 2, {1}, {null, 100});
+fo2 = _SingleFunctionObject(mul, 2, {0}, {3, null});
+fo3 = _ComposedFunctionObject({fo1, fo2});
 
 // r = 2 * 3 + 100
 r = Apply(fo3, 2);
@@ -194,8 +194,8 @@ import (""FunctionObject.ds"");
 def add(x,y) { return = x + y;}
 def mul(x, y) { return = x * y;}
 
-fo1 = SingleFunctionObject(add, 2, {1}, {null, 100});
-fo2 = ComposedFunctionObject({fo1, fo1});
+fo1 = _SingleFunctionObject(add, 2, {1}, {null, 100});
+fo2 = _ComposedFunctionObject({fo1, fo1});
 
 // r = 42 + 100 + 100
 r = Apply(fo2, 42);
@@ -214,8 +214,8 @@ def add(x, y) { return = x + y; }
 
 def mul(x, y) { return = x * y; }
 
-fo1 = SingleFunctionObject(add, 2, { 1 }, { null, 3});
-fo2 = SingleFunctionObject(mul, 2, { 0 }, { 5, null });
+fo1 = _SingleFunctionObject(add, 2, { 1 }, { null, 3});
+fo2 = _SingleFunctionObject(mul, 2, { 0 }, { 5, null });
 
 r1 = Apply(fo1, 7);     // 3 + 7
 r2 = Apply(fo2, 11);    // 5 * 11

@@ -1,4 +1,4 @@
-class FunctionObject
+class _FunctionObject
 {
     def DoEvaluate(v:var[]..[])
     {
@@ -6,17 +6,17 @@ class FunctionObject
     }
 }
 
-class SingleFunctionObject extends FunctionObject
+class _SingleFunctionObject extends _FunctionObject
 {
     __functionPointers : function;
     __argumtNumber : int;
     __params : var[]..[];
     __hasParamAt : bool[];
     
-    constructor SingleFunctionObject(fptr : function, 
-                                     argNumber: int, 
-                                     paramPositions : int[], 
-                                     params : var[]..[])
+    constructor _SingleFunctionObject(fptr : function, 
+                                      argNumber: int, 
+                                      paramPositions : int[], 
+                                      params : var[]..[])
     {
         __functionPointers = fptr;
         __argumtNumber = argNumber;
@@ -80,7 +80,7 @@ class SingleFunctionObject extends FunctionObject
                         }
                     }
                 
-                    return = SingleFunctionObject.SingleFunctionObject(
+                    return = _SingleFunctionObject._SingleFunctionObject(
                                                 __functionPointers,
                                                 __argumtNumber,
                                                 _paramPositions,
@@ -91,11 +91,11 @@ class SingleFunctionObject extends FunctionObject
     }
 }
 
-class ComposedFunctionObject extends FunctionObject
+class _ComposedFunctionObject extends _FunctionObject
 {
-    __funcs : FunctionObject[];
+    __funcs : _FunctionObject[];
     
-    constructor ComposedFunctionObject(funcs : FunctionObject[])
+    constructor _ComposedFunctionObject(funcs : _FunctionObject[])
     {
         __funcs = funcs;
     }
@@ -117,12 +117,12 @@ class ComposedFunctionObject extends FunctionObject
     }
 }
 
-def Apply(functionObject: FunctionObject, param: var[]..[])
+def Apply(functionObject: _FunctionObject, param: var[]..[])
 {
     return = functionObject.DoEvaluate(param);
 }
 
-def Compose(funcs : FunctionObject[])
+def Compose(funcs : _FunctionObject[])
 {
-    return = ComposedFunctionObject(funcs);
+    return = _ComposedFunctionObject(funcs);
 }
