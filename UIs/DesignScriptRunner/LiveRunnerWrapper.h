@@ -21,26 +21,26 @@ public:
     //virtual DesignScriptObject* getCoreDump();
     virtual const wchar_t* getCoreDumpCmdLineREPL();
     virtual void reInitializeLiveRunner();
-    virtual GraphNode* buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString);
-    virtual GraphNode* buildArrayNode(const std::vector<const wchar_t*>& arrayInputs);
+    virtual AstNode* buildAst(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString);
+    virtual AstNode* buildArrayNode(const std::vector<const wchar_t*>& arrayInputs);
 
     virtual void getFunctionArgs(DesignScriptMethod* methodMirror, std::vector<const wchar_t*>& argNames, std::vector<DesignScriptClass*>& argTypes);
 
     virtual std::vector<DesignScriptObject*>* resetAndImportLibrary(const std::vector<const wchar_t*>& libraries);
     
-    void updateGraph(GraphNode* graphNode);
+    void updateGraph(AstNode* graphNode);
 private:
     DesignScriptRunnerCallback* mpCallback;
     unsigned int mNodeId;
 };
 
-class GraphNodeWrapper : public WrapperObject<AssociativeNode, GraphNode>
+class AssociativeNodeWrapper : public WrapperObject<AssociativeNode, AstNode>
 {
 public:
-    GraphNodeWrapper(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString, ProtoCore::Core^ core);
-    GraphNodeWrapper(const std::vector<const wchar_t*>& arrayInputs);
+    AssociativeNodeWrapper(const wchar_t* type, void* hostInstancePtr, const wchar_t* methodName, const std::vector<void*>& selectionInputs, const std::vector<const wchar_t*>& cmdInputs, const wchar_t* formatString, ProtoCore::Core^ core);
+    AssociativeNodeWrapper(const std::vector<const wchar_t*>& arrayInputs);
 
-    virtual ~GraphNodeWrapper();
+    virtual ~AssociativeNodeWrapper();
     virtual const wchar_t* getNodeName() const;
     virtual const wchar_t* getCode() const;
 public:
