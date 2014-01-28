@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
+using ProtoCore.Utils;
+using ProtoCore.DSASM;
 
 namespace ProtoCore.AST.ImperativeAST
 {
@@ -40,6 +44,29 @@ namespace ProtoCore.AST.ImperativeAST
         public List<ImperativeNode> Attributes { get; set; }
         public ProtoCore.LanguageCodeBlock codeblock { get; set; }
         public Node CodeBlockNode { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            string strLang = ProtoCore.Utils.CoreUtils.GetLanguageString(codeblock.language);
+
+            buf.Append("[");
+            buf.Append(strLang);
+            buf.Append("]");
+
+            buf.Append("\n");
+            buf.Append("{");
+            buf.Append("\n");
+
+            buf.Append(CodeBlockNode.ToString());
+
+            buf.Append("\n");
+            buf.Append("}");
+            buf.Append("\n");
+
+            return buf.ToString();
+        }
     }
 
     public class ArrayNameNode : ImperativeNode
@@ -58,6 +85,18 @@ namespace ProtoCore.AST.ImperativeAST
             {
                 ArrayDimensions = new ArrayNode(rhs.ArrayDimensions);
             }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            if (ArrayDimensions != null)
+            {
+                buf.Append(ArrayDimensions.ToString());
+            }
+
+            return buf.ToString();
         }
     }
 
@@ -110,6 +149,11 @@ namespace ProtoCore.AST.ImperativeAST
         public ProtoCore.Type datatype { get; set; }
         public string Value { get; set; }
         public string ArrayName { get; set; }
+
+        public override string ToString()
+        {
+            return Value.Replace("%", string.Empty) + base.ToString();
+        }
     }
 
     public class TypedIdentifierNode: IdentifierNode
@@ -134,6 +178,11 @@ namespace ProtoCore.AST.ImperativeAST
         {
             value = rhs.value;
         }
+
+        public override string ToString()
+        {
+            return value;
+        }
     }
 
     public class DoubleNode : ImperativeNode
@@ -147,6 +196,11 @@ namespace ProtoCore.AST.ImperativeAST
             : base(rhs)
         {
             value = rhs.value;
+        }
+
+        public override string ToString()
+        {
+            return value;
         }
     }
 
@@ -162,6 +216,11 @@ namespace ProtoCore.AST.ImperativeAST
         {
             value = rhs.value;
         }
+
+        public override string ToString()
+        {
+            return value;
+        }
     }
 
     public class CharNode : ImperativeNode
@@ -174,6 +233,11 @@ namespace ProtoCore.AST.ImperativeAST
         public CharNode(CharNode rhs)
         {
             value = rhs.value;
+        }
+
+        public override string ToString()
+        {
+            return "'" + value + "'";
         }
     }
 
@@ -189,10 +253,19 @@ namespace ProtoCore.AST.ImperativeAST
         {
             value = rhs.value;
         }
+
+        public override string ToString()
+        {
+            return "\"" + value + "\"";
+        }
     }
 
     public class NullNode : ImperativeNode
     {
+        public override string ToString()
+        {
+            return ProtoCore.DSDefinitions.Keyword.Null;
+        }
     }
 
     public class ArrayNode : ImperativeNode
@@ -224,6 +297,23 @@ namespace ProtoCore.AST.ImperativeAST
 
         public ImperativeNode Expr { get; set; }
         public ImperativeNode Type { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            if (null != Expr)
+            {
+                buf.Append("[");
+                buf.Append(Expr.ToString());
+                buf.Append("]");
+            }
+
+            if (null != Type)
+                buf.Append(Type.ToString());
+
+            return buf.ToString();
+        }
     }
 
     public class FunctionCallNode : ArrayNameNode 
@@ -255,6 +345,64 @@ namespace ProtoCore.AST.ImperativeAST
                 FormalArguments.Add(tempNode);
             }
         }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+            string functionName = (Function as IdentifierNode).Value;
+            string postfix = base.ToString();
+
+            if (CoreUtils.IsInternalMethod(functionName))
+            {
+                if (!string.IsNullOrEmpty(postfix))
+                    buf.Append("(");
+
+                string nameWithoutPrefix = functionName.Substring(DSASM.Constants.kInternalNamePrefix.Length);
+                Operator op;
+                UnaryOperator uop;
+
+                if (Enum.TryParse<Operator>(nameWithoutPrefix, out op))
+                {
+                    buf.Append(FormalArguments[0].ToString());
+                    buf.Append(" " + Op.GetOpSymbol(op) + " ");
+                    buf.Append(FormalArguments[1].ToString());
+                }
+                else if (Enum.TryParse<UnaryOperator>(nameWithoutPrefix, out uop))
+                {
+                    buf.Append(Op.GetUnaryOpSymbol(uop));
+                    buf.Append(FormalArguments[0].ToString());
+                }
+                else
+                {
+                    return ProtoCore.DSDefinitions.Keyword.Null;
+                }
+
+                if (!string.IsNullOrEmpty(postfix))
+                    buf.Append(")");
+            }
+            else
+            {
+                buf.Append(functionName);
+                buf.Append("(");
+
+                if (FormalArguments != null)
+                {
+                    for (int n = 0; n < FormalArguments.Count; ++n)
+                    {
+                        buf.Append(FormalArguments[n]);
+                        if (n < FormalArguments.Count - 1)
+                        {
+                            buf.Append(", ");
+                        }
+                    }
+                }
+                buf.Append(")");
+            }
+
+            buf.Append(postfix);
+
+            return buf.ToString();
+        }
     }
 
     public class VarDeclNode : ImperativeNode
@@ -267,6 +415,27 @@ namespace ProtoCore.AST.ImperativeAST
         public ProtoCore.DSASM.MemoryRegion memregion { get; set; }
         public ProtoCore.Type ArgumentType { get; set; }
         public ImperativeNode NameNode { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            if (NameNode is TypedIdentifierNode)
+            {
+                buf.AppendLine(NameNode.ToString());
+            }
+            else if (NameNode is IdentifierNode)
+            {
+                buf.Append(NameNode.ToString());
+                string argType = ArgumentType.ToString();
+                if (!string.IsNullOrEmpty(argType))
+                    buf.Append(" : " + argType);
+            }
+            else
+                buf.Append(NameNode.ToString());
+
+            return buf.ToString();
+        }
     }
 
     public class ReturnNode : ImperativeNode
@@ -286,6 +455,18 @@ namespace ProtoCore.AST.ImperativeAST
         public void AddArgument(VarDeclNode arg)
         {
             Arguments.Add(arg);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+            for (int i = 0; i < Arguments.Count; ++i)
+            {
+                buf.Append(Arguments[i].ToString());
+                if (i < Arguments.Count - 1)
+                    buf.Append(", ");
+            }
+            return buf.ToString();
         }
     }
 
@@ -309,6 +490,26 @@ namespace ProtoCore.AST.ImperativeAST
         }
 
         public List<ImperativeNode> list { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append("{");
+            if (list != null)
+            {
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    buf.Append(list[i].ToString());
+                    if (i < list.Count - 1)
+                        buf.Append(", ");
+                }
+            }
+            buf.Append("}");
+            buf.Append(base.ToString());
+
+            return buf.ToString();
+        }
     }
 
     public class CodeBlockNode : ImperativeNode
@@ -329,6 +530,16 @@ namespace ProtoCore.AST.ImperativeAST
         }
 
         public List<ImperativeNode> Body { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+            foreach (ImperativeNode node in Body)
+            {
+                buf.Append(node.ToString());
+            }
+            return buf.ToString();
+        }
     }
 
     public class ConstructorDefinitionNode : ImperativeNode
@@ -352,6 +563,21 @@ namespace ProtoCore.AST.ImperativeAST
         public ImperativeNode ConditionExpression { get; set; }
         public ImperativeNode TrueExpression { get; set; }
         public ImperativeNode FalseExpression { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append("(");
+            buf.Append(ConditionExpression == null ? DSDefinitions.Keyword.Null : ConditionExpression.ToString());
+            buf.Append(" ? ");
+            buf.Append(TrueExpression == null ? DSDefinitions.Keyword.Null : TrueExpression.ToString());
+            buf.Append(" : ");
+            buf.Append(FalseExpression == null ? DSDefinitions.Keyword.Null : FalseExpression.ToString());
+            buf.Append(")");
+
+            return buf.ToString();
+        }
     }
 
     public class BinaryExpressionNode : ImperativeNode
@@ -376,6 +602,32 @@ namespace ProtoCore.AST.ImperativeAST
             Optr = rhs.Optr;
             LeftNode = rhs.LeftNode == null ? null : ProtoCore.Utils.NodeUtils.Clone(rhs.LeftNode);
             RightNode = rhs.RightNode == null ? null : ProtoCore.Utils.NodeUtils.Clone(rhs.RightNode);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            bool needBracket = LeftNode is BinaryExpressionNode || LeftNode is InlineConditionalNode || LeftNode is RangeExprNode;
+            if (needBracket)
+                buf.Append("(");
+            buf.Append(LeftNode.ToString());
+            if (needBracket)
+                buf.Append(")");
+
+            buf.Append(" " + CoreUtils.GetOperatorString(Optr) + " ");
+
+            needBracket = RightNode is BinaryExpressionNode || RightNode is InlineConditionalNode || RightNode is RangeExprNode;
+            if (needBracket)
+                buf.Append("(");
+            buf.Append(RightNode.ToString());
+            if (needBracket)
+                buf.Append(")");
+
+            if (DSASM.Operator.assign == Optr)
+                buf.Append(DSASM.Constants.termline);
+
+            return buf.ToString();
         }
     }
 
@@ -405,6 +657,31 @@ namespace ProtoCore.AST.ImperativeAST
         public ImperativeNode Expr { get; set; }
         public List<ImperativeNode> Body { get; set; }
         public ImperativeNode ElseIfBodyPosition { get; set; }
+
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            // elseif statement
+            buf.Append(ProtoCore.DSDefinitions.Keyword.Elseif);
+            buf.Append("(");
+            buf.Append(Expr);
+            buf.Append(")");
+
+            // elseif body
+            buf.Append("\n");
+            buf.Append("{");
+            buf.Append("\n");
+            foreach (ImperativeNode node in Body)
+            {
+                buf.Append(node.ToString());
+            }
+            buf.Append("\n");
+            buf.Append("}");
+            buf.Append("\n");
+            return buf.ToString();
+        }
     }
 
     public class IfStmtPositionNode: ImperativeNode
@@ -473,6 +750,55 @@ namespace ProtoCore.AST.ImperativeAST
         public List<ElseIfBlock> ElseIfList { get; set; }
         public List<ImperativeNode> ElseBody { get; set; }
         public ImperativeNode ElseBodyPosition { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            // If statement
+            buf.Append(ProtoCore.DSDefinitions.Keyword.If);
+            buf.Append("(");
+            buf.Append(IfExprNode);  
+            buf.Append(")");
+            
+            // If body
+            buf.Append("\n");
+            buf.Append("{");
+            buf.Append("\n");
+            foreach (ImperativeNode node in IfBody)
+            {
+                buf.Append(node.ToString());
+            }
+            buf.Append("\n");
+            buf.Append("}");
+            buf.Append("\n");
+
+            // Else if
+            foreach (ImperativeNode node in ElseIfList)
+            {
+                buf.Append(node.ToString());
+            }
+
+            if (ElseBody.Count > 0)
+            {
+                // else statement
+                buf.Append(ProtoCore.DSDefinitions.Keyword.Else);
+
+                // else body
+                buf.Append("\n");
+                buf.Append("{");
+                buf.Append("\n");
+                foreach (ImperativeNode node in ElseBody)
+                {
+                    buf.Append(node.ToString());
+                }
+                buf.Append("\n");
+                buf.Append("}");
+                buf.Append("\n");
+            }
+
+            return buf.ToString();
+        }
     }
 
     public class WhileStmtNode : ImperativeNode
@@ -495,6 +821,32 @@ namespace ProtoCore.AST.ImperativeAST
 
         public ImperativeNode Expr { get; set; }
         public List<ImperativeNode> Body { get; set; }
+
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            // If statement
+            buf.Append(ProtoCore.DSDefinitions.Keyword.While);
+            buf.Append("(");
+            buf.Append(Expr);
+            buf.Append(")");
+
+            // If body
+            buf.Append("\n");
+            buf.Append("{");
+            buf.Append("\n");
+            foreach (ImperativeNode node in Body)
+            {
+                buf.Append(node.ToString());
+            }
+            buf.Append("\n");
+            buf.Append("}");
+            buf.Append("\n");
+
+            return buf.ToString();
+        }
     }
 
     public class UnaryExpressionNode : ImperativeNode
@@ -535,6 +887,41 @@ namespace ProtoCore.AST.ImperativeAST
             }
             stepoperator = rhs.stepoperator;
         }
+
+        // Check if this can be unified associative range expr 
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            string postfix = base.ToString();
+            if (!string.IsNullOrEmpty(postfix))
+                buf.Append("(");
+
+            buf.Append(FromNode.ToString());
+            buf.Append("..");
+            buf.Append(ToNode.ToString());
+
+            if (StepNode != null)
+            {
+                buf.Append("..");
+                if (DSASM.RangeStepOperator.approxsize == stepoperator)
+                {
+                    buf.Append("~");
+                }
+                else if (DSASM.RangeStepOperator.num == stepoperator)
+                {
+                    buf.Append("#");
+                }
+                buf.Append(StepNode.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(postfix))
+                buf.Append(")");
+
+            buf.Append(postfix);
+
+            return buf.ToString();
+        }
     }
 
     public class ForLoopNode : ImperativeNode
@@ -569,6 +956,36 @@ namespace ProtoCore.AST.ImperativeAST
         public ImperativeNode loopVar { get; set; }
         public ImperativeNode expression { get; set; }
         public List<ImperativeNode> body { get; set; }
+
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+
+            // If statement
+            buf.Append(ProtoCore.DSDefinitions.Keyword.For);
+            buf.Append("(");
+            buf.Append(loopVar);
+            buf.Append(" ");
+            buf.Append(ProtoCore.DSDefinitions.Keyword.In);
+            buf.Append(" ");
+            buf.Append(expression);
+            buf.Append(")");
+
+            // If body
+            buf.Append("\n");
+            buf.Append("{");
+            buf.Append("\n");
+            foreach (ImperativeNode node in body)
+            {
+                buf.Append(node.ToString());
+            }
+            buf.Append("\n");
+            buf.Append("}");
+            buf.Append("\n");
+
+
+            return buf.ToString();
+        }
     }
 
     public class IdentifierListNode : ImperativeNode
@@ -587,6 +1004,11 @@ namespace ProtoCore.AST.ImperativeAST
             LeftNode = ProtoCore.Utils.NodeUtils.Clone(rhs.LeftNode);
             RightNode = ProtoCore.Utils.NodeUtils.Clone(rhs.RightNode);
         }
+
+        public override string ToString()
+        {
+            return LeftNode.ToString() + "." + RightNode.ToString();
+        }
     }
 
     public class PostFixNode : ImperativeNode
@@ -597,10 +1019,24 @@ namespace ProtoCore.AST.ImperativeAST
 
     public class BreakNode: ImperativeNode
     {
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+            buf.Append(ProtoCore.DSDefinitions.Keyword.Break);
+            buf.Append(";");
+            return buf.ToString();
+        }
     }
 
     public class ContinueNode: ImperativeNode
     {
+        public override string ToString()
+        {
+            StringBuilder buf = new StringBuilder();
+            buf.Append(ProtoCore.DSDefinitions.Keyword.Continue);
+            buf.Append(";");
+            return buf.ToString();
+        }
     }
 
     public class DefaultArgNode : ImperativeNode
