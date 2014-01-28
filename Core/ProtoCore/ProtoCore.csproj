@@ -195,6 +195,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ExtendedLibraries\FunctionObject.ds" />
     <None Include="Parser\atg\Associative.atg" />
     <None Include="Parser\atg\End.atg" />
     <None Include="Parser\atg\Imperative.atg" />
@@ -210,4 +211,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(ProjectDir)ExtendedLibraries\*.ds" "$(OutputPath)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
