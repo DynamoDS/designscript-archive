@@ -30,7 +30,6 @@ class DesignScriptObject;
 class DesignScriptConfiguration;
 class DesignScriptRunnerCallback;
 class DesignScriptNode;
-//class GraphNodeWrapper;
 
 class __declspec(novtable) AstNode
 {
