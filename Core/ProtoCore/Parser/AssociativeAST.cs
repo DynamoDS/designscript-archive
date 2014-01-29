@@ -1990,25 +1990,26 @@ namespace ProtoCore.AST.AssociativeAST
             return cond;
         }
 
-        public static AssociativeNode BuildFunctionCall(string function,
-                                                        List<AssociativeNode> arguments, Core core = null)
+        public static AssociativeNode BuildFunctionCall(string className,
+                                                        string functionName,
+                                                        List<AssociativeNode> arguments, 
+                                                        Core core = null)
         {
-            string[] dotcalls = function.Split('.');
-            string functionName = dotcalls[dotcalls.Length - 1];
+            return new IdentifierListNode
+            {
+                LeftNode = new IdentifierNode(className),
+                RightNode = AstFactory.BuildFunctionCall(functionName, arguments)
+            };
+        }
 
+        public static AssociativeNode BuildFunctionCall(string functionName,
+                                                        List<AssociativeNode> arguments,
+                                                        Core core = null)
+        {
             FunctionCallNode funcCall = new FunctionCallNode();
             funcCall.Function = BuildIdentifier(functionName);
             funcCall.FormalArguments = arguments;
-
-            if (dotcalls.Length == 1)
-            {
-                return funcCall;
-            }
-            else
-            {
-                IdentifierNode lhs = BuildIdentifier(dotcalls[0]);
-                return CoreUtils.GenerateCallDotNode(lhs, funcCall, core);
-            }
+            return funcCall;
         }
 
         public static IdentifierNode BuildIdentifier(string name)
