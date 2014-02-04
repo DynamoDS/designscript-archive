@@ -157,6 +157,8 @@ namespace ProtoScript.Runners
         private Options executionOptions = null;
         private bool syncCoreConfigurations = false;
         private int deltaSymbols = 0;
+        private bool isPreloadingLibraries = false;
+        private int codeBlockCount = 0;
         private ProtoCore.CompileTime.Context staticContext = null;
 
         private Dictionary<System.Guid, Subtree> currentSubTreeList = null;
@@ -744,7 +746,25 @@ namespace ProtoScript.Runners
         /// </summary>
         private void RetainVMStatesForDeltaExecution()
         {
-            runnerCore.CompleteCodeBlockList.Clear();
+            if (isPreloadingLibraries)
+            {
+                codeBlockCount = runnerCore.CompleteCodeBlockList.Count;
+            }
+            else
+            {
+                if (codeBlockCount > 0)
+                {
+                    int removeCount = runnerCore.CompleteCodeBlockList.Count - codeBlockCount;
+                    if (removeCount > 0)
+                    {
+                        runnerCore.CompleteCodeBlockList.RemoveRange(codeBlockCount, removeCount);
+                    }
+                }
+                else
+                {
+                    runnerCore.CompleteCodeBlockList.Clear();
+                }
+            }
         }
 
         /// <summary>
@@ -932,7 +952,9 @@ namespace ProtoScript.Runners
             ProtoCore.CodeGenDS codeGen = new ProtoCore.CodeGenDS(importNodes);
             string code = codeGen.GenerateCode();
 
+            isPreloadingLibraries = true;
             UpdateCmdLineInterpreter(code);
+            isPreloadingLibraries = false;
         }
 
         /// <summary>
