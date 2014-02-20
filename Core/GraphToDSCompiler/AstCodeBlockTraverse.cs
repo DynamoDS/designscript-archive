@@ -17,16 +17,14 @@ namespace GraphToDSCompiler
         /// </summary>
         protected ProtoCore.AST.AssociativeAST.BinaryExpressionNode ChildTree { get; set; }
 
-        public AstCodeBlockTraverse(List<ProtoCore.AST.AssociativeAST.AssociativeNode> astList)
-        //: base(astList)
-        { }
+        public AstCodeBlockTraverse() { }
 
         public AstCodeBlockTraverse(ProtoCore.AST.AssociativeAST.BinaryExpressionNode bNode)
         {
             ChildTree = bNode;
         }
 
-        protected void EmitIdentifierNode(ref ProtoCore.AST.AssociativeAST.AssociativeNode identNode)
+        protected virtual void EmitIdentifierNode(ref ProtoCore.AST.AssociativeAST.AssociativeNode identNode)
         {
 
             ProtoCore.AST.AssociativeAST.IdentifierNode iNode = ChildTree.LeftNode as ProtoCore.AST.AssociativeAST.IdentifierNode;
@@ -42,6 +40,12 @@ namespace GraphToDSCompiler
             }
         }
 
+        //=======================
+
+        /// <summary>
+        /// Depth first traversal of an AST node
+        /// </summary>
+        /// <param name="node"></param>
         public void DFSTraverse(ref ProtoCore.AST.AssociativeAST.AssociativeNode node)
         {
             if (node is ProtoCore.AST.AssociativeAST.IdentifierNode)
@@ -110,13 +114,6 @@ namespace GraphToDSCompiler
 
         }
 
-        //=======================
-
-        /// <summary>
-        /// Depth first traversal of an AST node
-        /// </summary>
-        /// <param name="node"></param>
-
         /// <summary>
         /// These functions emit the DesignScript code on the destination stream
         /// </summary>
@@ -136,7 +133,7 @@ namespace GraphToDSCompiler
             }
         }
 
-        private void EmitExprListNode(ref ProtoCore.AST.AssociativeAST.ExprListNode exprListNode)
+        protected virtual void EmitExprListNode(ref ProtoCore.AST.AssociativeAST.ExprListNode exprListNode)
         {
             for (int i = 0; i < exprListNode.list.Count; i++)
             {
@@ -184,6 +181,7 @@ namespace GraphToDSCompiler
                 funcCallNode.FormalArguments[n] = argNode;
                 if (n + 1 < funcCallNode.FormalArguments.Count)
                 {
+
                 }
             }
         }

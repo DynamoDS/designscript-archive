@@ -3,7 +3,6 @@
 #include "WrapperObject.h"
 
 using namespace ProtoScript::Runners;
-using namespace GraphToDSCompiler;
 using namespace ProtoCore::AST::AssociativeAST;
 using namespace System::Collections::Generic;
 

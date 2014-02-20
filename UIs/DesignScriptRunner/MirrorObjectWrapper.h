@@ -1,5 +1,6 @@
 #pragma once
 #include "WrapperObject.h"
+#include "StringUtils.h"
 
 using namespace ProtoCore::Mirror;
 
@@ -68,7 +69,7 @@ public:
 
     virtual const wchar_t* name() const;
     virtual bool isConstructor() const;
-    virtual std::vector<const wchar_t*> getArgumentNames() const;
-    virtual std::vector<DesignScriptClass*> getArgumentTypes(ProtoCore::Core^ core) const;
-    
+    std::vector<const wchar_t*> getArgumentNames() const;
+    std::vector<DesignScriptClass*> getArgumentTypes(ProtoCore::Core^ core) const;
+  
 };
